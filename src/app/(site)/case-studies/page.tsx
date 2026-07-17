@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = createMetadata({
   title: "Case studies",
   description: "Selected work from Credible Creators — bookings that became partnerships.",

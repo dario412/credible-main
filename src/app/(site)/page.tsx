@@ -7,6 +7,8 @@ import { KeyStudy } from "@/components/key-study";
 import { LatestInsights } from "@/components/latest-insights";
 import { BrandBrief } from "@/components/brand-brief";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = createMetadata({
   path: "/",
   description:

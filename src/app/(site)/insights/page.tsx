@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = createMetadata({
   title: "Insights",
   description: "Perspectives on the expert economy from Credible Creators.",

@@ -4,12 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 import { ButtonLink } from "@/components/ui";
 
-type Props = { params: Promise<{ slug: string }> };
+export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  const studies = await prisma.caseStudy.findMany({ select: { slug: true } });
-  return studies.map((s) => ({ slug: s.slug }));
-}
+type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;

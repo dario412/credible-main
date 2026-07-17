@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 import { RosterFilters } from "@/components/roster-filters";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = createMetadata({
   title: "Roster",
   description:

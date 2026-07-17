@@ -3,12 +3,9 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 
-type Props = { params: Promise<{ slug: string }> };
+export const dynamic = "force-dynamic";
 
-export async function generateStaticParams() {
-  const insights = await prisma.insight.findMany({ select: { slug: true } });
-  return insights.map((i) => ({ slug: i.slug }));
-}
+type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
