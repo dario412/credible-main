@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Credible Creators
 
-## Getting Started
+SEO-optimized website and admin portal for Credible Creators — a talent agency for the expert economy.
 
-First, run the development server:
+## Stack
+
+- Next.js (App Router) + TypeScript + Tailwind CSS
+- PostgreSQL + Prisma
+- Auth.js (credentials) + TOTP two-factor authentication
+
+## Quick start
+
+1. Copy env and start Postgres:
+
+```bash
+cp .env.example .env
+docker compose up -d
+```
+
+2. Install, migrate, seed:
+
+```bash
+npm install
+npx prisma migrate dev
+npm run db:seed
+```
+
+3. Run the app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Admin: [http://localhost:3000/admin/login](http://localhost:3000/admin/login).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Seeded owner
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Email: `dario@positivestudio.co` (override with `ADMIN_EMAIL`)
+- Password: set via `ADMIN_PASSWORD` in `.env`
+- On first login you will be prompted to enrol 2FA (Authenticator app)
 
-## Learn More
+## Public pages
 
-To learn more about Next.js, take a look at the following resources:
+| Path | Description |
+|------|-------------|
+| `/` | Home + waitlist |
+| `/roster` | Experts with filters |
+| `/roster/[slug]` | Expert profile |
+| `/what-we-do` | Services |
+| `/case-studies`, `/case-studies/[slug]` | Case studies |
+| `/insights`, `/insights/[slug]` | Insights |
+| `/about`, `/contact`, `/privacy`, `/terms` | Site pages |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Admin (noindex)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Admin routes are excluded from `robots.txt` and use `robots: noindex`.
 
-## Deploy on Vercel
+| Path | Access |
+|------|--------|
+| `/admin` | Dashboard |
+| `/admin/leads` | All form submissions |
+| `/admin/users` | User management (Owner) |
+| `/admin/style-guide` | Design system reference |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Roles
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Owner** — view leads, manage users, manage content (reserved)
+- **Editor** — view leads, manage content (reserved)
+- **Viewer** — view leads only
+
+## Environment
+
+See `.env.example`:
+
+- `DATABASE_URL` — Postgres connection string
+- `AUTH_SECRET` — `openssl rand -base64 32`
+- `AUTH_URL` / `NEXT_PUBLIC_SITE_URL` — public site URL
+- `ADMIN_EMAIL` / `ADMIN_PASSWORD` — used only by the seed script

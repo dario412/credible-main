@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum LeadSource {
+  WAITLIST
+  CONTACT
+}
+
+enum LeadStatus {
+  NEW
+  READ
+  ARCHIVED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  role         Role     @default(VIEWER)
+  totpSecret   String?
+  totpEnabled  Boolean  @default(false)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdById  String?
+  createdBy    User?    @relation("UserCreatedBy", fields: [createdById], references: [id])
+  createdUsers User[]   @relation("UserCreatedBy")
+}
+
+model Expert {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  title       String
+  bio         String
+  shortBio    String?
+  image       String?
+  categories  String[]
+  topics      String[]
+  featured    Boolean  @default(false)
+  seoTitle    String?
+  seoDescription String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CaseStudy {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  summary        String
+  body           String
+  coverImage     String?
+  relatedExperts String[]
+  seoTitle       String?
+  seoDescription String?
+  publishedAt    DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Insight {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  title          String
+  excerpt        String
+  body           String
+  category       String   @default("Perspective")
+  coverImage     String?
+  seoTitle       String?
+  seoDescription String?
+  publishedAt    DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Lead {
+  id        String     @id @default(cuid())
+  email     String
+  name      String?
+  company   String?
+  message   String?
+  source    LeadSource
+  status    LeadStatus @default(NEW)
+  createdAt DateTime   @default(now())
+}

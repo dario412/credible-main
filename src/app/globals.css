@@ -1,26 +1,274 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cream: #f9f3ef;
+  --cream-dark: #f0e9e3;
+  --charcoal: #1c1a17;
+  --forest: #345b47;
+  --forest-dark: #2a4939;
+  --taupe: #c9c2ba;
+  --rust: #935b3b;
+  --rust-dark: #7a4a30;
+  --muted: #6b6560;
+  --white: #ffffff;
+  --danger: #8b3a3a;
+  --success: #345b47;
+
+  /* Roster card SVG animations */
+  --ra-ink: #345b47;
+  --ra-ink-2: #2a4939;
+  --ra-sage: #b7c4bc;
+  --ra-line-w: 1.8px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-cream: var(--cream);
+  --color-cream-dark: var(--cream-dark);
+  --color-charcoal: var(--charcoal);
+  --color-forest: var(--forest);
+  --color-forest-dark: var(--forest-dark);
+  --color-taupe: var(--taupe);
+  --color-rust: var(--rust);
+  --color-rust-dark: var(--rust-dark);
+  --color-muted: var(--muted);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-instrument);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--cream);
+  color: var(--charcoal);
+  font-family: var(--font-instrument), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--forest) 25%, transparent);
+}
+
+.font-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+.prose-credible {
+  max-width: 65ch;
+}
+
+.prose-credible h1,
+.prose-credible h2,
+.prose-credible h3,
+.prose-credible h4,
+.prose-credible h5,
+.prose-credible h6 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  color: var(--charcoal);
+  line-height: 1.15;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose-credible h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 500; }
+.prose-credible h2 { font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 500; }
+.prose-credible h3 { font-size: 1.75rem; font-weight: 500; }
+.prose-credible h4 { font-size: 1.35rem; font-weight: 500; }
+.prose-credible h5 { font-size: 1.125rem; font-weight: 500; }
+.prose-credible h6 { font-size: 1rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+
+.prose-credible p {
+  margin: 0 0 1.1em;
+  line-height: 1.7;
+  color: var(--charcoal);
+}
+
+.prose-credible a {
+  color: var(--forest);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-credible a:hover {
+  color: var(--forest-dark);
+}
+
+.prose-credible ul,
+.prose-credible ol {
+  margin: 0 0 1.1em;
+  padding-left: 1.25em;
+  line-height: 1.7;
+}
+
+.prose-credible li + li {
+  margin-top: 0.35em;
+}
+
+.prose-credible blockquote {
+  margin: 1.5em 0;
+  padding-left: 1.25em;
+  border-left: 3px solid var(--forest);
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.25rem;
+  color: var(--forest-dark);
+}
+
+.prose-credible code {
+  font-size: 0.9em;
+  background: var(--cream-dark);
+  padding: 0.15em 0.4em;
+  border-radius: 2px;
+}
+
+.prose-credible pre {
+  background: var(--charcoal);
+  color: var(--cream);
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 0 0 1.25em;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.prose-credible pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out both;
+}
+
+.animate-delay-1 { animation-delay: 0.12s; }
+.animate-delay-2 { animation-delay: 0.24s; }
+.animate-delay-3 { animation-delay: 0.36s; }
+
+
+/* Roster card animations */
+@keyframes ra-expert-halo {
+  0%, 100% { opacity: 0.28; r: 16px; }
+  50% { opacity: 0.55; r: 20px; }
+}
+
+@keyframes ra-place {
+  0%, 10% { opacity: 0; }
+  22% { opacity: 1; }
+  74% { opacity: 1; }
+  88%, 100% { opacity: 0; }
+}
+
+@keyframes ra-ring {
+  0% { r: 10px; opacity: 0.6; stroke-width: 2.1px; }
+  100% { r: 92px; opacity: 0; stroke-width: 0.35px; }
+}
+
+@keyframes ra-pulse {
+  0%, 100% { r: 7px; }
+  50% { r: 9px; }
+}
+
+@keyframes ra-out {
+  0% { transform: translate(0, 0); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translate(84px, -30px); opacity: 0; }
+}
+
+@keyframes ra-out2 {
+  0% { transform: translate(0, 0); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translate(80px, 34px); opacity: 0; }
+}
+
+@keyframes ra-out3 {
+  0% { transform: translate(0, 0); opacity: 0; }
+  12% { opacity: 1; }
+  100% { transform: translate(-72px, -28px); opacity: 0; }
+}
+
+@keyframes ra-seat {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.55; }
+}
+
+.ra-illo {
+  display: block;
+  width: 360px;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.ra-expert-halo {
+  animation: ra-expert-halo 2.8s ease-in-out infinite;
+}
+
+.ra-place {
+  animation: ra-place 5s cubic-bezier(0.33, 0, 0.2, 1) infinite;
+}
+
+.ra-ring {
+  animation: ra-ring 2.8s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+.ra-node-p {
+  transform-origin: 150px 88px;
+  animation: ra-pulse 2.8s ease-in-out infinite;
+}
+
+.ra-content,
+.ra-content2,
+.ra-content3 {
+  transform-origin: 150px 88px;
+}
+
+.ra-content {
+  animation: ra-out 2.8s cubic-bezier(0.33, 0, 0.2, 1) infinite;
+}
+
+.ra-content2 {
+  animation: ra-out2 2.8s cubic-bezier(0.33, 0, 0.2, 1) infinite;
+}
+
+.ra-content3 {
+  animation: ra-out3 2.8s cubic-bezier(0.33, 0, 0.2, 1) infinite;
+}
+
+.ra-seat {
+  animation: ra-seat 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ra-illo * {
+    animation: none !important;
+  }
+
+  .ra-place {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .ra-ring,
+  .ra-content,
+  .ra-content2,
+  .ra-content3 {
+    opacity: 0;
+  }
 }
