@@ -1,4 +1,5 @@
 import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
@@ -8,9 +9,23 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is not set");
+  }
+
+  const useNeon =
+    Boolean(process.env.VERCEL) ||
+    connectionString.includes("neon.tech") ||
+    connectionString.includes("-pooler");
+
+  if (useNeon) {
+    const adapter = new PrismaNeon({ connectionString });
+    return new PrismaClient({ adapter });
+  }
+
   const pool =
-    globalForPrisma.pgPool ??
-    new pg.Pool({ connectionString: process.env.DATABASE_URL });
+    globalForPrisma.pgPool ?? new pg.Pool({ connectionString });
   if (process.env.NODE_ENV !== "production") {
     globalForPrisma.pgPool = pool;
   }
