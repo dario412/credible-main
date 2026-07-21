@@ -2,28 +2,181 @@
 
 import Link from "next/link";
 import { ArrowRight, Clock } from "@phosphor-icons/react";
+import { useEffect, useState } from "react";
 
 import { PatternField } from "@/components/pattern-field";
 import { cn } from "@/lib/utils";
 
 const CREAM_RGB = { r: 249, g: 243, b: 239 };
+const UPDATE_TZ = "Europe/Berlin";
+const UPDATE_HOUR = 15; // 3:00 PM local (CET/CEST)
 
-const updates = [
-  {
-    label: "Next update",
-    date: "21.07",
-    time: "3:00 PM CET",
-    status: "Today",
-    accent: true,
-  },
-  {
-    label: "Following update",
-    date: "22.07",
-    time: "3:00 PM CET",
-    status: "Tomorrow",
-    accent: false,
-  },
-] as const;
+type ScheduleUpdate = {
+  label: string;
+  date: string;
+  time: string;
+  status: string;
+  accent: boolean;
+  key: string;
+};
+
+function berlinParts(date: Date) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: UPDATE_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "0";
+
+  return {
+    year: Number(get("year")),
+    month: Number(get("month")),
+    day: Number(get("day")),
+    hour: Number(get("hour")),
+    minute: Number(get("minute")),
+    second: Number(get("second")),
+  };
+}
+
+/** UTC instant for y-m-d h:m in Europe/Berlin (handles CET/CEST). */
+function zonedTimeToUtc(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute = 0,
+) {
+  const utcGuess = Date.UTC(year, month - 1, day, hour, minute, 0);
+  const asBerlin = berlinParts(new Date(utcGuess));
+  const asBerlinMs = Date.UTC(
+    asBerlin.year,
+    asBerlin.month - 1,
+    asBerlin.day,
+    asBerlin.hour,
+    asBerlin.minute,
+    asBerlin.second,
+  );
+  const offset = asBerlinMs - utcGuess;
+  const corrected = Date.UTC(year, month - 1, day, hour, minute, 0) - offset;
+
+  const check = berlinParts(new Date(corrected));
+  const checkMs = Date.UTC(
+    check.year,
+    check.month - 1,
+    check.day,
+    check.hour,
+    check.minute,
+    check.second,
+  );
+  const offset2 = checkMs - corrected;
+  return new Date(Date.UTC(year, month - 1, day, hour, minute, 0) - offset2);
+}
+
+function addBerlinDays(
+  year: number,
+  month: number,
+  day: number,
+  days: number,
+) {
+  const noonUtc = zonedTimeToUtc(year, month, day, 12, 0);
+  const shifted = new Date(noonUtc.getTime() + days * 24 * 60 * 60 * 1000);
+  const parts = berlinParts(shifted);
+  return { year: parts.year, month: parts.month, day: parts.day };
+}
+
+function formatDayMonth(year: number, month: number, day: number) {
+  return `${String(day).padStart(2, "0")}.${String(month).padStart(2, "0")}`;
+}
+
+function statusForDay(
+  year: number,
+  month: number,
+  day: number,
+  now: Date,
+) {
+  const today = berlinParts(now);
+  const tomorrow = addBerlinDays(today.year, today.month, today.day, 1);
+
+  if (year === today.year && month === today.month && day === today.day) {
+    return "Today";
+  }
+  if (
+    year === tomorrow.year &&
+    month === tomorrow.month &&
+    day === tomorrow.day
+  ) {
+    return "Tomorrow";
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: UPDATE_TZ,
+    weekday: "short",
+  }).format(zonedTimeToUtc(year, month, day, UPDATE_HOUR));
+}
+
+function buildSchedule(now: Date): {
+  updates: ScheduleUpdate[];
+  nextAt: Date;
+} {
+  const current = berlinParts(now);
+  const todaysSlot = zonedTimeToUtc(
+    current.year,
+    current.month,
+    current.day,
+    UPDATE_HOUR,
+  );
+
+  const nextDay =
+    now.getTime() < todaysSlot.getTime()
+      ? { year: current.year, month: current.month, day: current.day }
+      : addBerlinDays(current.year, current.month, current.day, 1);
+
+  const followingDay = addBerlinDays(nextDay.year, nextDay.month, nextDay.day, 1);
+  const nextAt = zonedTimeToUtc(
+    nextDay.year,
+    nextDay.month,
+    nextDay.day,
+    UPDATE_HOUR,
+  );
+
+  return {
+    nextAt,
+    updates: [
+      {
+        key: `${nextDay.year}-${nextDay.month}-${nextDay.day}`,
+        label: "Next update",
+        date: formatDayMonth(nextDay.year, nextDay.month, nextDay.day),
+        time: "3:00 PM CET",
+        status: statusForDay(nextDay.year, nextDay.month, nextDay.day, now),
+        accent: true,
+      },
+      {
+        key: `${followingDay.year}-${followingDay.month}-${followingDay.day}`,
+        label: "Following update",
+        date: formatDayMonth(
+          followingDay.year,
+          followingDay.month,
+          followingDay.day,
+        ),
+        time: "3:00 PM CET",
+        status: statusForDay(
+          followingDay.year,
+          followingDay.month,
+          followingDay.day,
+          now,
+        ),
+        accent: false,
+      },
+    ],
+  };
+}
 
 export function InProgressPlaceholder({
   title = "Still in progress",
@@ -31,6 +184,24 @@ export function InProgressPlaceholder({
   title?: string;
 }) {
   const displayTitle = title.replace(/\s*—\s*still in progress$/i, "").trim();
+  const [updates, setUpdates] = useState<ScheduleUpdate[]>(
+    () => buildSchedule(new Date()).updates,
+  );
+
+  useEffect(() => {
+    let timeoutId = 0;
+
+    const tick = () => {
+      const { updates: nextUpdates, nextAt } = buildSchedule(new Date());
+      setUpdates(nextUpdates);
+
+      const delay = Math.max(1_000, nextAt.getTime() - Date.now() + 1_000);
+      timeoutId = window.setTimeout(tick, Math.min(delay, 60 * 60 * 1000));
+    };
+
+    tick();
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   return (
     <section className="relative isolate min-h-[calc(100vh-8rem)] overflow-hidden">
@@ -125,7 +296,7 @@ export function InProgressPlaceholder({
               <ul className="mt-8 space-y-4">
                 {updates.map((update, index) => (
                   <li
-                    key={update.date}
+                    key={update.key}
                     className={cn(
                       "rounded-[1.05rem] border px-5 py-5 transition-transform duration-500",
                       update.accent

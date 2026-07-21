@@ -25,8 +25,8 @@ const stats = [
 
 export function ImpactStats() {
   return (
-    <section className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12">
-      <div className="mx-auto max-w-352">
+    <section className="bg-cream">
+      <div className="mx-auto max-w-352 px-6 py-16 md:px-10 md:py-20 lg:px-12">
         <h2 className="max-w-2xl font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal sm:text-[2.4rem] md:text-[2.75rem]">
           Credible gives your brand
           <br />

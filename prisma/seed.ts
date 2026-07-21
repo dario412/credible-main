@@ -165,33 +165,100 @@ async function main() {
     });
   }
 
-  await prisma.caseStudy.upsert({
-    where: { slug: "stage-to-boardroom" },
-    update: {},
-    create: {
+  const caseStudies = [
+    {
+      slug: "notion-founders-journal",
+      title:
+        "The Founder's Journal — Notion's flagship B2B media property",
+      summary:
+        "A 22-month partnership. Twelve episodes with an operator as editorial lead. 4.1M downloads and $18.4M in first-touch pipeline.",
+      body: "Notion needed a founder-led media property that buyers would actually trust. We paired them with an operator as editorial lead and ran a twelve-episode series end-to-end — casting, format, distribution, and reporting. Twenty-two months in, it's the highest-performing brand series in its category: 4.1M downloads and $18.4M in first-touch pipeline.",
+      coverImage: "/images/insights/operator-creator.jpg",
+      relatedExperts: ["amara-chen"],
+      seoTitle: "Notion Founder's Journal | Case Study",
+      seoDescription:
+        "How Notion built a flagship B2B founder series with Credible Creators.",
+    },
+    {
+      slug: "hubspot-fintech-report",
+      title: "HubSpot's fintech report — with a category investor",
+      summary:
+        "A quarterly research release fronted by a category-defining investor. 41k downloads in eight weeks.",
+      body: "HubSpot needed a research drop with practitioner weight. We matched them with a category investor, scoped the brief, and managed delivery through launch. Forty-one thousand downloads in eight weeks.",
+      coverImage: "/images/insights/expert-economy.jpg",
+      relatedExperts: ["daniel-park"],
+      seoTitle: "HubSpot Fintech Report | Case Study",
+      seoDescription:
+        "A quarterly research release fronted by a category-defining investor.",
+    },
+    {
+      slug: "vanta-category-ambassador",
+      title: "Vanta's category ambassador program",
+      summary:
+        "Twelve months of content and events that put a practitioner voice at the centre of Vanta's category leadership.",
+      body: "Vanta wanted category leadership, not a one-off campaign. We placed a practitioner as ambassador across a year of content and events — one voice, one narrative, measured outcomes.",
+      coverImage: "/images/insights/beyond-keynote.jpg",
+      relatedExperts: ["sofia-martinez"],
+      seoTitle: "Vanta Category Ambassador | Case Study",
+      seoDescription:
+        "A twelve-month ambassador program for category leadership.",
+    },
+    {
+      slug: "ramp-summit-keynote",
+      title: "Ramp Summit — closing keynote for finance leaders",
+      summary:
+        "Closing keynote to 2,400 finance leaders. Highest-rated session of the summit — 4.9/5 attendee score.",
+      body: "Ramp needed a closing keynote with substance for 2,400 finance leaders. We handled casting, brief, and green-room delivery. Highest-rated session of the summit.",
+      coverImage: "/images/experts/amara-chen.jpg",
+      relatedExperts: ["amara-chen"],
+      seoTitle: "Ramp Summit Keynote | Case Study",
+      seoDescription:
+        "Closing keynote to 2,400 finance leaders at Ramp Summit.",
+    },
+    {
+      slug: "stripe-founder-salons",
+      title: "Stripe's founder salons — a closed network in four cities",
+      summary:
+        "Four cities, sixteen dinners, 340 founders in the room. A closed network Stripe couldn't have built alone.",
+      body: "Stripe wanted intimate founder rooms, not a megaphone. We co-produced salons across four cities — sixteen dinners, 340 founders — with a signed creator hosting the table.",
+      coverImage: "/images/experts/noah-bennett.jpg",
+      relatedExperts: ["noah-bennett"],
+      seoTitle: "Stripe Founder Salons | Case Study",
+      seoDescription:
+        "Four cities, sixteen dinners, 340 founders in the room.",
+    },
+    {
       slug: "stage-to-boardroom",
       title: "From stage to boardroom",
-      summary: "How we placed a keynote speaker into a year-long advisory partnership.",
+      summary:
+        "How we placed a keynote speaker into a year-long advisory partnership.",
       body: "A global brand needed credibility on stage and substance off it. We paired their flagship event with an ongoing advisory role for one of our founder speakers — turning a single booking into a durable commercial relationship.",
+      coverImage: "/images/insights/beyond-keynote.jpg",
       relatedExperts: ["amara-chen"],
       seoTitle: "From stage to boardroom | Case Study",
-      seoDescription: "Placing a keynote speaker into a year-long advisory partnership.",
+      seoDescription:
+        "Placing a keynote speaker into a year-long advisory partnership.",
     },
-  });
-
-  await prisma.caseStudy.upsert({
-    where: { slug: "creator-led-launch" },
-    update: {},
-    create: {
+    {
       slug: "creator-led-launch",
       title: "Creator-led product launch",
-      summary: "Orchestrating a multi-voice launch across media and live events.",
+      summary:
+        "Orchestrating a multi-voice launch across media and live events.",
       body: "We assembled a roster of operators and trusted voices to launch a new category product — combining keynotes, podcasts, and branded evenings into one coherent narrative.",
+      coverImage: "/images/insights/expert-economy.jpg",
       relatedExperts: ["sofia-martinez", "lena-weiss"],
       seoTitle: "Creator-led product launch | Case Study",
       seoDescription: "A multi-voice launch across media and live events.",
     },
-  });
+  ];
+
+  for (const study of caseStudies) {
+    await prisma.caseStudy.upsert({
+      where: { slug: study.slug },
+      update: study,
+      create: study,
+    });
+  }
 
   const insights = [
     {
