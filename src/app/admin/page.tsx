@@ -35,7 +35,7 @@ export default async function AdminDashboardPage() {
         {hasPermission(session.user.role, "VIEW_LEADS") ? (
           <Link
             href="/admin/leads"
-            className="inline-flex h-9 items-center rounded-md bg-forest px-3.5 text-sm font-medium text-cream transition-colors hover:bg-forest-dark"
+            className="inline-flex h-9 items-center rounded-sm bg-forest px-3.5 text-sm font-medium text-cream transition-colors hover:bg-forest-dark"
           >
             Open leads
           </Link>

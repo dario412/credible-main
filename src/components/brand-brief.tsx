@@ -19,7 +19,7 @@ const inputClass =
   "w-full border-b border-cream/25 bg-transparent pb-2.5 pt-1 text-sm text-cream transition-colors placeholder:text-cream/35 focus:border-cream focus:outline-none";
 
 const labelClass =
-  "block text-[10px] font-medium uppercase tracking-[0.18em] text-cream/50";
+  "block text-sm text-cream/55";
 
 export function BrandBrief() {
   const [state, action, pending] = useActionState(submitBrief, initial);
@@ -30,11 +30,7 @@ export function BrandBrief() {
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-20">
           {/* Left: pitch */}
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-cream/45">
-              For brands
-            </p>
-
-            <h2 className="mt-6 max-w-xl font-display text-[2.1rem] leading-[1.08] tracking-tight text-cream sm:text-[2.6rem] md:text-[3rem]">
+            <h2 className="max-w-xl font-display text-[2.1rem] leading-[1.08] tracking-tight text-cream sm:text-[2.6rem] md:text-[3rem]">
               Reach B2B audiences through the people they{" "}
               <em className="font-display italic text-[#E4EBE6]">
                 already trust.
@@ -50,7 +46,7 @@ export function BrandBrief() {
 
             <Link
               href="/what-we-do"
-              className="mt-8 inline-flex items-center border border-cream/30 px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-cream hover:bg-cream hover:text-charcoal"
+              className="mt-8 inline-flex items-center rounded-sm border border-cream/30 px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-cream hover:bg-cream hover:text-charcoal"
             >
               How we work with brands
               <span aria-hidden className="ml-2">
@@ -155,7 +151,7 @@ export function BrandBrief() {
             <button
               type="submit"
               disabled={pending}
-              className="inline-flex items-center bg-cream px-7 py-3 text-[0.8125rem] font-medium text-charcoal transition-colors hover:bg-cream-dark disabled:opacity-60"
+              className="inline-flex items-center rounded-sm bg-cream px-7 py-3 text-[0.8125rem] font-medium text-charcoal transition-colors hover:bg-cream-dark disabled:opacity-60"
             >
               {pending ? "Sending…" : "Send brief"}
               <span aria-hidden className="ml-2">
@@ -174,20 +170,17 @@ export function BrandBrief() {
           </form>
         </div>
 
-        {/* Creators strip */}
-        <div className="mt-14 flex flex-col gap-5 border-t border-cream/10 pt-8 md:mt-16 md:flex-row md:items-center md:justify-between">
+        {/* Creators strip — nested CTA */}
+        <div className="mt-14 rounded-sm bg-cream px-6 py-7 md:mt-16 md:flex md:items-center md:justify-between md:gap-8 md:px-8 md:py-8">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-cream/45">
-              For creators
-            </p>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-cream/70">
+            <p className="max-w-xl text-sm leading-relaxed text-charcoal/75 md:text-[0.95rem]">
               Founder, operator, investor or specialist ready to treat your
               audience as a business? Applications reviewed fortnightly.
             </p>
           </div>
           <Link
             href="/contact"
-            className="inline-flex w-fit shrink-0 items-center border border-cream/30 px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-cream hover:bg-cream hover:text-charcoal"
+            className="mt-5 inline-flex w-fit shrink-0 items-center rounded-sm bg-charcoal px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:bg-forest md:mt-0"
           >
             Apply
             <span aria-hidden className="ml-2">

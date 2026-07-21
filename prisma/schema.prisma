@@ -41,20 +41,27 @@ model User {
 }
 
 model Expert {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  title       String
-  bio         String
-  shortBio    String?
-  image       String?
-  categories  String[]
-  topics      String[]
-  featured    Boolean  @default(false)
-  seoTitle    String?
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  title          String
+  bio            String
+  shortBio       String?
+  image          String?
+  categories     String[]
+  topics         String[]
+  formats        String[] @default([])
+  combinedReach  String?
+  growth90d      String?
+  audienceWho    String?
+  audienceWhere  String?
+  /// [{ "type": "linkedin"|"youtube"|"podcast"|"x", "url": "https://..." }]
+  channels       Json     @default("[]")
+  featured       Boolean  @default(false)
+  seoTitle       String?
   seoDescription String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model CaseStudy {

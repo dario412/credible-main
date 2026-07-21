@@ -66,7 +66,7 @@ export function KeyStudy() {
 
             <Link
               href="/case-studies"
-              className="mt-8 inline-flex items-center justify-center border border-cream/30 px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-cream hover:bg-cream hover:text-charcoal"
+              className="mt-8 inline-flex items-center justify-center rounded-sm border border-cream/30 px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-cream hover:bg-cream hover:text-charcoal"
             >
               Read the case study
               <span aria-hidden className="ml-2">
@@ -82,7 +82,7 @@ export function KeyStudy() {
                 className="flex min-h-36 flex-col justify-between rounded-sm bg-[#E4EBE6] px-5 pb-5 pt-6 md:min-h-40 md:px-6 md:pb-6 md:pt-7"
               >
                 <div>
-                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-charcoal/55">
+                  <p className="text-sm font-medium text-charcoal/65">
                     {metric.label}
                   </p>
                   <p className="mt-3 font-display text-[2.15rem] leading-none tracking-tight text-charcoal md:text-[2.5rem]">

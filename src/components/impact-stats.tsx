@@ -1,3 +1,5 @@
+import { StatCounter } from "@/components/stat-counter";
+
 const stats = [
   {
     label: "Signed creators",
@@ -35,16 +37,16 @@ export function ImpactStats() {
           {stats.map((stat) => (
             <li
               key={stat.label}
-              className="flex min-h-44 flex-col justify-between rounded-sm bg-[#E4EBE6] px-6 pb-6 pt-7 md:min-h-50"
+              className="flex min-h-44 flex-col justify-between rounded-sm bg-[#E4EBE6] px-6 pb-6 pt-7 md:min-h-50 md:px-7"
             >
               <p className="font-display text-[2.6rem] leading-none tracking-tight text-charcoal md:text-[3rem]">
-                {stat.value}
+                <StatCounter value={stat.value} />
               </p>
               <div className="mt-8">
-                <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-charcoal/60">
+                <p className="text-[0.95rem] font-medium leading-snug text-charcoal">
                   {stat.label}
                 </p>
-                <p className="mt-1.5 text-[0.75rem] leading-relaxed text-charcoal/70">
+                <p className="mt-2 text-sm leading-relaxed text-charcoal/70">
                   {stat.caption}
                 </p>
               </div>

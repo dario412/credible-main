@@ -317,7 +317,7 @@ export function WaysIn() {
             </p>
             <Link
               href="/what-we-do"
-              className="mt-6 inline-flex items-center justify-center border border-charcoal/25 px-5 py-2.5 text-[0.8125rem] font-medium text-charcoal transition-colors hover:border-forest hover:bg-forest hover:text-cream"
+              className="mt-6 inline-flex items-center justify-center rounded-sm border border-charcoal/25 px-5 py-2.5 text-[0.8125rem] font-medium text-charcoal transition-colors hover:border-forest hover:bg-forest hover:text-cream"
             >
               Explore the model
             </Link>

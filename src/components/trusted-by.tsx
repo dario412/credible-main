@@ -71,11 +71,7 @@ export function TrustedBy() {
   return (
     <section className="bg-cream px-6 py-8 md:px-10 md:py-10 lg:px-12">
       <div className="mx-auto max-w-352 overflow-visible rounded-sm bg-charcoal px-6 py-14 md:px-10 md:py-16 lg:px-12 lg:py-20">
-        <p className="text-center text-[11px] font-medium uppercase tracking-[0.2em] text-cream/45">
-          Trusted by teams at
-        </p>
-
-        <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:mt-12 md:grid-cols-5 md:gap-x-8 md:gap-y-14">
+        <ul className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:grid-cols-5 md:gap-x-8 md:gap-y-14">
           {brands.map((brand) => {
             const hasStory = Boolean(brand.caseStudySlug && brand.testimonial);
 
@@ -89,7 +85,7 @@ export function TrustedBy() {
                     className="pointer-events-none absolute bottom-[calc(100%+0.75rem)] left-1/2 z-20 w-[min(18.5rem,calc(100vw-3rem))] -translate-x-1/2 scale-[0.96] opacity-0 transition-all duration-300 ease-out group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:scale-100 group-focus-within:opacity-100"
                     role="tooltip"
                   >
-                    <div className="rounded-xl bg-[#E4EBE6] px-5 py-4 text-left shadow-[0_16px_40px_rgba(28,26,23,0.35)]">
+                    <div className="rounded-sm bg-[#E4EBE6] px-5 py-4 text-left shadow-[0_16px_40px_rgba(28,26,23,0.35)]">
                       <span
                         className="font-display text-3xl leading-none text-forest"
                         aria-hidden

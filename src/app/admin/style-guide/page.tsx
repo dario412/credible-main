@@ -36,7 +36,13 @@ export default async function StyleGuidePage() {
 
       <section>
         <h2 className="font-display text-2xl">Brand</h2>
-        <p className="mt-4 font-display text-3xl text-forest">credible.</p>
+        <img
+          src="/brand/credible-wordmark.svg"
+          alt="Credible"
+          width={253}
+          height={50}
+          className="mt-4 h-8 w-auto"
+        />
         <p className="mt-2 text-xs text-muted">
           class: <code className="bg-cream-dark px-1">font-display text-forest</code>
         </p>
@@ -61,7 +67,7 @@ export default async function StyleGuidePage() {
       <section>
         <h2 className="font-display text-2xl">Typography</h2>
         <p className="mt-2 text-sm text-muted">
-          Display: <strong>Fraunces</strong> (<code>font-display</code>). Body:{" "}
+          Display: <strong>Faculty Glyphic</strong> (<code>font-display</code>). Body:{" "}
           <strong>Instrument Sans</strong> (default).
         </p>
         <div className="prose-credible mt-8 border border-charcoal/10 p-6">

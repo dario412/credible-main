@@ -26,7 +26,7 @@ export function Button({
       type={type}
       disabled={disabled}
       className={cn(
-        "inline-flex items-center justify-center px-5 py-3 text-sm font-medium transition-colors disabled:opacity-50",
+        "inline-flex items-center justify-center rounded-sm px-5 py-3 text-sm font-medium transition-colors disabled:opacity-50",
         variants[variant],
         className,
       )}
@@ -52,7 +52,7 @@ export function ButtonLink({
     <Link
       href={href}
       className={cn(
-        "inline-flex items-center justify-center px-5 py-3 text-sm font-medium transition-colors",
+        "inline-flex items-center justify-center rounded-sm px-5 py-3 text-sm font-medium transition-colors",
         variants[variant],
         className,
       )}

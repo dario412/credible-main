@@ -39,8 +39,14 @@ export default async function AdminLayout({
       {/* Fixed-width sidebar — never resizes with active state */}
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-charcoal/10 bg-white md:flex">
         <div className="flex h-14 shrink-0 items-center border-b border-charcoal/10 px-5">
-          <Link href="/" className="font-display text-lg text-forest">
-            credible.
+          <Link href="/" className="inline-block transition-opacity hover:opacity-80">
+            <img
+              src="/brand/credible-wordmark.svg"
+              alt="Credible"
+              width={253}
+              height={50}
+              className="h-6 w-auto"
+            />
           </Link>
         </div>
 

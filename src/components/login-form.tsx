@@ -90,7 +90,13 @@ export function LoginFormInner() {
       className="mx-auto w-full max-w-md space-y-5 border border-charcoal/10 bg-white/50 p-8"
     >
       <div>
-        <p className="font-display text-2xl text-forest">credible.</p>
+        <img
+          src="/brand/credible-wordmark.svg"
+          alt="Credible"
+          width={253}
+          height={50}
+          className="h-7 w-auto"
+        />
         <h1 className="mt-4 font-display text-3xl">Admin login</h1>
         <p className="mt-2 text-sm text-muted">
           Sign in with email, password and two-factor authentication.

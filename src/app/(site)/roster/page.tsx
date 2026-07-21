@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
+import { parseExpertChannels } from "@/lib/expert-channels";
+import { RosterCard, type RosterCardExpert } from "@/components/roster-card";
 import { RosterFilters } from "@/components/roster-filters";
 
 export const dynamic = "force-dynamic";
@@ -8,11 +9,18 @@ export const dynamic = "force-dynamic";
 export const metadata = createMetadata({
   title: "Roster",
   description:
-    "Browse founders, operators, speakers and trusted voices represented by Credible Creators.",
+    "Twenty-four B2B expert creators ready to brief — filter by archetype, topic or format.",
   path: "/roster",
 });
 
-type SearchParams = Promise<{ category?: string; topic?: string; q?: string }>;
+type SearchParams = Promise<{
+  archetype?: string;
+  topic?: string;
+  format?: string;
+  q?: string;
+  /** @deprecated legacy param */
+  category?: string;
+}>;
 
 export default async function RosterPage({
   searchParams,
@@ -20,21 +28,34 @@ export default async function RosterPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const category = params.category?.toLowerCase();
-  const topic = params.topic?.toLowerCase();
+  const archetype = (params.archetype ?? params.category)?.trim();
+  const topic = params.topic?.trim();
+  const format = params.format?.trim();
   const q = params.q?.trim();
 
   const all = await prisma.expert.findMany({ orderBy: { name: "asc" } });
-  const categories = Array.from(
-    new Set(all.flatMap((e) => e.categories)),
-  ).sort();
-  const topics = Array.from(new Set(all.flatMap((e) => e.topics))).sort();
 
   const experts = all.filter((expert) => {
-    if (category && !expert.categories.map((c) => c.toLowerCase()).includes(category)) {
+    const categories = expert.categories ?? [];
+    const topics = expert.topics ?? [];
+    const formats = expert.formats ?? [];
+
+    if (
+      archetype &&
+      !categories.some((c) => c.toLowerCase() === archetype.toLowerCase())
+    ) {
       return false;
     }
-    if (topic && !expert.topics.map((t) => t.toLowerCase()).includes(topic)) {
+    if (
+      topic &&
+      !topics.some((t) => t.toLowerCase() === topic.toLowerCase())
+    ) {
+      return false;
+    }
+    if (
+      format &&
+      !formats.some((f) => f.toLowerCase() === format.toLowerCase())
+    ) {
       return false;
     }
     if (q) {
@@ -44,60 +65,56 @@ export default async function RosterPage({
     return true;
   });
 
-  return (
-    <div className="mx-auto max-w-6xl px-6 py-16">
-      <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted">
-        Roster
-      </p>
-      <h1 className="mt-3 font-display text-4xl md:text-5xl">
-        Experts we represent.
-      </h1>
-      <p className="mt-4 max-w-2xl text-muted">
-        Filter by category or topic to find the right voice for your stage,
-        campaign or partnership.
-      </p>
+  const cards: RosterCardExpert[] = experts.map((expert) => ({
+    id: expert.id,
+    slug: expert.slug,
+    name: expert.name,
+    shortBio: expert.shortBio,
+    image: expert.image,
+    role: expert.categories[0] ?? null,
+    topics: expert.topics ?? [],
+    combinedReach: expert.combinedReach,
+    growth90d: expert.growth90d,
+    audienceWho: expert.audienceWho,
+    audienceWhere: expert.audienceWhere,
+    channels: parseExpertChannels(expert.channels),
+  }));
 
-      <div className="mt-10">
+  return (
+    <div className="mx-auto max-w-352 px-6 py-16 md:px-10 md:py-20 lg:px-12">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] lg:items-end lg:gap-12">
+        <h1 className="max-w-2xl font-display text-[2.4rem] leading-[1.08] tracking-tight text-charcoal sm:text-[2.9rem] md:text-[3.25rem]">
+          24 B2B expert creators
+          <br />
+          <span className="text-forest">ready to brief.</span>
+        </h1>
+        <p className="max-w-md text-[0.95rem] leading-relaxed text-charcoal/65 lg:justify-self-end">
+          Filter by archetype, topic or format. Each profile carries reach data,
+          past collaborations and format-level pricing so you can shortlist
+          before you brief.
+        </p>
+      </div>
+
+      <div className="mt-10 md:mt-12">
         <RosterFilters
-          categories={categories}
-          topics={topics}
-          currentCategory={category}
+          currentArchetype={archetype}
           currentTopic={topic}
+          currentFormat={format}
           currentQuery={q}
         />
       </div>
 
-      <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {experts.map((expert) => (
-          <Link
-            key={expert.id}
-            href={`/roster/${expert.slug}`}
-            className="group border border-charcoal/10 bg-white/40 p-6 transition-colors hover:border-forest"
-          >
-            <p className="font-display text-2xl group-hover:text-forest">
-              {expert.name}
-            </p>
-            <p className="mt-2 text-sm text-muted">{expert.title}</p>
-            <p className="mt-4 line-clamp-3 text-sm leading-relaxed">
-              {expert.shortBio}
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {expert.categories.map((c) => (
-                <span
-                  key={c}
-                  className="border border-charcoal/15 px-2 py-0.5 text-xs uppercase tracking-wide text-muted"
-                >
-                  {c}
-                </span>
-              ))}
-            </div>
-          </Link>
+      <p className="mt-8 text-sm text-charcoal/50">
+        {experts.length === 0
+          ? "No experts match these filters."
+          : `${experts.length} ${experts.length === 1 ? "expert" : "experts"}`}
+      </p>
+
+      <div className="mt-5 grid items-stretch gap-x-5 gap-y-10 overflow-visible sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((expert) => (
+          <RosterCard key={expert.id} expert={expert} />
         ))}
       </div>
-
-      {experts.length === 0 ? (
-        <p className="mt-12 text-muted">No experts match these filters.</p>
-      ) : null}
     </div>
   );
 }

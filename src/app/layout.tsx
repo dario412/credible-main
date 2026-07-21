@@ -1,11 +1,12 @@
-import { Fraunces, Instrument_Sans } from "next/font/google";
+import { Faculty_Glyphic, Instrument_Sans } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { createMetadata, organizationJsonLd } from "@/lib/seo";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const facultyGlyphic = Faculty_Glyphic({
+  variable: "--font-faculty-glyphic",
   subsets: ["latin"],
+  weight: "400",
   display: "swap",
 });
 
@@ -25,9 +26,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${instrument.variable} h-full antialiased`}
+      className={`${facultyGlyphic.variable} ${instrument.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-cream text-charcoal">
+      <body
+        className="flex min-h-full flex-col bg-cream text-charcoal"
+        suppressHydrationWarning
+      >
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

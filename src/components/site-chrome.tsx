@@ -1,4 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/roster", label: "Roster" },
@@ -9,14 +14,28 @@ const links = [
 ];
 
 export function SiteHeader() {
+  const pathname = usePathname();
+  const insightArticle = /^\/insights\/[^/]+\/?$/.test(pathname);
+
   return (
-    <header className="relative z-20 bg-cream">
+    <header
+      className={cn(
+        "relative z-20",
+        insightArticle ? "bg-[#E4EBE6]" : "bg-cream",
+      )}
+    >
       <div className="mx-auto grid max-w-352 grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-5 md:px-10 lg:px-12">
         <Link
           href="/"
-          className="justify-self-start font-display text-[1.65rem] leading-none tracking-tight text-forest transition-opacity hover:opacity-80"
+          className="justify-self-start transition-opacity hover:opacity-80"
         >
-          credible.
+          <img
+            src="/brand/credible-wordmark.svg"
+            alt="Credible"
+            width={253}
+            height={50}
+            className="h-7 w-auto md:h-8"
+          />
         </Link>
 
         <nav
@@ -36,14 +55,17 @@ export function SiteHeader() {
 
         <Link
           href="/contact"
-          className="hidden justify-self-end bg-forest px-[1.35rem] py-[0.7rem] text-[0.95rem] leading-none text-cream transition-colors hover:bg-forest-dark sm:inline-flex sm:items-center sm:justify-center"
+          className="hidden justify-self-end rounded-sm bg-forest px-[1.35rem] py-[0.7rem] text-[0.95rem] leading-none text-cream transition-colors hover:bg-forest-dark sm:inline-flex sm:items-center sm:justify-center"
         >
           Send brief
         </Link>
       </div>
 
       <nav
-        className="flex gap-5 overflow-x-auto border-t border-charcoal/8 px-6 py-3 md:hidden"
+        className={cn(
+          "flex gap-5 overflow-x-auto px-6 py-3 md:hidden",
+          insightArticle ? "border-t border-charcoal/10" : "border-t border-charcoal/8",
+        )}
         aria-label="Mobile"
       >
         {links.map((link) => (
@@ -66,15 +88,28 @@ export function SiteHeader() {
   );
 }
 
+
 const footerColumns = [
   {
     title: "Roster",
     links: [
       { href: "/roster", label: "All creators" },
-      { href: "/roster?category=founder", label: "Founders/Csuite" },
-      { href: "/roster?category=speaker", label: "Subject Matter Experts" },
-      { href: "/roster?category=investor", label: "Investors" },
-      { href: "/roster?category=operator", label: "Category Specialists" },
+      {
+        href: `/roster?archetype=${encodeURIComponent("Founder / C-Suite")}`,
+        label: "Founders/Csuite",
+      },
+      {
+        href: `/roster?archetype=${encodeURIComponent("Subject Matter Expert")}`,
+        label: "Subject Matter Experts",
+      },
+      {
+        href: `/roster?archetype=${encodeURIComponent("Investor / Analyst")}`,
+        label: "Investors",
+      },
+      {
+        href: `/roster?archetype=${encodeURIComponent("Category Specialist")}`,
+        label: "Category Specialists",
+      },
     ],
   },
   {
@@ -126,11 +161,14 @@ export function SiteFooter() {
         {/* Top: logo + contact on the left, link columns on the right */}
         <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
           <div className="max-w-xs shrink-0">
-            <Link
-              href="/"
-              className="font-display text-[1.5rem] leading-none tracking-tight text-cream transition-opacity hover:opacity-70"
-            >
-              credible.
+            <Link href="/" className="inline-block transition-opacity hover:opacity-70">
+              <img
+                src="/brand/credible-wordmark-cream.svg"
+                alt="Credible"
+                width={253}
+                height={50}
+                className="h-7 w-auto md:h-8"
+              />
             </Link>
 
             <p className="mt-6 text-base leading-relaxed text-cream/70">
@@ -139,12 +177,9 @@ export function SiteFooter() {
             <p className="mt-1.5 text-sm text-cream/50">A PepTalk company.</p>
 
             <div className="mt-10">
-              <p className="text-xs uppercase tracking-[0.18em] text-cream/45">
-                Get in touch
-              </p>
               <a
                 href="mailto:hello@crediblecreators.com"
-                className="mt-2 block w-fit text-sm font-medium text-cream/90 transition-colors hover:text-cream"
+                className="block w-fit text-sm font-medium text-cream/90 transition-colors hover:text-cream"
               >
                 hello@crediblecreators.com
               </a>

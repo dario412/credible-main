@@ -69,7 +69,7 @@ export default async function AdminLeadsPage({
         </select>
         <button
           type="submit"
-          className="bg-forest px-4 py-2 text-sm text-white hover:bg-forest-dark"
+          className="rounded-sm bg-forest px-4 py-2 text-sm text-white hover:bg-forest-dark"
         >
           Filter
         </button>
