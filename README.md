@@ -74,5 +74,11 @@ See `.env.example`:
 
 - `DATABASE_URL` — Postgres connection string
 - `AUTH_SECRET` — `openssl rand -base64 32`
-- `AUTH_URL` / `NEXT_PUBLIC_SITE_URL` — public site URL
+- `AUTH_URL` / `NEXT_PUBLIC_SITE_URL` — public site URL (must not be `localhost` on Vercel; use your production domain, e.g. `https://credible-main-lilac.vercel.app`)
 - `ADMIN_EMAIL` / `ADMIN_PASSWORD` — used only by the seed script
+
+### Admin on Vercel
+
+- Open **`/admin/login`** on the **production** deployment URL (not one-off deployment URLs if your team uses Vercel Authentication on previews).
+- Sign in with the owner account from the seed (`ADMIN_EMAIL` / `ADMIN_PASSWORD` in Vercel env).
+- After first login, complete **2FA setup** at `/admin/setup-2fa`.

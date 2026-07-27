@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 
+import { getSiteUrl } from "@/lib/site-url";
+
 const siteName = "Credible Creators";
 const defaultDescription =
   "The talent agency for the expert economy. We represent founders, operators and trusted voices.";
 
 export function absoluteUrl(path = "") {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  return `${base.replace(/\/$/, "")}${path}`;
+  return `${getSiteUrl()}${path}`;
 }
 
 export function createMetadata({

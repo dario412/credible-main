@@ -1,5 +1,9 @@
 import type { NextAuthConfig } from "next-auth";
 
+import { ensureAuthUrl } from "@/lib/site-url";
+
+ensureAuthUrl();
+
 export const authConfig = {
   pages: {
     signIn: "/admin/login",
