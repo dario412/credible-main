@@ -17,6 +17,7 @@
 *.tsbuildinfo
 .DS_Store
 .env*
+!.env.example
 .env.production.local
 .env.vercel
 .pnp.*
