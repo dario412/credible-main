@@ -3,7 +3,13 @@ declare module "@/lib/pattern.js" {
     constructor(
       canvas: HTMLCanvasElement,
       container: HTMLElement,
-      options?: { color?: { r: number; g: number; b: number } },
+      options?: {
+        color?: { r: number; g: number; b: number };
+        lineCount?: number | null;
+        drawOnMobile?: boolean;
+        baseWidth?: number;
+        edgeFade?: boolean;
+      },
     );
     mount(): void;
     destroy(): void;
