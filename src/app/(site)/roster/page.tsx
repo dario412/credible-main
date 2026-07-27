@@ -82,20 +82,20 @@ export default async function RosterPage({
 
   return (
     <div className="mx-auto max-w-352 px-6 py-16 md:px-10 md:py-20 lg:px-12">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] lg:items-end lg:gap-12">
-        <h1 className="max-w-2xl font-display text-[2.4rem] leading-[1.08] tracking-tight text-charcoal sm:text-[2.9rem] md:text-[3.25rem]">
+      <div className="mx-auto max-w-3xl text-center">
+        <h1 className="font-display text-[2.6rem] leading-[1.08] tracking-tight text-charcoal sm:text-[3.15rem] md:text-[3.65rem]">
           24 B2B expert creators
           <br />
           <span className="text-forest">ready to brief.</span>
         </h1>
-        <p className="max-w-md text-[0.95rem] leading-relaxed text-charcoal/65 lg:justify-self-end">
+        <p className="mx-auto mt-5 max-w-lg text-[0.9rem] leading-relaxed text-charcoal/65 md:text-[0.95rem]">
           Filter by archetype, topic or format. Each profile carries reach data,
           past collaborations and format-level pricing so you can shortlist
           before you brief.
         </p>
       </div>
 
-      <div className="mt-10 md:mt-12">
+      <div className="mx-auto mt-8 max-w-4xl md:mt-10">
         <RosterFilters
           currentArchetype={archetype}
           currentTopic={topic}

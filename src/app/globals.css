@@ -163,6 +163,11 @@ h6.font-display {
   to { opacity: 1; }
 }
 
+@keyframes creator-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 .animate-fade-up {
   animation: fade-up 0.7s ease-out both;
 }
@@ -171,9 +176,30 @@ h6.font-display {
   animation: fade-in 0.8s ease-out both;
 }
 
+.animate-creator-marquee {
+  animation: creator-marquee 72s linear infinite;
+  will-change: transform;
+}
+
+.creator-marquee-window:hover .animate-creator-marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-creator-marquee {
+    animation: none;
+  }
+}
+
 .animate-delay-1 { animation-delay: 0.12s; }
 .animate-delay-2 { animation-delay: 0.24s; }
 .animate-delay-3 { animation-delay: 0.36s; }
+
+@keyframes geo-pulse {
+  0% { transform: scale(0.55); opacity: 0.65; }
+  70% { transform: scale(1.55); opacity: 0; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
 
 
 /* Roster card animations */
@@ -284,6 +310,75 @@ h6.font-display {
   .ra-content2,
   .ra-content3 {
     opacity: 0;
+  }
+}
+
+/* Ways-in card abstractions */
+@keyframes wi-bar {
+  0%, 100% { transform: scaleX(0.78); opacity: 0.55; }
+  50% { transform: scaleX(1); opacity: 1; }
+}
+
+@keyframes wi-orbit {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes wi-eq {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes wi-ring {
+  0% { transform: scale(0.3); opacity: 0.5; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+@keyframes wi-drift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.wi-illo {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.wi-bar {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: wi-bar 3.6s cubic-bezier(0.33, 0, 0.2, 1) infinite;
+}
+
+.wi-orbit,
+.wi-ring {
+  transform-box: view-box;
+  transform-origin: 120px 80px;
+}
+
+.wi-orbit {
+  animation: wi-orbit 11s linear infinite;
+}
+
+.wi-ring {
+  animation: wi-ring 3.4s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+.wi-eq {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: wi-eq 2.4s ease-in-out infinite;
+}
+
+.wi-drift {
+  transform-box: fill-box;
+  animation: wi-drift 4.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wi-illo * {
+    animation: none !important;
   }
 }
 

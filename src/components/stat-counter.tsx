@@ -8,10 +8,12 @@ const STAT_PATTERN = /^([^0-9]*)([\d.]+)(.*)$/;
 export function StatCounter({
   value,
   duration = 1600,
+  delay = 0,
   className,
 }: {
   value: string;
   duration?: number;
+  delay?: number;
   className?: string;
 }) {
   const match = value.match(STAT_PATTERN);
@@ -31,27 +33,31 @@ export function StatCounter({
     }
 
     let raf = 0;
+    let timeout = 0;
     const observer = new IntersectionObserver(
       (entries) => {
         if (!entries[0].isIntersecting) return;
         observer.disconnect();
 
-        const start = performance.now();
-        const tick = (now: number) => {
-          const t = Math.min((now - start) / duration, 1);
-          const eased = 1 - Math.pow(1 - t, 3);
-          setDisplay((target * eased).toFixed(decimals));
-          if (t < 1) raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
+        timeout = window.setTimeout(() => {
+          const start = performance.now();
+          const tick = (now: number) => {
+            const t = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - t, 3);
+            setDisplay((target * eased).toFixed(decimals));
+            if (t < 1) raf = requestAnimationFrame(tick);
+          };
+          raf = requestAnimationFrame(tick);
+        }, delay);
       },
-      { threshold: 0.4 },
+      { threshold: 0.2 },
     );
     observer.observe(el);
 
     return () => {
       observer.disconnect();
       cancelAnimationFrame(raf);
+      window.clearTimeout(timeout);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

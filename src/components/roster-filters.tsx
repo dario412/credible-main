@@ -1,7 +1,9 @@
 "use client";
 
+import { CaretDown, X } from "@phosphor-icons/react";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
+
 import { cn } from "@/lib/utils";
 
 export const ARCHETYPE_OPTIONS = [
@@ -36,6 +38,8 @@ type FilterPatch = {
   q?: string;
 };
 
+type OpenMenu = "archetype" | "topic" | "format" | null;
+
 export function RosterFilters({
   currentArchetype,
   currentTopic,
@@ -51,6 +55,9 @@ export function RosterFilters({
   const pathname = usePathname();
   const [pending, startTransition] = useTransition();
   const [query, setQuery] = useState(currentQuery ?? "");
+  const [open, setOpen] = useState<OpenMenu>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const searchId = useId();
 
   useEffect(() => {
     setQuery(currentQuery ?? "");
@@ -65,10 +72,30 @@ export function RosterFilters({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
+  useEffect(() => {
+    if (!open) return;
+
+    function onPointerDown(event: MouseEvent) {
+      if (!barRef.current?.contains(event.target as Node)) {
+        setOpen(null);
+      }
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(null);
+    }
+
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
   function update(patch: FilterPatch) {
     const params = new URLSearchParams();
-    const archetype =
-      "archetype" in patch ? patch.archetype : currentArchetype;
+    const archetype = "archetype" in patch ? patch.archetype : currentArchetype;
     const topic = "topic" in patch ? patch.topic : currentTopic;
     const format = "format" in patch ? patch.format : currentFormat;
     const q = "q" in patch ? patch.q : currentQuery;
@@ -84,146 +111,248 @@ export function RosterFilters({
     });
   }
 
+  function clearAll() {
+    setQuery("");
+    setOpen(null);
+    startTransition(() => router.push(pathname));
+  }
+
   const hasFilters = Boolean(
     currentArchetype || currentTopic || currentFormat || query,
   );
 
   return (
-    <div
-      className={cn(
-        "rounded-sm border border-charcoal/8 bg-[#FBF8F5] px-5 py-6 shadow-[0_10px_28px_rgba(28,26,23,0.05)] transition-opacity md:px-7 md:py-7",
-        pending && "opacity-70",
-      )}
-    >
-      <div className="relative">
-        <label htmlFor="roster-search" className="sr-only">
-          Search experts
-        </label>
-        <span
-          aria-hidden
-          className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-charcoal/40"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            className="size-4"
+    <>
+      <div
+        ref={barRef}
+        className={cn(
+          "rounded-sm border border-charcoal/8 bg-[#FBF8F5] shadow-[0_10px_28px_rgba(28,26,23,0.06)] transition-opacity",
+          // The menus are absolutely positioned below the bar, so they need to escape it.
+          open ? "overflow-visible" : "overflow-hidden",
+          pending && "opacity-70",
+        )}
+      >
+        <div className="flex flex-col lg:flex-row lg:items-stretch">
+          <label
+            htmlFor={searchId}
+            className={cn(
+              "group/search relative flex min-w-0 flex-1 cursor-text flex-col justify-center gap-0.5 px-4 py-3 transition-colors",
+              "hover:bg-cream/70 focus-within:bg-cream/70",
+              "lg:px-5",
+            )}
           >
-            <circle cx="11" cy="11" r="7" />
-            <path d="m20 20-3.5-3.5" strokeLinecap="round" />
-          </svg>
-        </span>
-        <input
-          id="roster-search"
-          type="search"
-          placeholder="Search by name, title, or focus…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-full border-b border-charcoal/12 bg-transparent py-2.5 pr-16 pl-7 text-sm text-charcoal transition-colors placeholder:text-charcoal/40 focus:border-forest focus:outline-none"
-        />
-        {hasFilters ? (
-          <button
-            type="button"
-            onClick={() => {
-              setQuery("");
-              startTransition(() => router.push(pathname));
+            <span className="text-[10px] font-medium tracking-[0.14em] text-charcoal uppercase">
+              Search
+            </span>
+            <span className="relative flex items-center">
+              <input
+                id={searchId}
+                type="search"
+                placeholder="Search experts"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full bg-transparent pr-7 text-[0.8125rem] text-charcoal outline-none placeholder:text-charcoal/40"
+              />
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="absolute right-0 cursor-pointer text-charcoal/40 transition-colors hover:text-charcoal"
+                  aria-label="Clear search"
+                >
+                  <X weight="bold" className="size-3.5" aria-hidden />
+                </button>
+              ) : null}
+            </span>
+          </label>
+
+          <FilterSegment
+            label="Archetype"
+            value={currentArchetype}
+            placeholder="All archetypes"
+            options={ARCHETYPE_OPTIONS}
+            open={open === "archetype"}
+            onToggle={() =>
+              setOpen((current) =>
+                current === "archetype" ? null : "archetype",
+              )
+            }
+            onSelect={(value) => {
+              update({ archetype: value });
+              setOpen(null);
             }}
-            className="absolute top-1/2 right-0 -translate-y-1/2 cursor-pointer text-xs text-charcoal/50 transition-colors hover:text-forest focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
-          >
-            Clear all
-          </button>
-        ) : null}
+            onClear={() => {
+              update({ archetype: undefined });
+              setOpen(null);
+            }}
+          />
+
+          <FilterSegment
+            label="Topic"
+            value={currentTopic}
+            placeholder="All topics"
+            options={TOPIC_OPTIONS}
+            open={open === "topic"}
+            onToggle={() =>
+              setOpen((current) => (current === "topic" ? null : "topic"))
+            }
+            onSelect={(value) => {
+              update({ topic: value });
+              setOpen(null);
+            }}
+            onClear={() => {
+              update({ topic: undefined });
+              setOpen(null);
+            }}
+          />
+
+          <FilterSegment
+            label="Format"
+            value={currentFormat}
+            placeholder="All formats"
+            options={FORMAT_OPTIONS}
+            open={open === "format"}
+            onToggle={() =>
+              setOpen((current) => (current === "format" ? null : "format"))
+            }
+            onSelect={(value) => {
+              update({ format: value });
+              setOpen(null);
+            }}
+            onClear={() => {
+              update({ format: undefined });
+              setOpen(null);
+            }}
+            isLast
+          />
+        </div>
       </div>
 
-      <div className="mt-7 divide-y divide-charcoal/10">
-        <FilterRow
-          id="roster-archetype-label"
-          label="Archetype"
-          options={["All", ...ARCHETYPE_OPTIONS]}
-          current={currentArchetype}
-          onSelect={(value) =>
-            update(
-              value === "All"
-                ? { archetype: undefined }
-                : { archetype: value },
-            )
-          }
-        />
-        <FilterRow
-          id="roster-topic-label"
-          label="Topic"
-          options={["All", ...TOPIC_OPTIONS]}
-          current={currentTopic}
-          onSelect={(value) =>
-            update(value === "All" ? { topic: undefined } : { topic: value })
-          }
-        />
-        <FilterRow
-          id="roster-format-label"
-          label="Format"
-          options={["All", ...FORMAT_OPTIONS]}
-          current={currentFormat}
-          onSelect={(value) =>
-            update(
-              value === "All" ? { format: undefined } : { format: value },
-            )
-          }
-        />
-      </div>
-    </div>
+      {hasFilters ? (
+        <div className="mt-3 flex justify-end">
+          <button
+            type="button"
+            onClick={clearAll}
+            className="inline-flex cursor-pointer items-center gap-1.5 text-[0.75rem] font-medium text-charcoal/55 transition-colors hover:text-forest"
+          >
+            <X weight="bold" className="size-3" aria-hidden />
+            Clear all filters
+          </button>
+        </div>
+      ) : null}
+    </>
   );
 }
 
-function FilterRow({
-  id,
+function FilterSegment({
   label,
+  value,
+  placeholder,
   options,
-  current,
+  open,
+  onToggle,
   onSelect,
+  onClear,
+  isLast = false,
 }: {
-  id: string;
   label: string;
+  value?: string;
+  placeholder: string;
   options: readonly string[];
-  current?: string;
+  open: boolean;
+  onToggle: () => void;
   onSelect: (value: string) => void;
+  onClear: () => void;
+  isLast?: boolean;
 }) {
-  return (
-    <div className="grid gap-3 py-5 first:pt-0 last:pb-0 md:grid-cols-[7.5rem_minmax(0,1fr)] md:items-start md:gap-6">
-      <p
-        id={id}
-        className="pt-2 text-[11px] font-medium tracking-[0.16em] text-charcoal/50 uppercase"
-      >
-        {label}
-      </p>
-      <div
-        role="group"
-        aria-labelledby={id}
-        className="flex flex-wrap gap-1.5 lg:flex-nowrap lg:gap-1.5"
-      >
-        {options.map((option) => {
-          const isAll = option === "All";
-          const active = isAll ? !current : current === option;
+  const listId = useId();
 
-          return (
+  return (
+    <div
+      className={cn(
+        "relative border-t border-charcoal/8 lg:border-t-0 lg:border-l lg:border-charcoal/10",
+        !isLast && "lg:min-w-[10rem]",
+        isLast && "lg:min-w-[9.5rem]",
+      )}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-controls={listId}
+        onClick={onToggle}
+        className={cn(
+          "flex w-full cursor-pointer flex-col gap-0.5 px-4 py-3 text-left transition-colors",
+          "hover:bg-cream/70 focus-visible:bg-cream/70 focus-visible:outline-none",
+          open && "bg-cream/70",
+          isLast && "lg:pr-4",
+        )}
+      >
+        <span className="text-[10px] font-medium tracking-[0.14em] text-charcoal uppercase">
+          {label}
+        </span>
+        <span className="flex items-center gap-2">
+          <span
+            className={cn(
+              "min-w-0 flex-1 truncate text-[0.8125rem]",
+              value ? "font-medium text-charcoal" : "text-charcoal/40",
+            )}
+          >
+            {value ?? placeholder}
+          </span>
+          <CaretDown
+            weight="bold"
+            aria-hidden
+            className={cn(
+              "size-3.5 shrink-0 text-charcoal/40 transition-transform duration-300",
+              open && "rotate-180",
+            )}
+          />
+        </span>
+      </button>
+
+      {open ? (
+        <ul
+          id={listId}
+          role="listbox"
+          aria-label={label}
+          className="absolute top-[calc(100%+0.4rem)] right-0 left-0 z-30 overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] py-1.5 shadow-[0_16px_36px_rgba(28,26,23,0.12)]"
+        >
+          <li role="option" aria-selected={!value}>
             <button
-              key={option}
               type="button"
-              aria-pressed={active}
-              onClick={() => onSelect(option)}
+              onClick={onClear}
               className={cn(
-                "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-sm border px-3 text-[0.8125rem] font-medium transition-colors lg:min-h-9 lg:px-3 lg:text-[0.75rem]",
-                "min-h-9 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest",
-                active
-                  ? "border-forest bg-forest text-cream shadow-[0_4px_14px_rgba(52,91,71,0.35)] ring-2 ring-forest/25"
-                  : "border-charcoal/15 bg-white/60 text-charcoal/70 hover:border-forest/35 hover:text-charcoal",
+                "flex w-full cursor-pointer px-3.5 py-2.5 text-left text-[0.8125rem] transition-colors",
+                !value
+                  ? "bg-forest/10 font-medium text-forest"
+                  : "text-charcoal hover:bg-cream",
               )}
             >
-              {option}
+              {placeholder}
             </button>
-          );
-        })}
-      </div>
+          </li>
+          {options.map((option) => {
+            const active = value === option;
+            return (
+              <li key={option} role="option" aria-selected={active}>
+                <button
+                  type="button"
+                  onClick={() => onSelect(option)}
+                  className={cn(
+                    "flex w-full cursor-pointer px-3.5 py-2.5 text-left text-[0.8125rem] transition-colors",
+                    active
+                      ? "bg-forest/10 font-medium text-forest"
+                      : "text-charcoal hover:bg-cream",
+                  )}
+                >
+                  {option}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
     </div>
   );
 }

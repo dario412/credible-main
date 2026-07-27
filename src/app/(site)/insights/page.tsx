@@ -4,7 +4,6 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 import { INSIGHT_TOPICS } from "@/lib/insight-topics";
-import { InsightsToolbar } from "@/components/insights-filters";
 import { ViewMoreLink } from "@/components/view-more-link";
 import { InsightsPromo } from "@/components/insights-promo";
 
@@ -117,12 +116,9 @@ export default async function InsightsPage({
 
   return (
     <div className="mx-auto max-w-352 px-6 py-16 md:px-10 md:py-20 lg:px-12">
-      <div className="flex flex-wrap items-end justify-between gap-6">
-        <h1 className="font-display text-[2.6rem] leading-none tracking-tight text-charcoal sm:text-[3.25rem] md:text-[3.75rem]">
-          Insights.
-        </h1>
-        <InsightsToolbar currentCategory={category} currentQuery={q} />
-      </div>
+      <h1 className="text-center font-display text-[2.6rem] leading-none tracking-tight text-charcoal sm:text-[3.25rem] md:text-[3.75rem]">
+        Insights.
+      </h1>
 
       {featured ? (
         <Link
@@ -130,20 +126,25 @@ export default async function InsightsPage({
           className="group mt-10 block overflow-hidden rounded-sm bg-[#FBF8F5] shadow-[0_10px_28px_rgba(28,26,23,0.05)] transition-shadow duration-300 hover:shadow-[0_16px_36px_rgba(28,26,23,0.08)] md:mt-12"
         >
           <article className="grid min-h-80 lg:min-h-112 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-            <div className="flex flex-col justify-between gap-10 px-6 py-10 md:px-8 md:py-12 lg:px-10 lg:py-14">
+            <div className="flex flex-col justify-between gap-8 px-6 py-10 md:px-8 md:py-12 lg:gap-10 lg:px-10 lg:py-14">
               <div>
-                <p className="text-[11px] font-medium tracking-[0.16em] text-charcoal/45 uppercase">
-                  {featured.category} · {featuredMins} min read
+                <p className="text-[0.65rem] font-medium tracking-[0.16em] text-charcoal/45 uppercase">
+                  Featured · {featured.category} · {featuredMins} min read
                 </p>
                 <h2 className="mt-4 max-w-xl font-display text-[1.65rem] leading-[1.12] tracking-tight text-charcoal transition-colors group-hover:text-forest sm:text-[1.9rem] md:text-[2.15rem]">
                   {featured.title}
                 </h2>
+                {featured.excerpt ? (
+                  <p className="mt-4 max-w-lg text-[0.95rem] leading-relaxed text-charcoal/65 md:text-[1rem]">
+                    {featured.excerpt}
+                  </p>
+                ) : null}
               </div>
 
               <div className="flex items-center gap-3">
                 <span
                   aria-hidden
-                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#E4EBE6] font-display text-sm text-forest"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-sm bg-cream-dark font-display text-sm text-forest"
                 >
                   C
                 </span>
@@ -156,7 +157,7 @@ export default async function InsightsPage({
               </div>
             </div>
 
-            <div className="relative min-h-64 overflow-hidden bg-[#E4EBE6] lg:min-h-full">
+            <div className="relative min-h-64 overflow-hidden bg-cream-dark lg:min-h-full">
               {coverFor(featured) ? (
                 <Image
                   src={coverFor(featured)!}
@@ -174,7 +175,7 @@ export default async function InsightsPage({
                   01
                 </span>
               )}
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-[#FBF8F5]/40 to-transparent lg:hidden" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-[#FBF8F5]/40 to-transparent lg:hidden" />
             </div>
           </article>
         </Link>
@@ -182,7 +183,7 @@ export default async function InsightsPage({
 
       <InsightsPromo />
 
-      <div className="mt-14 md:mt-20">
+      <div className="mt-14 md:mt-16">
         {sections ? (
           <div className="space-y-16 md:space-y-20">
             {sections.map((section) => (
@@ -252,7 +253,7 @@ function InsightCard({
 
   return (
     <Link href={`/insights/${insight.slug}`} className="group block cursor-pointer">
-      <div className="relative aspect-16/10 overflow-hidden rounded-sm bg-[#E4EBE6]">
+      <div className="relative aspect-16/10 overflow-hidden rounded-sm bg-cream-dark">
         {cover ? (
           <Image
             src={cover}

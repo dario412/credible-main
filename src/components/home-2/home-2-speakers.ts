@@ -1,0 +1,178 @@
+export type Home2Speaker = {
+  id: string;
+  name: string;
+  title: string;
+  prompt: string;
+  slug: string;
+};
+
+export const HOME_2_SPEAKERS: Home2Speaker[] = [
+  {
+    id: "1",
+    name: "Amara Chen",
+    title: "Founder & Keynote",
+    prompt: "How do you brief a founder for stage?",
+    slug: "amara-chen",
+  },
+  {
+    id: "2",
+    name: "James Okafor",
+    title: "Motivational Speaker",
+    prompt: "What makes a keynote convert?",
+    slug: "james-okafor",
+  },
+  {
+    id: "3",
+    name: "Sofia Martinez",
+    title: "Brand Strategist",
+    prompt: "How do brand partnerships stay credible?",
+    slug: "sofia-martinez",
+  },
+  {
+    id: "4",
+    name: "Noah Bennett",
+    title: "Executive Operator",
+    prompt: "When should a COO take the stage?",
+    slug: "noah-bennett",
+  },
+  {
+    id: "5",
+    name: "Lena Weiss",
+    title: "Media Host",
+    prompt: "What makes a moderator worth booking?",
+    slug: "lena-weiss",
+  },
+  {
+    id: "6",
+    name: "Daniel Park",
+    title: "Innovation Keynote",
+    prompt: "How do you talk AI without the hype?",
+    slug: "daniel-park",
+  },
+  {
+    id: "7",
+    name: "Maya Okonkwo",
+    title: "Growth Advisor",
+    prompt: "Can creators actually drive pipeline?",
+    slug: "maya-okonkwo",
+  },
+  {
+    id: "8",
+    name: "Theo Astrid",
+    title: "Venture Partner",
+    prompt: "What do investors want from a briefing?",
+    slug: "theo-astrid",
+  },
+  {
+    id: "9",
+    name: "Priya Nair",
+    title: "Product Operator",
+    prompt: "How do operators sound on LinkedIn?",
+    slug: "priya-nair",
+  },
+  {
+    id: "10",
+    name: "Omar Hassan",
+    title: "Stage Moderator",
+    prompt: "What ruins a panel — and how do you fix it?",
+    slug: "omar-hassan",
+  },
+  {
+    id: "11",
+    name: "Clara Vries",
+    title: "Culture Speaker",
+    prompt: "How do you brief culture without fluff?",
+    slug: "clara-vries",
+  },
+  {
+    id: "12",
+    name: "Ethan Brooks",
+    title: "B2B Storyteller",
+    prompt: "What story closes an enterprise room?",
+    slug: "ethan-brooks",
+  },
+  {
+    id: "13",
+    name: "Nina Solberg",
+    title: "Investor Voice",
+    prompt: "Why do buyers trust investor voices?",
+    slug: "nina-solberg",
+  },
+  {
+    id: "14",
+    name: "Kai Nakamura",
+    title: "Founder Coach",
+    prompt: "When is a founder the right face?",
+    slug: "kai-nakamura",
+  },
+  {
+    id: "15",
+    name: "Isla Rowe",
+    title: "Events Host",
+    prompt: "How do you hold a 500-person room?",
+    slug: "isla-rowe",
+  },
+  {
+    id: "16",
+    name: "Marcus Hale",
+    title: "Sales Leader",
+    prompt: "Can sales leaders be content engines?",
+    slug: "marcus-hale",
+  },
+  {
+    id: "17",
+    name: "Aisha Rahman",
+    title: "Policy Advisor",
+    prompt: "How do specialists earn attention?",
+    slug: "aisha-rahman",
+  },
+  {
+    id: "18",
+    name: "Jonas Klein",
+    title: "Tech Operator",
+    prompt: "What should a tech briefing sound like?",
+    slug: "jonas-klein",
+  },
+  {
+    id: "19",
+    name: "Elena Costa",
+    title: "Brand Creator",
+    prompt: "Where does authenticity start?",
+    slug: "elena-costa",
+  },
+  {
+    id: "20",
+    name: "Felix Andersson",
+    title: "Keynote Talent",
+    prompt: "What does a perfect brief look like?",
+    slug: "felix-andersson",
+  },
+  {
+    id: "21",
+    name: "Harper Quinn",
+    title: "Founder",
+    prompt: "How do you scale a founder’s voice?",
+    slug: "harper-quinn",
+  },
+  {
+    id: "22",
+    name: "Ravi Mehta",
+    title: "Operator",
+    prompt: "Why book operators, not celebrities?",
+    slug: "ravi-mehta",
+  },
+  {
+    id: "23",
+    name: "Zoe Laurent",
+    title: "Speaker",
+    prompt: "What changes after the keynote?",
+    slug: "zoe-laurent",
+  },
+  {
+    id: "24",
+    name: "Alex Lieberman",
+    title: "Founder & Storyteller",
+    prompt: "How do operators become trusted voices?",
+    slug: "alex-lieberman",
+  },
+];

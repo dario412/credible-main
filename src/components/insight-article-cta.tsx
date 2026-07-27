@@ -5,13 +5,17 @@ import { PatternField } from "@/components/pattern-field";
 
 const CREAM_RGB = { r: 249, g: 243, b: 239 };
 
+/** Compact roster CTA — matches Insights promo card language. */
 export function InsightArticleCta() {
   return (
-    <div className="relative overflow-hidden rounded-sm bg-forest px-5 py-6 shadow-[0_14px_36px_rgba(42,73,57,0.28)] md:px-6 md:py-7">
+    <Link
+      href="/roster"
+      className="group relative flex flex-col justify-between overflow-hidden rounded-sm bg-forest px-5 py-6 transition-colors hover:bg-forest-dark md:px-6 md:py-7"
+    >
       <PatternField
         color={CREAM_RGB}
-        className="opacity-[0.16]"
-        mask="linear-gradient(to left, black 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.12) 65%, transparent 88%)"
+        className="opacity-[0.12]"
+        mask="linear-gradient(to left, black 0%, rgba(0,0,0,0.45) 40%, transparent 85%)"
       />
 
       <div className="relative z-2">
@@ -22,14 +26,15 @@ export function InsightArticleCta() {
           Browse operators by topic, format, and archetype — then send a brief.
         </p>
 
-        <Link
-          href="/roster"
-          className="mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-sm bg-cream px-4 py-3 text-[0.8125rem] font-medium text-charcoal transition-colors hover:bg-cream-dark"
-        >
+        <span className="mt-5 inline-flex items-center gap-1.5 text-[0.875rem] font-medium text-cream">
           Browse the roster
-          <ArrowRight weight="bold" className="size-3.5" aria-hidden />
-        </Link>
+          <ArrowRight
+            weight="bold"
+            className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+            aria-hidden
+          />
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }

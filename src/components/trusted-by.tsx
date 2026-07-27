@@ -9,14 +9,17 @@ type Testimonial = {
 
 type Brand = {
   name: string;
+  logoSrc?: string;
+  logoClassName?: string;
   caseStudySlug?: string;
   testimonial?: Testimonial;
 };
 
 const brands: Brand[] = [
-  { name: "Notion" },
+  { name: "Notion", logoSrc: "/brand/clients/notion-wordmark-white.png" },
   {
     name: "Stripe",
+    logoSrc: "/brand/clients/stripe-wordmark-white.svg",
     caseStudySlug: "stage-to-boardroom",
     testimonial: {
       quote:
@@ -25,9 +28,10 @@ const brands: Brand[] = [
       title: "Head of Brand Partnerships, Stripe",
     },
   },
-  { name: "Linear" },
+  { name: "Linear", logoSrc: "/brand/clients/linear-wordmark-white.svg" },
   {
     name: "Figma",
+    logoSrc: "/brand/clients/figma-wordmark-white.svg",
     caseStudySlug: "creator-led-launch",
     testimonial: {
       quote:
@@ -36,11 +40,12 @@ const brands: Brand[] = [
       title: "Director of Marketing, Figma",
     },
   },
-  { name: "Vercel" },
-  { name: "Intercom" },
-  { name: "Ramp" },
+  { name: "Vercel", logoSrc: "/brand/clients/vercel-wordmark-white.svg" },
+  { name: "Intercom", logoSrc: "/brand/clients/intercom-wordmark-white.svg" },
+  { name: "Ramp", logoSrc: "/brand/clients/ramp-wordmark-white.svg" },
   {
     name: "Retool",
+    logoSrc: "/brand/clients/retool-wordmark-white.svg",
     caseStudySlug: "stage-to-boardroom",
     testimonial: {
       quote:
@@ -49,9 +54,32 @@ const brands: Brand[] = [
       title: "VP Marketing, Retool",
     },
   },
-  { name: "Loom" },
-  { name: "Cursor" },
+  { name: "Loom", logoSrc: "/brand/clients/loom-wordmark-white.svg" },
+  { name: "Cursor", logoSrc: "/brand/clients/cursor-wordmark-white.svg" },
 ];
+
+const LOGO_CLASS = "h-[1.35rem] w-auto md:h-[1.55rem]";
+
+function BrandMark({ brand }: { brand: Brand }) {
+  if (brand.logoSrc) {
+    return (
+      <>
+        <span className="sr-only">{brand.name}</span>
+        <img
+          src={brand.logoSrc}
+          alt=""
+          className={`${brand.logoClassName ?? LOGO_CLASS} w-auto object-contain transition-opacity duration-200`}
+        />
+      </>
+    );
+  }
+
+  return (
+    <span className="font-display text-[1.35rem] leading-none tracking-tight md:text-[1.55rem]">
+      {brand.name}
+    </span>
+  );
+}
 
 function ArrowIcon({ className }: { className?: string }) {
   return (
@@ -70,7 +98,7 @@ function ArrowIcon({ className }: { className?: string }) {
 export function TrustedBy() {
   return (
     <section className="bg-cream px-6 py-8 md:px-10 md:py-10 lg:px-12">
-      <div className="mx-auto max-w-352 overflow-visible rounded-sm bg-charcoal px-6 py-14 md:px-10 md:py-16 lg:px-12 lg:py-20">
+      <div className="mx-auto max-w-352 overflow-visible rounded-sm bg-charcoal px-6 py-6 md:px-10 md:py-10 lg:px-12 lg:py-12">
         <ul className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:grid-cols-5 md:gap-x-8 md:gap-y-14">
           {brands.map((brand) => {
             const hasStory = Boolean(brand.caseStudySlug && brand.testimonial);
@@ -118,8 +146,8 @@ export function TrustedBy() {
                   </div>
                 ) : null}
 
-                <span className="font-display text-[1.35rem] leading-none tracking-tight text-cream/90 transition-colors duration-200 group-hover:text-cream md:text-[1.55rem]">
-                  {brand.name}
+                <span className="flex h-[1.75rem] items-center justify-center text-white transition-opacity duration-200">
+                  <BrandMark brand={brand} />
                 </span>
 
                 {hasStory && brand.caseStudySlug ? (

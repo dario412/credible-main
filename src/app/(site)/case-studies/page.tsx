@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown } from "@phosphor-icons/react/ssr";
 
 import {
   CaseStudyArchiveCard,
@@ -118,14 +117,6 @@ export default async function CaseStudiesPage({
                 </li>
               ))}
             </ul>
-
-            <Link
-              href="#all-case-studies"
-              className="flex w-full items-center justify-center gap-2 rounded-sm bg-cream-dark px-6 py-4 text-[0.875rem] font-medium text-charcoal transition-colors hover:bg-[#E4EBE6]"
-            >
-              <ArrowDown weight="bold" className="size-3.5" aria-hidden />
-              Read all case studies
-            </Link>
           </div>
         </div>
       </section>
@@ -137,11 +128,11 @@ export default async function CaseStudiesPage({
         className="scroll-mt-8 bg-cream"
       >
         <div className="mx-auto max-w-352 px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
-          <h2 className="font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal sm:text-[2.4rem] md:text-[2.75rem]">
+          <h2 className="text-center font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal sm:text-[2.4rem] md:text-[2.75rem]">
             All stories
           </h2>
 
-          <div className="mt-8 md:mt-10">
+          <div className="mx-auto mt-8 max-w-4xl md:mt-10">
             <CaseStudyFilters
               currentClientType={clientType}
               currentPillar={pillar}

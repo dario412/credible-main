@@ -1,10 +1,10 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-import { CaseStudyArchiveCard } from "@/components/case-study-archive-card";
 import { CaseStudyCreatorCta } from "@/components/case-study-creator-cta";
 import { InsightArticleCta } from "@/components/insight-article-cta";
 import { InsightShare } from "@/components/insight-share";
+import { SimilarCaseStudiesGrid } from "@/components/similar-case-studies-grid";
 import { StatCounter } from "@/components/stat-counter";
 import { ViewMoreLink } from "@/components/view-more-link";
 import {
@@ -101,7 +101,7 @@ export default async function CaseStudyPage({ params }: Props) {
 
   return (
     <>
-      <section className="relative isolate min-h-[min(92vh,52rem)] w-full overflow-hidden md:min-h-[min(94vh,56rem)]">
+      <section className="relative isolate min-h-[min(92vh,52rem)] w-full -mt-[7.25rem] overflow-hidden md:min-h-[min(94vh,56rem)] md:-mt-[5.5rem]">
         <Image
           src={study.coverImage}
           alt=""
@@ -112,10 +112,24 @@ export default async function CaseStudyPage({ params }: Props) {
         />
         <div
           aria-hidden
-          className="absolute inset-0 bg-linear-to-t from-charcoal/92 via-charcoal/55 to-charcoal/45 backdrop-blur-[2px]"
+          className="absolute inset-0 bg-linear-to-t from-charcoal via-charcoal/78 to-charcoal/55"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-linear-to-b from-charcoal/75 via-charcoal/35 to-transparent"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-[55%] backdrop-blur-[8px]"
+          style={{
+            maskImage:
+              "linear-gradient(to bottom, black 0%, black 35%, transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 0%, black 35%, transparent 100%)",
+          }}
         />
 
-        <div className="relative mx-auto flex min-h-[min(92vh,52rem)] max-w-352 flex-col justify-between px-6 py-12 md:min-h-[min(94vh,56rem)] md:px-10 md:py-14 lg:px-12 lg:py-16">
+        <div className="relative mx-auto flex min-h-[min(92vh,52rem)] max-w-352 flex-col justify-between px-6 pt-36 pb-12 md:min-h-[min(94vh,56rem)] md:px-10 md:pb-14 lg:px-12 lg:pb-16">
           <div>
             <Image
               src={logo}
@@ -223,30 +237,31 @@ export default async function CaseStudyPage({ params }: Props) {
                   ) : null}
 
                   {results.length > 0 ? (
-                    <ul className="mt-8 grid gap-3 sm:grid-cols-2 md:mt-10 md:gap-4">
+                    <ul className="mt-8 border-t border-charcoal/12 md:mt-10">
                       {results.map((result) => (
                         <li
                           key={result.value + (result.label ?? "")}
-                          className="flex items-center gap-5 rounded-sm bg-cream-dark px-5 py-6 md:gap-6 md:px-6 md:py-7"
+                          className="border-b border-charcoal/12 py-8 md:py-10"
                         >
-                          <p className="shrink-0 font-display text-[2.15rem] leading-none tracking-tight text-charcoal md:text-[2.5rem]">
-                            <StatCounter value={result.value} />
-                          </p>
-                          <div className="min-w-0">
-                            {result.label ? (
-                              <p className="text-[0.95rem] font-medium leading-snug text-charcoal">
-                                {result.label}
-                              </p>
-                            ) : null}
-                            <p
-                              className={
-                                result.label
-                                  ? "mt-1 text-sm leading-relaxed text-charcoal/70"
-                                  : "text-sm leading-relaxed text-charcoal/70"
-                              }
-                            >
-                              {result.caption}
+                          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
+                            <p className="font-display text-[3.75rem] leading-none tracking-tight text-charcoal sm:text-[4.5rem] md:text-[5.25rem]">
+                              <StatCounter value={result.value} duration={1400} />
                             </p>
+                            <div className="max-w-md sm:text-right">
+                              {result.label ? (
+                                <p className="text-[1.05rem] leading-snug font-medium text-charcoal md:text-[1.2rem]">
+                                  {result.label}
+                                </p>
+                              ) : null}
+                              <p
+                                className={cn(
+                                  "text-sm leading-relaxed text-charcoal/55",
+                                  result.label ? "mt-1.5" : undefined,
+                                )}
+                              >
+                                {result.caption}
+                              </p>
+                            </div>
                           </div>
                         </li>
                       ))}
@@ -271,7 +286,7 @@ export default async function CaseStudyPage({ params }: Props) {
                     {story.deliverables.map((item) => (
                       <li
                         key={item.title}
-                        className="flex min-h-40 flex-col justify-between rounded-sm bg-[#E4EBE6] px-5 pb-5 pt-6 md:min-h-44 md:px-6 md:pb-6 md:pt-7"
+                        className="flex min-h-40 flex-col justify-between rounded-sm bg-cream-dark px-5 pb-5 pt-6 md:min-h-44 md:px-6 md:pb-6 md:pt-7"
                       >
                         <div>
                           <Image
@@ -298,18 +313,8 @@ export default async function CaseStudyPage({ params }: Props) {
                     className="mt-10 md:mt-12"
                     creatorName={study.ctaCreator.name}
                     expert={{
-                      id: study.ctaCreator.slug,
                       slug: study.ctaCreator.slug,
                       name: study.ctaCreator.name,
-                      shortBio: study.ctaCreator.shortBio,
-                      image: study.ctaCreator.image,
-                      role: study.ctaCreator.role,
-                      topics: study.ctaCreator.topics,
-                      combinedReach: study.ctaCreator.combinedReach,
-                      growth90d: study.ctaCreator.growth90d,
-                      audienceWho: study.ctaCreator.audienceWho,
-                      audienceWhere: study.ctaCreator.audienceWhere,
-                      channels: study.ctaCreator.channels,
                     }}
                   />
                 ) : null}
@@ -340,13 +345,7 @@ export default async function CaseStudyPage({ params }: Props) {
                   <ViewMoreLink href="/case-studies">View all</ViewMoreLink>
                 </div>
 
-                <ul className="mt-8 grid gap-8 sm:grid-cols-2 md:mt-10 lg:grid-cols-3 lg:gap-10">
-                  {similar.map((item) => (
-                    <li key={item.slug}>
-                      <CaseStudyArchiveCard study={item} />
-                    </li>
-                  ))}
-                </ul>
+                <SimilarCaseStudiesGrid studies={similar} />
               </section>
             ) : (
               <div className="pb-10 md:pb-12 lg:pb-14" aria-hidden />

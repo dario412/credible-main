@@ -76,6 +76,7 @@ function drawStraightLine(
   time,
   seed,
   color,
+  edgeFade = true,
 ) {
   const steps = Math.ceil(height / 10);
 
@@ -95,7 +96,8 @@ function drawStraightLine(
     else ctx.lineTo(px, y);
   }
 
-  ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * fadeAlpha(x, width)})`;
+  const edge = edgeFade ? fadeAlpha(x, width) : 1;
+  ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * edge})`;
   ctx.stroke();
 }
 
@@ -113,6 +115,7 @@ function drawKinkedLine(
   time,
   seed,
   color,
+  edgeFade = true,
 ) {
   const y1 = height * profile.enter;
   const y2 = height * profile.midTop;
@@ -143,7 +146,8 @@ function drawKinkedLine(
     else ctx.lineTo(drawX, py);
   });
 
-  ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * fadeAlpha(x, width)})`;
+  const edge = edgeFade ? fadeAlpha(x, width) : 1;
+  ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha * edge})`;
   ctx.stroke();
 }
 
@@ -152,6 +156,10 @@ export class PatternCanvas {
     this.canvas = canvas;
     this.container = container;
     this.color = options.color || GREEN;
+    this.lineCount = options.lineCount || null;
+    this.drawOnMobile = Boolean(options.drawOnMobile);
+    this.baseWidth = options.baseWidth || BASE_WIDTH;
+    this.edgeFade = options.edgeFade !== false;
     this.ctx = canvas.getContext("2d");
     this.lines = [];
     this.spacing = 14;
@@ -205,7 +213,7 @@ export class PatternCanvas {
   onResize() {
     this.isMobile = isMobileViewport();
 
-    if (this.isMobile) {
+    if (this.isMobile && !this.drawOnMobile) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       return;
     }
@@ -215,17 +223,41 @@ export class PatternCanvas {
 
     this.width = rect.width;
     this.height = rect.height;
-    this.spacing = clamp(this.width / 38, 13, 18);
+
+    if (this.lineCount) {
+      this.spacing = this.width / this.lineCount;
+      const profiles = [
+        { enter: 0.37, midTop: 0.49, midBottom: 0.62, exit: 0.74 },
+        { enter: 0.04, midTop: 0.16, midBottom: 0.29, exit: 0.41 },
+        { enter: 0.52, midTop: 0.64, midBottom: 0.76, exit: 0.87 },
+      ];
+      this.lines = Array.from({ length: this.lineCount }, (_, i) => {
+        const x = i * this.spacing + this.spacing * 0.5;
+        const posInGroup = i % 6;
+        if (posInGroup === 3 || posInGroup === 4) {
+          return {
+            x,
+            type: "kink",
+            profile: profiles[Math.floor(i / 6) % profiles.length],
+            seed: i,
+          };
+        }
+        return { x, type: "straight", seed: i };
+      });
+    } else {
+      this.spacing = clamp(this.width / 38, 13, 18);
+      this.lines = buildLines(rect.width, this.spacing);
+    }
+
     this.canvas.width = Math.floor(rect.width * dpr);
     this.canvas.height = Math.floor(rect.height * dpr);
     this.canvas.style.width = `${rect.width}px`;
     this.canvas.style.height = `${rect.height}px`;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.lines = buildLines(rect.width, this.spacing);
   }
 
   animate(now) {
-    if (this.isMobile) {
+    if (this.isMobile && !this.drawOnMobile) {
       this.raf = requestAnimationFrame(this.animate);
       return;
     }
@@ -256,7 +288,7 @@ export class PatternCanvas {
         : 0;
 
       const alpha = 0.82 + lineInfluence * 0.18;
-      this.ctx.lineWidth = BASE_WIDTH + lineInfluence * 1.4;
+      this.ctx.lineWidth = this.baseWidth + lineInfluence * 1.4;
 
       if (line.type === "kink") {
         drawKinkedLine(
@@ -273,6 +305,7 @@ export class PatternCanvas {
           elapsed,
           line.seed,
           this.color,
+          this.edgeFade,
         );
       } else {
         drawStraightLine(
@@ -287,6 +320,7 @@ export class PatternCanvas {
           elapsed,
           line.seed,
           this.color,
+          this.edgeFade,
         );
       }
     }

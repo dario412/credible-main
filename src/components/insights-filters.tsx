@@ -1,11 +1,11 @@
 "use client";
 
+import { CaretDown, X } from "@phosphor-icons/react";
 import { useRouter, usePathname } from "next/navigation";
-import { CaretDown } from "@phosphor-icons/react";
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 
-import { cn } from "@/lib/utils";
 import { INSIGHT_TOPICS } from "@/lib/insight-topics";
+import { cn } from "@/lib/utils";
 
 export { INSIGHT_TOPICS };
 
@@ -19,20 +19,17 @@ export function InsightsToolbar({
   const router = useRouter();
   const pathname = usePathname();
   const [pending, startTransition] = useTransition();
-  const [topicsOpen, setTopicsOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(Boolean(currentQuery));
   const [query, setQuery] = useState(currentQuery ?? "");
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const searchRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listboxId = useId();
+  const [open, setOpen] = useState(false);
+  const barRef = useRef<HTMLDivElement>(null);
+  const searchId = useId();
+  const listId = useId();
 
   useEffect(() => {
     setQuery(currentQuery ?? "");
   }, [currentQuery]);
 
   useEffect(() => {
-    if (!searchOpen) return;
     const handle = setTimeout(() => {
       if ((currentQuery ?? "") === query) return;
       push({ q: query || undefined });
@@ -42,35 +39,16 @@ export function InsightsToolbar({
   }, [query]);
 
   useEffect(() => {
-    if (!searchOpen) return;
-    const id = requestAnimationFrame(() => inputRef.current?.focus());
-    return () => cancelAnimationFrame(id);
-  }, [searchOpen]);
-
-  useEffect(() => {
-    if (!topicsOpen && !searchOpen) return;
+    if (!open) return;
 
     function onPointerDown(event: MouseEvent) {
-      const target = event.target as Node;
-      if (topicsOpen && !dropdownRef.current?.contains(target)) {
-        setTopicsOpen(false);
-      }
-      if (
-        searchOpen &&
-        !searchRef.current?.contains(target) &&
-        !query
-      ) {
-        setSearchOpen(false);
+      if (!barRef.current?.contains(event.target as Node)) {
+        setOpen(false);
       }
     }
 
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== "Escape") return;
-      if (topicsOpen) setTopicsOpen(false);
-      if (searchOpen) {
-        setSearchOpen(false);
-        if (!query && currentQuery) push({ q: undefined });
-      }
+      if (event.key === "Escape") setOpen(false);
     }
 
     document.addEventListener("mousedown", onPointerDown);
@@ -79,8 +57,7 @@ export function InsightsToolbar({
       document.removeEventListener("mousedown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topicsOpen, searchOpen, query, currentQuery]);
+  }, [open]);
 
   function push(patch: { category?: string; q?: string }) {
     const params = new URLSearchParams();
@@ -95,142 +72,156 @@ export function InsightsToolbar({
     });
   }
 
-  function selectTopic(option: string) {
-    setTopicsOpen(false);
-    if (option === "All topics") {
-      push({ category: undefined });
-      return;
-    }
-    push({ category: option });
+  function clearAll() {
+    setQuery("");
+    setOpen(false);
+    startTransition(() => router.push(pathname));
   }
 
-  const options = ["All topics", ...INSIGHT_TOPICS];
-  const triggerLabel = currentCategory ?? "Explore topics";
+  const hasFilters = Boolean(currentCategory || query);
 
   return (
-    <div className={cn(pending && "opacity-70")}>
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        <div ref={searchRef} className="flex items-center">
-          <div
-            className={cn(
-              "overflow-hidden transition-[max-width,opacity,margin] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-              searchOpen
-                ? "mr-2 max-w-56 opacity-100 sm:max-w-64"
-                : "max-w-0 opacity-0",
-            )}
+    <>
+      <div
+        ref={barRef}
+        className={cn(
+          "rounded-sm border border-charcoal/8 bg-[#FBF8F5] shadow-[0_10px_28px_rgba(28,26,23,0.06)] transition-opacity",
+          open ? "overflow-visible" : "overflow-hidden",
+          pending && "opacity-70",
+        )}
+      >
+        <div className="flex flex-col lg:flex-row lg:items-stretch">
+          <label
+            htmlFor={searchId}
+            className="relative flex min-w-0 flex-1 cursor-text flex-col justify-center gap-0.5 px-4 py-3 transition-colors hover:bg-cream/70 focus-within:bg-cream/70 lg:px-5"
           >
-            <label htmlFor="insights-search" className="sr-only">
-              Search insights
-            </label>
-            <input
-              ref={inputRef}
-              id="insights-search"
-              type="search"
-              placeholder="Search insights…"
-              value={query}
-              tabIndex={searchOpen ? 0 : -1}
-              aria-hidden={!searchOpen}
-              onChange={(e) => setQuery(e.target.value)}
-              className="h-10 w-56 border-b border-charcoal/15 bg-transparent px-1 text-sm text-charcoal placeholder:text-charcoal/40 focus:border-forest focus:outline-none sm:w-64"
-            />
-          </div>
+            <span className="text-[10px] font-medium tracking-[0.14em] text-charcoal uppercase">
+              Search
+            </span>
+            <span className="relative flex items-center">
+              <input
+                id={searchId}
+                type="search"
+                placeholder="Search insights"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full bg-transparent pr-7 text-[0.8125rem] text-charcoal outline-none placeholder:text-charcoal/40"
+              />
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="absolute right-0 cursor-pointer text-charcoal/40 transition-colors hover:text-charcoal"
+                  aria-label="Clear search"
+                >
+                  <X weight="bold" className="size-3.5" aria-hidden />
+                </button>
+              ) : null}
+            </span>
+          </label>
 
-          <button
-            type="button"
-            aria-label={searchOpen ? "Close search" : "Search insights"}
-            aria-expanded={searchOpen}
-            onClick={() => {
-              setSearchOpen((open) => {
-                const next = !open;
-                if (!next && !query && currentQuery) {
-                  push({ q: undefined });
-                }
-                return next;
-              });
-              setTopicsOpen(false);
-            }}
-            className={cn(
-              "inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-sm border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest",
-              searchOpen
-                ? "border-forest text-forest"
-                : "border-charcoal/20 text-charcoal hover:border-forest hover:text-forest",
-            )}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 256 256"
-              fill="currentColor"
-              aria-hidden
-              className="size-[1.125rem]"
-            >
-              <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="relative" ref={dropdownRef}>
-          <button
-            type="button"
-            aria-expanded={topicsOpen}
-            aria-haspopup="listbox"
-            aria-controls={listboxId}
-            onClick={() => {
-              setTopicsOpen((open) => !open);
-              if (!query) setSearchOpen(false);
-            }}
-            className={cn(
-              "inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-sm border px-4 text-[0.8125rem] font-medium transition-colors",
-              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest",
-              topicsOpen || currentCategory
-                ? "border-forest text-forest"
-                : "border-charcoal/20 text-charcoal hover:border-forest hover:text-forest",
-            )}
-          >
-            {triggerLabel}
-            <CaretDown
-              weight="bold"
+          <div className="relative border-t border-charcoal/8 lg:min-w-52 lg:border-t-0 lg:border-l lg:border-charcoal/10">
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-haspopup="listbox"
+              aria-controls={listId}
+              onClick={() => setOpen((current) => !current)}
               className={cn(
-                "size-3 shrink-0 transition-transform duration-300",
-                topicsOpen && "rotate-180",
+                "flex w-full cursor-pointer flex-col gap-0.5 px-4 py-3 text-left transition-colors",
+                "hover:bg-cream/70 focus-visible:bg-cream/70 focus-visible:outline-none",
+                open && "bg-cream/70",
               )}
-              aria-hidden
-            />
-          </button>
-
-          {topicsOpen ? (
-            <ul
-              id={listboxId}
-              role="listbox"
-              aria-label="Filter insights by topic"
-              className="absolute top-[calc(100%+0.4rem)] right-0 z-30 min-w-[12.5rem] overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] py-1.5 shadow-[0_16px_36px_rgba(28,26,23,0.12)]"
             >
-              {options.map((option) => {
-                const isAll = option === "All topics";
-                const active = isAll
-                  ? !currentCategory
-                  : currentCategory === option;
+              <span className="text-[10px] font-medium tracking-[0.14em] text-charcoal uppercase">
+                Topic
+              </span>
+              <span className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    "min-w-0 flex-1 truncate text-[0.8125rem]",
+                    currentCategory
+                      ? "font-medium text-charcoal"
+                      : "text-charcoal/40",
+                  )}
+                >
+                  {currentCategory ?? "All topics"}
+                </span>
+                <CaretDown
+                  weight="bold"
+                  aria-hidden
+                  className={cn(
+                    "size-3.5 shrink-0 text-charcoal/40 transition-transform duration-300",
+                    open && "rotate-180",
+                  )}
+                />
+              </span>
+            </button>
 
-                return (
-                  <li key={option} role="option" aria-selected={active}>
-                    <button
-                      type="button"
-                      onClick={() => selectTopic(option)}
-                      className={cn(
-                        "flex w-full cursor-pointer items-center px-3.5 py-2.5 text-left text-[0.8125rem] transition-colors",
-                        active
-                          ? "bg-forest/10 font-medium text-forest"
-                          : "text-charcoal/75 hover:bg-charcoal/[0.04] hover:text-charcoal",
-                      )}
-                    >
-                      {option}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : null}
+            {open ? (
+              <ul
+                id={listId}
+                role="listbox"
+                aria-label="Topic"
+                className="absolute top-[calc(100%+0.4rem)] right-0 left-0 z-30 overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] py-1.5 shadow-[0_16px_36px_rgba(28,26,23,0.12)]"
+              >
+                <li role="option" aria-selected={!currentCategory}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      push({ category: undefined });
+                      setOpen(false);
+                    }}
+                    className={cn(
+                      "flex w-full cursor-pointer px-3.5 py-2.5 text-left text-[0.8125rem] transition-colors",
+                      !currentCategory
+                        ? "bg-forest/10 font-medium text-forest"
+                        : "text-charcoal hover:bg-cream",
+                    )}
+                  >
+                    All topics
+                  </button>
+                </li>
+                {INSIGHT_TOPICS.map((topic) => {
+                  const active = currentCategory === topic;
+                  return (
+                    <li key={topic} role="option" aria-selected={active}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          push({ category: topic });
+                          setOpen(false);
+                        }}
+                        className={cn(
+                          "flex w-full cursor-pointer px-3.5 py-2.5 text-left text-[0.8125rem] transition-colors",
+                          active
+                            ? "bg-forest/10 font-medium text-forest"
+                            : "text-charcoal hover:bg-cream",
+                        )}
+                      >
+                        {topic}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : null}
+          </div>
         </div>
       </div>
-    </div>
+
+      {hasFilters ? (
+        <div className="mt-3 flex justify-end">
+          <button
+            type="button"
+            onClick={clearAll}
+            className="inline-flex cursor-pointer items-center gap-1.5 text-[0.75rem] font-medium text-charcoal/55 transition-colors hover:text-forest"
+          >
+            <X weight="bold" className="size-3" aria-hidden />
+            Clear all filters
+          </button>
+        </div>
+      ) : null}
+    </>
   );
 }

@@ -1,26 +1,29 @@
 import Link from "next/link";
 
-const ways = [
+export const WAYS = [
   {
     index: "01",
     title: "Brand partnerships",
     body: "Campaign work with creators your buyers already trust — long-form and considered, not a one-post drop.",
     span: "lg:col-span-7",
-    visual: "brand" as const,
+    visual: "partnerships" as const,
+    visualClass: "w-48 lg:w-60",
   },
   {
     index: "02",
     title: "Ambassador programs",
     body: "Category ambassadors and retainers that embed a credible voice into your brand for the long haul.",
     span: "lg:col-span-5",
-    visual: "none" as const,
+    visual: "ambassadors" as const,
+    visualClass: "w-40 lg:w-44",
   },
   {
     index: "03",
     title: "Speaking engagements",
     body: "Keynotes, panels, fireside chats and closed-door executive sessions. Bureau-quality booking.",
     span: "lg:col-span-5",
-    visual: "none" as const,
+    visual: "speaking" as const,
+    visualClass: "w-40 lg:w-44",
   },
   {
     index: "04",
@@ -28,276 +31,190 @@ const ways = [
     body: "Creators attend and amplify your event — presence, content and credibility that give the room lasting reach.",
     span: "lg:col-span-7",
     visual: "live" as const,
+    visualClass: "w-48 lg:w-60",
   },
 ] as const;
 
-/** Editorial placements — a creator accumulates brand work over time */
-function BrandVisual() {
-  const placements = [
-    { x: 148, y: 46, delay: "0s", rot: "-4" },
-    { x: 162, y: 62, delay: "0.7s", rot: "2" },
-    { x: 154, y: 80, delay: "1.4s", rot: "-1.5" },
+const INK = "var(--charcoal)";
+const ACCENT = "var(--forest)";
+
+/** Ongoing series of long-form placements, not a single drop */
+function PartnershipsVisual() {
+  const rows = [
+    { y: 44, w: 148, delay: "0s", accent: false },
+    { y: 68, w: 186, delay: "0.35s", accent: true },
+    { y: 92, w: 118, delay: "0.7s", accent: false },
+    { y: 116, w: 162, delay: "1.05s", accent: false },
   ] as const;
 
   return (
-    <div className="flex shrink-0 items-center justify-center lg:justify-end">
-      <svg
-        className="ra-illo"
-        viewBox="0 0 300 176"
-        role="img"
-        aria-label="A creator builds an ongoing run of brand placements and stories."
-      >
-        {/* creator portrait arch */}
-        <path
-          d="M42 148 V72 A40 40 0 0 1 122 72 V148"
-          fill="var(--ra-ink)"
-          fillOpacity="0.05"
-          stroke="var(--ra-ink)"
-          strokeWidth="1.5"
-        />
-        <circle
-          className="ra-expert-halo"
-          cx="82"
-          cy="84"
-          r="16"
-          fill="none"
-          stroke="var(--ra-ink)"
-          strokeWidth="1"
-        />
-        <circle cx="82" cy="84" r="10" fill="var(--ra-ink)" />
-        <circle cx="82" cy="84" r="3.5" fill="#f9f3ef" opacity="0.35" />
-
-        {/* soft desk / stage line */}
-        <line
-          x1="38"
-          y1="148"
-          x2="262"
-          y2="148"
-          stroke="var(--ra-sage)"
-          strokeWidth="1"
-          opacity="0.4"
-        />
-
-        {/* fanned editorial pieces */}
-        {placements.map((p) => (
-          <g
-            key={p.delay}
-            transform={`translate(${p.x} ${p.y}) rotate(${p.rot})`}
-          >
-            <g className="ra-place" style={{ animationDelay: p.delay }}>
-              <rect
-                width="92"
-                height="58"
-                rx="3"
-                fill="#fbf8f5"
-                stroke="var(--ra-ink)"
-                strokeWidth="1.2"
-              />
-              {/* brand chip */}
-              <rect
-                x="8"
-                y="8"
-                width="18"
-                height="18"
-                rx="2"
-                fill="var(--ra-ink)"
-                opacity="0.85"
-              />
-              {/* headline + deck lines */}
-              <rect
-                x="32"
-                y="10"
-                width="48"
-                height="4"
-                rx="1"
-                fill="var(--ra-ink)"
-                opacity="0.45"
-              />
-              <rect
-                x="32"
-                y="18"
-                width="36"
-                height="3"
-                rx="1"
-                fill="var(--ra-sage)"
-              />
-              <rect
-                x="8"
-                y="34"
-                width="76"
-                height="2.5"
-                rx="1"
-                fill="var(--ra-sage)"
-                opacity="0.85"
-              />
-              <rect
-                x="8"
-                y="41"
-                width="70"
-                height="2.5"
-                rx="1"
-                fill="var(--ra-sage)"
-                opacity="0.65"
-              />
-              <rect
-                x="8"
-                y="48"
-                width="58"
-                height="2.5"
-                rx="1"
-                fill="var(--ra-sage)"
-                opacity="0.5"
-              />
-              <circle cx="14" cy="28" r="3" fill="var(--ra-ink)" opacity="0.55" />
-              <rect
-                x="20"
-                y="26.5"
-                width="28"
-                height="2.5"
-                rx="1"
-                fill="var(--ra-ink)"
-                opacity="0.3"
-              />
-            </g>
-          </g>
-        ))}
-      </svg>
-    </div>
+    <svg
+      className="wi-illo"
+      viewBox="0 0 240 160"
+      role="img"
+      aria-label="A run of long-form placements building over time."
+    >
+      <line x1="24" y1="38" x2="24" y2="126" stroke={INK} strokeOpacity="0.18" />
+      {rows.map((row) => (
+        <g key={row.y}>
+          <circle
+            cx="24"
+            cy={row.y + 5}
+            r="2.5"
+            fill={row.accent ? ACCENT : INK}
+            fillOpacity={row.accent ? 1 : 0.3}
+          />
+          <rect
+            className="wi-bar group-hover:[animation-duration:2s]"
+            style={{ animationDelay: row.delay }}
+            x="36"
+            y={row.y}
+            width={row.w}
+            height="10"
+            rx="2"
+            fill={row.accent ? ACCENT : INK}
+            fillOpacity={row.accent ? 0.85 : 0.14}
+          />
+        </g>
+      ))}
+    </svg>
   );
 }
 
-/** Reach — audience seats, more content paths, tighter ring stagger */
-function LiveVisual() {
-  const seats = [
-    [118, 108],
-    [134, 114],
-    [150, 116],
-    [166, 114],
-    [182, 108],
-    [126, 126],
-    [150, 130],
-    [174, 126],
+/** A credible voice held in orbit around the brand, long term */
+function AmbassadorsVisual() {
+  return (
+    <svg
+      className="wi-illo"
+      viewBox="0 0 240 160"
+      role="img"
+      aria-label="A creator voice kept in long-term orbit around a brand."
+    >
+      <circle
+        cx="120"
+        cy="80"
+        r="56"
+        fill="none"
+        stroke={INK}
+        strokeOpacity="0.16"
+        strokeDasharray="3 6"
+      />
+      <circle cx="120" cy="80" r="32" fill="none" stroke={INK} strokeOpacity="0.14" />
+
+      <g className="wi-orbit group-hover:[animation-duration:5s]">
+        <circle cx="176" cy="80" r="5.5" fill={ACCENT} />
+      </g>
+      <g
+        className="wi-orbit group-hover:[animation-duration:7s]"
+        style={{ animationDuration: "16s", animationDirection: "reverse" }}
+      >
+        <circle cx="152" cy="80" r="3.5" fill={INK} fillOpacity="0.35" />
+      </g>
+
+      <circle cx="120" cy="80" r="9" fill={INK} />
+      <circle cx="120" cy="80" r="3" fill="var(--cream)" fillOpacity="0.4" />
+    </svg>
+  );
+}
+
+/** Voices carrying a room, from keynote to closed-door session */
+function SpeakingVisual() {
+  const bars = [
+    { x: 62, h: 26 },
+    { x: 78, h: 44 },
+    { x: 94, h: 34 },
+    { x: 110, h: 58 },
+    { x: 126, h: 40 },
+    { x: 142, h: 52 },
+    { x: 158, h: 30 },
+    { x: 174, h: 22 },
   ] as const;
 
   return (
-    <div className="flex shrink-0 items-center justify-center lg:justify-end">
-      <svg
-        className="ra-illo"
-        viewBox="0 0 300 176"
-        role="img"
-        aria-label="An expert stands in the venue and sends rings of reach and content beyond its walls."
-      >
-        <g fill="var(--ra-sage)">
-          <circle cx="24" cy="52" r="3" />
-          <circle cx="24" cy="72" r="3.2" />
-          <circle cx="24" cy="92" r="3" />
-          <circle cx="24" cy="112" r="3.2" />
-          <circle cx="40" cy="62" r="2.8" />
-          <circle cx="40" cy="88" r="2.8" />
-          <circle cx="40" cy="114" r="2.8" />
-        </g>
+    <svg
+      className="wi-illo"
+      viewBox="0 0 240 160"
+      role="img"
+      aria-label="A voice carrying across a room, from keynote to private session."
+    >
+      <path
+        d="M52 118 Q120 40 188 118"
+        fill="none"
+        stroke={INK}
+        strokeOpacity="0.12"
+      />
+      <line x1="48" y1="118" x2="192" y2="118" stroke={INK} strokeOpacity="0.2" />
 
+      {bars.map((bar, index) => (
         <rect
-          x="86"
-          y="40"
-          width="150"
-          height="96"
-          rx="14"
-          fill="var(--ra-ink)"
-          fillOpacity="0.03"
-          stroke="var(--ra-sage)"
-          strokeWidth="1"
-          strokeDasharray="4 5"
+          key={bar.x}
+          className="wi-eq group-hover:[animation-duration:1.3s]"
+          style={{ animationDelay: `${index * 0.11}s` }}
+          x={bar.x}
+          y={118 - bar.h}
+          width="6"
+          height={bar.h}
+          rx="1.5"
+          fill={bar.h > 50 ? ACCENT : INK}
+          fillOpacity={bar.h > 50 ? 0.85 : 0.22}
         />
-        <path
-          d="M108 56 H214"
-          stroke="var(--ra-sage)"
-          strokeWidth="1"
-          opacity="0.55"
-        />
-
-        {seats.map(([cx, cy], i) => (
-          <circle
-            key={`${cx}-${cy}`}
-            className="ra-seat"
-            style={{ animationDelay: `${i * 0.1}s` }}
-            cx={cx}
-            cy={cy}
-            r="2.4"
-            fill="var(--ra-ink-2)"
-          />
-        ))}
-
-        <g fill="none" stroke="var(--ra-ink)">
-          <circle
-            className="ra-ring"
-            style={{ animationDelay: "0s" }}
-            cx="150"
-            cy="88"
-          />
-          <circle
-            className="ra-ring"
-            style={{ animationDelay: "0.7s" }}
-            cx="150"
-            cy="88"
-          />
-          <circle
-            className="ra-ring"
-            style={{ animationDelay: "1.4s" }}
-            cx="150"
-            cy="88"
-          />
-          <circle
-            className="ra-ring"
-            style={{ animationDelay: "2.1s" }}
-            cx="150"
-            cy="88"
-          />
-        </g>
-
-        <circle
-          className="ra-content"
-          style={{ animationDelay: "0.25s" }}
-          cx="150"
-          cy="88"
-          r="4"
-          fill="var(--ra-ink-2)"
-        />
-        <circle
-          className="ra-content2"
-          style={{ animationDelay: "1.1s" }}
-          cx="150"
-          cy="88"
-          r="4"
-          fill="var(--ra-ink-2)"
-        />
-        <circle
-          className="ra-content3"
-          style={{ animationDelay: "1.9s" }}
-          cx="150"
-          cy="88"
-          r="3.5"
-          fill="var(--ra-ink)"
-        />
-
-        <circle
-          className="ra-expert-halo"
-          cx="150"
-          cy="88"
-          r="11"
-          style={{ animationDuration: "2.8s" }}
-        />
-        <circle
-          className="ra-node-p"
-          cx="150"
-          cy="88"
-          r="7"
-          fill="var(--ra-ink)"
-        />
-      </svg>
-    </div>
+      ))}
+    </svg>
   );
 }
+
+/** Presence in the room, reach far past its walls */
+function LiveVisual() {
+  const seats = [96, 110, 124, 138] as const;
+
+  return (
+    <svg
+      className="wi-illo"
+      viewBox="0 0 240 160"
+      role="img"
+      aria-label="Presence inside a venue sending reach beyond its walls."
+    >
+      <rect
+        x="72"
+        y="40"
+        width="96"
+        height="80"
+        rx="6"
+        fill="none"
+        stroke={INK}
+        strokeOpacity="0.18"
+      />
+
+      <g fill="none" stroke={ACCENT} strokeWidth="1.2">
+        {["0s", "1.13s", "2.26s"].map((delay) => (
+          <circle
+            key={delay}
+            className="wi-ring group-hover:[animation-duration:2.2s]"
+            style={{ animationDelay: delay }}
+            cx="120"
+            cy="80"
+            r="36"
+          />
+        ))}
+      </g>
+
+      <circle className="wi-drift" cx="120" cy="80" r="7" fill={INK} />
+
+      <g fill={INK} fillOpacity="0.22">
+        {seats.map((cx) => (
+          <circle key={cx} cx={cx} cy="132" r="2.5" />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+const WAY_VISUALS = {
+  partnerships: PartnershipsVisual,
+  ambassadors: AmbassadorsVisual,
+  speaking: SpeakingVisual,
+  live: LiveVisual,
+} as const;
 
 export function WaysIn() {
   return (
@@ -325,26 +242,31 @@ export function WaysIn() {
         </div>
 
         <ul className="mt-12 grid gap-3 md:mt-14 md:grid-cols-2 md:gap-4 lg:grid-cols-12">
-          {ways.map((way) => (
-            <li key={way.index} className={way.span}>
-              <Link
-                href="/what-we-do"
-                className="group flex h-full min-h-[16rem] flex-col gap-6 rounded-sm border border-charcoal/15 bg-transparent px-7 pb-8 pt-11 transition-colors duration-300 hover:border-forest/40 md:px-8 md:pb-9 md:pt-12 lg:min-h-[18.5rem] lg:flex-row lg:items-end lg:justify-end lg:gap-8"
-              >
-                <div className="flex min-w-0 flex-1 flex-col justify-end">
-                  <h3 className="font-display text-[1.35rem] leading-tight tracking-tight text-charcoal md:text-[1.5rem]">
-                    {way.title}
-                  </h3>
-                  <p className="mt-3 max-w-sm text-[0.8125rem] leading-relaxed text-charcoal/70 md:text-[0.875rem]">
-                    {way.body}
-                  </p>
-                </div>
+          {WAYS.map((way) => {
+            const Visual = WAY_VISUALS[way.visual];
 
-                {way.visual === "brand" ? <BrandVisual /> : null}
-                {way.visual === "live" ? <LiveVisual /> : null}
-              </Link>
-            </li>
-          ))}
+            return (
+              <li key={way.index} className={way.span}>
+                <Link
+                  href="/what-we-do"
+                  className="group flex h-full min-h-64 flex-col justify-between gap-8 rounded-sm border border-charcoal/15 bg-transparent px-7 pb-8 pt-8 transition-colors duration-300 hover:border-forest/40 md:px-8 md:pb-9 md:pt-9 lg:min-h-74"
+                >
+                  <div className={`${way.visualClass} self-end`}>
+                    <Visual />
+                  </div>
+
+                  <div className="min-w-0">
+                    <h3 className="font-display text-[1.35rem] leading-tight tracking-tight text-charcoal md:text-[1.5rem]">
+                      {way.title}
+                    </h3>
+                    <p className="mt-3 max-w-sm text-[0.8125rem] leading-relaxed text-charcoal/70 md:text-[0.875rem]">
+                      {way.body}
+                    </p>
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>

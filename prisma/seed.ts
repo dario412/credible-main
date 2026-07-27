@@ -28,6 +28,29 @@ async function main() {
 
   const experts = [
     {
+      slug: "alex-lieberman",
+      name: "Alex Lieberman",
+      title: "Co-founder, Morning Brew · Host, Founder’s Journal",
+      shortBio:
+        "Morning Brew co-founder and Founder’s Journal host — the operator voice founders already listen to.",
+      bio: "Alex Lieberman co-founded Morning Brew and built it into one of the defining media brands for professionals. Through Founder’s Journal he documents the unfiltered work of building companies — the decisions, doubts, and operating systems behind the stories. Brands partner with Alex when they want founder-grade credibility with an audience that already trusts his voice.",
+      image: "/images/experts/alex-lieberman.png",
+      categories: ["Founder / C-Suite"],
+      topics: ["Entrepreneurship", "Media", "Creator economy"],
+      formats: ["Podcast series", "Keynote", "Ambassador"],
+      combinedReach: "3.2M",
+      growth90d: "+18%",
+      audienceWho: "Founders & operators",
+      audienceWhere: "SaaS, media & startups",
+      channels: [
+        { type: "linkedin", url: "https://www.linkedin.com/in/alexlieberman" },
+        { type: "youtube", url: "https://www.youtube.com/@foundersjournal" },
+        { type: "podcast", url: "https://www.youtube.com/@foundersjournal" },
+        { type: "x", url: "https://x.com/businessbarista" },
+      ],
+      featured: true,
+    },
+    {
       slug: "amara-chen",
       name: "Amara Chen",
       title: "Founder & Keynote Speaker",
