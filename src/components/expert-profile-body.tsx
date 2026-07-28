@@ -18,7 +18,6 @@ import { ViewMoreLink } from "@/components/view-more-link";
 import {
   channelPresenceUrl,
   firstName,
-  isPositiveGrowth,
   type ExpertAudience,
   type ExpertChannelPresence,
   type ExpertFormatOffering,
@@ -160,19 +159,17 @@ function ChannelsSection({
 
       <div className="mt-8 overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] shadow-[0_12px_32px_rgba(28,26,23,0.06)]">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[36rem] border-collapse text-left">
+          <table className="w-full min-w-[24rem] border-collapse text-left">
             <thead>
               <tr className="border-b border-charcoal/10 bg-cream">
-                {["", "Platform", "Followers", "Growth", "Engagement"].map(
-                  (label) => (
-                    <th
-                      key={label || "icon"}
-                      className="px-3 py-3.5 text-[0.65rem] font-medium tracking-[0.14em] text-charcoal/45 uppercase first:w-14 first:pl-4 last:pr-4 md:px-4"
-                    >
-                      {label}
-                    </th>
-                  ),
-                )}
+                {["", "Platform", "Followers"].map((label) => (
+                  <th
+                    key={label || "icon"}
+                    className="px-3 py-3.5 text-[0.65rem] font-medium tracking-[0.14em] text-charcoal/45 uppercase first:w-14 first:pl-4 last:pr-4 md:px-4"
+                  >
+                    {label}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -210,21 +207,8 @@ function ChannelsSection({
                         {channel.handle}
                       </p>
                     </td>
-                    <td className="px-3 py-4 text-[1.05rem] font-medium tabular-nums tracking-tight text-charcoal md:px-4 md:py-4.5 md:text-[1.125rem]">
-                      <StatCounter value={channel.followers} />
-                    </td>
-                    <td
-                      className={cn(
-                        "px-3 py-4 text-[1.05rem] font-medium tabular-nums tracking-tight md:px-4 md:py-4.5 md:text-[1.125rem]",
-                        isPositiveGrowth(channel.growth90d)
-                          ? "text-forest"
-                          : "text-charcoal/55",
-                      )}
-                    >
-                      <StatCounter value={channel.growth90d} />
-                    </td>
                     <td className="px-3 py-4 text-[1.05rem] font-medium tabular-nums tracking-tight text-charcoal last:pr-4 md:px-4 md:py-4.5 md:text-[1.125rem]">
-                      <StatCounter value={channel.engagement} />
+                      <StatCounter value={channel.followers} />
                     </td>
                   </tr>
                 );
