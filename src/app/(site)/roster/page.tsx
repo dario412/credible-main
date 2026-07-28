@@ -9,17 +9,19 @@ export const dynamic = "force-dynamic";
 export const metadata = createMetadata({
   title: "Roster",
   description:
-    "Twenty-four B2B expert creators ready to brief — filter by archetype, topic or format.",
+    "Twenty-four B2B expert creators ready to brief — filter by archetype, topic or channel.",
   path: "/roster",
 });
 
 type SearchParams = Promise<{
   archetype?: string;
   topic?: string;
-  format?: string;
+  channels?: string;
   q?: string;
   /** @deprecated legacy param */
   category?: string;
+  /** @deprecated use channels */
+  format?: string;
 }>;
 
 export default async function RosterPage({
@@ -30,7 +32,13 @@ export default async function RosterPage({
   const params = await searchParams;
   const archetype = (params.archetype ?? params.category)?.trim();
   const topic = params.topic?.trim();
-  const format = params.format?.trim();
+  const channelParam = params.channels?.trim() || params.format?.trim();
+  const selectedChannels = channelParam
+    ? channelParam
+        .split(",")
+        .map((item) => item.trim().toLowerCase())
+        .filter(Boolean)
+    : [];
   const q = params.q?.trim();
 
   const all = await prisma.expert.findMany({ orderBy: { name: "asc" } });
@@ -38,7 +46,9 @@ export default async function RosterPage({
   const experts = all.filter((expert) => {
     const categories = expert.categories ?? [];
     const topics = expert.topics ?? [];
-    const formats = expert.formats ?? [];
+    const expertChannelTypes = parseExpertChannels(expert.channels).map(
+      (channel) => channel.type,
+    );
 
     if (
       archetype &&
@@ -53,8 +63,12 @@ export default async function RosterPage({
       return false;
     }
     if (
-      format &&
-      !formats.some((f) => f.toLowerCase() === format.toLowerCase())
+      selectedChannels.length > 0 &&
+      !selectedChannels.some((channel) =>
+        expertChannelTypes.includes(
+          channel as (typeof expertChannelTypes)[number],
+        ),
+      )
     ) {
       return false;
     }
@@ -89,7 +103,7 @@ export default async function RosterPage({
           <span className="text-forest">ready to brief.</span>
         </h1>
         <p className="mx-auto mt-5 max-w-lg text-[0.9rem] leading-relaxed text-charcoal/65 md:text-[0.95rem]">
-          Filter by archetype, topic or format. Each profile carries reach data,
+          Filter by archetype, topic or channel. Each profile carries reach data,
           past collaborations and format-level pricing so you can shortlist
           before you brief.
         </p>
@@ -99,7 +113,7 @@ export default async function RosterPage({
         <RosterFilters
           currentArchetype={archetype}
           currentTopic={topic}
-          currentFormat={format}
+          currentChannels={selectedChannels}
           currentQuery={q}
         />
       </div>

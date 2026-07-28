@@ -1,7 +1,15 @@
 export type ExpertChannel = {
-  type: "linkedin" | "youtube" | "podcast" | "x";
+  type: "linkedin" | "youtube" | "podcast" | "x" | "tiktok";
   url: string;
 };
+
+const EXPERT_CHANNEL_TYPES: ExpertChannel["type"][] = [
+  "linkedin",
+  "youtube",
+  "podcast",
+  "x",
+  "tiktok",
+];
 
 export function parseExpertChannels(value: unknown): ExpertChannel[] {
   if (!Array.isArray(value)) return [];
@@ -10,7 +18,7 @@ export function parseExpertChannels(value: unknown): ExpertChannel[] {
     const channel = item as ExpertChannel;
     return (
       typeof channel.url === "string" &&
-      ["linkedin", "youtube", "podcast", "x"].includes(channel.type)
+      EXPERT_CHANNEL_TYPES.includes(channel.type)
     );
   });
 }

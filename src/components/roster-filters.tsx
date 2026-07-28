@@ -23,32 +23,32 @@ export const TOPIC_OPTIONS = [
   "Media",
 ] as const;
 
-export const FORMAT_OPTIONS = [
-  "Keynote",
-  "Podcast guest",
-  "Content series",
-  "Newsletter",
-  "Ambassador",
+export const CHANNEL_FILTER_OPTIONS = [
+  { label: "LinkedIn", value: "linkedin" },
+  { label: "X", value: "x" },
+  { label: "TikTok", value: "tiktok" },
+  { label: "YouTube", value: "youtube" },
+  { label: "Podcast", value: "podcast" },
 ] as const;
 
 type FilterPatch = {
   archetype?: string;
   topic?: string;
-  format?: string;
+  channels?: string[];
   q?: string;
 };
 
-type OpenMenu = "archetype" | "topic" | "format" | null;
+type OpenMenu = "archetype" | "topic" | "channels" | null;
 
 export function RosterFilters({
   currentArchetype,
   currentTopic,
-  currentFormat,
+  currentChannels = [],
   currentQuery,
 }: {
   currentArchetype?: string;
   currentTopic?: string;
-  currentFormat?: string;
+  currentChannels?: string[];
   currentQuery?: string;
 }) {
   const router = useRouter();
@@ -97,12 +97,12 @@ export function RosterFilters({
     const params = new URLSearchParams();
     const archetype = "archetype" in patch ? patch.archetype : currentArchetype;
     const topic = "topic" in patch ? patch.topic : currentTopic;
-    const format = "format" in patch ? patch.format : currentFormat;
+    const channels = "channels" in patch ? patch.channels : currentChannels;
     const q = "q" in patch ? patch.q : currentQuery;
 
     if (archetype) params.set("archetype", archetype);
     if (topic) params.set("topic", topic);
-    if (format) params.set("format", format);
+    if (channels?.length) params.set("channels", channels.join(","));
     if (q) params.set("q", q);
 
     const qs = params.toString();
@@ -117,8 +117,19 @@ export function RosterFilters({
     startTransition(() => router.push(pathname));
   }
 
+  const channelLabels = CHANNEL_FILTER_OPTIONS.filter((option) =>
+    currentChannels.includes(option.value),
+  ).map((option) => option.label);
+
+  const channelSummary =
+    channelLabels.length === 0
+      ? undefined
+      : channelLabels.length <= 2
+        ? channelLabels.join(", ")
+        : `${channelLabels.length} selected`;
+
   const hasFilters = Boolean(
-    currentArchetype || currentTopic || currentFormat || query,
+    currentArchetype || currentTopic || currentChannels.length || query,
   );
 
   return (
@@ -206,22 +217,24 @@ export function RosterFilters({
             }}
           />
 
-          <FilterSegment
-            label="Format"
-            value={currentFormat}
-            placeholder="All formats"
-            options={FORMAT_OPTIONS}
-            open={open === "format"}
+          <MultiFilterSegment
+            label="Channels"
+            summary={channelSummary}
+            placeholder="All channels"
+            options={CHANNEL_FILTER_OPTIONS}
+            selectedValues={currentChannels}
+            open={open === "channels"}
             onToggle={() =>
-              setOpen((current) => (current === "format" ? null : "format"))
+              setOpen((current) => (current === "channels" ? null : "channels"))
             }
-            onSelect={(value) => {
-              update({ format: value });
-              setOpen(null);
+            onToggleValue={(value) => {
+              const next = currentChannels.includes(value)
+                ? currentChannels.filter((item) => item !== value)
+                : [...currentChannels, value];
+              update({ channels: next });
             }}
             onClear={() => {
-              update({ format: undefined });
-              setOpen(null);
+              update({ channels: [] });
             }}
             isLast
           />
@@ -347,6 +360,123 @@ function FilterSegment({
                   )}
                 >
                   {option}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+function MultiFilterSegment({
+  label,
+  summary,
+  placeholder,
+  options,
+  selectedValues,
+  open,
+  onToggle,
+  onToggleValue,
+  onClear,
+  isLast = false,
+}: {
+  label: string;
+  summary?: string;
+  placeholder: string;
+  options: readonly { label: string; value: string }[];
+  selectedValues: string[];
+  open: boolean;
+  onToggle: () => void;
+  onToggleValue: (value: string) => void;
+  onClear: () => void;
+  isLast?: boolean;
+}) {
+  const listId = useId();
+  const hasSelection = selectedValues.length > 0;
+
+  return (
+    <div
+      className={cn(
+        "relative border-t border-charcoal/8 lg:border-t-0 lg:border-l lg:border-charcoal/10",
+        !isLast && "lg:min-w-[10rem]",
+        isLast && "lg:min-w-[9.5rem]",
+      )}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-controls={listId}
+        onClick={onToggle}
+        className={cn(
+          "flex w-full cursor-pointer flex-col gap-0.5 px-4 py-3 text-left transition-colors",
+          "hover:bg-cream/70 focus-visible:bg-cream/70 focus-visible:outline-none",
+          open && "bg-cream/70",
+          isLast && "lg:pr-4",
+        )}
+      >
+        <span className="text-[10px] font-medium tracking-[0.14em] text-charcoal uppercase">
+          {label}
+        </span>
+        <span className="flex items-center gap-2">
+          <span
+            className={cn(
+              "min-w-0 flex-1 truncate text-[0.8125rem]",
+              hasSelection ? "font-medium text-charcoal" : "text-charcoal/40",
+            )}
+          >
+            {summary ?? placeholder}
+          </span>
+          <CaretDown
+            weight="bold"
+            aria-hidden
+            className={cn(
+              "size-3.5 shrink-0 text-charcoal/40 transition-transform duration-300",
+              open && "rotate-180",
+            )}
+          />
+        </span>
+      </button>
+
+      {open ? (
+        <ul
+          id={listId}
+          role="listbox"
+          aria-label={label}
+          aria-multiselectable="true"
+          className="absolute top-[calc(100%+0.4rem)] right-0 left-0 z-30 overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] py-1.5 shadow-[0_16px_36px_rgba(28,26,23,0.12)]"
+        >
+          <li role="option" aria-selected={!hasSelection}>
+            <button
+              type="button"
+              onClick={onClear}
+              className={cn(
+                "flex w-full cursor-pointer px-3.5 py-2.5 text-left text-[0.8125rem] transition-colors",
+                !hasSelection
+                  ? "bg-forest/10 font-medium text-forest"
+                  : "text-charcoal hover:bg-cream",
+              )}
+            >
+              {placeholder}
+            </button>
+          </li>
+          {options.map((option) => {
+            const active = selectedValues.includes(option.value);
+            return (
+              <li key={option.value} role="option" aria-selected={active}>
+                <button
+                  type="button"
+                  onClick={() => onToggleValue(option.value)}
+                  className={cn(
+                    "flex w-full cursor-pointer px-3.5 py-2.5 text-left text-[0.8125rem] transition-colors",
+                    active
+                      ? "bg-forest/10 font-medium text-forest"
+                      : "text-charcoal hover:bg-cream",
+                  )}
+                >
+                  {option.label}
                 </button>
               </li>
             );
