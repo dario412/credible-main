@@ -519,7 +519,7 @@ export function SendBriefForm({
       {briefingTalent ? (
         <div className="mt-3.5 space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor={`${id}-campaign`} className={labelClass}>
+            <label htmlFor={`${id}-campaign`} className="sr-only">
               Tell us about your campaign
             </label>
             <textarea
