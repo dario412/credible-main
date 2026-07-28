@@ -379,29 +379,13 @@ export function AudienceShareList({
         {title}
       </p>
       <ul className="mt-5 divide-y divide-charcoal/8">
-        {items.map((item, index) => (
+        {items.map((item) => (
           <li
             key={item.label}
-            className="flex items-baseline justify-between gap-4 py-3.5 first:pt-0 last:pb-0"
+            className="py-3.5 first:pt-0 last:pb-0"
           >
-            <div className="min-w-0 flex-1">
-              <span className="text-[0.9375rem] leading-snug text-charcoal/75">
-                {item.label}
-              </span>
-              <div className="mt-2.5 h-px overflow-hidden bg-charcoal/10">
-                <div
-                  className="h-full bg-forest transition-[width] duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-                  style={{
-                    width: visible ? `${item.percent}%` : "0%",
-                    transitionDelay: visible
-                      ? `${delay + 200 + index * 120}ms`
-                      : "0ms",
-                  }}
-                />
-              </div>
-            </div>
-            <span className="shrink-0 font-display text-[1.45rem] leading-none tracking-tight tabular-nums text-charcoal md:text-[1.6rem]">
-              {item.percent}%
+            <span className="text-[0.9375rem] leading-snug text-charcoal/75">
+              {item.label}
             </span>
           </li>
         ))}
@@ -453,7 +437,7 @@ export function TopicMixPie({ topics }: { topics: ExpertTopicShare[] }) {
           <li
             key={topic.label}
             className={cn(
-              "grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-6 py-4 transition-[opacity,transform] duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] first:pt-0 last:pb-0 sm:gap-10",
+              "py-4 transition-[opacity,transform] duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] first:pt-0 last:pb-0",
               visible
                 ? "translate-y-0 opacity-100"
                 : "translate-y-4 opacity-0",
@@ -462,24 +446,8 @@ export function TopicMixPie({ topics }: { topics: ExpertTopicShare[] }) {
               transitionDelay: visible ? `${180 + index * 120}ms` : "0ms",
             }}
           >
-            <div className="min-w-0">
-              <p className="text-[1rem] leading-snug text-charcoal/80 md:text-[1.0625rem]">
-                {topic.label}
-              </p>
-              <div className="mt-3 h-px max-w-md overflow-hidden bg-charcoal/10">
-                <div
-                  className="h-full bg-forest transition-[width] duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-                  style={{
-                    width: visible ? `${topic.percent}%` : "0%",
-                    transitionDelay: visible
-                      ? `${280 + index * 120}ms`
-                      : "0ms",
-                  }}
-                />
-              </div>
-            </div>
-            <p className="font-display text-[1.75rem] leading-none tracking-tight tabular-nums text-charcoal md:text-[2rem]">
-              {topic.percent}%
+            <p className="text-[1rem] leading-snug text-charcoal/80 md:text-[1.0625rem]">
+              {topic.label}
             </p>
           </li>
         ))}
