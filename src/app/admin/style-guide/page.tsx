@@ -1,8 +1,11 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
+import { getSiteFontSettings } from "@/lib/site-fonts-server";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import { PatternField } from "@/components/pattern-field";
+import { FontSettingsForm } from "@/components/font-settings-form";
 
 export const metadata = createMetadata({
   title: "Style guide",
@@ -23,6 +26,9 @@ export default async function StyleGuidePage() {
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
   if (!session.user.totpEnabled) redirect("/admin/setup-2fa");
+
+  const fontSettings = await getSiteFontSettings();
+  const canEdit = hasPermission(session.user.role, "MANAGE_CONTENT");
 
   return (
     <div className="max-w-4xl space-y-16">
@@ -67,9 +73,23 @@ export default async function StyleGuidePage() {
       <section>
         <h2 className="font-display text-2xl">Typography</h2>
         <p className="mt-2 text-sm text-muted">
-          Display: <strong>Faculty Glyphic</strong> (<code>font-display</code>). Body:{" "}
-          <strong>Instrument Sans</strong> (default).
+          Active site fonts — headings use <code>font-display</code> /{" "}
+          <code>.prose-credible</code> headings; body is the default paragraph
+          type. Changes apply across the marketing site after save.
         </p>
+        <p className="mt-3 text-sm text-charcoal">
+          Heading: <strong>{fontSettings.heading.family}</strong>
+          <span className="text-muted">
+            {" "}
+            ({fontSettings.heading.source})
+          </span>
+          <span className="mx-2 text-charcoal/30">·</span>
+          Body: <strong>{fontSettings.body.family}</strong>
+          <span className="text-muted"> ({fontSettings.body.source})</span>
+        </p>
+
+        <FontSettingsForm initial={fontSettings} canEdit={canEdit} />
+
         <div className="prose-credible mt-8 border border-charcoal/10 p-6">
           <p className="!mt-0 text-xs uppercase tracking-wide text-muted">
             Wrap editorial content in <code>.prose-credible</code>
@@ -93,7 +113,9 @@ export default async function StyleGuidePage() {
             <li>Ordered list item</li>
             <li>Second step</li>
           </ol>
-          <blockquote>Blockquote — for pull quotes and highlighted statements.</blockquote>
+          <blockquote>
+            Blockquote — for pull quotes and highlighted statements.
+          </blockquote>
           <p>
             Inline <code>code</code> sample.
           </p>

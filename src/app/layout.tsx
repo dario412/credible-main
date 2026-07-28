@@ -1,6 +1,7 @@
 import { Faculty_Glyphic, Instrument_Sans } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { createMetadata, organizationJsonLd } from "@/lib/seo";
+import { getSiteFontStylesheet } from "@/lib/site-fonts-server";
 import "./globals.css";
 
 const facultyGlyphic = Faculty_Glyphic({
@@ -18,11 +19,13 @@ const instrument = Instrument_Sans({
 
 export const metadata = createMetadata();
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const fonts = await getSiteFontStylesheet();
+
   return (
     <html
       lang="en"
@@ -32,9 +35,21 @@ export default function RootLayout({
         className="flex min-h-full flex-col bg-cream text-charcoal"
         suppressHydrationWarning
       >
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        {fonts.googleHref ? (
+          <link rel="stylesheet" href={fonts.googleHref} />
+        ) : null}
+        <style dangerouslySetInnerHTML={{ __html: fonts.inlineCss }} />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
         />
         <Providers>{children}</Providers>
       </body>

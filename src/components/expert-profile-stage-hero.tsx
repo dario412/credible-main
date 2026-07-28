@@ -63,15 +63,7 @@ export function ExpertProfileStageHero({
       <div className="relative mx-auto flex min-h-[min(88vh,48rem)] max-w-352 flex-col justify-between px-6 pt-36 pb-12 md:min-h-[min(90vh,52rem)] md:px-10 md:pb-14 lg:px-12 lg:pb-16">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-16">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-sm bg-forest/25 px-2.5 py-1 text-[0.75rem] font-medium tracking-[0.14em] text-cream uppercase backdrop-blur-sm">
-              <span className="relative flex size-2 shrink-0">
-                <span className="absolute inset-0 animate-ping rounded-full bg-[#9BC4AD]/70" />
-                <span className="relative size-2 rounded-full bg-[#9BC4AD]" />
-              </span>
-              Available to book
-            </span>
-
-            <h1 className="mt-7 max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:mt-8 md:text-[4.5rem] lg:text-[5rem]">
+            <h1 className="max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:text-[4.5rem] lg:text-[5rem]">
               {name}.
             </h1>
 

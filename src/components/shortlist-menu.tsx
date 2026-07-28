@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Basket, X } from "@phosphor-icons/react";
+import { ArrowRight, ListChecks, X } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -56,7 +56,7 @@ export function ShortlistMenu() {
         )}
       >
         <span className="relative">
-          <Basket className="size-5" aria-hidden />
+          <ListChecks className="size-5" aria-hidden />
           {entries.length > 0 ? (
             <span className="absolute -top-1.5 -right-2.5 inline-flex min-w-4 justify-center rounded-full bg-forest px-1 text-[0.625rem] leading-4 font-medium text-cream">
               {entries.length}

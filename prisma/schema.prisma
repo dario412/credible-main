@@ -104,3 +104,26 @@ model Lead {
   status    LeadStatus @default(NEW)
   createdAt DateTime   @default(now())
 }
+
+/// Singleton site settings (always id = "default").
+model SiteSettings {
+  id               String   @id @default("default")
+  /// Display / heading font (font-display, prose headings)
+  headingFamily    String   @default("Faculty Glyphic")
+  headingSource    String   @default("default") // default | google | upload
+  headingAssetId   String?
+  /// Body / paragraph font
+  bodyFamily       String   @default("Instrument Sans")
+  bodySource       String   @default("default") // default | google | upload
+  bodyAssetId      String?
+  updatedAt        DateTime @updatedAt
+}
+
+model FontAsset {
+  id        String   @id @default(cuid())
+  family    String
+  fileName  String
+  mimeType  String
+  data      Bytes
+  createdAt DateTime @default(now())
+}
