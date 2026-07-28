@@ -101,7 +101,6 @@ export function ExpertAudienceMap({
   } | null>(null);
 
   const ranked = [...geography].sort((a, b) => b.percent - a.percent);
-  const max = ranked[0]?.percent ?? 100;
   const highlightIds = ranked.flatMap((item) => pathIdsForLabel(item.label));
 
   useEffect(() => {
@@ -235,9 +234,6 @@ export function ExpertAudienceMap({
             >
               <span className="size-2 rounded-sm bg-forest" aria-hidden />
               <span className="text-[0.8rem] text-charcoal/70">{item.label}</span>
-              <span className="text-[0.9rem] font-medium tabular-nums tracking-tight text-charcoal">
-                {item.percent}%
-              </span>
             </li>
           ))}
         </ul>
@@ -285,7 +281,6 @@ export function ExpertAudienceMap({
 
           {ranked.map((item, index) => {
             const coords = resolveCoords(item.label);
-            const markerScale = 0.9 + (item.percent / max) * 0.2;
             const code = item.label.slice(0, 2).toUpperCase();
 
             return (
@@ -301,9 +296,7 @@ export function ExpertAudienceMap({
                   )}
                   style={{
                     transitionDelay: `${220 + index * 140}ms`,
-                    transform: visible
-                      ? `scale(${markerScale})`
-                      : "scale(0.55)",
+                    transform: visible ? "scale(1)" : "scale(0.55)",
                   }}
                 >
                   <span
@@ -314,12 +307,9 @@ export function ExpertAudienceMap({
                     style={{ animationDelay: `${index * 0.35}s` }}
                     aria-hidden
                   />
-                  <span className="relative inline-flex items-center gap-2 rounded-sm bg-charcoal px-2.5 py-1.5 shadow-[0_10px_24px_rgba(28,26,23,0.28)] ring-1 ring-cream/10">
+                  <span className="relative inline-flex items-center rounded-sm bg-charcoal px-2.5 py-1.5 shadow-[0_10px_24px_rgba(28,26,23,0.28)] ring-1 ring-cream/10">
                     <span className="text-[0.65rem] font-medium tracking-[0.12em] text-cream/65 uppercase">
                       {code}
-                    </span>
-                    <span className="text-[0.8125rem] font-medium tabular-nums tracking-tight text-cream">
-                      {item.percent}%
                     </span>
                   </span>
                 </div>
