@@ -56,6 +56,11 @@ const brands: Brand[] = [
   },
   { name: "Loom", logoSrc: "/brand/clients/loom-wordmark-white.svg" },
   { name: "Cursor", logoSrc: "/brand/clients/cursor-wordmark-white.svg" },
+  { name: "HubSpot", logoSrc: "/brand/clients/hubspot-wordmark-white.svg" },
+  { name: "SaaStr", logoSrc: "/brand/clients/saastr-wordmark-white.svg" },
+  { name: "Attio", logoSrc: "/brand/clients/attio-wordmark-white.svg" },
+  { name: "Vanta", logoSrc: "/brand/clients/vanta-wordmark-white.svg" },
+  { name: "Clerk", logoSrc: "/brand/clients/clerk-wordmark-white.svg" },
 ];
 
 const LOGO_CLASS = "h-[1.35rem] w-auto md:h-[1.55rem]";
