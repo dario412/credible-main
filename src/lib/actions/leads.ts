@@ -82,18 +82,55 @@ export async function submitBrief(
   };
 }
 
-const sendBriefSchema = z.object({
-  audience: z.string().max(40).optional(),
-  name: z.string().min(1).max(120),
-  email: z.string().email(),
-  company: z.string().max(120).optional(),
-  jobRole: z.string().max(120).optional(),
-  creators: z.string().max(2000).optional(),
-  formats: z.string().max(400).optional(),
-  timing: z.string().max(60).optional(),
-  budget: z.string().max(60).optional(),
-  brief: z.string().min(1).max(5000),
-});
+const sendBriefSchema = z
+  .object({
+    audience: z.string().max(40).optional(),
+    name: z.string().min(1).max(120),
+    email: z.string().email(),
+    company: z.string().max(120).optional(),
+    jobRole: z.string().max(120).optional(),
+    creators: z.string().max(2000).optional(),
+    formats: z.string().max(400).optional(),
+    timing: z.string().max(60).optional(),
+    budget: z.string().max(60).optional(),
+    campaign: z.string().max(5000).optional(),
+    targetAudience: z.string().max(5000).optional(),
+    successMetrics: z.string().max(5000).optional(),
+    brief: z.string().max(5000).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.audience === "creator") {
+      if (!data.brief?.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Brief is required",
+          path: ["brief"],
+        });
+      }
+      return;
+    }
+    if (!data.campaign?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Campaign is required",
+        path: ["campaign"],
+      });
+    }
+    if (!data.targetAudience?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Target audience is required",
+        path: ["targetAudience"],
+      });
+    }
+    if (!data.successMetrics?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Success metrics are required",
+        path: ["successMetrics"],
+      });
+    }
+  });
 
 /**
  * The Lead model has no structured brief columns, so the qualifying answers are
@@ -113,7 +150,10 @@ export async function submitSendBrief(
     formats: formData.get("formats") || undefined,
     timing: formData.get("timing") || undefined,
     budget: formData.get("budget") || undefined,
-    brief: formData.get("brief"),
+    campaign: formData.get("campaign") || undefined,
+    targetAudience: formData.get("targetAudience") || undefined,
+    successMetrics: formData.get("successMetrics") || undefined,
+    brief: formData.get("brief") || undefined,
   });
 
   if (!parsed.success) {
@@ -123,7 +163,8 @@ export async function submitSendBrief(
     };
   }
 
-  const { brief, ...details } = parsed.data;
+  const { brief, campaign, targetAudience, successMetrics, ...details } =
+    parsed.data;
   const summary = [
     ["Briefing as", details.audience],
     ["Role", details.jobRole],
@@ -136,12 +177,27 @@ export async function submitSendBrief(
     .map(([label, value]) => `${label}: ${value}`)
     .join("\n");
 
+  const narrative =
+    details.audience === "creator"
+      ? (brief ?? "")
+      : [
+          ["Campaign", campaign],
+          ["Audience", targetAudience],
+          ["Success metrics", successMetrics],
+        ]
+          .filter((row): row is [string, string] => Boolean(row[1]?.trim()))
+          .map(([label, value]) => `${label}:\n${value}`)
+          .join("\n\n");
+
+  const message = summary
+    ? `${summary}\n\n${narrative}`
+    : narrative;
   await prisma.lead.create({
     data: {
       email: details.email,
       name: details.name,
       company: details.company,
-      message: summary ? `${summary}\n\n${brief}` : brief,
+      message,
       source: "CONTACT",
     },
   });

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "@phosphor-icons/react/ssr";
 
-import { PatternField } from "@/components/pattern-field";
 import {
   SendBriefForm,
   type BriefAudience,
@@ -43,8 +42,6 @@ const STEPS = [
 
 const EYEBROW =
   "text-[0.7rem] font-medium tracking-[0.16em] text-charcoal/45 uppercase";
-const CREAM_RGB = { r: 249, g: 243, b: 239 };
-
 const CONTACT_CHANNELS = [
   {
     label: "Direct email",
@@ -157,22 +154,6 @@ export default async function ContactPage({
                 </li>
               ))}
             </ul>
-
-            {/* Lifted a shade off the card so the proof reads first. */}
-            <figure className="relative mt-7 overflow-hidden rounded-sm border border-cream/10 bg-cream/8 p-5">
-              <PatternField
-                color={CREAM_RGB}
-                className="opacity-[0.16]"
-                mask="linear-gradient(to left, black 0%, rgba(0,0,0,0.45) 45%, transparent 92%)"
-              />
-              <blockquote className="relative z-2 text-[0.95rem] leading-relaxed text-cream/90">
-                “Credible turned a single keynote into a year-long advisory
-                partnership — exactly the kind of credibility our buyers trust.”
-              </blockquote>
-              <figcaption className="relative z-2 mt-3.5 text-[0.75rem] text-cream/55">
-                Maya Chen · Head of Brand Partnerships, Stripe
-              </figcaption>
-            </figure>
           </div>
 
           <div className="rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-6 md:p-7">

@@ -512,29 +512,67 @@ export function SendBriefForm({
 
       <div className="mt-7 border-t border-charcoal/8 pt-6">
         <SectionLabel step={briefingTalent ? "05" : "03"}>
-          {briefingTalent ? "The brief" : "Your audience"}
+          {briefingTalent ? "Tell us about your campaign" : "Your audience"}
         </SectionLabel>
       </div>
 
-      <div className="mt-3.5 space-y-1.5">
-        <label htmlFor={`${id}-brief`} className="sr-only">
-          {briefingTalent
-            ? "The brief"
-            : "Your audience and what you're building"}
-        </label>
-        <textarea
-          id={`${id}-brief`}
-          name="brief"
-          required
-          rows={4}
-          placeholder={
-            briefingTalent
-              ? "Who you need to reach, the outcome you're after, and any dates that matter."
-              : "Where you publish, the size and shape of your audience, and what you want representation to unlock."
-          }
-          className={cn(inputClass, "min-h-28 resize-y")}
-        />
-      </div>
+      {briefingTalent ? (
+        <div className="mt-3.5 space-y-4">
+          <div className="space-y-1.5">
+            <label htmlFor={`${id}-campaign`} className={labelClass}>
+              Tell us about your campaign
+            </label>
+            <textarea
+              id={`${id}-campaign`}
+              name="campaign"
+              required
+              rows={3}
+              placeholder="Goals, deliverables, timing, and anything else we should know."
+              className={cn(inputClass, "min-h-24 resize-y")}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor={`${id}-target-audience`} className={labelClass}>
+              Who is your audience
+            </label>
+            <textarea
+              id={`${id}-target-audience`}
+              name="targetAudience"
+              required
+              rows={3}
+              placeholder="Who you need to reach — role, industry, company size, geography."
+              className={cn(inputClass, "min-h-24 resize-y")}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor={`${id}-success-metrics`} className={labelClass}>
+              What are your success metrics?
+            </label>
+            <textarea
+              id={`${id}-success-metrics`}
+              name="successMetrics"
+              required
+              rows={3}
+              placeholder="How you'll measure impact — pipeline, sign-ups, awareness, other KPIs."
+              className={cn(inputClass, "min-h-24 resize-y")}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="mt-3.5 space-y-1.5">
+          <label htmlFor={`${id}-brief`} className="sr-only">
+            Your audience and what you&apos;re building
+          </label>
+          <textarea
+            id={`${id}-brief`}
+            name="brief"
+            required
+            rows={4}
+            placeholder="Where you publish, the size and shape of your audience, and what you want representation to unlock."
+            className={cn(inputClass, "min-h-28 resize-y")}
+          />
+        </div>
+      )}
 
       <button
         type="submit"
