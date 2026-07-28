@@ -133,7 +133,6 @@ export default async function ExpertPage({ params }: Props) {
         name={expert.name}
         title={expert.title}
         archetype={expert.categories[0] ?? null}
-        topics={expert.topics ?? []}
         based={enrichment.based}
         stageImage={enrichment.stageImage}
         stageImagePosition={enrichment.stageImagePosition}

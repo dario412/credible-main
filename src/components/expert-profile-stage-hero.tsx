@@ -3,18 +3,13 @@ import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { ExpertHeroStats } from "@/components/expert-hero-stats";
-import {
-  firstName,
-  formatTopicLabel,
-  type ExpertProfileStat,
-} from "@/lib/expert-profiles";
+import { firstName, type ExpertProfileStat } from "@/lib/expert-profiles";
 
 export function ExpertProfileStageHero({
   slug,
   name,
   title,
   archetype,
-  topics,
   based,
   stageImage,
   stageImagePosition,
@@ -27,7 +22,6 @@ export function ExpertProfileStageHero({
   name: string;
   title: string;
   archetype: string | null;
-  topics: string[];
   based?: string;
   stageImage?: string;
   stageImagePosition?: string;
@@ -37,7 +31,6 @@ export function ExpertProfileStageHero({
   stats: ExpertProfileStat[];
 }) {
   const first = firstName(name);
-  const topicLine = topics.slice(0, 3).map(formatTopicLabel);
   const cover = stageImage ?? portraitImage ?? "/images/case-studies/notion.jpg";
   const proof =
     heroProof ??
@@ -78,13 +71,7 @@ export function ExpertProfileStageHero({
               Available to book
             </span>
 
-            {topicLine.length > 0 ? (
-              <p className="mt-7 text-[0.75rem] font-medium tracking-[0.18em] text-cream/80 uppercase">
-                {topicLine.join(" · ")}
-              </p>
-            ) : null}
-
-            <h1 className="mt-4 max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:mt-5 md:text-[4.5rem] lg:text-[5rem]">
+            <h1 className="mt-7 max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:mt-8 md:text-[4.5rem] lg:text-[5rem]">
               {name}.
             </h1>
 
