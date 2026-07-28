@@ -91,27 +91,27 @@ function CaseStudyCta({
 function FullKeyStudy() {
   return (
     <section className="bg-cream-dark">
-      <div className="mx-auto max-w-352 px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
-        <div className="flex flex-col gap-8 border-b border-charcoal/12 pb-10 md:flex-row md:items-end md:justify-between md:gap-12 md:pb-12">
-          <div className="max-w-3xl">
-            <img
-              src="/brand/clients/notion-lockup.png"
-              alt="Notion"
-              className="h-8 w-auto object-contain md:h-9"
-            />
+      <div className="mx-auto max-w-352 px-6 py-12 md:px-10 md:py-14 lg:px-12 lg:py-16">
+        <img
+          src="/brand/clients/notion-lockup.png"
+          alt="Notion"
+          className="h-7 w-auto object-contain md:h-8"
+        />
 
-            <h2 className="mt-7 font-display text-[2rem] leading-[1.08] tracking-tight text-charcoal sm:text-[2.45rem] md:text-[2.85rem]">
+        <div className="mt-7 grid gap-10 border-b border-charcoal/12 pb-10 md:mt-8 md:gap-12 md:pb-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start lg:gap-14 xl:gap-20">
+          <div className="max-w-2xl">
+            <h2 className="font-display text-[1.85rem] leading-[1.08] tracking-tight text-charcoal sm:text-[2.15rem] md:text-[2.45rem]">
               How Notion built B2B&apos;s defining founder series —{" "}
               <span className="text-forest">without a studio.</span>
             </h2>
 
-            <p className="mt-5 max-w-xl text-[0.95rem] leading-relaxed text-charcoal/70 md:text-base">
+            <p className="mt-4 max-w-xl text-[0.925rem] leading-relaxed text-charcoal/70 md:text-[0.975rem]">
               One operator voice. Twelve episodes. End-to-end casting, format,
               and distribution — so Notion owned the category without standing
               up an in-house media team.
             </p>
 
-            <dl className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-[0.8125rem] md:gap-x-7">
+            <dl className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] md:gap-x-6">
               <div className="flex items-baseline gap-2">
                 <dt className="font-medium text-charcoal/50">Pillar</dt>
                 <dd className="font-medium text-charcoal">Content</dd>
@@ -133,35 +133,35 @@ function FullKeyStudy() {
                 <dd className="font-medium text-charcoal">22 months</dd>
               </div>
             </dl>
+
+            <CaseStudyCta tone="charcoal" className="mt-8" />
           </div>
 
-          <CaseStudyCta tone="charcoal" className="self-start md:self-end" />
-        </div>
-
-        <ul>
-          {fullMetrics.map((metric) => (
-            <li
-              key={metric.value}
-              className="border-b border-charcoal/12 py-8 md:py-10"
-            >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
-                <p className="font-display text-[4.25rem] leading-none tracking-tight text-charcoal sm:text-[5rem] md:text-[5.75rem]">
-                  <StatCounter value={metric.value} duration={1400} />
-                </p>
-                <div className="max-w-md sm:text-right">
-                  <p className="text-[1.05rem] leading-snug font-medium text-charcoal md:text-[1.2rem]">
-                    {metric.label}
+          <ul className="min-w-0">
+            {fullMetrics.map((metric) => (
+              <li
+                key={metric.value}
+                className="border-b border-charcoal/12 py-5 first:pt-0 last:border-b-0 last:pb-0 md:py-6"
+              >
+                <div className="flex items-baseline gap-4 sm:gap-5">
+                  <p className="shrink-0 font-display text-[2.35rem] leading-none tracking-tight text-charcoal sm:text-[2.75rem] md:text-[3.1rem]">
+                    <StatCounter value={metric.value} duration={1400} />
                   </p>
-                  {"note" in metric && metric.note ? (
-                    <p className="mt-1.5 text-sm text-charcoal/55">
-                      ({metric.note})
+                  <div className="min-w-0 pt-1">
+                    <p className="text-[0.9rem] leading-snug font-medium text-charcoal md:text-[0.95rem]">
+                      {metric.label}
                     </p>
-                  ) : null}
+                    {"note" in metric && metric.note ? (
+                      <p className="mt-1 text-[0.75rem] text-charcoal/55">
+                        ({metric.note})
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );
