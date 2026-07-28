@@ -35,7 +35,7 @@ export function Home2Hero() {
   }
 
   return (
-    <section className="relative bg-cream">
+    <section className="relative bg-cream" data-site-hero>
       <div className="relative z-10 mx-auto max-w-3xl px-6 pb-10 pt-16 text-center md:px-10 md:pb-12 md:pt-20 lg:pt-24">
         <h1 className="font-display text-[2.5rem] leading-[1.06] tracking-tight text-charcoal sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.15rem]">
           Book the voices your buyers already trust

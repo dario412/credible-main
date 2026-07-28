@@ -117,6 +117,34 @@ const WORK_TONE: Record<ExpertRecentWork["tone"], string> = {
   sage: "bg-[#D8E2DC] text-charcoal",
 };
 
+function bioParagraphs(bio: string): string[] {
+  const trimmed = bio.trim();
+  if (!trimmed) return [];
+
+  const explicit = trimmed
+    .split(/\n\s*\n/)
+    .map((part) => part.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+  if (explicit.length > 1) return explicit;
+
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  // Short bios stay as one block; longer (~200 words) get readable breaks.
+  if (words.length < 110) return [trimmed];
+
+  const sentences =
+    trimmed.match(/[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g)?.map((s) => s.trim()) ??
+    [trimmed];
+
+  if (sentences.length <= 2) return [trimmed];
+
+  const target = Math.ceil(sentences.length / (words.length > 180 ? 3 : 2));
+  const groups: string[] = [];
+  for (let i = 0; i < sentences.length; i += target) {
+    groups.push(sentences.slice(i, i + target).join(" "));
+  }
+  return groups.filter(Boolean);
+}
+
 function IntroBlock({
   first,
   bio,
@@ -128,20 +156,41 @@ function IntroBlock({
   quote?: string;
   quoteAttribution?: string;
 }) {
+  const paragraphs = bioParagraphs(bio);
+
   return (
     <div id="overview" className="scroll-mt-28">
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.85fr)] lg:gap-12 lg:items-start">
-        <div>
-          <h2 className="max-w-[16ch] font-display text-[1.75rem] leading-[1.08] tracking-tight text-charcoal md:text-[2rem]">
-            About {first}.
-          </h2>
-          <p className="mt-6 max-w-2xl text-[1.0625rem] leading-[1.7] text-charcoal/75 md:mt-7 md:text-[1.125rem] md:leading-[1.65]">
-            {bio}
-          </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h2 className="max-w-[16ch] font-display text-[1.75rem] leading-[1.08] tracking-tight text-charcoal md:text-[2rem]">
+          About {first}.
+        </h2>
+        <p className="text-[0.7rem] font-medium tracking-[0.14em] text-charcoal/40 uppercase">
+          Biography
+        </p>
+      </div>
+
+      <div
+        className={cn(
+          "mt-7 grid gap-8 md:mt-8",
+          quote
+            ? "lg:grid-cols-[minmax(0,1fr)_minmax(15rem,20rem)] lg:items-start lg:gap-10 xl:gap-12"
+            : "",
+        )}
+      >
+        <div className="rounded-sm bg-[#FBF8F5] px-5 py-7 md:px-7 md:py-8 lg:px-8 lg:py-9">
+          <div className="max-w-[62ch] space-y-5 text-[1.02rem] leading-[1.75] text-charcoal/78 md:text-[1.06rem] md:leading-[1.72]">
+            {paragraphs.map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </div>
         </div>
 
         {quote ? (
-          <ExpertQuoteCard quote={quote} attribution={quoteAttribution} />
+          <ExpertQuoteCard
+            quote={quote}
+            attribution={quoteAttribution}
+            className="lg:sticky lg:top-28"
+          />
         ) : null}
       </div>
     </div>

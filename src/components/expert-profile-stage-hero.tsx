@@ -60,7 +60,7 @@ export function ExpertProfileStageHero({
         className="absolute inset-0 bg-linear-to-r from-charcoal/85 via-charcoal/45 to-transparent"
       />
 
-      <div className="relative mx-auto flex min-h-[min(88vh,48rem)] max-w-352 flex-col justify-between px-6 pt-36 pb-12 md:min-h-[min(90vh,52rem)] md:px-10 md:pb-14 lg:px-12 lg:pb-16">
+      <div className="relative mx-auto flex min-h-[min(88vh,48rem)] max-w-352 flex-col justify-between px-6 pt-48 pb-12 md:min-h-[min(90vh,52rem)] md:px-10 md:pt-56 md:pb-14 lg:px-12 lg:pb-16">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-16">
           <div className="max-w-3xl">
             <h1 className="max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:text-[4.5rem] lg:text-[5rem]">

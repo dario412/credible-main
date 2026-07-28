@@ -5,12 +5,19 @@ import { FadeUp } from "@/components/fade-up";
 export function ExpertQuoteCard({
   quote,
   attribution,
+  className,
 }: {
   quote: string;
   attribution?: string;
+  className?: string;
 }) {
   return (
-    <FadeUp duration={1200} y={24} threshold={0.3} className="lg:mt-8">
+    <FadeUp
+      duration={1200}
+      y={24}
+      threshold={0.3}
+      className={className}
+    >
       <figure className="relative isolate overflow-hidden rounded-sm bg-cream-dark px-6 py-7 text-charcoal md:px-7 md:py-8">
         <p className="relative text-[0.65rem] font-medium tracking-[0.18em] text-charcoal/45 uppercase">
           In their words

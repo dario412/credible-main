@@ -27,17 +27,44 @@ export function SiteHeader() {
   const overlay =
     /^\/roster\/[^/]+\/?$/.test(pathname) ||
     /^\/case-studies\/[^/]+\/?$/.test(pathname);
+  const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
-      const threshold = overlay ? window.innerHeight * 0.6 : 8;
-      setScrolled(window.scrollY > threshold);
+      const y = window.scrollY;
+
+      if (overlay) {
+        setScrolled(y > window.innerHeight * 0.6);
+        setExpanded(y > window.innerHeight * 0.55);
+        return;
+      }
+
+      if (isHome) {
+        const hero = document.querySelector<HTMLElement>("[data-site-hero]");
+        const heroBottom = hero
+          ? hero.offsetTop + hero.offsetHeight
+          : window.innerHeight;
+        // Expand as the first section ends / second begins.
+        const expandAt = Math.max(heroBottom - window.innerHeight * 0.22, 120);
+        setExpanded(y > expandAt);
+        setScrolled(y > 8);
+        return;
+      }
+
+      setScrolled(y > 8);
+      setExpanded(y > 48);
     };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [overlay]);
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [overlay, isHome]);
 
   const pageSurface = insightArticle ? "bg-cream-dark" : "bg-cream";
   // Over the stage image: invert the charcoal pill to cream with dark type.
@@ -46,8 +73,9 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 overflow-visible px-4 pt-4 pb-3 transition-colors duration-300 md:px-6 md:pt-5 md:pb-4 lg:px-8",
+        "sticky top-0 z-50 overflow-visible pt-4 pb-3 transition-[padding,background-color] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:pt-5 md:pb-4",
         scrolled || overlay ? "bg-transparent" : pageSurface,
+        expanded ? "px-6 md:px-10 lg:px-12" : "px-4 md:px-6 lg:px-8",
       )}
     >
       {/*
@@ -58,7 +86,7 @@ export function SiteHeader() {
       <div
         aria-hidden
         className={cn(
-          "pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(100%+8rem)] transition-opacity duration-500",
+          "pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(100%+8rem)] transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
           scrolled ? "opacity-100" : "opacity-0",
         )}
         style={{
@@ -74,10 +102,17 @@ export function SiteHeader() {
         }}
       />
 
-      <div className="mx-auto flex max-w-5xl items-stretch gap-1">
+      <div
+        className={cn(
+          "mx-auto flex w-full items-stretch gap-1 transition-[max-width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[max-width]",
+          expanded ? "max-w-352" : "max-w-5xl",
+        )}
+      >
         <div
           className={cn(
-            "flex flex-1 items-center gap-3 rounded-sm p-3 shadow-[0_10px_40px_rgba(28,26,23,0.12)] transition-colors duration-300 md:gap-6 md:p-3.5",
+            "flex flex-1 items-center gap-3 rounded-sm p-3 shadow-[0_10px_40px_rgba(28,26,23,0.12)] transition-[background-color,box-shadow,gap,padding] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:p-3.5",
+            expanded ? "md:gap-8" : "md:gap-6",
+            "gap-3",
             onImage ? "bg-cream" : "bg-charcoal",
           )}
         >
@@ -96,7 +131,10 @@ export function SiteHeader() {
           </Link>
 
           <nav
-            className="hidden flex-1 items-center justify-center gap-5 lg:gap-7 md:flex"
+            className={cn(
+              "hidden flex-1 items-center justify-center transition-[gap] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:flex",
+              expanded ? "gap-6 lg:gap-9" : "gap-5 lg:gap-7",
+            )}
             aria-label="Primary"
           >
             {links.map((link) => (

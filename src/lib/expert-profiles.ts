@@ -198,32 +198,32 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
       },
       formats: [
         {
-          category: "Content",
-          title: "Podcast series",
+          category: "01",
+          title: "Brand partnerships",
           description:
-            "Hosted or co-produced series with brand integration. Built for operators who already trust Alex’s voice.",
+            "Hosted or co-produced series with brand integration — long-form and considered, built for operators who already trust Alex’s voice.",
           pricing: "Custom scoped",
         },
         {
-          category: "Speaking",
-          title: "Keynote",
-          description:
-            "45–60 minute delivery. Preferred topics: building media businesses, founder storytelling, and creator-led growth.",
-          pricing: "From $65k",
-        },
-        {
-          category: "Speaking",
-          title: "Fireside",
-          description:
-            "Moderated conversation format. Strong for founder summits, closed-door exec events, and product launches.",
-          pricing: "From $45k",
-        },
-        {
-          category: "Brand",
-          title: "Ambassadorship",
+          category: "02",
+          title: "Ambassador programs",
           description:
             "12–18 month terms only. Selective — Alex takes on a small number of brand partners per year.",
           pricing: "Custom scoped",
+        },
+        {
+          category: "03",
+          title: "Speaking engagements",
+          description:
+            "Keynotes and firesides on building media businesses, founder storytelling and creator-led growth. 45–60 minute delivery.",
+          pricing: "From $65k",
+        },
+        {
+          category: "04",
+          title: "Live events",
+          description:
+            "Founder summits, product launches and closed-door exec sessions — Alex hosts the room, then carries it to his own audience.",
+          pricing: "From $45k",
         },
       ],
       recentWork: [
@@ -356,32 +356,32 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
       },
       formats: [
         {
-          category: "Speaking",
-          title: "Keynote",
+          category: "01",
+          title: "Brand partnerships",
           description:
-            "45–60 minute delivery. Preferred topics: culture systems, founder leadership, and scaling expert brands.",
-          pricing: "From $75k",
-        },
-        {
-          category: "Speaking",
-          title: "Fireside",
-          description:
-            "Moderated conversation format. Works well for closed-door executive events and summits.",
-          pricing: "From $50k",
-        },
-        {
-          category: "Content",
-          title: "Podcast series",
-          description:
-            "Sponsored series (host or guest). Includes brand integration and distribution.",
+            "Sponsored series across podcast and newsletter, hosted or guested. Brand integration and distribution included.",
           pricing: "Custom scoped",
         },
         {
-          category: "Brand",
-          title: "Ambassadorship",
+          category: "02",
+          title: "Ambassador programs",
           description:
             "12–18 month terms only. Selective — Amara takes on 2 ambassador partners per year maximum.",
           pricing: "Custom scoped",
+        },
+        {
+          category: "03",
+          title: "Speaking engagements",
+          description:
+            "Keynotes and firesides on culture systems, founder leadership and scaling expert brands. 45–60 minute delivery.",
+          pricing: "From $75k",
+        },
+        {
+          category: "04",
+          title: "Live events",
+          description:
+            "Summits and closed-door executive events across APAC and the US — Amara anchors the programming and amplifies it after.",
+          pricing: "From $50k",
         },
       ],
       recentWork: [
@@ -505,32 +505,32 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
       },
       formats: [
         {
-          category: "Speaking",
-          title: "Keynote",
+          category: "01",
+          title: "Brand partnerships",
           description:
-            "High-energy stage talks on performance, resilience, and sales credibility.",
+            "Flagship podcast takeovers and campaign arcs with clip packages built for social distribution.",
+          pricing: "Custom scoped",
+        },
+        {
+          category: "02",
+          title: "Ambassador programs",
+          description:
+            "Selective annual seats for brands that need an operator voice on stage all year, not for one campaign.",
+          pricing: "Custom scoped",
+        },
+        {
+          category: "03",
+          title: "Speaking engagements",
+          description:
+            "High-energy stage talks on performance, resilience and sales credibility. Keynotes, panels and closing sessions.",
           pricing: "From $45k",
         },
         {
-          category: "Speaking",
-          title: "Workshop",
+          category: "04",
+          title: "Live events",
           description:
-            "Half-day intensives for revenue teams installing operating cadence.",
+            "Half-day intensives and revenue offsites for GTM teams installing operating cadence in the room.",
           pricing: "From $28k",
-        },
-        {
-          category: "Content",
-          title: "Podcast guest",
-          description:
-            "Flagship podcast takeovers with clip packages for social distribution.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "Brand",
-          title: "Ambassador",
-          description:
-            "Selective annual seats for brands that need an operator voice on stage.",
-          pricing: "Custom scoped",
         },
       ],
       recentWork: [
@@ -654,32 +654,32 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
       },
       formats: [
         {
-          category: "Content",
-          title: "Newsletter series",
+          category: "01",
+          title: "Brand partnerships",
           description:
-            "Sponsored editorial arcs with measurement built for partnership teams.",
+            "Sponsored editorial arcs across newsletter, LinkedIn and podcast, with measurement built for partnership teams.",
           pricing: "From $35k",
         },
         {
-          category: "Brand",
-          title: "Ambassadorship",
+          category: "02",
+          title: "Ambassador programs",
           description:
-            "12-month brand seats with clear editorial guardrails.",
+            "12-month brand seats with clear editorial guardrails — the creator stays editorial, the brand stays clear.",
           pricing: "Custom scoped",
         },
         {
-          category: "Content",
-          title: "Content series",
+          category: "03",
+          title: "Speaking engagements",
           description:
-            "Multi-format campaigns across newsletter, LinkedIn, and podcast.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "Speaking",
-          title: "Fireside",
-          description:
-            "On-stage partnership conversations for brand and media summits.",
+            "On-stage partnership conversations and firesides for brand and media summits.",
           pricing: "From $30k",
+        },
+        {
+          category: "04",
+          title: "Live events",
+          description:
+            "Partner summits and launch moments across EU and LATAM — Sofia shapes the programming and the follow-through.",
+          pricing: "Custom scoped",
         },
       ],
       recentWork: [
@@ -803,31 +803,31 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
       },
       formats: [
         {
-          category: "Speaking",
-          title: "Keynote",
+          category: "01",
+          title: "Brand partnerships",
           description:
-            "Operator talks on systems, hiring, and decision quality under pressure.",
+            "Deep-dive interviews and newsletter arcs with clip packages built for LinkedIn distribution.",
+          pricing: "Custom scoped",
+        },
+        {
+          category: "02",
+          title: "Ambassador programs",
+          description:
+            "Long-term operator voice for product and infrastructure brands — retained, not rented for a campaign.",
+          pricing: "Custom scoped",
+        },
+        {
+          category: "03",
+          title: "Speaking engagements",
+          description:
+            "Operator talks on systems, hiring and decision quality under pressure. Keynotes and panels.",
           pricing: "From $40k",
         },
         {
-          category: "Content",
-          title: "Podcast guest",
+          category: "04",
+          title: "Live events",
           description:
-            "Deep-dive interviews with clip packages for LinkedIn distribution.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "Brand",
-          title: "Ambassador",
-          description:
-            "Long-term operator voice for product and infrastructure brands.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "Speaking",
-          title: "Executive roundtable",
-          description:
-            "Facilitated sessions for leadership teams installing cadence.",
+            "Facilitated executive roundtables and leadership offsites for teams installing operating cadence.",
           pricing: "From $25k",
         },
       ],
@@ -952,31 +952,31 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
       },
       formats: [
         {
-          category: "Content",
-          title: "Podcast host",
+          category: "01",
+          title: "Brand partnerships",
           description:
-            "Flagship hosted series with brand integration and clip systems.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "Speaking",
-          title: "Moderator",
-          description:
-            "On-stage moderation for conferences and brand summits.",
-          pricing: "From $35k",
-        },
-        {
-          category: "Content",
-          title: "Newsletter",
-          description:
-            "Editorial newsletter partnerships with measured distribution.",
+            "Flagship hosted series and interview-led campaigns across video, audio and newsletter, with clip systems included.",
           pricing: "From $28k",
         },
         {
-          category: "Content",
-          title: "Content series",
+          category: "02",
+          title: "Ambassador programs",
           description:
-            "Interview-led series across video, audio, and social.",
+            "Season-long editorial partnerships where Lena carries one brand across the whole run of the show.",
+          pricing: "Custom scoped",
+        },
+        {
+          category: "03",
+          title: "Speaking engagements",
+          description:
+            "On-stage moderation, panels and firesides for conferences and brand summits.",
+          pricing: "From $35k",
+        },
+        {
+          category: "04",
+          title: "Live events",
+          description:
+            "Live recordings and hosted stages across the EU — Lena runs the room and turns it into a content package.",
           pricing: "Custom scoped",
         },
       ],
@@ -1110,32 +1110,32 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
       },
       formats: [
         {
-          category: "Speaking",
-          title: "Keynote",
+          category: "01",
+          title: "Brand partnerships",
           description:
-            "45–60 minute delivery on AI adoption, fintech infrastructure, and category narrative.",
+            "Sponsored series with brand integration and weekly distribution to an investor and operator audience.",
+          pricing: "Custom scoped",
+        },
+        {
+          category: "02",
+          title: "Ambassador programs",
+          description:
+            "Selective annual seats — two commercial partners per year maximum, on 12–18 month terms.",
+          pricing: "Custom scoped",
+        },
+        {
+          category: "03",
+          title: "Speaking engagements",
+          description:
+            "Keynotes and firesides on AI adoption, fintech infrastructure and category narrative. 45–60 minute delivery.",
           pricing: "From $80k",
         },
         {
-          category: "Speaking",
-          title: "Fireside",
+          category: "04",
+          title: "Live events",
           description:
-            "Investor-operator conversations for summits and closed executive rooms.",
+            "Summits and closed executive rooms — investor-operator conversations that give the room lasting reach.",
           pricing: "From $55k",
-        },
-        {
-          category: "Content",
-          title: "Podcast series",
-          description:
-            "Sponsored series with brand integration and weekly distribution.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "Brand",
-          title: "Ambassadorship",
-          description:
-            "Selective annual seats — two commercial partners per year maximum.",
-          pricing: "Custom scoped",
         },
       ],
       recentWork: [

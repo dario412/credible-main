@@ -33,7 +33,13 @@ async function main() {
       title: "Co-founder, Morning Brew · Host, Founder’s Journal",
       shortBio:
         "Morning Brew co-founder and Founder’s Journal host — the operator voice founders already listen to.",
-      bio: "Alex Lieberman co-founded Morning Brew and built it into one of the defining media brands for professionals. Through Founder’s Journal he documents the unfiltered work of building companies — the decisions, doubts, and operating systems behind the stories. Brands partner with Alex when they want founder-grade credibility with an audience that already trusts his voice.",
+      bio: `Alex Lieberman is the co-founder and Executive Chairman of Morning Brew, the business media brand he built from a college newsletter to a $75 million exit.
+
+Since then, Alex has built a portfolio of ventures across AI, content, and talent — including Tenex, an AI transformation consultancy; storyarb, a full-stack B2B content subscription; and GrowthPair, which connects companies with top growth and marketing talent at a fraction of US hiring costs.
+
+He is a Forbes 30 Under 30 and AdAge 40 Under 40 honoree, and has created brand content for IBM, General Catalyst, Zoom, Zapier, Webflow, and Intuit. Through Founder’s Journal, he documents the unfiltered work of building companies — the decisions, doubts, and operating systems behind the stories operators already trust.
+
+Brands partner with Alex when they need founder-grade credibility with an audience that listens: operators, founders, and marketers who care less about polish and more about how the work actually gets done. He brings that same operator instinct to briefed partnerships, long-form series, and live stages — staying editorial while helping brands earn attention in rooms where trust is hard to buy.`,
       image: "/images/experts/alex-lieberman.png",
       categories: ["Founder / C-Suite"],
       topics: ["Entrepreneurship", "Media", "Creator economy"],

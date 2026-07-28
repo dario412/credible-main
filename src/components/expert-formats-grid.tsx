@@ -4,7 +4,9 @@ import {
   ChatsCircle,
   Handshake,
   Headphones,
+  Medal,
   MicrophoneStage,
+  Ticket,
 } from "@phosphor-icons/react";
 
 import { FadeUp } from "@/components/fade-up";
@@ -14,17 +16,20 @@ function FormatIcon({ format }: { format: ExpertFormatOffering }) {
   const key = `${format.category} ${format.title}`.toLowerCase();
   const className = "size-7";
 
+  if (key.includes("ambassador")) {
+    return <Medal weight="bold" className={className} aria-hidden />;
+  }
+  if (key.includes("brand") || key.includes("partnership")) {
+    return <Handshake weight="bold" className={className} aria-hidden />;
+  }
+  if (key.includes("live") || key.includes("event")) {
+    return <Ticket weight="bold" className={className} aria-hidden />;
+  }
   if (key.includes("fireside")) {
     return <ChatsCircle weight="bold" className={className} aria-hidden />;
   }
   if (key.includes("podcast") || key.includes("newsletter")) {
     return <Headphones weight="bold" className={className} aria-hidden />;
-  }
-  if (key.includes("ambassador") || key.includes("brand")) {
-    return <Handshake weight="bold" className={className} aria-hidden />;
-  }
-  if (key.includes("keynote") || key.includes("speaking")) {
-    return <MicrophoneStage weight="bold" className={className} aria-hidden />;
   }
   return <MicrophoneStage weight="bold" className={className} aria-hidden />;
 }
