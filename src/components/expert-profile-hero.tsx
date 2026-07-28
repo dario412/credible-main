@@ -187,7 +187,7 @@ export function ExpertProfileShell({
                   href={`/contact?expert=${encodeURIComponent(slug)}`}
                   className="inline-flex min-w-0 flex-[1.65] items-center justify-center rounded-sm border border-forest bg-forest px-3 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-forest-dark hover:bg-forest-dark"
                 >
-                  Send brief
+                  Get Rates
                 </Link>
                 <button
                   type="button"
