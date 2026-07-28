@@ -33,17 +33,6 @@ const AUDIENCES: { id: BriefAudience; label: string; hint: string }[] = [
   { id: "creator", label: "Creator", hint: "Applying for representation" },
 ];
 
-const FORMATS = [
-  "Keynote",
-  "Fireside / panel",
-  "Podcast",
-  "Content series",
-  "Newsletter",
-  "Ambassadorship",
-  "Live event",
-  "Not sure yet",
-] as const;
-
 const TIMINGS = [
   "Within 4 weeks",
   "1–3 months",
@@ -99,7 +88,6 @@ export function SendBriefForm({
 
   const [audience, setAudience] = useState<BriefAudience>(initialAudience);
   const [selected, setSelected] = useState<BriefCreator[]>(preselected);
-  const [formats, setFormats] = useState<string[]>([]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerQuery, setPickerQuery] = useState("");
 
@@ -139,14 +127,6 @@ export function SendBriefForm({
       current.some((item) => item.slug === creator.slug)
         ? current.filter((item) => item.slug !== creator.slug)
         : [...current, creator],
-    );
-  }
-
-  function toggleFormat(format: string) {
-    setFormats((current) =>
-      current.includes(format)
-        ? current.filter((item) => item !== format)
-        : [...current, format],
     );
   }
 
@@ -201,8 +181,6 @@ export function SendBriefForm({
           .map((creator) => `${creator.name} (${creator.slug})`)
           .join(", ")}
       />
-      <input type="hidden" name="formats" value={formats.join(", ")} />
-
       {/* Who's briefing — keeps one form serving brands, agencies and creators. */}
       <fieldset>
         <legend className="sr-only">I&apos;m briefing as</legend>
@@ -432,81 +410,65 @@ export function SendBriefForm({
           <fieldset className="mt-7 border-t border-charcoal/8 pt-6">
             <legend className="sr-only">What are you looking for?</legend>
             <SectionLabel step="04">What are you looking for?</SectionLabel>
-            <div className="mt-3.5 flex flex-wrap gap-2">
-              {FORMATS.map((format) => {
-                const active = formats.includes(format);
-                return (
-                  <button
-                    key={format}
-                    type="button"
-                    onClick={() => toggleFormat(format)}
-                    aria-pressed={active}
+            <div className="mt-3.5 grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <label htmlFor={`${id}-timing`} className={labelClass}>
+                  Timing
+                </label>
+                <div className="relative">
+                  <select
+                    id={`${id}-timing`}
+                    name="timing"
+                    defaultValue=""
                     className={cn(
-                      "cursor-pointer rounded-sm border px-3 py-2 text-[0.6875rem] font-medium tracking-[0.06em] uppercase transition-colors",
-                      active
-                        ? "border-forest bg-forest text-cream"
-                        : "border-forest/20 bg-cream text-charcoal/70 hover:border-forest/45 hover:text-charcoal",
+                      inputClass,
+                      "cursor-pointer appearance-none pr-10",
                     )}
                   >
-                    {format}
-                  </button>
-                );
-              })}
+                    <option value="">Select</option>
+                    {TIMINGS.map((timing) => (
+                      <option key={timing} value={timing}>
+                        {timing}
+                      </option>
+                    ))}
+                  </select>
+                  <CaretDown
+                    weight="bold"
+                    aria-hidden
+                    className="pointer-events-none absolute top-1/2 right-3.5 size-3 -translate-y-1/2 text-charcoal/40"
+                  />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor={`${id}-budget`} className={labelClass}>
+                  Budget shape
+                </label>
+                <div className="relative">
+                  <select
+                    id={`${id}-budget`}
+                    name="budget"
+                    defaultValue=""
+                    className={cn(
+                      inputClass,
+                      "cursor-pointer appearance-none pr-10",
+                    )}
+                  >
+                    <option value="">Select</option>
+                    {BUDGETS.map((budget) => (
+                      <option key={budget} value={budget}>
+                        {budget}
+                      </option>
+                    ))}
+                  </select>
+                  <CaretDown
+                    weight="bold"
+                    aria-hidden
+                    className="pointer-events-none absolute top-1/2 right-3.5 size-3 -translate-y-1/2 text-charcoal/40"
+                  />
+                </div>
+              </div>
             </div>
           </fieldset>
-
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <label htmlFor={`${id}-timing`} className={labelClass}>
-                Timing
-              </label>
-              <div className="relative">
-                <select
-                  id={`${id}-timing`}
-                  name="timing"
-                  defaultValue=""
-                  className={cn(inputClass, "cursor-pointer appearance-none pr-10")}
-                >
-                  <option value="">Select</option>
-                  {TIMINGS.map((timing) => (
-                    <option key={timing} value={timing}>
-                      {timing}
-                    </option>
-                  ))}
-                </select>
-                <CaretDown
-                  weight="bold"
-                  aria-hidden
-                  className="pointer-events-none absolute top-1/2 right-3.5 size-3 -translate-y-1/2 text-charcoal/40"
-                />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <label htmlFor={`${id}-budget`} className={labelClass}>
-                Budget shape
-              </label>
-              <div className="relative">
-                <select
-                  id={`${id}-budget`}
-                  name="budget"
-                  defaultValue=""
-                  className={cn(inputClass, "cursor-pointer appearance-none pr-10")}
-                >
-                  <option value="">Select</option>
-                  {BUDGETS.map((budget) => (
-                    <option key={budget} value={budget}>
-                      {budget}
-                    </option>
-                  ))}
-                </select>
-                <CaretDown
-                  weight="bold"
-                  aria-hidden
-                  className="pointer-events-none absolute top-1/2 right-3.5 size-3 -translate-y-1/2 text-charcoal/40"
-                />
-              </div>
-            </div>
-          </div>
         </>
       ) : null}
 
