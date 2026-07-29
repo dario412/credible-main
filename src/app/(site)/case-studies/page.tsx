@@ -43,20 +43,22 @@ export default async function CaseStudiesPage({
 
   return (
     <>
-      <section className="mx-auto max-w-352 px-6 pt-16 pb-12 md:px-10 md:pt-20 md:pb-14 lg:px-12 lg:pt-24 lg:pb-16">
-        <h1 className="max-w-[16ch] font-display text-[2.6rem] leading-[1.05] tracking-tight text-charcoal sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.15rem]">
-          Work that ran, and
-          <br />
-          what happened <span className="text-forest">next.</span>
-        </h1>
-        <p className="mt-6 max-w-xl text-[1.05rem] leading-relaxed text-charcoal/65 md:text-[1.125rem]">
-          Not decks or promises — deals we structured, delivered, and measured
-          with expert creators your buyers already trust.
-        </p>
+      <section className="px-6 pt-16 pb-12 md:px-10 md:pt-20 md:pb-14 lg:px-12 lg:pt-24 lg:pb-16">
+        <div className="mx-auto max-w-352">
+          <h1 className="max-w-[16ch] font-display text-[2.6rem] leading-[1.05] tracking-tight text-charcoal sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.15rem]">
+            Work that ran, and
+            <br />
+            what happened <span className="text-forest">next.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-[1.05rem] leading-relaxed text-charcoal/65 md:text-[1.125rem]">
+            Not decks or promises — deals we structured, delivered, and measured
+            with expert creators your buyers already trust.
+          </p>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-352 px-6 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
-        <div className="grid items-start gap-5 lg:grid-cols-2 lg:gap-6 xl:gap-7">
+      <section className="px-6 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
+        <div className="mx-auto grid max-w-352 items-start gap-5 lg:grid-cols-2 lg:gap-6 xl:gap-7">
           <div className="lg:sticky lg:top-6 lg:self-start lg:h-[calc(100dvh-3rem)]">
             <Link
               href={`/case-studies/${featured.slug}`}
@@ -125,9 +127,9 @@ export default async function CaseStudiesPage({
 
       <section
         id="all-case-studies"
-        className="scroll-mt-8 bg-cream"
+        className="scroll-mt-8 bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24"
       >
-        <div className="mx-auto max-w-352 px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
+        <div className="mx-auto max-w-352">
           <h2 className="text-center font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal sm:text-[2.4rem] md:text-[2.75rem]">
             All stories
           </h2>

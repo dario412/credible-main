@@ -118,169 +118,171 @@ export default async function ContactPage({
   });
 
   return (
-    <div className="mx-auto max-w-352 px-6 py-14 md:px-10 md:py-18 lg:px-12 lg:py-20">
-      <div className="mx-auto max-w-3xl text-center">
-        <h1 className="font-display text-[2.6rem] leading-[1.06] tracking-tight text-charcoal sm:text-[3.15rem] md:text-[3.5rem]">
-          Brief the voices your buyers{" "}
-          <span className="text-forest">already trust.</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-xl text-[0.95rem] leading-relaxed text-charcoal/65 md:text-base">
-          {preselected.length > 0
-            ? `Your shortlist is loaded below. Tell us the ambition and we'll come back with availability, pricing and a scoped proposal.`
-            : `In-house, agency or creator — send us the ambition. We'll come back with a named shortlist within 48 hours.`}
-        </p>
-      </div>
+    <div className="px-6 py-14 md:px-10 md:py-18 lg:px-12 lg:py-20">
+      <div className="mx-auto max-w-352">
+        <div className="mx-auto max-w-3xl text-center">
+          <h1 className="font-display text-[2.6rem] leading-[1.06] tracking-tight text-charcoal sm:text-[3.15rem] md:text-[3.5rem]">
+            Brief the voices your buyers{" "}
+            <span className="text-forest">already trust.</span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl text-[0.95rem] leading-relaxed text-charcoal/65 md:text-base">
+            {preselected.length > 0
+              ? `Your shortlist is loaded below. Tell us the ambition and we'll come back with availability, pricing and a scoped proposal.`
+              : `In-house, agency or creator — send us the ambition. We'll come back with a named shortlist within 48 hours.`}
+          </p>
+        </div>
 
-      <div className="mt-10 grid items-start gap-8 md:mt-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12">
-        <SendBriefForm
-          preselected={preselected}
-          roster={creators}
-          initialAudience={parseAudience(params.type)}
-        />
+        <div className="mt-10 grid items-start gap-8 md:mt-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12">
+          <SendBriefForm
+            preselected={preselected}
+            roster={creators}
+            initialAudience={parseAudience(params.type)}
+          />
 
-        <aside className="flex flex-col gap-5 lg:sticky lg:top-32">
-          <div className="rounded-sm bg-charcoal p-6 md:p-7">
-            <p className="text-[0.7rem] font-medium tracking-[0.16em] text-cream/55 uppercase">
-              Briefed by teams at
-            </p>
-            <ul className="mt-5 grid grid-cols-3 items-center gap-x-6 gap-y-5">
-              {TRUST_LOGOS.map((logo) => (
-                <li key={logo.name}>
-                  <img
-                    src={logo.src}
-                    alt={logo.name}
-                    className="h-5 w-auto max-w-full object-contain object-left brightness-0 invert md:h-5.5"
-                  />
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-6 md:p-7">
-            <p className="text-[0.7rem] font-medium tracking-[0.16em] text-charcoal/45 uppercase">
-              What happens next
-            </p>
-            <ol className="mt-6">
-              {STEPS.map((step, index) => (
-                <li
-                  key={step.title}
-                  className="relative flex gap-4 pb-6 last:pb-0"
-                >
-                  {index < STEPS.length - 1 ? (
-                    <span
-                      aria-hidden
-                      className="absolute top-7 bottom-0 left-2.75 w-px bg-charcoal/12"
+          <aside className="flex flex-col gap-5 lg:sticky lg:top-32">
+            <div className="rounded-sm bg-charcoal p-6 md:p-7">
+              <p className="text-[0.7rem] font-medium tracking-[0.16em] text-cream/55 uppercase">
+                Briefed by teams at
+              </p>
+              <ul className="mt-5 grid grid-cols-3 items-center gap-x-6 gap-y-5">
+                {TRUST_LOGOS.map((logo) => (
+                  <li key={logo.name}>
+                    <img
+                      src={logo.src}
+                      alt={logo.name}
+                      className="h-5 w-auto max-w-full object-contain object-left brightness-0 invert md:h-5.5"
                     />
-                  ) : null}
-                  <span className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-forest/25 bg-forest/8 font-display text-[0.6875rem] leading-none text-forest">
-                    {index + 1}
-                  </span>
-                  <div className="-mt-1">
-                    <p className="font-display text-[1.0625rem] leading-snug tracking-tight text-charcoal">
-                      {step.title}
-                    </p>
-                    <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/60">
-                      {step.body}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-            <p className="mt-2 border-t border-charcoal/8 pt-5 text-[0.8125rem] leading-relaxed text-charcoal/60">
-              Rather browse first?{" "}
-              <Link
-                href="/roster"
-                className="font-medium text-forest transition-colors hover:text-forest-dark"
-              >
-                See all 24 creators
-              </Link>
-              {" · "}
-              <a
-                href="mailto:hello@crediblecreators.com"
-                className="font-medium text-forest transition-colors hover:text-forest-dark"
-              >
-                email us
-              </a>
-            </p>
-          </div>
-        </aside>
-      </div>
-
-      <section className="mt-16 border-t border-charcoal/10 pt-12 md:mt-20 md:pt-14">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {CONTACT_CHANNELS.map((channel) => (
-            <a
-              key={channel.address}
-              href={`mailto:${channel.address}`}
-              className="group flex flex-col rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-5 transition-colors hover:border-forest/45 md:p-6"
-            >
-              <span className="flex items-center justify-between gap-3">
-                <span className={EYEBROW}>{channel.label}</span>
-                <ArrowUpRight
-                  weight="bold"
-                  aria-hidden
-                  className="size-3 shrink-0 text-charcoal/25 transition-colors group-hover:text-forest"
-                />
-              </span>
-              <span className="mt-4 font-display text-[1.15rem] leading-tight tracking-tight text-charcoal transition-colors group-hover:text-forest md:text-[1.25rem]">
-                {channel.address}
-              </span>
-              <span className="mt-2.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-                {channel.body}
-              </span>
-            </a>
-          ))}
-        </div>
-
-        <div className="mt-4 grid gap-4 lg:grid-cols-3">
-          <div className="rounded-sm border border-charcoal/10 p-5 md:p-6">
-            <p className={EYEBROW}>London office</p>
-            <p className="mt-4 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
-              Credible Talent Ltd
-            </p>
-            <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-              Somers Town, London NW1
-            </p>
-          </div>
-
-          <div className="rounded-sm border border-charcoal/10 p-5 md:p-6">
-            <p className={EYEBROW}>By phone</p>
-            <a
-              href="tel:+442079460018"
-              className="mt-4 inline-block font-display text-[1.15rem] leading-snug tracking-tight text-charcoal transition-colors hover:text-forest"
-            >
-              +44 20 7946 0018
-            </a>
-            <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-              Weekdays, 9am–6pm GMT
-            </p>
-          </div>
-
-          <div className="rounded-sm border border-charcoal/10 p-5 md:p-6">
-            <p className={EYEBROW}>Follow along</p>
-            <ul className="mt-4 space-y-2">
-              {SOCIALS.map((social) => (
-                <li key={social.label}>
-                  <a
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center justify-between gap-3 rounded-sm border border-charcoal/12 px-3.5 py-2.5 transition-colors hover:border-charcoal hover:bg-charcoal"
+            <div className="rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-6 md:p-7">
+              <p className="text-[0.7rem] font-medium tracking-[0.16em] text-charcoal/45 uppercase">
+                What happens next
+              </p>
+              <ol className="mt-6">
+                {STEPS.map((step, index) => (
+                  <li
+                    key={step.title}
+                    className="relative flex gap-4 pb-6 last:pb-0"
                   >
-                    <span className="text-[0.8125rem] font-medium text-charcoal transition-colors group-hover:text-cream">
-                      {social.label}
+                    {index < STEPS.length - 1 ? (
+                      <span
+                        aria-hidden
+                        className="absolute top-7 bottom-0 left-2.75 w-px bg-charcoal/12"
+                      />
+                    ) : null}
+                    <span className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-forest/25 bg-forest/8 font-display text-[0.6875rem] leading-none text-forest">
+                      {index + 1}
                     </span>
-                    <span className="text-[0.6875rem] text-charcoal/40 transition-colors group-hover:text-cream/70">
-                      {social.handle}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+                    <div className="-mt-1">
+                      <p className="font-display text-[1.0625rem] leading-snug tracking-tight text-charcoal">
+                        {step.title}
+                      </p>
+                      <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/60">
+                        {step.body}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+
+              <p className="mt-2 border-t border-charcoal/8 pt-5 text-[0.8125rem] leading-relaxed text-charcoal/60">
+                Rather browse first?{" "}
+                <Link
+                  href="/roster"
+                  className="font-medium text-forest transition-colors hover:text-forest-dark"
+                >
+                  See all 24 creators
+                </Link>
+                {" · "}
+                <a
+                  href="mailto:hello@crediblecreators.com"
+                  className="font-medium text-forest transition-colors hover:text-forest-dark"
+                >
+                  email us
+                </a>
+              </p>
+            </div>
+          </aside>
         </div>
-      </section>
+
+        <section className="mt-16 border-t border-charcoal/10 pt-12 md:mt-20 md:pt-14">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {CONTACT_CHANNELS.map((channel) => (
+              <a
+                key={channel.address}
+                href={`mailto:${channel.address}`}
+                className="group flex flex-col rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-5 transition-colors hover:border-forest/45 md:p-6"
+              >
+                <span className="flex items-center justify-between gap-3">
+                  <span className={EYEBROW}>{channel.label}</span>
+                  <ArrowUpRight
+                    weight="bold"
+                    aria-hidden
+                    className="size-3 shrink-0 text-charcoal/25 transition-colors group-hover:text-forest"
+                  />
+                </span>
+                <span className="mt-4 font-display text-[1.15rem] leading-tight tracking-tight text-charcoal transition-colors group-hover:text-forest md:text-[1.25rem]">
+                  {channel.address}
+                </span>
+                <span className="mt-2.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
+                  {channel.body}
+                </span>
+              </a>
+            ))}
+          </div>
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-3">
+            <div className="rounded-sm border border-charcoal/10 p-5 md:p-6">
+              <p className={EYEBROW}>London office</p>
+              <p className="mt-4 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
+                Credible Talent Ltd
+              </p>
+              <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
+                Somers Town, London NW1
+              </p>
+            </div>
+
+            <div className="rounded-sm border border-charcoal/10 p-5 md:p-6">
+              <p className={EYEBROW}>By phone</p>
+              <a
+                href="tel:+442079460018"
+                className="mt-4 inline-block font-display text-[1.15rem] leading-snug tracking-tight text-charcoal transition-colors hover:text-forest"
+              >
+                +44 20 7946 0018
+              </a>
+              <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
+                Weekdays, 9am–6pm GMT
+              </p>
+            </div>
+
+            <div className="rounded-sm border border-charcoal/10 p-5 md:p-6">
+              <p className={EYEBROW}>Follow along</p>
+              <ul className="mt-4 space-y-2">
+                {SOCIALS.map((social) => (
+                  <li key={social.label}>
+                    <a
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-center justify-between gap-3 rounded-sm border border-charcoal/12 px-3.5 py-2.5 transition-colors hover:border-charcoal hover:bg-charcoal"
+                    >
+                      <span className="text-[0.8125rem] font-medium text-charcoal transition-colors group-hover:text-cream">
+                        {social.label}
+                      </span>
+                      <span className="text-[0.6875rem] text-charcoal/40 transition-colors group-hover:text-cream/70">
+                        {social.handle}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

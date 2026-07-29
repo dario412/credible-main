@@ -95,39 +95,41 @@ export default async function RosterPage({
   }));
 
   return (
-    <div className="mx-auto max-w-352 px-6 py-16 md:px-10 md:py-20 lg:px-12">
-      <div className="mx-auto max-w-3xl text-center">
-        <h1 className="font-display text-[2.6rem] leading-[1.08] tracking-tight text-charcoal sm:text-[3.15rem] md:text-[3.65rem]">
-          24 B2B expert creators
-          <br />
-          <span className="text-forest">ready to brief.</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-lg text-[0.9rem] leading-relaxed text-charcoal/65 md:text-[0.95rem]">
-          Filter by archetype, topic or channel. Each profile carries reach data,
-          past collaborations and format-level pricing so you can shortlist
-          before you brief.
+    <div className="px-6 py-16 md:px-10 md:py-20 lg:px-12">
+      <div className="mx-auto max-w-352">
+        <div className="mx-auto max-w-3xl text-center">
+          <h1 className="font-display text-[2.6rem] leading-[1.08] tracking-tight text-charcoal sm:text-[3.15rem] md:text-[3.65rem]">
+            24 B2B expert creators
+            <br />
+            <span className="text-forest">ready to brief.</span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-lg text-[0.9rem] leading-relaxed text-charcoal/65 md:text-[0.95rem]">
+            Filter by archetype, topic or channel. Each profile carries reach
+            data, past collaborations and format-level pricing so you can
+            shortlist before you brief.
+          </p>
+        </div>
+
+        <div className="mx-auto mt-8 max-w-4xl md:mt-10">
+          <RosterFilters
+            currentArchetype={archetype}
+            currentTopic={topic}
+            currentChannels={selectedChannels}
+            currentQuery={q}
+          />
+        </div>
+
+        <p className="mt-8 text-sm text-charcoal/50">
+          {experts.length === 0
+            ? "No experts match these filters."
+            : `${experts.length} ${experts.length === 1 ? "expert" : "experts"}`}
         </p>
-      </div>
 
-      <div className="mx-auto mt-8 max-w-4xl md:mt-10">
-        <RosterFilters
-          currentArchetype={archetype}
-          currentTopic={topic}
-          currentChannels={selectedChannels}
-          currentQuery={q}
-        />
-      </div>
-
-      <p className="mt-8 text-sm text-charcoal/50">
-        {experts.length === 0
-          ? "No experts match these filters."
-          : `${experts.length} ${experts.length === 1 ? "expert" : "experts"}`}
-      </p>
-
-      <div className="mt-5 grid items-stretch gap-x-5 gap-y-10 overflow-visible sm:grid-cols-2 lg:grid-cols-3">
-        {cards.map((expert) => (
-          <RosterCard key={expert.id} expert={expert} />
-        ))}
+        <div className="mt-5 grid items-stretch gap-x-5 gap-y-10 overflow-visible sm:grid-cols-2 lg:grid-cols-3">
+          {cards.map((expert) => (
+            <RosterCard key={expert.id} expert={expert} />
+          ))}
+        </div>
       </div>
     </div>
   );

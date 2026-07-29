@@ -54,8 +54,8 @@ export function ExpertProfileShell({
   const topicLine = topics.slice(0, 3).map(formatTopicLabel);
 
   return (
-    <div className="bg-cream">
-      <div className="mx-auto grid max-w-352 items-start gap-10 px-6 pt-8 pb-16 md:gap-12 md:px-10 md:pt-12 md:pb-20 lg:grid-cols-[minmax(0,18.5rem)_minmax(0,1fr)] lg:gap-12 lg:px-12 lg:pt-14 lg:pb-24 xl:grid-cols-[minmax(0,19.5rem)_minmax(0,1fr)] xl:gap-14">
+    <div className="bg-cream px-6 pt-8 pb-16 md:px-10 md:pt-12 md:pb-20 lg:px-12 lg:pt-14 lg:pb-24">
+      <div className="mx-auto grid max-w-352 items-start gap-10 md:gap-12 lg:grid-cols-[minmax(0,18.5rem)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,19.5rem)_minmax(0,1fr)] xl:gap-14">
         {/* Premium agency talent card — sticky CRO rail */}
         <aside className="order-1 self-start lg:sticky lg:top-32">
           <div className="overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] shadow-[0_18px_44px_rgba(28,26,23,0.07)] lg:max-h-[calc(100vh-9rem)]">

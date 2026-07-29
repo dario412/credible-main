@@ -446,8 +446,8 @@ export function ExpertProfileFooter({
 
   return (
     <>
-      <section className="bg-cream">
-        <div className="mx-auto max-w-352 px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
+      <section className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
+        <div className="mx-auto max-w-352">
           <div className="relative isolate overflow-hidden rounded-sm bg-charcoal px-6 py-12 text-center shadow-[0_24px_60px_rgba(28,26,23,0.18)] md:px-12 md:py-14">
             {cover ? (
               <>
@@ -476,8 +476,8 @@ export function ExpertProfileFooter({
       </section>
 
       {similar.length > 0 ? (
-        <section className="bg-cream">
-          <div className="mx-auto max-w-352 px-6 pt-4 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
+        <section className="bg-cream px-6 pt-4 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
+          <div className="mx-auto max-w-352">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <h2 className="font-display text-[1.75rem] leading-[1.08] tracking-tight text-charcoal md:text-[2rem]">
                 Similar creators.

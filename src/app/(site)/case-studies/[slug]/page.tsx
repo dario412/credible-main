@@ -129,51 +129,55 @@ export default async function CaseStudyPage({ params }: Props) {
           }}
         />
 
-        <div className="relative mx-auto flex min-h-[min(92vh,52rem)] max-w-352 flex-col justify-between px-6 pt-36 pb-12 md:min-h-[min(94vh,56rem)] md:px-10 md:pb-14 lg:px-12 lg:pb-16">
-          <div>
-            <Image
-              src={logo}
-              alt={study.client}
-              width={48}
-              height={48}
-              className="size-10 object-contain brightness-0 invert md:size-11"
-              priority
-            />
+        <div className="relative flex min-h-[min(92vh,52rem)] flex-col px-6 pt-36 pb-12 md:min-h-[min(94vh,56rem)] md:px-10 md:pb-14 lg:px-12 lg:pb-16">
+          <div className="mx-auto flex w-full max-w-352 flex-1 flex-col justify-between">
+            <div>
+              <Image
+                src={logo}
+                alt={study.client}
+                width={48}
+                height={48}
+                className="size-10 object-contain brightness-0 invert md:size-11"
+                priority
+              />
 
-            <h1 className="mt-8 max-w-[18ch] font-display text-[2.4rem] leading-[1.08] tracking-tight text-cream sm:text-[3rem] md:mt-10 md:text-[3.5rem] lg:text-[4rem]">
-              {hero.titleEmphasis ? (
-                <>
-                  {hero.title}{" "}
-                  <em className="font-display italic">{hero.titleEmphasis}</em>
-                </>
-              ) : (
-                hero.title
-              )}
-            </h1>
+              <h1 className="mt-8 max-w-[18ch] font-display text-[2.4rem] leading-[1.08] tracking-tight text-cream sm:text-[3rem] md:mt-10 md:text-[3.5rem] lg:text-[4rem]">
+                {hero.titleEmphasis ? (
+                  <>
+                    {hero.title}{" "}
+                    <em className="font-display italic">
+                      {hero.titleEmphasis}
+                    </em>
+                  </>
+                ) : (
+                  hero.title
+                )}
+              </h1>
 
-            <p className="mt-6 max-w-2xl text-[1.05rem] leading-relaxed text-cream/75 md:mt-7 md:text-[1.125rem]">
-              {hero.summary}
-            </p>
+              <p className="mt-6 max-w-2xl text-[1.05rem] leading-relaxed text-cream/75 md:mt-7 md:text-[1.125rem]">
+                {hero.summary}
+              </p>
+            </div>
+
+            <dl className="mt-14 grid gap-8 border-t border-cream/20 pt-8 sm:grid-cols-2 md:mt-16 md:gap-10 lg:grid-cols-4">
+              {hero.meta.map((item) => (
+                <div key={item.label}>
+                  <dt className="font-mono text-[10px] tracking-[0.14em] text-cream/55 uppercase">
+                    {item.label}
+                  </dt>
+                  <dd className="mt-2.5 text-[0.95rem] leading-snug text-cream md:text-[1rem]">
+                    {item.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
-
-          <dl className="mt-14 grid gap-8 border-t border-cream/20 pt-8 sm:grid-cols-2 md:mt-16 md:gap-10 lg:grid-cols-4">
-            {hero.meta.map((item) => (
-              <div key={item.label}>
-                <dt className="font-mono text-[10px] tracking-[0.14em] text-cream/55 uppercase">
-                  {item.label}
-                </dt>
-                <dd className="mt-2.5 text-[0.95rem] leading-snug text-cream md:text-[1rem]">
-                  {item.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
         </div>
       </section>
 
       {quote ? (
-        <section className="bg-cream">
-          <div className="mx-auto flex max-w-352 flex-col items-center px-6 py-20 text-center md:px-10 md:py-28 lg:px-12 lg:py-32">
+        <section className="bg-cream px-6 py-20 md:px-10 md:py-28 lg:px-12 lg:py-32">
+          <div className="mx-auto flex max-w-352 flex-col items-center text-center">
             <blockquote className="max-w-[38rem] text-[1.35rem] leading-[1.35] font-medium tracking-tight text-charcoal sm:text-[1.55rem] md:text-[1.75rem] md:leading-[1.3]">
               “{quote.text}”
             </blockquote>
@@ -191,8 +195,8 @@ export default async function CaseStudyPage({ params }: Props) {
       ) : null}
 
       {story ? (
-        <div className="bg-cream">
-          <div className="mx-auto max-w-352 px-6 pt-10 pb-0 md:px-10 md:pt-12 lg:px-12 lg:pt-14">
+        <div className="bg-cream px-6 pt-10 pb-0 md:px-10 md:pt-12 lg:px-12 lg:pt-14">
+          <div className="mx-auto max-w-352">
             <InsightShare
               url={shareUrl}
               title={study.title}

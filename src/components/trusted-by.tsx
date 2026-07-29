@@ -15,7 +15,7 @@ type Brand = {
   testimonial?: Testimonial;
 };
 
-const brands: Brand[] = [
+const firstRow: Brand[] = [
   { name: "Notion", logoSrc: "/brand/clients/notion-wordmark-white.png" },
   {
     name: "Stripe",
@@ -41,6 +41,9 @@ const brands: Brand[] = [
     },
   },
   { name: "Vercel", logoSrc: "/brand/clients/vercel-wordmark-white.svg" },
+];
+
+const middleRow: Brand[] = [
   { name: "Intercom", logoSrc: "/brand/clients/intercom-wordmark-white.svg" },
   { name: "Ramp", logoSrc: "/brand/clients/ramp-wordmark-white.svg" },
   {
@@ -56,12 +59,9 @@ const brands: Brand[] = [
   },
   { name: "Loom", logoSrc: "/brand/clients/loom-wordmark-white.svg" },
   { name: "Cursor", logoSrc: "/brand/clients/cursor-wordmark-white.svg" },
-  { name: "HubSpot", logoSrc: "/brand/clients/hubspot-wordmark-white.svg" },
-  { name: "SaaStr", logoSrc: "/brand/clients/saastr-wordmark-white.svg" },
-  { name: "Attio", logoSrc: "/brand/clients/attio-wordmark-white.svg" },
-  { name: "Vanta", logoSrc: "/brand/clients/vanta-wordmark-white.svg" },
-  { name: "Clerk", logoSrc: "/brand/clients/clerk-wordmark-white.svg" },
 ];
+
+const brands: Brand[] = [...firstRow, ...middleRow, ...firstRow];
 
 const LOGO_CLASS = "h-[1.35rem] w-auto md:h-[1.55rem]";
 
@@ -105,12 +105,12 @@ export function TrustedBy() {
     <section className="bg-cream px-6 py-8 md:px-10 md:py-10 lg:px-12">
       <div className="mx-auto max-w-352 overflow-visible rounded-sm bg-charcoal px-6 py-6 md:px-10 md:py-10 lg:px-12 lg:py-12">
         <ul className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:grid-cols-5 md:gap-x-8 md:gap-y-14">
-          {brands.map((brand) => {
+          {brands.map((brand, index) => {
             const hasStory = Boolean(brand.caseStudySlug && brand.testimonial);
 
             return (
               <li
-                key={brand.name}
+                key={`${brand.name}-${index}`}
                 className="group relative flex flex-col items-center gap-3"
               >
                 {hasStory && brand.testimonial ? (

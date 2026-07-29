@@ -57,9 +57,9 @@ export default async function InsightPage({ params }: Props) {
 
   return (
     <>
-      <section className="overflow-hidden bg-cream-dark">
+      <section className="overflow-hidden bg-cream-dark px-6 py-10 md:px-10 md:py-12 lg:px-12 lg:py-14">
         <div className="mx-auto grid max-w-352 items-stretch lg:grid-cols-2">
-          <div className="flex min-w-0 flex-col justify-center px-6 py-10 md:px-10 md:py-12 lg:px-12 lg:py-14">
+          <div className="flex min-w-0 flex-col justify-center pb-10 md:pb-12 lg:pb-0 lg:pr-12">
             <nav
               aria-label="Breadcrumb"
               className="flex flex-wrap items-center gap-2"
@@ -112,13 +112,15 @@ export default async function InsightPage({ params }: Props) {
                 C
               </span>
               <div>
-                <p className="text-sm font-medium text-charcoal">{author.name}</p>
+                <p className="text-sm font-medium text-charcoal">
+                  {author.name}
+                </p>
                 <p className="text-xs text-charcoal/50">{author.role}</p>
               </div>
             </Link>
           </div>
 
-          <div className="px-6 pb-10 md:px-10 lg:flex lg:items-center lg:px-12 lg:py-14 lg:pl-0">
+          <div className="lg:flex lg:items-center">
             <div className="relative aspect-16/10 w-full overflow-hidden rounded-sm bg-forest/10 lg:aspect-auto lg:min-h-112">
               {cover ? (
                 <Image
@@ -142,137 +144,139 @@ export default async function InsightPage({ params }: Props) {
         </div>
       </section>
 
-      <div className="mx-auto max-w-352 px-6 py-10 md:px-10 md:py-12 lg:px-12 lg:py-14">
-        <InsightShare
-          url={shareUrl}
-          title={insight.title}
-          className="mb-8 lg:hidden"
-        />
+      <div className="px-6 py-10 md:px-10 md:py-12 lg:px-12 lg:py-14">
+        <div className="mx-auto max-w-352">
+          <InsightShare
+            url={shareUrl}
+            title={insight.title}
+            className="mb-8 lg:hidden"
+          />
 
-        {toc.length > 0 ? (
-          <nav
-            aria-label="In this article"
-            className="mb-8 rounded-sm border border-charcoal/8 bg-[#FBF8F5] px-5 py-5 md:mb-10 md:px-6 lg:hidden"
-          >
-            <p className="font-display text-[1.05rem] font-medium leading-snug tracking-tight text-charcoal">
-              In this article
-            </p>
-            <ol className="mt-3 space-y-2">
-              {toc.map((item) => (
-                <li key={item.id}>
-                  <a
-                    href={`#${item.id}`}
-                    className="text-[0.875rem] text-charcoal/60 transition-colors hover:text-forest"
+          {toc.length > 0 ? (
+            <nav
+              aria-label="In this article"
+              className="mb-8 rounded-sm border border-charcoal/8 bg-[#FBF8F5] px-5 py-5 md:mb-10 md:px-6 lg:hidden"
+            >
+              <p className="font-display text-[1.05rem] font-medium leading-snug tracking-tight text-charcoal">
+                In this article
+              </p>
+              <ol className="mt-3 space-y-2">
+                {toc.map((item) => (
+                  <li key={item.id}>
+                    <a
+                      href={`#${item.id}`}
+                      className="text-[0.875rem] text-charcoal/60 transition-colors hover:text-forest"
+                    >
+                      {item.text}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          ) : null}
+
+          <div className="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-stretch lg:gap-12 xl:grid-cols-[19rem_minmax(0,1fr)] xl:gap-14">
+            <aside className="hidden lg:block">
+              <InsightShare url={shareUrl} title={insight.title} />
+
+              <div className="sticky top-28 mt-8">
+                {toc.length > 0 ? (
+                  <nav
+                    aria-label="On this page"
+                    className="border-t border-charcoal/10 pt-7"
                   >
-                    {item.text}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        ) : null}
+                    <p className="font-display text-[1.05rem] font-medium leading-snug tracking-tight text-charcoal">
+                      In this article
+                    </p>
+                    <ol className="mt-3 space-y-2.5">
+                      {toc.map((item) => (
+                        <li key={item.id}>
+                          <a
+                            href={`#${item.id}`}
+                            className="block text-[0.8125rem] leading-snug text-charcoal/60 transition-colors hover:text-forest"
+                          >
+                            {item.text}
+                          </a>
+                        </li>
+                      ))}
+                    </ol>
+                  </nav>
+                ) : null}
 
-        <div className="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:items-stretch lg:gap-12 xl:grid-cols-[19rem_minmax(0,1fr)] xl:gap-14">
-          <aside className="hidden lg:block">
-            <InsightShare url={shareUrl} title={insight.title} />
+                <div className={toc.length > 0 ? "mt-8" : undefined}>
+                  <InsightArticleCta />
+                </div>
+              </div>
+            </aside>
 
-            <div className="sticky top-28 mt-8">
-              {toc.length > 0 ? (
-                <nav
-                  aria-label="On this page"
-                  className="border-t border-charcoal/10 pt-7"
-                >
-                  <p className="font-display text-[1.05rem] font-medium leading-snug tracking-tight text-charcoal">
-                    In this article
-                  </p>
-                  <ol className="mt-3 space-y-2.5">
-                    {toc.map((item) => (
-                      <li key={item.id}>
-                        <a
-                          href={`#${item.id}`}
-                          className="block text-[0.8125rem] leading-snug text-charcoal/60 transition-colors hover:text-forest"
-                        >
-                          {item.text}
-                        </a>
-                      </li>
-                    ))}
-                  </ol>
-                </nav>
-              ) : null}
+            <div className="min-w-0 w-full">
+              <p className="mb-7 w-full text-[0.98rem] leading-relaxed text-charcoal/65 md:mb-8 md:text-[1.02rem]">
+                {insight.excerpt}
+              </p>
 
-              <div className={toc.length > 0 ? "mt-8" : undefined}>
+              <div className="prose-credible w-full ![max-width:none]">
+                {blocks.map((block, index) => (
+                  <InsightBlockView
+                    key={`${block.type}-${index}`}
+                    block={block}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-12 rounded-sm bg-[#FBF8F5] px-5 py-6 md:mt-14 md:px-7 md:py-7">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-5">
+                  <span
+                    aria-hidden
+                    className="flex size-14 shrink-0 items-center justify-center rounded-sm bg-cream-dark font-display text-xl text-forest sm:size-16 sm:text-2xl"
+                  >
+                    C
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[0.65rem] font-medium tracking-[0.16em] text-charcoal/45 uppercase">
+                      {author.role}
+                    </p>
+                    <p className="mt-1.5 font-display text-[1.2rem] leading-snug tracking-tight text-charcoal md:text-[1.3rem]">
+                      {author.name}
+                    </p>
+                    <p className="mt-3 text-[0.875rem] leading-relaxed text-charcoal/65">
+                      {author.shortBio}
+                    </p>
+                    <Link
+                      href={`/insights/authors/${author.slug}`}
+                      className="group mt-5 inline-flex items-center gap-1.5 text-[0.875rem] font-medium text-forest transition-colors hover:text-forest-dark"
+                    >
+                      Read more about the author
+                      <ArrowRight
+                        weight="bold"
+                        className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+                        aria-hidden
+                      />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-10 lg:hidden">
                 <InsightArticleCta />
               </div>
             </div>
-          </aside>
-
-          <div className="min-w-0 w-full">
-            <p className="mb-7 w-full text-[0.98rem] leading-relaxed text-charcoal/65 md:mb-8 md:text-[1.02rem]">
-              {insight.excerpt}
-            </p>
-
-            <div className="prose-credible w-full ![max-width:none]">
-              {blocks.map((block, index) => (
-                <InsightBlockView
-                  key={`${block.type}-${index}`}
-                  block={block}
-                />
-              ))}
-            </div>
-
-            <div className="mt-12 rounded-sm bg-[#FBF8F5] px-5 py-6 md:mt-14 md:px-7 md:py-7">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-5">
-                <span
-                  aria-hidden
-                  className="flex size-14 shrink-0 items-center justify-center rounded-sm bg-cream-dark font-display text-xl text-forest sm:size-16 sm:text-2xl"
-                >
-                  C
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[0.65rem] font-medium tracking-[0.16em] text-charcoal/45 uppercase">
-                    {author.role}
-                  </p>
-                  <p className="mt-1.5 font-display text-[1.2rem] leading-snug tracking-tight text-charcoal md:text-[1.3rem]">
-                    {author.name}
-                  </p>
-                  <p className="mt-3 text-[0.875rem] leading-relaxed text-charcoal/65">
-                    {author.shortBio}
-                  </p>
-                  <Link
-                    href={`/insights/authors/${author.slug}`}
-                    className="group mt-5 inline-flex items-center gap-1.5 text-[0.875rem] font-medium text-forest transition-colors hover:text-forest-dark"
-                  >
-                    Read more about the author
-                    <ArrowRight
-                      weight="bold"
-                      className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
-                      aria-hidden
-                    />
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-10 lg:hidden">
-              <InsightArticleCta />
-            </div>
           </div>
+
+          {related.length > 0 ? (
+            <section className="mt-20 md:mt-24">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <h2 className="font-display text-[1.75rem] leading-[1.12] tracking-tight text-charcoal sm:text-[2rem]">
+                  More in {insight.category}
+                </h2>
+                <ViewMoreLink
+                  href={`/insights?category=${encodeURIComponent(insight.category)}`}
+                />
+              </div>
+
+              <RelatedInsightsGrid items={related} />
+            </section>
+          ) : null}
         </div>
-
-        {related.length > 0 ? (
-          <section className="mt-20 md:mt-24">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <h2 className="font-display text-[1.75rem] leading-[1.12] tracking-tight text-charcoal sm:text-[2rem]">
-                More in {insight.category}
-              </h2>
-              <ViewMoreLink
-                href={`/insights?category=${encodeURIComponent(insight.category)}`}
-              />
-            </div>
-
-            <RelatedInsightsGrid items={related} />
-          </section>
-        ) : null}
       </div>
     </>
   );

@@ -90,8 +90,8 @@ function CaseStudyCta({
 
 function FullKeyStudy() {
   return (
-    <section className="bg-cream-dark">
-      <div className="mx-0 max-w-352 px-6 py-12 md:px-10 md:py-14 lg:px-12 lg:py-16">
+    <section className="bg-cream-dark px-6 py-12 md:px-10 md:py-14 lg:px-12 lg:py-16">
+      <div className="mx-auto max-w-352">
         <img
           src="/brand/clients/notion-lockup.png"
           alt="Notion"
