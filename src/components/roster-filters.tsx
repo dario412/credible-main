@@ -1,6 +1,6 @@
 "use client";
 
-import { CaretDown, X } from "@phosphor-icons/react";
+import { CaretDown, Check, X } from "@phosphor-icons/react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 
@@ -55,6 +55,8 @@ export function RosterFilters({
   const pathname = usePathname();
   const [pending, startTransition] = useTransition();
   const [query, setQuery] = useState(currentQuery ?? "");
+  const [selectedChannels, setSelectedChannels] = useState(currentChannels);
+  const selectedChannelsRef = useRef(currentChannels);
   const [open, setOpen] = useState<OpenMenu>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const searchId = useId();
@@ -62,6 +64,17 @@ export function RosterFilters({
   useEffect(() => {
     setQuery(currentQuery ?? "");
   }, [currentQuery]);
+
+  useEffect(() => {
+    selectedChannelsRef.current = currentChannels;
+    setSelectedChannels(currentChannels);
+  }, [currentChannels]);
+
+  function setChannels(next: string[]) {
+    selectedChannelsRef.current = next;
+    setSelectedChannels(next);
+    update({ channels: next });
+  }
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -97,7 +110,8 @@ export function RosterFilters({
     const params = new URLSearchParams();
     const archetype = "archetype" in patch ? patch.archetype : currentArchetype;
     const topic = "topic" in patch ? patch.topic : currentTopic;
-    const channels = "channels" in patch ? patch.channels : currentChannels;
+    const channels =
+      "channels" in patch ? patch.channels : selectedChannelsRef.current;
     const q = "q" in patch ? patch.q : currentQuery;
 
     if (archetype) params.set("archetype", archetype);
@@ -118,7 +132,7 @@ export function RosterFilters({
   }
 
   const channelLabels = CHANNEL_FILTER_OPTIONS.filter((option) =>
-    currentChannels.includes(option.value),
+    selectedChannels.includes(option.value),
   ).map((option) => option.label);
 
   const channelSummary =
@@ -129,7 +143,7 @@ export function RosterFilters({
         : `${channelLabels.length} selected`;
 
   const hasFilters = Boolean(
-    currentArchetype || currentTopic || currentChannels.length || query,
+    currentArchetype || currentTopic || selectedChannels.length || query,
   );
 
   return (
@@ -222,19 +236,20 @@ export function RosterFilters({
             summary={channelSummary}
             placeholder="All channels"
             options={CHANNEL_FILTER_OPTIONS}
-            selectedValues={currentChannels}
+            selectedValues={selectedChannels}
             open={open === "channels"}
             onToggle={() =>
               setOpen((current) => (current === "channels" ? null : "channels"))
             }
             onToggleValue={(value) => {
-              const next = currentChannels.includes(value)
-                ? currentChannels.filter((item) => item !== value)
-                : [...currentChannels, value];
-              update({ channels: next });
+              const prev = selectedChannelsRef.current;
+              const next = prev.includes(value)
+                ? prev.filter((item) => item !== value)
+                : [...prev, value];
+              setChannels(next);
             }}
             onClear={() => {
-              update({ channels: [] });
+              setChannels([]);
             }}
             isLast
           />
@@ -470,12 +485,20 @@ function MultiFilterSegment({
                   type="button"
                   onClick={() => onToggleValue(option.value)}
                   className={cn(
-                    "flex w-full cursor-pointer px-3.5 py-2.5 text-left text-[0.8125rem] transition-colors",
+                    "flex w-full cursor-pointer items-center gap-2.5 px-3.5 py-2.5 text-left text-[0.8125rem] transition-colors",
                     active
                       ? "bg-forest/10 font-medium text-forest"
                       : "text-charcoal hover:bg-cream",
                   )}
                 >
+                  <Check
+                    weight="bold"
+                    aria-hidden
+                    className={cn(
+                      "size-3.5 shrink-0",
+                      active ? "opacity-100" : "opacity-0",
+                    )}
+                  />
                   {option.label}
                 </button>
               </li>
