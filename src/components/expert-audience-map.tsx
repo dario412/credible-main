@@ -113,7 +113,7 @@ export function TopicMixPie({
       )}
     >
       <p className="text-[0.65rem] font-medium tracking-[0.14em] text-charcoal/45 uppercase">
-        Topic mix
+        Talks About
       </p>
       <ul className="mt-4 divide-y divide-charcoal/8">
         {ranked.map((topic, index) => (

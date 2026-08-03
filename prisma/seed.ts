@@ -26,6 +26,28 @@ async function main() {
     },
   });
 
+  // Client owner account — password set explicitly for Lloyd's access.
+  const lloydPasswordHash = await bcrypt.hash("Lloyd123", 12);
+  await prisma.user.upsert({
+    where: { email: "lloyd@crediblecreators.com" },
+    update: {
+      name: "Lloyd",
+      passwordHash: lloydPasswordHash,
+      role: "OWNER",
+      active: true,
+      totpEnabled: false,
+      totpSecret: null,
+    },
+    create: {
+      email: "lloyd@crediblecreators.com",
+      name: "Lloyd",
+      passwordHash: lloydPasswordHash,
+      role: "OWNER",
+      active: true,
+      totpEnabled: false,
+    },
+  });
+
   const experts = [
     {
       slug: "alex-lieberman",

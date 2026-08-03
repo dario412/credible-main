@@ -99,7 +99,7 @@ export function LoginFormInner() {
         />
         <h1 className="mt-4 font-display text-3xl">Admin login</h1>
         <p className="mt-2 text-sm text-muted">
-          Sign in with email, password and two-factor authentication.
+          Sign in with your admin credentials.
         </p>
       </div>
 
