@@ -128,6 +128,8 @@ export default async function ExpertPage({ params }: Props) {
     .slice(0, 3)
     .map(toRosterCard);
 
+  const heroStats = buildStats(expert, enrichment.stats);
+
   return (
     <>
       <ExpertProfileStageHero
@@ -141,7 +143,34 @@ export default async function ExpertPage({ params }: Props) {
         portraitImage={expert.image}
         heroProof={enrichment.heroProof}
         trustedBy={enrichment.trustedBy}
-        stats={buildStats(expert, enrichment.stats)}
+        stats={heroStats}
+      />
+
+      {/* Client review: new-creator hero without Trusted by logos */}
+      <div className="bg-cream px-6 py-5 md:px-10 lg:px-12">
+        <div className="mx-auto max-w-352">
+          <p className="text-[0.65rem] font-medium tracking-[0.14em] text-charcoal/40 uppercase">
+            Layout option · New creator (no Trusted by)
+          </p>
+          <p className="mt-1.5 max-w-xl text-[0.875rem] leading-relaxed text-charcoal/50">
+            Same hero — name, proof, brief CTA, and stats — without the logo
+            strip, for creators who do not have brand clients yet.
+          </p>
+        </div>
+      </div>
+      <ExpertProfileStageHero
+        slug={expert.slug}
+        name={expert.name}
+        title={expert.title}
+        archetype={expert.categories[0] ?? null}
+        based={enrichment.based}
+        stageImage={enrichment.stageImage}
+        stageImagePosition={enrichment.stageImagePosition}
+        portraitImage={expert.image}
+        heroProof={enrichment.heroProof}
+        trustedBy={[]}
+        stats={heroStats}
+        preview
       />
 
       <ExpertProfileShell
@@ -154,7 +183,7 @@ export default async function ExpertPage({ params }: Props) {
         based={enrichment.based}
         languages={enrichment.languages}
         representationStatus={enrichment.representationStatus}
-        stats={buildStats(expert, enrichment.stats)}
+        stats={heroStats}
         nav={[
           { href: "#overview", label: "Overview" },
           ...(enrichment.channels?.length

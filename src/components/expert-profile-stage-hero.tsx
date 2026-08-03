@@ -4,6 +4,7 @@ import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { ExpertHeroStats } from "@/components/expert-hero-stats";
 import { firstName, type ExpertProfileStat } from "@/lib/expert-profiles";
+import { cn } from "@/lib/utils";
 
 export function ExpertProfileStageHero({
   slug,
@@ -17,6 +18,8 @@ export function ExpertProfileStageHero({
   heroProof,
   trustedBy = [],
   stats,
+  /** Client-review variant: no under-nav overlap; hides Trusted by. */
+  preview = false,
 }: {
   slug: string;
   name: string;
@@ -29,20 +32,30 @@ export function ExpertProfileStageHero({
   heroProof?: string;
   trustedBy?: { name: string; logo?: string }[];
   stats: ExpertProfileStat[];
+  preview?: boolean;
 }) {
   const first = firstName(name);
   const cover = stageImage ?? portraitImage ?? "/images/case-studies/notion.jpg";
   const proof =
     heroProof ??
     [title, archetype, based].filter(Boolean).join(" · ");
+  const showTrustedBy = !preview && trustedBy.length > 0;
 
   return (
-    <section className="relative isolate min-h-[min(88vh,48rem)] w-full -mt-[7.25rem] overflow-hidden md:min-h-[min(90vh,52rem)] md:-mt-[5.5rem]">
+    <section
+      className={cn(
+        "relative isolate w-full overflow-hidden",
+        preview
+          ? "min-h-[min(72vh,40rem)] md:min-h-[min(76vh,44rem)]"
+          : "min-h-[min(88vh,48rem)] -mt-[7.25rem] md:min-h-[min(90vh,52rem)] md:-mt-[5.5rem]",
+      )}
+      aria-label={preview ? "Hero layout without Trusted by" : undefined}
+    >
       <Image
         src={cover}
         alt=""
         fill
-        priority
+        priority={!preview}
         sizes="100vw"
         className="object-cover"
         style={
@@ -60,13 +73,31 @@ export function ExpertProfileStageHero({
         className="absolute inset-0 bg-linear-to-r from-charcoal/85 via-charcoal/45 to-transparent"
       />
 
-      <div className="relative flex min-h-[min(88vh,48rem)] flex-col px-6 pt-48 pb-12 md:min-h-[min(90vh,52rem)] md:px-10 md:pt-56 md:pb-14 lg:px-12 lg:pb-16">
-        <div className="mx-auto flex w-full max-w-352 flex-1 flex-col justify-between">
+      <div
+        className={cn(
+          "relative flex flex-col px-6 pb-12 md:px-10 md:pb-14 lg:px-12 lg:pb-16",
+          preview
+            ? "min-h-[min(72vh,40rem)] pt-16 md:min-h-[min(76vh,44rem)] md:pt-20"
+            : "min-h-[min(88vh,48rem)] pt-48 md:min-h-[min(90vh,52rem)] md:pt-56",
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto flex w-full max-w-352 flex-1 flex-col",
+            showTrustedBy ? "justify-between" : "justify-end",
+          )}
+        >
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-16">
             <div className="max-w-3xl">
-              <h1 className="max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:text-[4.5rem] lg:text-[5rem]">
-                {name}.
-              </h1>
+              {preview ? (
+                <p className="max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:text-[4.5rem] lg:text-[5rem]">
+                  {name}.
+                </p>
+              ) : (
+                <h1 className="max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:text-[4.5rem] lg:text-[5rem]">
+                  {name}.
+                </h1>
+              )}
 
               <p className="mt-5 max-w-xl text-[1.1rem] leading-relaxed text-cream/90 md:mt-6 md:text-[1.2rem]">
                 {proof}
@@ -90,7 +121,7 @@ export function ExpertProfileStageHero({
             <ExpertHeroStats stats={stats} />
           </div>
 
-          {trustedBy.length > 0 ? (
+          {showTrustedBy ? (
             <div className="mt-14 border-t border-cream/30 pt-8 md:mt-16">
               <p className="text-[0.7rem] font-medium tracking-[0.16em] text-cream/70 uppercase">
                 Trusted by

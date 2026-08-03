@@ -89,14 +89,9 @@ export function ExpertFormatsGrid({
             <article className="rounded-sm bg-[#FBF8F5] p-5 md:p-7 lg:p-8">
               <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.25fr)] lg:gap-0">
                 <div className="flex flex-col lg:pr-10 xl:pr-12">
-                  <div className="flex items-start justify-between gap-4">
-                    <span className="flex size-10 items-center justify-center rounded-md border border-charcoal/10 bg-cream/60 text-forest">
-                      <FormatIcon format={format} />
-                    </span>
-                    <p className="text-[0.7rem] font-medium tracking-[0.08em] text-charcoal/35 tabular-nums">
-                      {format.category}
-                    </p>
-                  </div>
+                  <span className="flex size-10 items-center justify-center rounded-md border border-charcoal/10 bg-cream/60 text-forest">
+                    <FormatIcon format={format} />
+                  </span>
 
                   <h3 className="mt-6 text-[1.35rem] font-medium tracking-tight text-charcoal md:text-[1.5rem]">
                     {format.title}

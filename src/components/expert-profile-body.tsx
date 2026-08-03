@@ -10,6 +10,7 @@ import {
 import { ExpertFormatsGrid } from "@/components/expert-formats-grid";
 import { ExpertInterestCta } from "@/components/expert-interest-cta";
 import { ExpertQuoteCard } from "@/components/expert-quote-card";
+import { ExpertWorkLayoutPreviews } from "@/components/expert-work-layouts";
 import type { RosterCardExpert } from "@/components/roster-card";
 import { SimilarCreatorsGrid } from "@/components/similar-creators-grid";
 import { StatCounter } from "@/components/stat-counter";
@@ -23,6 +24,7 @@ import {
   type ExpertRecentWork,
   type ExpertTopicShare,
 } from "@/lib/expert-profiles";
+import { getCaseStudy } from "@/lib/case-studies";
 import { cn } from "@/lib/utils";
 
 function SectionHeading({
@@ -314,37 +316,68 @@ function workTypeLabel(meta: string) {
     .trim();
 }
 
+function workCover(item: ExpertRecentWork): string | null {
+  if (!item.href?.startsWith("/case-studies/")) return null;
+  const slug = item.href.replace(/^\/case-studies\//, "").replace(/\/$/, "");
+  return getCaseStudy(slug)?.coverImage ?? null;
+}
+
 function RecentWorkSection({ work }: { work: ExpertRecentWork[] }) {
   return (
     <section id="work" className="scroll-mt-28">
       <SectionHeading>Recent work.</SectionHeading>
 
-      <ul className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+      <ul className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         {work.map((item) => {
           const typeLabel = workTypeLabel(item.meta);
+          const cover = workCover(item);
           const card = (
             <>
               <div
                 className={cn(
-                  "relative flex aspect-4/3 items-center justify-center overflow-hidden rounded-sm transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.015]",
-                  WORK_TONE[item.tone],
+                  "relative flex aspect-4/3 items-center justify-center overflow-hidden rounded-sm",
+                  !cover && WORK_TONE[item.tone],
                 )}
               >
+                {cover ? (
+                  <Image
+                    src={cover}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 18rem, (min-width: 640px) 40vw, 100vw"
+                    className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.035]"
+                  />
+                ) : (
+                  <span className="font-display text-[1.5rem] tracking-tight md:text-[1.7rem]">
+                    {item.client}
+                  </span>
+                )}
                 {typeLabel ? (
-                  <span className="absolute top-3 left-3 z-10 rounded-sm border border-cream/25 bg-charcoal/35 px-2.5 py-1 text-[0.625rem] font-medium tracking-[0.12em] text-cream uppercase shadow-[0_6px_18px_rgba(28,26,23,0.18)] backdrop-blur-md">
+                  <span className="absolute top-3 left-3 z-10 rounded-sm border border-cream/25 bg-charcoal/40 px-2.5 py-1 text-[0.625rem] font-medium tracking-[0.12em] text-cream uppercase shadow-[0_6px_18px_rgba(28,26,23,0.18)] backdrop-blur-md">
                     {typeLabel}
                   </span>
                 ) : null}
-                <span className="font-display text-[1.5rem] tracking-tight md:text-[1.7rem]">
-                  {item.client}
-                </span>
               </div>
-              <h3 className="mt-4 font-display text-[1.1rem] leading-snug tracking-tight text-charcoal transition-colors group-hover:text-forest">
+              <p className="mt-4 text-[0.65rem] font-medium tracking-[0.12em] text-charcoal/40 uppercase">
+                {item.client}
+              </p>
+              <h3 className="mt-1.5 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal transition-colors duration-300 group-hover:text-forest">
                 {item.title}
               </h3>
               <p className="mt-2 text-[0.875rem] leading-relaxed text-charcoal/55">
                 {item.description}
               </p>
+              {item.href ? (
+                <span className="mt-3 inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-charcoal/50 transition-colors duration-300 group-hover:text-forest">
+                  View case
+                  <span
+                    aria-hidden
+                    className="transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
+                </span>
+              ) : null}
             </>
           );
 
@@ -416,7 +449,16 @@ export function ExpertProfileMain({
       ) : null}
 
       {recentWork && recentWork.length > 0 ? (
-        <RecentWorkSection work={recentWork} />
+        <>
+          <RecentWorkSection work={recentWork} />
+          <section
+            id="work-layout-options"
+            className="scroll-mt-28"
+            aria-label="Recent work layout options"
+          >
+            <ExpertWorkLayoutPreviews work={recentWork} />
+          </section>
+        </>
       ) : null}
     </div>
   );
