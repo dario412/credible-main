@@ -5,6 +5,7 @@ import * as OTPAuth from "otpauth";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { authConfig } from "@/lib/auth.config";
+import { isTotpExempt } from "@/lib/totp-exempt";
 import type { Role } from "@/generated/prisma/client";
 
 declare module "next-auth" {
@@ -57,6 +58,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) return null;
+
+        // Exempt accounts skip 2FA entirely (treated as verified for session gates).
+        if (isTotpExempt(user.email)) {
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            totpEnabled: true,
+          };
+        }
 
         if (!user.totpEnabled) {
           return {

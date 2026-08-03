@@ -30,11 +30,22 @@ export type ExpertAudience = {
   geography: ExpertAudienceSlice[];
 };
 
+export type ExpertFormatChannel = {
+  channel: string;
+  formats: string[];
+};
+
 export type ExpertFormatOffering = {
+  /** Display index, e.g. "01" */
   category: string;
   title: string;
   description: string;
-  pricing: string;
+  /** Kept for briefs / future use — not shown on the formats grid */
+  pricing?: string;
+  /** Channel rows with format pills (Brand partnerships) */
+  channels?: ExpertFormatChannel[];
+  /** Flat format pills when there are no channel rows */
+  formats?: string[];
 };
 
 export type ExpertRecentWork = {
@@ -89,6 +100,87 @@ const BRAND_LOGOS = {
 
 function brands(...names: (keyof typeof BRAND_LOGOS)[]) {
   return names.map((name) => ({ name, logo: BRAND_LOGOS[name] }));
+}
+
+const BRAND_PARTNERSHIP_CHANNELS: ExpertFormatChannel[] = [
+  {
+    channel: "LinkedIn",
+    formats: ["Video Post", "Image Post", "Carousel", "Live Event"],
+  },
+  { channel: "X", formats: ["Video Post", "Image Post"] },
+  {
+    channel: "Instagram",
+    formats: ["Static Post", "Reel", "Story"],
+  },
+  { channel: "TikTok", formats: ["Video"] },
+  {
+    channel: "Newsletter",
+    formats: ["Dedicated Send", "Brand Feature", "Sponsored Section"],
+  },
+  { channel: "YouTube", formats: ["Video", "Short"] },
+];
+
+const SPEAKING_FORMATS = [
+  "In-Person Keynote",
+  "Virtual Keynote / Webinar",
+  "Podcast Guest",
+  "Fireside Chat / Interview",
+  "Workshop",
+];
+
+const LIVE_EVENT_FORMATS = [
+  "Hackathon",
+  "Panel",
+  "Retreat / Summit",
+  "Roundtable",
+];
+
+const AMBASSADOR_FORMATS = ["Brand Ambassador", "Category Ambassador"];
+
+/** Shared format offerings — descriptions stay per-expert. */
+function expertFormats(copy: {
+  brandPartnerships: string;
+  speaking: string;
+  liveEvents: string;
+  ambassador: string;
+  pricing?: {
+    brandPartnerships?: string;
+    speaking?: string;
+    liveEvents?: string;
+    ambassador?: string;
+  };
+}): ExpertFormatOffering[] {
+  const p = copy.pricing ?? {};
+  return [
+    {
+      category: "01",
+      title: "Brand partnerships",
+      description: copy.brandPartnerships,
+      pricing: p.brandPartnerships,
+      channels: BRAND_PARTNERSHIP_CHANNELS,
+    },
+    {
+      category: "02",
+      title: "Speaking",
+      description: copy.speaking,
+      pricing: p.speaking,
+      formats: SPEAKING_FORMATS,
+    },
+    {
+      category: "03",
+      title: "Live events",
+      description: copy.liveEvents,
+      pricing: p.liveEvents,
+      formats: LIVE_EVENT_FORMATS,
+    },
+    {
+      category: "04",
+      title: "Ambassador program",
+      description: copy.ambassador,
+      pricing: p.ambassador,
+      formats: AMBASSADOR_FORMATS,
+    },
+  ];
 }
 
 /** Profile fields not yet in the Expert model — keyed by slug. */
@@ -199,36 +291,22 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           { label: "Canada", percent: 6 },
         ],
       },
-      formats: [
-        {
-          category: "01",
-          title: "Brand partnerships",
-          description:
-            "Hosted or co-produced series with brand integration — long-form and considered, built for operators who already trust Alex’s voice.",
-          pricing: "Custom scoped",
+      formats: expertFormats({
+        brandPartnerships:
+          "Hosted or co-produced series with brand integration — long-form and considered, built for operators who already trust Alex’s voice.",
+        speaking:
+          "Keynotes and firesides on building media businesses, founder storytelling and creator-led growth. 45–60 minute delivery.",
+        liveEvents:
+          "Founder summits, product launches and closed-door exec sessions — Alex hosts the room, then carries it to his own audience.",
+        ambassador:
+          "12–18 month terms only. Selective — Alex takes on a small number of brand partners per year.",
+        pricing: {
+          brandPartnerships: "Custom scoped",
+          speaking: "From $65k",
+          liveEvents: "From $45k",
+          ambassador: "Custom scoped",
         },
-        {
-          category: "02",
-          title: "Ambassador programs",
-          description:
-            "12–18 month terms only. Selective — Alex takes on a small number of brand partners per year.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "03",
-          title: "Speaking engagements",
-          description:
-            "Keynotes and firesides on building media businesses, founder storytelling and creator-led growth. 45–60 minute delivery.",
-          pricing: "From $65k",
-        },
-        {
-          category: "04",
-          title: "Live events",
-          description:
-            "Founder summits, product launches and closed-door exec sessions — Alex hosts the room, then carries it to his own audience.",
-          pricing: "From $45k",
-        },
-      ],
+      }),
       recentWork: [
         {
           client: "Notion",
@@ -357,36 +435,22 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           { label: "Singapore", percent: 8 },
         ],
       },
-      formats: [
-        {
-          category: "01",
-          title: "Brand partnerships",
-          description:
-            "Sponsored series across podcast and newsletter, hosted or guested. Brand integration and distribution included.",
-          pricing: "Custom scoped",
+      formats: expertFormats({
+        brandPartnerships:
+          "Sponsored series across podcast and newsletter, hosted or guested. Brand integration and distribution included.",
+        speaking:
+          "Keynotes and firesides on culture systems, founder leadership and scaling expert brands. 45–60 minute delivery.",
+        liveEvents:
+          "Summits and closed-door executive events across APAC and the US — Amara anchors the programming and amplifies it after.",
+        ambassador:
+          "12–18 month terms only. Selective — Amara takes on 2 ambassador partners per year maximum.",
+        pricing: {
+          brandPartnerships: "Custom scoped",
+          speaking: "From $75k",
+          liveEvents: "From $50k",
+          ambassador: "Custom scoped",
         },
-        {
-          category: "02",
-          title: "Ambassador programs",
-          description:
-            "12–18 month terms only. Selective — Amara takes on 2 ambassador partners per year maximum.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "03",
-          title: "Speaking engagements",
-          description:
-            "Keynotes and firesides on culture systems, founder leadership and scaling expert brands. 45–60 minute delivery.",
-          pricing: "From $75k",
-        },
-        {
-          category: "04",
-          title: "Live events",
-          description:
-            "Summits and closed-door executive events across APAC and the US — Amara anchors the programming and amplifies it after.",
-          pricing: "From $50k",
-        },
-      ],
+      }),
       recentWork: [
         {
           client: "Notion",
@@ -506,36 +570,22 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           { label: "Nigeria", percent: 18 },
         ],
       },
-      formats: [
-        {
-          category: "01",
-          title: "Brand partnerships",
-          description:
-            "Flagship podcast takeovers and campaign arcs with clip packages built for social distribution.",
-          pricing: "Custom scoped",
+      formats: expertFormats({
+        brandPartnerships:
+          "Flagship podcast takeovers and campaign arcs with clip packages built for social distribution.",
+        speaking:
+          "High-energy stage talks on performance, resilience and sales credibility. Keynotes, panels and closing sessions.",
+        liveEvents:
+          "Half-day intensives and revenue offsites for GTM teams installing operating cadence in the room.",
+        ambassador:
+          "Selective annual seats for brands that need an operator voice on stage all year, not for one campaign.",
+        pricing: {
+          brandPartnerships: "Custom scoped",
+          speaking: "From $45k",
+          liveEvents: "From $28k",
+          ambassador: "Custom scoped",
         },
-        {
-          category: "02",
-          title: "Ambassador programs",
-          description:
-            "Selective annual seats for brands that need an operator voice on stage all year, not for one campaign.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "03",
-          title: "Speaking engagements",
-          description:
-            "High-energy stage talks on performance, resilience and sales credibility. Keynotes, panels and closing sessions.",
-          pricing: "From $45k",
-        },
-        {
-          category: "04",
-          title: "Live events",
-          description:
-            "Half-day intensives and revenue offsites for GTM teams installing operating cadence in the room.",
-          pricing: "From $28k",
-        },
-      ],
+      }),
       recentWork: [
         {
           client: "SaaStr",
@@ -655,36 +705,22 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           { label: "LATAM", percent: 10 },
         ],
       },
-      formats: [
-        {
-          category: "01",
-          title: "Brand partnerships",
-          description:
-            "Sponsored editorial arcs across newsletter, LinkedIn and podcast, with measurement built for partnership teams.",
-          pricing: "From $35k",
+      formats: expertFormats({
+        brandPartnerships:
+          "Sponsored editorial arcs across newsletter, LinkedIn and podcast, with measurement built for partnership teams.",
+        speaking:
+          "On-stage partnership conversations and firesides for brand and media summits.",
+        liveEvents:
+          "Partner summits and launch moments across EU and LATAM — Sofia shapes the programming and the follow-through.",
+        ambassador:
+          "12-month brand seats with clear editorial guardrails — the creator stays editorial, the brand stays clear.",
+        pricing: {
+          brandPartnerships: "From $35k",
+          speaking: "From $30k",
+          liveEvents: "Custom scoped",
+          ambassador: "Custom scoped",
         },
-        {
-          category: "02",
-          title: "Ambassador programs",
-          description:
-            "12-month brand seats with clear editorial guardrails — the creator stays editorial, the brand stays clear.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "03",
-          title: "Speaking engagements",
-          description:
-            "On-stage partnership conversations and firesides for brand and media summits.",
-          pricing: "From $30k",
-        },
-        {
-          category: "04",
-          title: "Live events",
-          description:
-            "Partner summits and launch moments across EU and LATAM — Sofia shapes the programming and the follow-through.",
-          pricing: "Custom scoped",
-        },
-      ],
+      }),
       recentWork: [
         {
           client: "Notion",
@@ -804,36 +840,22 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           { label: "Canada", percent: 6 },
         ],
       },
-      formats: [
-        {
-          category: "01",
-          title: "Brand partnerships",
-          description:
-            "Deep-dive interviews and newsletter arcs with clip packages built for LinkedIn distribution.",
-          pricing: "Custom scoped",
+      formats: expertFormats({
+        brandPartnerships:
+          "Deep-dive interviews and newsletter arcs with clip packages built for LinkedIn distribution.",
+        speaking:
+          "Operator talks on systems, hiring and decision quality under pressure. Keynotes and panels.",
+        liveEvents:
+          "Facilitated executive roundtables and leadership offsites for teams installing operating cadence.",
+        ambassador:
+          "Long-term operator voice for product and infrastructure brands — retained, not rented for a campaign.",
+        pricing: {
+          brandPartnerships: "Custom scoped",
+          speaking: "From $40k",
+          liveEvents: "From $25k",
+          ambassador: "Custom scoped",
         },
-        {
-          category: "02",
-          title: "Ambassador programs",
-          description:
-            "Long-term operator voice for product and infrastructure brands — retained, not rented for a campaign.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "03",
-          title: "Speaking engagements",
-          description:
-            "Operator talks on systems, hiring and decision quality under pressure. Keynotes and panels.",
-          pricing: "From $40k",
-        },
-        {
-          category: "04",
-          title: "Live events",
-          description:
-            "Facilitated executive roundtables and leadership offsites for teams installing operating cadence.",
-          pricing: "From $25k",
-        },
-      ],
+      }),
       recentWork: [
         {
           client: "Ramp",
@@ -953,36 +975,22 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           { label: "UK", percent: 9 },
         ],
       },
-      formats: [
-        {
-          category: "01",
-          title: "Brand partnerships",
-          description:
-            "Flagship hosted series and interview-led campaigns across video, audio and newsletter, with clip systems included.",
-          pricing: "From $28k",
+      formats: expertFormats({
+        brandPartnerships:
+          "Flagship hosted series and interview-led campaigns across video, audio and newsletter, with clip systems included.",
+        speaking:
+          "On-stage moderation, panels and firesides for conferences and brand summits.",
+        liveEvents:
+          "Live recordings and hosted stages across the EU — Lena runs the room and turns it into a content package.",
+        ambassador:
+          "Season-long editorial partnerships where Lena carries one brand across the whole run of the show.",
+        pricing: {
+          brandPartnerships: "From $28k",
+          speaking: "From $35k",
+          liveEvents: "Custom scoped",
+          ambassador: "Custom scoped",
         },
-        {
-          category: "02",
-          title: "Ambassador programs",
-          description:
-            "Season-long editorial partnerships where Lena carries one brand across the whole run of the show.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "03",
-          title: "Speaking engagements",
-          description:
-            "On-stage moderation, panels and firesides for conferences and brand summits.",
-          pricing: "From $35k",
-        },
-        {
-          category: "04",
-          title: "Live events",
-          description:
-            "Live recordings and hosted stages across the EU — Lena runs the room and turns it into a content package.",
-          pricing: "Custom scoped",
-        },
-      ],
+      }),
       recentWork: [
         {
           client: "Notion",
@@ -1111,36 +1119,22 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           { label: "EU", percent: 14 },
         ],
       },
-      formats: [
-        {
-          category: "01",
-          title: "Brand partnerships",
-          description:
-            "Sponsored series with brand integration and weekly distribution to an investor and operator audience.",
-          pricing: "Custom scoped",
+      formats: expertFormats({
+        brandPartnerships:
+          "Sponsored series with brand integration and weekly distribution to an investor and operator audience.",
+        speaking:
+          "Keynotes and firesides on AI adoption, fintech infrastructure and category narrative. 45–60 minute delivery.",
+        liveEvents:
+          "Summits and closed executive rooms — investor-operator conversations that give the room lasting reach.",
+        ambassador:
+          "Selective annual seats — two commercial partners per year maximum, on 12–18 month terms.",
+        pricing: {
+          brandPartnerships: "Custom scoped",
+          speaking: "From $80k",
+          liveEvents: "From $55k",
+          ambassador: "Custom scoped",
         },
-        {
-          category: "02",
-          title: "Ambassador programs",
-          description:
-            "Selective annual seats — two commercial partners per year maximum, on 12–18 month terms.",
-          pricing: "Custom scoped",
-        },
-        {
-          category: "03",
-          title: "Speaking engagements",
-          description:
-            "Keynotes and firesides on AI adoption, fintech infrastructure and category narrative. 45–60 minute delivery.",
-          pricing: "From $80k",
-        },
-        {
-          category: "04",
-          title: "Live events",
-          description:
-            "Summits and closed executive rooms — investor-operator conversations that give the room lasting reach.",
-          pricing: "From $55k",
-        },
-      ],
+      }),
       recentWork: [
         {
           client: "Notion",

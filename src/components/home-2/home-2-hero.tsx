@@ -49,7 +49,7 @@ export function Home2Hero() {
             href="/contact"
             className="inline-flex items-center justify-center rounded-sm bg-charcoal px-6 py-3 text-[0.8125rem] font-medium text-cream transition-opacity hover:opacity-90"
           >
-            Book a briefing
+            Apply for Representation
           </Link>
           <Link
             href="/roster"

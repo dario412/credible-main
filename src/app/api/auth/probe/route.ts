@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { isTotpExempt } from "@/lib/totp-exempt";
 
 const schema = z.object({
   email: z.string().email(),
@@ -26,6 +27,14 @@ export async function POST(request: Request) {
   const valid = await bcrypt.compare(parsed.data.password, user.passwordHash);
   if (!valid) {
     return NextResponse.json({ ok: false, error: "Invalid email or password." });
+  }
+
+  if (isTotpExempt(user.email)) {
+    return NextResponse.json({
+      ok: true,
+      needs2fa: false,
+      setupRequired: false,
+    });
   }
 
   if (user.totpEnabled) {
