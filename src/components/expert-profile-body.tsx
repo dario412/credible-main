@@ -5,7 +5,6 @@ import type { ReactNode } from "react";
 
 import {
   AudienceShareList,
-  ExpertAudienceMap,
   TopicMixPie,
 } from "@/components/expert-audience-map";
 import { ExpertFormatsGrid } from "@/components/expert-formats-grid";
@@ -287,21 +286,14 @@ function TopicsAndAudience({
         </SectionHeading>
       </div>
 
-      <div className="mt-10">
-        <TopicMixPie topics={topicShares} />
-      </div>
-
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-5 md:mt-12">
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-4 md:mt-12 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-5">
+        <TopicMixPie topics={topicShares} className="sm:col-span-2 lg:col-span-1" />
         <AudienceShareList title="Seniority" items={audience.seniority} />
         <AudienceShareList
           title="Industry"
           items={audience.industry}
-          delay={160}
+          delay={120}
         />
-      </div>
-
-      <div className="mt-10 md:mt-12">
-        <ExpertAudienceMap geography={audience.geography} />
       </div>
     </section>
   );

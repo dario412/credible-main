@@ -16,54 +16,66 @@ type Brand = {
 };
 
 const firstRow: Brand[] = [
-  { name: "Notion", logoSrc: "/brand/clients/notion-wordmark-white.png" },
+  { name: "LinkedIn", logoSrc: "/brand/clients/linkedin-wordmark-white.svg" },
   {
-    name: "Stripe",
-    logoSrc: "/brand/clients/stripe-wordmark-white.svg",
+    name: "Airtable",
+    logoSrc: "/brand/clients/airtable-wordmark-white.svg",
     caseStudySlug: "stage-to-boardroom",
     testimonial: {
       quote:
         "Credible turned a single keynote into a year-long advisory partnership — exactly the kind of credibility our buyers trust.",
       name: "Maya Chen",
-      title: "Head of Brand Partnerships, Stripe",
+      title: "Head of Brand Partnerships, Airtable",
     },
   },
-  { name: "Linear", logoSrc: "/brand/clients/linear-wordmark-white.svg" },
+  { name: "Wispr Flow", logoSrc: "/brand/clients/wispr-flow-wordmark-white.svg" },
   {
-    name: "Figma",
-    logoSrc: "/brand/clients/figma-wordmark-white.svg",
+    name: "Webflow",
+    logoSrc: "/brand/clients/webflow-wordmark-white.svg",
     caseStudySlug: "creator-led-launch",
     testimonial: {
       quote:
         "They assembled operators and trusted voices into one coherent launch narrative — stage, media, and everything in between.",
       name: "Jordan Hale",
-      title: "Director of Marketing, Figma",
+      title: "Director of Marketing, Webflow",
     },
   },
-  { name: "Vercel", logoSrc: "/brand/clients/vercel-wordmark-white.svg" },
+  { name: "Perplexity", logoSrc: "/brand/clients/perplexity-wordmark-white.svg" },
 ];
 
 const middleRow: Brand[] = [
-  { name: "Intercom", logoSrc: "/brand/clients/intercom-wordmark-white.svg" },
-  { name: "Ramp", logoSrc: "/brand/clients/ramp-wordmark-white.svg" },
+  { name: "Typeform", logoSrc: "/brand/clients/typeform-wordmark-white.svg" },
+  { name: "Zapier", logoSrc: "/brand/clients/zapier-wordmark-white.svg" },
   {
-    name: "Retool",
-    logoSrc: "/brand/clients/retool-wordmark-white.svg",
+    name: "HubSpot",
+    logoSrc: "/brand/clients/hubspot-wordmark-white.svg",
     caseStudySlug: "stage-to-boardroom",
     testimonial: {
       quote:
         "The creators we booked felt like peers to our audience — not sponsors. That authenticity moved the deal cycle.",
       name: "Sam Okonkwo",
-      title: "VP Marketing, Retool",
+      title: "VP Marketing, HubSpot",
     },
   },
-  { name: "Loom", logoSrc: "/brand/clients/loom-wordmark-white.svg" },
-  { name: "Cursor", logoSrc: "/brand/clients/cursor-wordmark-white.svg" },
+  { name: "Profound", logoSrc: "/brand/clients/profound-wordmark-white.svg" },
+  { name: "AWS", logoSrc: "/brand/clients/aws-wordmark-white.svg" },
 ];
 
-const brands: Brand[] = [...firstRow, ...middleRow, ...firstRow];
+const thirdRow: Brand[] = [
+  { name: "PolyAI", logoSrc: "/brand/clients/polyai-wordmark-white.svg" },
+  { name: "Intuit", logoSrc: "/brand/clients/intuit-wordmark-white.svg" },
+  { name: "HCLTech", logoSrc: "/brand/clients/hcltech-wordmark-white.svg" },
+  {
+    name: "General Catalyst",
+    logoSrc: "/brand/clients/general-catalyst-wordmark-white.svg",
+  },
+  { name: "Justworks", logoSrc: "/brand/clients/justworks-wordmark-white.svg" },
+];
 
-const LOGO_CLASS = "h-[1.35rem] w-auto md:h-[1.55rem]";
+const brands: Brand[] = [...firstRow, ...middleRow, ...thirdRow];
+
+const LOGO_CLASS =
+  "h-full w-auto max-w-full object-contain object-center brightness-0 invert transition-opacity duration-200";
 
 function BrandMark({ brand }: { brand: Brand }) {
   if (brand.logoSrc) {
@@ -73,7 +85,7 @@ function BrandMark({ brand }: { brand: Brand }) {
         <img
           src={brand.logoSrc}
           alt=""
-          className={`${brand.logoClassName ?? LOGO_CLASS} w-auto object-contain transition-opacity duration-200`}
+          className={brand.logoClassName ?? LOGO_CLASS}
         />
       </>
     );
@@ -151,7 +163,7 @@ export function TrustedBy() {
                   </div>
                 ) : null}
 
-                <span className="flex h-[1.75rem] items-center justify-center text-white transition-opacity duration-200">
+                <span className="flex h-6 w-full max-w-[9.5rem] items-center justify-center md:h-7">
                   <BrandMark brand={brand} />
                 </span>
 

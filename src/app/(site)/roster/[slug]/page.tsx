@@ -10,6 +10,7 @@ import type { RosterCardExpert } from "@/components/roster-card";
 import { parseExpertChannels } from "@/lib/expert-channels";
 import {
   getExpertProfileEnrichment,
+  isLinkedInTopVoice,
   type ExpertProfileStat,
 } from "@/lib/expert-profiles";
 import { prisma } from "@/lib/prisma";
@@ -84,6 +85,7 @@ function toRosterCard(expert: {
     audienceWho: expert.audienceWho,
     audienceWhere: expert.audienceWhere,
     channels: parseExpertChannels(expert.channels),
+    linkedinTopVoice: isLinkedInTopVoice(expert.slug),
   };
 }
 

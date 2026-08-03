@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useActionState, useId } from "react";
+import { useActionState, useId, type ReactNode } from "react";
 import { ArrowRight, CaretDown } from "@phosphor-icons/react/ssr";
 
 import { CreatorFacesMarquee } from "@/components/creator-faces-marquee";
@@ -14,6 +14,14 @@ import { cn } from "@/lib/utils";
 
 const initial: FormState = { ok: false, message: "" };
 const CREAM_RGB = { r: 249, g: 243, b: 239 };
+
+function SectionEyebrow({ children }: { children: ReactNode }) {
+  return (
+    <p className="text-[0.68rem] font-medium tracking-[0.16em] text-cream/60 uppercase">
+      {children}
+    </p>
+  );
+}
 
 const BRIEF_LOGOS = [
   { name: "Stripe", src: "/brand/clients/stripe-wordmark-white.svg" },
@@ -54,9 +62,7 @@ function CreatorCta({ className }: { className?: string }) {
       <div className="relative z-2 p-7">
         <div className="grid gap-9 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:items-end lg:gap-16">
           <div>
-            <p className="text-[0.68rem] font-medium tracking-[0.16em] text-cream/60 uppercase">
-              For creators
-            </p>
+            <SectionEyebrow>For creators</SectionEyebrow>
 
             <h2 className="mt-4 max-w-xl font-display text-[1.75rem] leading-[1.1] tracking-tight text-cream sm:text-[2.1rem] md:text-[2.4rem]">
               Your audience is already a business. Run it like one.
@@ -261,7 +267,9 @@ function BriefBody({
   return (
     <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-16 xl:gap-20">
       <div>
-        <h2 className="max-w-xl font-display text-[2.1rem] leading-[1.08] tracking-tight text-cream sm:text-[2.6rem] md:text-[3rem]">
+        <SectionEyebrow>For brands &amp; agencies</SectionEyebrow>
+
+        <h2 className="mt-4 max-w-xl font-display text-[2.1rem] leading-[1.08] tracking-tight text-cream sm:text-[2.6rem] md:text-[3rem]">
           Reach B2B audiences through the people they{" "}
           <em className="font-display italic text-[#E4EBE6]">already trust.</em>
         </h2>
@@ -315,7 +323,9 @@ function BoxedBrief() {
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-stretch lg:gap-10 xl:gap-12">
             <div className="flex max-w-xl flex-col justify-between gap-10 lg:min-h-full lg:gap-0">
               <div>
-                <h2 className="font-display text-[2.15rem] leading-[1.06] tracking-tight text-cream sm:text-[2.65rem] md:text-[3.1rem]">
+                <SectionEyebrow>For brands &amp; agencies</SectionEyebrow>
+
+                <h2 className="mt-4 font-display text-[2.15rem] leading-[1.06] tracking-tight text-cream sm:text-[2.65rem] md:text-[3.1rem]">
                   Reach buyers through the voices they{" "}
                   <em className="font-display italic text-[#E4EBE6]">
                     already trust.

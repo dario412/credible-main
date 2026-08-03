@@ -69,6 +69,8 @@ export type ExpertProfileEnrichment = {
   heroProof?: string;
   /** Brands this talent has worked with */
   trustedBy?: { name: string; logo?: string }[];
+  /** LinkedIn Top Voice designation — shown as social proof on roster cards */
+  linkedinTopVoice?: boolean;
 };
 
 /** White wordmarks so every hero logo reads on the dark stage image. */
@@ -96,6 +98,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
       based: "New York",
       languages: ["English"],
       representationStatus: "SIGNED",
+      linkedinTopVoice: true,
       stageImage: "/images/experts/alex-lieberman-stage.png",
       stageImagePosition: "center 28%",
       ctaImage: "/images/experts/alex-lieberman-cta.jpg",
@@ -1174,6 +1177,10 @@ export function getExpertProfileEnrichment(
   slug: string,
 ): ExpertProfileEnrichment {
   return EXPERT_PROFILE_ENRICHMENT[slug] ?? {};
+}
+
+export function isLinkedInTopVoice(slug: string) {
+  return Boolean(EXPERT_PROFILE_ENRICHMENT[slug]?.linkedinTopVoice);
 }
 
 export function expertInitials(name: string) {

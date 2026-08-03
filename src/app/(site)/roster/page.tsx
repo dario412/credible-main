@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 import { parseExpertChannels } from "@/lib/expert-channels";
+import { isLinkedInTopVoice } from "@/lib/expert-profiles";
 import { RosterCard, type RosterCardExpert } from "@/components/roster-card";
-import { RosterFilters } from "@/components/roster-filters";
+import { StickyRosterFilters } from "@/components/roster-filters";
 
 export const dynamic = "force-dynamic";
 
@@ -92,6 +93,7 @@ export default async function RosterPage({
     audienceWho: expert.audienceWho,
     audienceWhere: expert.audienceWhere,
     channels: parseExpertChannels(expert.channels),
+    linkedinTopVoice: isLinkedInTopVoice(expert.slug),
   }));
 
   return (
@@ -110,14 +112,12 @@ export default async function RosterPage({
           </p>
         </div>
 
-        <div className="mx-auto mt-8 max-w-4xl md:mt-10">
-          <RosterFilters
-            currentArchetype={archetype}
-            currentTopic={topic}
-            currentChannels={selectedChannels}
-            currentQuery={q}
-          />
-        </div>
+        <StickyRosterFilters
+          currentArchetype={archetype}
+          currentTopic={topic}
+          currentChannels={selectedChannels}
+          currentQuery={q}
+        />
 
         <p className="mt-8 text-sm text-charcoal/50">
           {experts.length === 0

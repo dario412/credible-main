@@ -23,6 +23,7 @@ export type RosterCardExpert = {
   audienceWho: string | null;
   audienceWhere: string | null;
   channels: ExpertChannel[];
+  linkedinTopVoice?: boolean;
 };
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -67,6 +68,24 @@ export function RosterCard({ expert }: { expert: RosterCardExpert }) {
             className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
             style={{ transitionTimingFunction: EASE }}
           />
+          {expert.linkedinTopVoice ? (
+            <span
+              className="absolute top-2.5 right-2.5 inline-flex items-center gap-1.5 rounded-sm border border-charcoal/12 bg-cream py-1 pr-2.5 pl-1 shadow-[0_6px_18px_rgba(28,26,23,0.22)]"
+              title="LinkedIn Top Voice"
+            >
+              <Image
+                src="/brand/linkedin-in-bug.png"
+                alt=""
+                width={20}
+                height={20}
+                className="size-5 shrink-0"
+                aria-hidden
+              />
+              <span className="text-[11px] leading-none font-semibold tracking-[-0.01em] text-charcoal">
+                Top Voice
+              </span>
+            </span>
+          ) : null}
           {expert.role ? (
             <span className="absolute right-2.5 bottom-2.5 rounded-sm border border-cream/20 bg-forest/70 px-2.5 py-1 text-[10px] font-medium tracking-[0.14em] text-cream uppercase shadow-[0_6px_20px_rgba(42,73,57,0.3)] backdrop-blur-md">
               {formatLabel(expert.role)}

@@ -4,6 +4,7 @@ import { ArrowRight } from "@phosphor-icons/react/ssr";
 import { RosterPreviewGrid } from "@/components/home-2/roster-preview-grid";
 import type { RosterCardExpert } from "@/components/roster-card";
 import { parseExpertChannels } from "@/lib/expert-channels";
+import { isLinkedInTopVoice } from "@/lib/expert-profiles";
 import { prisma } from "@/lib/prisma";
 
 const PREVIEW_COUNT = 4;
@@ -29,6 +30,7 @@ export async function RosterPreview() {
     audienceWho: expert.audienceWho,
     audienceWhere: expert.audienceWhere,
     channels: parseExpertChannels(expert.channels),
+    linkedinTopVoice: isLinkedInTopVoice(expert.slug),
   }));
 
   return (
