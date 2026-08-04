@@ -13,8 +13,8 @@ import {
 } from "@/lib/insight-authors";
 import {
   insightCover,
-  parseInsightBody,
-  readingTime,
+  readingTimeFromBlocks,
+  resolveInsightContent,
   type InsightBlock,
 } from "@/lib/insight-content";
 import { prisma } from "@/lib/prisma";
@@ -41,8 +41,8 @@ export default async function InsightPage({ params }: Props) {
   if (!insight) notFound();
 
   const cover = insightCover(insight);
-  const mins = readingTime(insight.body);
-  const { blocks, toc } = parseInsightBody(insight.body);
+  const { blocks, toc } = resolveInsightContent(insight);
+  const mins = readingTimeFromBlocks(blocks);
   const shareUrl = absoluteUrl(`/insights/${insight.slug}`);
   const author = getInsightAuthor(DEFAULT_INSIGHT_AUTHOR_SLUG);
 

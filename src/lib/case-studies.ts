@@ -361,14 +361,17 @@ export function secondaryCaseStudies() {
   return CASE_STUDIES.filter((study) => !study.featured).slice(0, 4);
 }
 
-export function filterCaseStudies(filters: {
-  clientType?: string;
-  pillar?: string;
-  q?: string;
-}) {
+export function filterCaseStudies(
+  filters: {
+    clientType?: string;
+    pillar?: string;
+    q?: string;
+  },
+  source: CaseStudyCard[] = CASE_STUDIES,
+) {
   const q = filters.q?.trim().toLowerCase();
 
-  return CASE_STUDIES.filter((study) => {
+  return source.filter((study) => {
     if (
       filters.clientType &&
       study.clientType.toLowerCase() !== filters.clientType.toLowerCase()

@@ -29,8 +29,12 @@ export function insightCover(insight: {
 }
 
 export function readingTime(body: string) {
-  const words = body.trim().split(/\s+/).length;
+  const words = body.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
+}
+
+export function readingTimeFromBlocks(blocks: InsightBlock[]) {
+  return readingTime(blocksToPlainText(blocks));
 }
 
 export type InsightBlock =
@@ -47,6 +51,113 @@ function slugify(text: string) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
+}
+
+export function blocksToPlainText(blocks: InsightBlock[]): string {
+  return blocks
+    .map((block) => {
+      switch (block.type) {
+        case "ul":
+          return block.items.join(" ");
+        case "quote":
+          return `${block.text} ${block.attribution ?? ""}`;
+        default:
+          return block.text;
+      }
+    })
+    .join(" ");
+}
+
+export function blocksToMarkdown(blocks: InsightBlock[]): string {
+  return blocks
+    .map((block) => {
+      switch (block.type) {
+        case "h2":
+          return `## ${block.text}`;
+        case "h3":
+          return `### ${block.text}`;
+        case "quote":
+          return block.attribution
+            ? `> ${block.text} — ${block.attribution}`
+            : `> ${block.text}`;
+        case "ul":
+          return block.items.map((item) => `- ${item}`).join("\n");
+        case "p":
+        default:
+          return block.text;
+      }
+    })
+    .join("\n\n");
+}
+
+export function tocFromBlocks(blocks: InsightBlock[]): InsightTocItem[] {
+  return blocks
+    .filter((b): b is Extract<InsightBlock, { type: "h2" }> => b.type === "h2")
+    .map((b) => ({ id: b.id, text: b.text }));
+}
+
+export function ensureBlockIds(blocks: InsightBlock[]): InsightBlock[] {
+  const usedIds = new Map<string, number>();
+  function uniqueId(text: string) {
+    const base = slugify(text) || "section";
+    const count = usedIds.get(base) ?? 0;
+    usedIds.set(base, count + 1);
+    return count === 0 ? base : `${base}-${count + 1}`;
+  }
+
+  return blocks.map((block) => {
+    if (block.type === "h2" || block.type === "h3") {
+      return { ...block, id: block.id || uniqueId(block.text) };
+    }
+    return block;
+  });
+}
+
+export function parseInsightBlocks(raw: unknown): InsightBlock[] | null {
+  if (!Array.isArray(raw) || raw.length === 0) return null;
+  const blocks: InsightBlock[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const block = item as Record<string, unknown>;
+    const type = block.type;
+    if (type === "p" && typeof block.text === "string") {
+      blocks.push({ type: "p", text: block.text });
+    } else if (
+      (type === "h2" || type === "h3") &&
+      typeof block.text === "string"
+    ) {
+      blocks.push({
+        type,
+        text: block.text,
+        id: typeof block.id === "string" ? block.id : slugify(block.text),
+      });
+    } else if (type === "quote" && typeof block.text === "string") {
+      blocks.push({
+        type: "quote",
+        text: block.text,
+        attribution:
+          typeof block.attribution === "string" ? block.attribution : undefined,
+      });
+    } else if (type === "ul" && Array.isArray(block.items)) {
+      blocks.push({
+        type: "ul",
+        items: block.items.filter((i): i is string => typeof i === "string"),
+      });
+    }
+  }
+  return blocks.length > 0 ? ensureBlockIds(blocks) : null;
+}
+
+/** Resolve blocks from CMS JSON or legacy markdown body. */
+export function resolveInsightContent(insight: {
+  body: string;
+  blocks?: unknown;
+}): { blocks: InsightBlock[]; toc: InsightTocItem[] } {
+  const fromJson = parseInsightBlocks(insight.blocks);
+  if (fromJson) {
+    return { blocks: fromJson, toc: tocFromBlocks(fromJson) };
+  }
+  return parseInsightBody(insight.body);
 }
 
 /** Lightweight markdown: ## / ### / > / - lists / paragraphs */

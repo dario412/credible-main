@@ -11,11 +11,15 @@ import {
   CASE_STUDIES,
   CASE_STUDY_LOGO,
   caseStudyHero,
-  getCaseStudy,
-  similarCaseStudies,
 } from "@/lib/case-studies";
+import {
+  loadCaseStudy,
+  loadSimilarCaseStudies,
+} from "@/lib/case-studies-server";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -32,7 +36,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const study = getCaseStudy(slug);
+  const study = await loadCaseStudy(slug);
   if (!study) return {};
 
   const hero = caseStudyHero(study);
@@ -88,7 +92,7 @@ function StoryToc({ className }: { className?: string }) {
 
 export default async function CaseStudyPage({ params }: Props) {
   const { slug } = await params;
-  const study = getCaseStudy(slug);
+  const study = await loadCaseStudy(slug);
   if (!study) notFound();
 
   const hero = caseStudyHero(study);
@@ -97,7 +101,7 @@ export default async function CaseStudyPage({ params }: Props) {
   const story = study.story;
   const results = hero.results;
   const shareUrl = absoluteUrl(`/case-studies/${study.slug}`);
-  const similar = similarCaseStudies(study.slug, 3);
+  const similar = await loadSimilarCaseStudies(study.slug, 3);
 
   return (
     <>

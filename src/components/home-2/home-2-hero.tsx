@@ -3,8 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
+import type {
+  CtaStyle,
+  HeadlineStyle,
+  HomePageSections,
+  TextStyle,
+} from "@/lib/cms";
+import { DEFAULT_HOME_SECTIONS } from "@/lib/cms";
+import {
+  ctaClassName,
+  headlineClassName,
+  subheadClassName,
+} from "@/lib/home-styles";
 import { cn } from "@/lib/utils";
 
 import { HOME_2_SPEAKERS } from "./home-2-speakers";
@@ -17,7 +29,57 @@ const CHARCOAL = { r: 28, g: 26, b: 23 };
 const CARD_HEIGHT = 268;
 const CARD_MARGIN = 18;
 
-export function Home2Hero() {
+export type Home2HeroProps = {
+  headline?: string;
+  subhead?: string;
+  primaryCta?: string;
+  primaryHref?: string;
+  secondaryCta?: string;
+  secondaryHref?: string;
+  headlineStyle?: HeadlineStyle;
+  subheadStyle?: TextStyle;
+  primaryCtaStyle?: CtaStyle;
+  secondaryCtaStyle?: CtaStyle;
+  /** When set, editable regions wrap headline/subhead/CTAs instead of plain markup. */
+  editSlots?: {
+    headline?: (node: ReactNode) => ReactNode;
+    subhead?: (node: ReactNode) => ReactNode;
+    primaryCta?: (node: ReactNode) => ReactNode;
+    secondaryCta?: (node: ReactNode) => ReactNode;
+  };
+  /** Disable CTA navigation (edit mode). */
+  disableCtaLinks?: boolean;
+};
+
+export function heroPropsFromSections(hero: HomePageSections["hero"]): Home2HeroProps {
+  return {
+    headline: hero.headline,
+    subhead: hero.subhead,
+    primaryCta: hero.primaryCta,
+    primaryHref: hero.primaryHref,
+    secondaryCta: hero.secondaryCta,
+    secondaryHref: hero.secondaryHref,
+    headlineStyle: hero.headlineStyle,
+    subheadStyle: hero.subheadStyle,
+    primaryCtaStyle: hero.primaryCtaStyle,
+    secondaryCtaStyle: hero.secondaryCtaStyle,
+  };
+}
+
+export function Home2Hero({
+  headline = DEFAULT_HOME_SECTIONS.hero.headline,
+  subhead = DEFAULT_HOME_SECTIONS.hero.subhead,
+  primaryCta = DEFAULT_HOME_SECTIONS.hero.primaryCta,
+  primaryHref = DEFAULT_HOME_SECTIONS.hero.primaryHref,
+  secondaryCta = DEFAULT_HOME_SECTIONS.hero.secondaryCta,
+  secondaryHref = DEFAULT_HOME_SECTIONS.hero.secondaryHref,
+  headlineStyle = DEFAULT_HOME_SECTIONS.hero.headlineStyle,
+  subheadStyle = DEFAULT_HOME_SECTIONS.hero.subheadStyle,
+  primaryCtaStyle = DEFAULT_HOME_SECTIONS.hero.primaryCtaStyle,
+  secondaryCtaStyle = DEFAULT_HOME_SECTIONS.hero.secondaryCtaStyle,
+  editSlots,
+  disableCtaLinks = false,
+}: Home2HeroProps) {
   const router = useRouter();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [cardBottom, setCardBottom] = useState<number | null>(null);
@@ -34,29 +96,48 @@ export function Home2Hero() {
     setHoveredIndex(index);
   }
 
+  const headlineNode = (
+    <h1 className={headlineClassName(headlineStyle)}>{headline}</h1>
+  );
+  const subheadNode = (
+    <p className={subheadClassName(subheadStyle)}>{subhead}</p>
+  );
+
+  const primaryInner = (
+    <span className={ctaClassName(primaryCtaStyle)}>{primaryCta}</span>
+  );
+  const secondaryInner = (
+    <span className={ctaClassName(secondaryCtaStyle)}>{secondaryCta}</span>
+  );
+
+  const primaryCtaNode = disableCtaLinks ? (
+    <span className="inline-flex">{primaryInner}</span>
+  ) : (
+    <Link href={primaryHref} className="inline-flex">
+      {primaryInner}
+    </Link>
+  );
+
+  const secondaryCtaNode = disableCtaLinks ? (
+    <span className="inline-flex">{secondaryInner}</span>
+  ) : (
+    <Link href={secondaryHref} className="inline-flex">
+      {secondaryInner}
+    </Link>
+  );
+
   return (
     <section className="relative bg-cream" data-site-hero>
       <div className="relative z-10 mx-auto max-w-3xl px-6 pb-10 pt-16 text-center md:px-10 md:pb-12 md:pt-20 lg:pt-24">
-        <h1 className="font-display text-[2.5rem] leading-[1.06] tracking-tight text-charcoal sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.15rem]">
-          Book the voices your buyers already trust
-        </h1>
-        <p className="mx-auto mt-6 max-w-xl text-[0.95rem] leading-relaxed text-charcoal/65 md:text-[1.05rem]">
-          Founders, operators, investors, and specialists — briefed for stage,
-          content, and advisory that moves B2B brands.
-        </p>
+        {editSlots?.headline ? editSlots.headline(headlineNode) : headlineNode}
+        {editSlots?.subhead ? editSlots.subhead(subheadNode) : subheadNode}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/contact"
-            className="inline-flex items-center justify-center rounded-sm bg-charcoal px-6 py-3 text-[0.8125rem] font-medium text-cream transition-opacity hover:opacity-90"
-          >
-            Apply for Representation
-          </Link>
-          <Link
-            href="/roster"
-            className="inline-flex items-center justify-center rounded-sm border border-charcoal/20 px-6 py-3 text-[0.8125rem] font-medium text-charcoal transition-colors hover:border-forest hover:bg-forest hover:text-cream"
-          >
-            Explore roster
-          </Link>
+          {editSlots?.primaryCta
+            ? editSlots.primaryCta(primaryCtaNode)
+            : primaryCtaNode}
+          {editSlots?.secondaryCta
+            ? editSlots.secondaryCta(secondaryCtaNode)
+            : secondaryCtaNode}
         </div>
       </div>
 

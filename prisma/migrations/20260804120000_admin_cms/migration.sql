@@ -1,0 +1,31 @@
+-- AlterTable
+ALTER TABLE "Insight" ADD COLUMN IF NOT EXISTS "blocks" JSONB;
+
+-- AlterTable CaseStudy: add CMS fields, drop legacy body
+ALTER TABLE "CaseStudy" ADD COLUMN IF NOT EXISTS "client" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "CaseStudy" ADD COLUMN IF NOT EXISTS "pillar" TEXT NOT NULL DEFAULT 'Content';
+ALTER TABLE "CaseStudy" ADD COLUMN IF NOT EXISTS "clientType" TEXT NOT NULL DEFAULT 'Direct client';
+ALTER TABLE "CaseStudy" ADD COLUMN IF NOT EXISTS "industry" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "CaseStudy" ADD COLUMN IF NOT EXISTS "size" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "CaseStudy" ADD COLUMN IF NOT EXISTS "period" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "CaseStudy" ADD COLUMN IF NOT EXISTS "featured" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "CaseStudy" ADD COLUMN IF NOT EXISTS "data" JSONB NOT NULL DEFAULT '{}';
+
+ALTER TABLE "CaseStudy" ALTER COLUMN "relatedExperts" SET DEFAULT ARRAY[]::TEXT[];
+
+-- Drop legacy body if present
+ALTER TABLE "CaseStudy" DROP COLUMN IF EXISTS "body";
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "PageContent" (
+    "id" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "sections" JSONB NOT NULL DEFAULT '{}',
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PageContent_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "PageContent_slug_key" ON "PageContent"("slug");

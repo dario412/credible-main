@@ -14,6 +14,21 @@ export const metadata = createMetadata({
 const nav = [
   { href: "/admin", label: "Dashboard", permission: null },
   { href: "/admin/leads", label: "Leads", permission: "VIEW_LEADS" as const },
+  {
+    href: "/admin/insights",
+    label: "Insights",
+    permission: "MANAGE_CONTENT" as const,
+  },
+  {
+    href: "/admin/case-studies",
+    label: "Case studies",
+    permission: "MANAGE_CONTENT" as const,
+  },
+  {
+    href: "/admin/pages",
+    label: "Pages",
+    permission: "MANAGE_CONTENT" as const,
+  },
   { href: "/admin/users", label: "Users", permission: "MANAGE_USERS" as const },
   { href: "/admin/style-guide", label: "Style guide", permission: null },
 ];

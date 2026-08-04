@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { PatternField } from "@/components/pattern-field";
+import { EditableHit } from "@/components/editable-hit";
+import { useHomeCms } from "@/components/home-cms-context";
 import { ShortlistMenu } from "@/components/shortlist-menu";
 import { cn } from "@/lib/utils";
 
@@ -224,6 +226,7 @@ const socials = [
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
+  const cms = useHomeCms();
 
   return (
     <footer className="mt-auto bg-cream px-6 py-8 md:px-10 md:py-10 lg:px-12">
@@ -247,18 +250,49 @@ export function SiteFooter() {
               />
             </Link>
 
-            <p className="mt-6 text-base leading-relaxed text-cream/70">
-              The talent agency for the expert economy.
-            </p>
-            <p className="mt-1.5 text-sm text-cream/50">A PepTalk company.</p>
+            <EditableHit
+              active={cms.editing && cms.canEdit}
+              selected={cms.selected === "footer.tagline"}
+              label="footer tagline"
+              block
+              ringOffset="ring-offset-charcoal"
+              onSelect={() => cms.onSelectFooterField?.("tagline")}
+            >
+              <p className="mt-6 text-base leading-relaxed text-cream/70">
+                {cms.footer.tagline}
+              </p>
+            </EditableHit>
+            <EditableHit
+              active={cms.editing && cms.canEdit}
+              selected={cms.selected === "footer.companyLine"}
+              label="footer company line"
+              block
+              ringOffset="ring-offset-charcoal"
+              onSelect={() => cms.onSelectFooterField?.("companyLine")}
+            >
+              <p className="mt-1.5 text-sm text-cream/50">
+                {cms.footer.companyLine}
+              </p>
+            </EditableHit>
 
             <div className="mt-10">
-              <a
-                href="mailto:hello@crediblecreators.com"
-                className="block w-fit text-sm font-medium text-cream/90 transition-colors hover:text-cream"
+              <EditableHit
+                active={cms.editing && cms.canEdit}
+                selected={cms.selected === "footer.email"}
+                label="footer email"
+                ringOffset="ring-offset-charcoal"
+                onSelect={() => cms.onSelectFooterField?.("email")}
               >
-                hello@crediblecreators.com
-              </a>
+                <a
+                  href={`mailto:${cms.footer.email}`}
+                  className="block w-fit text-sm font-medium text-cream/90 transition-colors hover:text-cream"
+                  onClick={(e) => {
+                    if (cms.editing) e.preventDefault();
+                  }}
+                >
+                  {cms.footer.email}
+                </a>
+              </EditableHit>
             </div>
 
             <div className="mt-8 flex items-center gap-5">

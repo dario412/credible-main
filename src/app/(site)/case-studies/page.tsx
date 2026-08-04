@@ -8,11 +8,13 @@ import {
 import { CaseStudyFilters } from "@/components/case-study-filters";
 import { ImpactStats } from "@/components/impact-stats";
 import {
-  featuredCaseStudy,
-  filterCaseStudies,
-  secondaryCaseStudies,
-} from "@/lib/case-studies";
+  loadFeaturedCaseStudy,
+  loadFilteredCaseStudies,
+  loadSecondaryCaseStudies,
+} from "@/lib/case-studies-server";
 import { createMetadata } from "@/lib/seo";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = createMetadata({
   title: "Case studies",
@@ -37,9 +39,9 @@ export default async function CaseStudiesPage({
   const pillar = params.pillar?.trim();
   const q = params.q?.trim();
 
-  const featured = featuredCaseStudy();
-  const secondary = secondaryCaseStudies();
-  const stories = filterCaseStudies({ clientType, pillar, q });
+  const featured = await loadFeaturedCaseStudy();
+  const secondary = await loadSecondaryCaseStudies();
+  const stories = await loadFilteredCaseStudies({ clientType, pillar, q });
 
   return (
     <>

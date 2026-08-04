@@ -1,12 +1,13 @@
-import { createMetadata } from "@/lib/seo";
-import { TrustedBy } from "@/components/trusted-by";
+import { HomeVisualEditor } from "@/components/home-visual-editor";
 import { LatestInsights } from "@/components/latest-insights";
-import { Home2Hero } from "@/components/home-2/home-2-hero";
-import { WaysInAccordion } from "@/components/home-2/ways-in-accordion";
-import { RosterPreview } from "@/components/home-2/roster-preview";
-import { ImpactStats } from "@/components/impact-stats";
-import { KeyStudy } from "@/components/key-study";
-import { BrandBrief } from "@/components/brand-brief";
+import { loadRosterPreviewCards } from "@/components/home-2/roster-preview";
+import {
+  getHomePageSections,
+  saveHomePage,
+} from "@/lib/actions/admin-cms";
+import { auth } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
+import { createMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -16,16 +17,24 @@ export const metadata = createMetadata({
     "Book B2B creators for your brand. Credible represents the founders, operators, investors and specialists whose voices your buyers already trust.",
 });
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [home, session, rosterCards] = await Promise.all([
+    getHomePageSections(),
+    auth(),
+    loadRosterPreviewCards(),
+  ]);
+  const canEdit = Boolean(
+    session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
+  );
+
   return (
     <>
-      <Home2Hero />
-      <TrustedBy />
-      <WaysInAccordion />
-      <RosterPreview />
-      <ImpactStats />
-      <KeyStudy variant="full" />
-      <BrandBrief variant="boxed" />
+      <HomeVisualEditor
+        initial={home}
+        canEdit={canEdit}
+        rosterCards={rosterCards}
+        saveAction={saveHomePage}
+      />
       <LatestInsights />
     </>
   );

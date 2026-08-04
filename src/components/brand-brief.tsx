@@ -10,6 +10,10 @@ import { Home2WaveField } from "@/components/home-2/home-2-wave-field";
 import { PatternField } from "@/components/pattern-field";
 import { inputClassName } from "@/components/ui";
 import { submitBrief, type FormState } from "@/lib/actions/leads";
+import {
+  DEFAULT_HOME_SECTIONS,
+  type HomePageSections,
+} from "@/lib/cms";
 import { cn } from "@/lib/utils";
 
 const initial: FormState = { ok: false, message: "" };
@@ -300,7 +304,72 @@ function BriefBody({
   );
 }
 
-function BoxedBrief() {
+function BoxedBrief({
+  content,
+  editSlots,
+}: {
+  content: HomePageSections["brandBrief"];
+  editSlots?: {
+    eyebrow?: (node: ReactNode) => ReactNode;
+    headline?: (node: ReactNode) => ReactNode;
+    subhead?: (node: ReactNode) => ReactNode;
+    quote?: (node: ReactNode) => ReactNode;
+    formTitle?: (node: ReactNode) => ReactNode;
+  };
+}) {
+  const eyebrowNode = <SectionEyebrow>{content.eyebrow}</SectionEyebrow>;
+  const headlineNode = (
+    <h2 className="mt-4 font-display text-[2.15rem] leading-[1.06] tracking-tight text-cream sm:text-[2.65rem] md:text-[3.1rem]">
+      {content.headline}{" "}
+      <em className="font-display italic text-[#E4EBE6]">
+        {content.headlineEmphasis}
+      </em>
+    </h2>
+  );
+  const subheadNode = (
+    <p className="mt-6 max-w-lg text-[1.05rem] leading-relaxed text-cream/72 sm:text-[1.125rem] md:text-[1.2rem] md:leading-relaxed">
+      {content.subhead}
+    </p>
+  );
+  const quoteNode = (
+    <figure className="rounded-sm bg-[#3E6D55] px-5 py-5 md:px-6 md:py-6">
+      <blockquote>
+        <p className="text-[0.9rem] leading-relaxed text-cream/85 md:text-[0.95rem] md:leading-relaxed">
+          “{content.quote}”
+        </p>
+      </blockquote>
+      <figcaption className="mt-4 flex items-center gap-3">
+        <div className="relative h-11 w-9 shrink-0 overflow-hidden rounded-sm bg-cream/15 md:h-12 md:w-10">
+          <Image
+            src="/images/experts/amara-chen.jpg"
+            alt=""
+            fill
+            sizes="40px"
+            className="object-cover object-top"
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[0.9rem] font-medium leading-tight text-cream">
+            {content.quoteName}
+          </p>
+          <p className="mt-0.5 truncate text-[0.75rem] leading-tight text-cream/60">
+            {content.quoteRole}
+          </p>
+        </div>
+        <img
+          src="/brand/clients/stripe-wordmark-white.svg"
+          alt="Stripe"
+          className="h-4 w-auto shrink-0 object-contain md:h-[1.1rem]"
+        />
+      </figcaption>
+    </figure>
+  );
+  const formTitleNode = (
+    <p className="mb-5 font-display text-[1.15rem] leading-tight tracking-tight text-charcoal md:text-[1.25rem]">
+      {content.formTitle}
+    </p>
+  );
+
   return (
     <section className="bg-cream-dark px-6 pb-8 pt-0 md:px-10 md:pb-10 lg:px-12">
       <div className="relative mx-auto max-w-352 overflow-hidden rounded-sm bg-forest-dark shadow-[0_24px_60px_rgba(28,26,23,0.18)]">
@@ -323,60 +392,20 @@ function BoxedBrief() {
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-stretch lg:gap-10 xl:gap-12">
             <div className="flex max-w-xl flex-col justify-between gap-10 lg:min-h-full lg:gap-0">
               <div>
-                <SectionEyebrow>For brands &amp; agencies</SectionEyebrow>
-
-                <h2 className="mt-4 font-display text-[2.15rem] leading-[1.06] tracking-tight text-cream sm:text-[2.65rem] md:text-[3.1rem]">
-                  Reach buyers through the voices they{" "}
-                  <em className="font-display italic text-[#E4EBE6]">
-                    already trust.
-                  </em>
-                </h2>
-
-                <p className="mt-6 max-w-lg text-[1.05rem] leading-relaxed text-cream/72 sm:text-[1.125rem] md:text-[1.2rem] md:leading-relaxed">
-                  In-house or agency — send the ambition. We&apos;ll return a
-                  shortlist within 48 hours.
-                </p>
+                {editSlots?.eyebrow ? editSlots.eyebrow(eyebrowNode) : eyebrowNode}
+                {editSlots?.headline
+                  ? editSlots.headline(headlineNode)
+                  : headlineNode}
+                {editSlots?.subhead ? editSlots.subhead(subheadNode) : subheadNode}
               </div>
 
-              <figure className="rounded-sm bg-[#3E6D55] px-5 py-5 md:px-6 md:py-6">
-                <blockquote>
-                  <p className="text-[0.9rem] leading-relaxed text-cream/85 md:text-[0.95rem] md:leading-relaxed">
-                    “Credible turned a single keynote into a year-long advisory
-                    partnership — exactly the kind of credibility our buyers
-                    trust.”
-                  </p>
-                </blockquote>
-                <figcaption className="mt-4 flex items-center gap-3">
-                  <div className="relative h-11 w-9 shrink-0 overflow-hidden rounded-sm bg-cream/15 md:h-12 md:w-10">
-                    <Image
-                      src="/images/experts/amara-chen.jpg"
-                      alt=""
-                      fill
-                      sizes="40px"
-                      className="object-cover object-top"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[0.9rem] font-medium leading-tight text-cream">
-                      Maya Chen
-                    </p>
-                    <p className="mt-0.5 truncate text-[0.75rem] leading-tight text-cream/60">
-                      Head of Brand Partnerships, Stripe
-                    </p>
-                  </div>
-                  <img
-                    src="/brand/clients/stripe-wordmark-white.svg"
-                    alt="Stripe"
-                    className="h-4 w-auto shrink-0 object-contain md:h-[1.1rem]"
-                  />
-                </figcaption>
-              </figure>
+              {editSlots?.quote ? editSlots.quote(quoteNode) : quoteNode}
             </div>
 
             <div className="rounded-sm bg-cream px-5 py-6 shadow-[0_20px_50px_rgba(28,26,23,0.22)] sm:px-6 sm:py-7 md:px-7 md:py-8">
-              <p className="mb-5 font-display text-[1.15rem] leading-tight tracking-tight text-charcoal md:text-[1.25rem]">
-                Send a brief
-              </p>
+              {editSlots?.formTitle
+                ? editSlots.formTitle(formTitleNode)
+                : formTitleNode}
               <BriefForm surface="light" />
 
               <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2.5 border-t border-charcoal/10 pt-5">
@@ -410,11 +439,26 @@ function BoxedBrief() {
 
 export function BrandBrief({
   variant = "full",
+  content,
+  editSlots,
 }: {
   variant?: "full" | "boxed";
+  content?: HomePageSections["brandBrief"];
+  editSlots?: {
+    eyebrow?: (node: ReactNode) => ReactNode;
+    headline?: (node: ReactNode) => ReactNode;
+    subhead?: (node: ReactNode) => ReactNode;
+    quote?: (node: ReactNode) => ReactNode;
+    formTitle?: (node: ReactNode) => ReactNode;
+  };
 }) {
   if (variant === "boxed") {
-    return <BoxedBrief />;
+    return (
+      <BoxedBrief
+        content={content ?? DEFAULT_HOME_SECTIONS.brandBrief}
+        editSlots={editSlots}
+      />
+    );
   }
 
   return (

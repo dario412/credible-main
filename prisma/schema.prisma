@@ -69,9 +69,17 @@ model CaseStudy {
   slug           String   @unique
   title          String
   summary        String
-  body           String
+  client         String   @default("")
+  pillar         String   @default("Content")
+  clientType     String   @default("Direct client")
+  industry       String   @default("")
+  size           String   @default("")
+  period         String   @default("")
   coverImage     String?
-  relatedExperts String[]
+  featured       Boolean  @default(false)
+  /// Full CaseStudyCard extras: hero, meta, results, quote, story, ctaCreator, logo…
+  data           Json     @default("{}")
+  relatedExperts String[] @default([])
   seoTitle       String?
   seoDescription String?
   publishedAt    DateTime @default(now())
@@ -84,7 +92,10 @@ model Insight {
   slug           String   @unique
   title          String
   excerpt        String
-  body           String
+  /// Plain/markdown fallback + reading-time source
+  body           String   @default("")
+  /// Structured article blocks (p, h2, h3, quote, ul)
+  blocks         Json?
   category       String   @default("Perspective")
   coverImage     String?
   seoTitle       String?
@@ -107,16 +118,16 @@ model Lead {
 
 /// Singleton site settings (always id = "default").
 model SiteSettings {
-  id               String   @id @default("default")
+  id             String   @id @default("default")
   /// Display / heading font (font-display, prose headings)
-  headingFamily    String   @default("Faculty Glyphic")
-  headingSource    String   @default("default") // default | google | upload
-  headingAssetId   String?
+  headingFamily  String   @default("Faculty Glyphic")
+  headingSource  String   @default("default") // default | google | upload
+  headingAssetId String?
   /// Body / paragraph font
-  bodyFamily       String   @default("Instrument Sans")
-  bodySource       String   @default("default") // default | google | upload
-  bodyAssetId      String?
-  updatedAt        DateTime @updatedAt
+  bodyFamily     String   @default("Instrument Sans")
+  bodySource     String   @default("default") // default | google | upload
+  bodyAssetId    String?
+  updatedAt      DateTime @updatedAt
 }
 
 model FontAsset {
@@ -125,5 +136,15 @@ model FontAsset {
   fileName  String
   mimeType  String
   data      Bytes
+  createdAt DateTime @default(now())
+}
+
+/// Editable marketing page copy (home, about, what-we-do, …).
+model PageContent {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  sections  Json     @default("{}")
+  updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 }

@@ -41,7 +41,7 @@ export function CreateUserForm() {
           defaultValue="VIEWER"
         >
           <option value="VIEWER">Viewer — view leads</option>
-          <option value="EDITOR">Editor — view leads (+ content later)</option>
+          <option value="EDITOR">Editor — leads + content</option>
           <option value="OWNER">Owner — full access</option>
         </select>
       </Field>

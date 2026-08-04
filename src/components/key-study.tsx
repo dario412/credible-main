@@ -1,8 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { PatternField } from "@/components/pattern-field";
 import { StatCounter } from "@/components/stat-counter";
+import type { HomePageSections } from "@/lib/cms";
+import { DEFAULT_HOME_SECTIONS } from "@/lib/cms";
 import { cn } from "@/lib/utils";
 
 const CREAM_RGB = { r: 249, g: 243, b: 239 };
@@ -30,22 +33,6 @@ const boxedMetrics = [
   },
 ] as const;
 
-const fullMetrics = [
-  {
-    value: "12",
-    label: "Episodes shipped end-to-end — zero studio overhead",
-  },
-  {
-    value: "4.1M",
-    label: "Downloads across video, audio, and written",
-  },
-  {
-    value: "$18.4M",
-    label: "Pipeline attributed in the first partnership term",
-    note: "Renewed through 2027",
-  },
-] as const;
-
 const CASE_STUDY_HREF = "/case-studies/notion-founders-journal";
 
 function ArrowIcon({ className }: { className?: string }) {
@@ -65,13 +52,17 @@ function ArrowIcon({ className }: { className?: string }) {
 function CaseStudyCta({
   className,
   tone = "cream",
+  label = "Read the full case study",
+  href = CASE_STUDY_HREF,
 }: {
   className?: string;
   tone?: "cream" | "solid" | "charcoal";
+  label?: string;
+  href?: string;
 }) {
   return (
     <Link
-      href={CASE_STUDY_HREF}
+      href={href}
       className={cn(
         "inline-flex shrink-0 items-center justify-center gap-2 rounded-sm px-5 py-2.5 text-[0.8125rem] font-medium transition-colors",
         tone === "charcoal"
@@ -82,13 +73,69 @@ function CaseStudyCta({
         className,
       )}
     >
-      Read the full case study
+      {label}
       <ArrowIcon className="size-3 shrink-0" />
     </Link>
   );
 }
 
-function FullKeyStudy() {
+function FullKeyStudy({
+  content,
+  editSlots,
+}: {
+  content: HomePageSections["keyStudy"];
+  editSlots?: {
+    headline?: (node: ReactNode) => ReactNode;
+    summary?: (node: ReactNode) => ReactNode;
+    meta?: (node: ReactNode) => ReactNode;
+    cta?: (node: ReactNode) => ReactNode;
+    metric?: (index: number, node: ReactNode) => ReactNode;
+  };
+}) {
+  const headlineNode = (
+    <h2 className="font-display text-[1.85rem] leading-[1.08] tracking-tight text-charcoal sm:text-[2.15rem] md:text-[2.45rem]">
+      {content.headline}{" "}
+      <span className="text-forest">{content.headlineAccent}</span>
+    </h2>
+  );
+  const summaryNode = (
+    <p className="mt-4 max-w-xl text-[0.925rem] leading-relaxed text-charcoal/70 md:text-[0.975rem]">
+      {content.summary}
+    </p>
+  );
+  const metaNode = (
+    <dl className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] md:gap-x-6">
+      <div className="flex items-baseline gap-2">
+        <dt className="font-medium text-charcoal/50">Pillar</dt>
+        <dd className="font-medium text-charcoal">{content.pillar}</dd>
+      </div>
+      <span
+        aria-hidden
+        className="hidden h-3.5 w-px bg-charcoal/20 sm:block"
+      />
+      <div className="flex items-baseline gap-2">
+        <dt className="font-medium text-charcoal/50">Lead</dt>
+        <dd className="font-medium text-charcoal">{content.lead}</dd>
+      </div>
+      <span
+        aria-hidden
+        className="hidden h-3.5 w-px bg-charcoal/20 sm:block"
+      />
+      <div className="flex items-baseline gap-2">
+        <dt className="font-medium text-charcoal/50">Term</dt>
+        <dd className="font-medium text-charcoal">{content.term}</dd>
+      </div>
+    </dl>
+  );
+  const ctaNode = (
+    <CaseStudyCta
+      tone="charcoal"
+      className="mt-8"
+      label={content.ctaLabel}
+      href={content.ctaHref}
+    />
+  );
+
   return (
     <section className="bg-cream-dark px-6 py-12 md:px-10 md:py-14 lg:px-12 lg:py-16">
       <div className="mx-auto max-w-352">
@@ -100,66 +147,39 @@ function FullKeyStudy() {
 
         <div className="mt-7 grid gap-10 border-b border-charcoal/12 pb-10 md:mt-8 md:gap-12 md:pb-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start lg:gap-14 xl:gap-20">
           <div className="max-w-2xl">
-            <h2 className="font-display text-[1.85rem] leading-[1.08] tracking-tight text-charcoal sm:text-[2.15rem] md:text-[2.45rem]">
-              How Notion built B2B&apos;s defining founder series —{" "}
-              <span className="text-forest">without a studio.</span>
-            </h2>
-
-            <p className="mt-4 max-w-xl text-[0.925rem] leading-relaxed text-charcoal/70 md:text-[0.975rem]">
-              One operator voice. Twelve episodes. End-to-end casting, format,
-              and distribution — so Notion owned the category without standing
-              up an in-house media team.
-            </p>
-
-            <dl className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] md:gap-x-6">
-              <div className="flex items-baseline gap-2">
-                <dt className="font-medium text-charcoal/50">Pillar</dt>
-                <dd className="font-medium text-charcoal">Content</dd>
-              </div>
-              <span
-                aria-hidden
-                className="hidden h-3.5 w-px bg-charcoal/20 sm:block"
-              />
-              <div className="flex items-baseline gap-2">
-                <dt className="font-medium text-charcoal/50">Lead</dt>
-                <dd className="font-medium text-charcoal">Alex Lieberman</dd>
-              </div>
-              <span
-                aria-hidden
-                className="hidden h-3.5 w-px bg-charcoal/20 sm:block"
-              />
-              <div className="flex items-baseline gap-2">
-                <dt className="font-medium text-charcoal/50">Term</dt>
-                <dd className="font-medium text-charcoal">22 months</dd>
-              </div>
-            </dl>
-
-            <CaseStudyCta tone="charcoal" className="mt-8" />
+            {editSlots?.headline ? editSlots.headline(headlineNode) : headlineNode}
+            {editSlots?.summary ? editSlots.summary(summaryNode) : summaryNode}
+            {editSlots?.meta ? editSlots.meta(metaNode) : metaNode}
+            {editSlots?.cta ? editSlots.cta(ctaNode) : ctaNode}
           </div>
 
           <ul className="min-w-0">
-            {fullMetrics.map((metric) => (
-              <li
-                key={metric.value}
-                className="border-b border-charcoal/12 py-5 first:pt-0 last:border-b-0 last:pb-0 md:py-6"
-              >
-                <div className="flex items-baseline gap-4 sm:gap-5">
-                  <p className="shrink-0 font-display text-[2.35rem] leading-none tracking-tight text-charcoal sm:text-[2.75rem] md:text-[3.1rem]">
-                    <StatCounter value={metric.value} duration={1400} />
-                  </p>
-                  <div className="min-w-0 pt-1">
-                    <p className="text-[0.9rem] leading-snug font-medium text-charcoal md:text-[0.95rem]">
-                      {metric.label}
+            {content.metrics.map((metric, index) => {
+              const node = (
+                <li className="border-b border-charcoal/12 py-5 first:pt-0 last:border-b-0 last:pb-0 md:py-6">
+                  <div className="flex items-baseline gap-4 sm:gap-5">
+                    <p className="shrink-0 font-display text-[2.35rem] leading-none tracking-tight text-charcoal sm:text-[2.75rem] md:text-[3.1rem]">
+                      <StatCounter value={metric.value} duration={1400} />
                     </p>
-                    {"note" in metric && metric.note ? (
-                      <p className="mt-1 text-[0.75rem] text-charcoal/55">
-                        ({metric.note})
+                    <div className="min-w-0 pt-1">
+                      <p className="text-[0.9rem] leading-snug font-medium text-charcoal md:text-[0.95rem]">
+                        {metric.label}
                       </p>
-                    ) : null}
+                      {metric.note ? (
+                        <p className="mt-1 text-[0.75rem] text-charcoal/55">
+                          ({metric.note})
+                        </p>
+                      ) : null}
+                    </div>
                   </div>
+                </li>
+              );
+              return (
+                <div key={`${metric.value}-${metric.label}`}>
+                  {editSlots?.metric ? editSlots.metric(index, node) : node}
                 </div>
-              </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
       </div>
@@ -237,9 +257,21 @@ function BoxedKeyStudy() {
 
 export function KeyStudy({
   variant = "boxed",
+  content = DEFAULT_HOME_SECTIONS.keyStudy,
+  editSlots,
 }: {
   variant?: "boxed" | "full";
+  content?: HomePageSections["keyStudy"];
+  editSlots?: {
+    headline?: (node: ReactNode) => ReactNode;
+    summary?: (node: ReactNode) => ReactNode;
+    meta?: (node: ReactNode) => ReactNode;
+    cta?: (node: ReactNode) => ReactNode;
+    metric?: (index: number, node: ReactNode) => ReactNode;
+  };
 }) {
-  if (variant === "full") return <FullKeyStudy />;
+  if (variant === "full") {
+    return <FullKeyStudy content={content} editSlots={editSlots} />;
+  }
   return <BoxedKeyStudy />;
 }

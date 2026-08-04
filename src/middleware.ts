@@ -9,6 +9,9 @@ const { auth } = NextAuth(authConfig);
 const routePermissions: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/admin/users", permission: "MANAGE_USERS" },
   { prefix: "/admin/leads", permission: "VIEW_LEADS" },
+  { prefix: "/admin/insights", permission: "MANAGE_CONTENT" },
+  { prefix: "/admin/case-studies", permission: "MANAGE_CONTENT" },
+  { prefix: "/admin/pages", permission: "MANAGE_CONTENT" },
 ];
 
 export default auth((req) => {
