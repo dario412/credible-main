@@ -1,0 +1,51 @@
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+
+import { AdminTrustedByEditor } from "@/components/admin-trusted-by-editor";
+import {
+  deleteTrustedClient,
+  getTrustedClientCard,
+  saveTrustedClient,
+} from "@/lib/actions/admin-trusted-by";
+import { auth } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
+import { createMetadata } from "@/lib/seo";
+
+export const metadata = createMetadata({
+  title: "Edit trusted by client",
+  path: "/admin/trusted-by",
+  noIndex: true,
+});
+
+export default async function AdminTrustedByEditPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const session = await auth();
+  if (!session?.user) redirect("/admin/login");
+  if (!hasPermission(session.user.role, "MANAGE_CONTENT")) redirect("/admin");
+
+  const { id } = await params;
+  const client = await getTrustedClientCard(id);
+  if (!client) notFound();
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-6">
+      <div>
+        <Link
+          href="/admin/trusted-by"
+          className="text-sm text-charcoal/55 hover:text-charcoal"
+        >
+          ← Trusted by
+        </Link>
+        <h1 className="mt-3 font-display text-3xl">{client.name || "Client"}</h1>
+      </div>
+      <AdminTrustedByEditor
+        initial={client}
+        saveAction={saveTrustedClient}
+        deleteAction={deleteTrustedClient}
+      />
+    </div>
+  );
+}

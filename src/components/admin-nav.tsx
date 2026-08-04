@@ -30,6 +30,19 @@ const icons: Record<string, React.ReactNode> = {
       <path d="M5.5 2.5h5v2h-5z" stroke="currentColor" strokeWidth="1.25" />
     </svg>
   ),
+  "/admin/trusted-by": (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path d="M2.5 8h11M8 2.5v11" stroke="currentColor" strokeWidth="1.25" />
+      <circle cx="8" cy="8" r="5.25" stroke="currentColor" strokeWidth="1.25" />
+    </svg>
+  ),
+  "/admin/media": (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path d="M2.5 3.5h11v9H2.5z" stroke="currentColor" strokeWidth="1.25" />
+      <circle cx="5.5" cy="6.25" r="1.1" fill="currentColor" />
+      <path d="M2.5 10.5 6 7.5l2.2 2 2-2.5 3.3 3.5" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round" />
+    </svg>
+  ),
   "/admin/pages": (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
       <path d="M4 2.5h5.5L12 5v8.5H4z" stroke="currentColor" strokeWidth="1.25" />

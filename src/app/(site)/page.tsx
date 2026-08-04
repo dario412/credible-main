@@ -1,13 +1,15 @@
 import { HomeVisualEditor } from "@/components/home-visual-editor";
 import { LatestInsights } from "@/components/latest-insights";
-import { loadRosterPreviewCards } from "@/components/home-2/roster-preview";
+import { loadRosterPreviewCards } from "@/lib/roster-preview-server";
 import {
   getHomePageSections,
   saveHomePage,
 } from "@/lib/actions/admin-cms";
+import { saveTrustedClientsList } from "@/lib/actions/admin-trusted-by";
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
+import { loadTrustedClients } from "@/lib/trusted-by-server";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +20,11 @@ export const metadata = createMetadata({
 });
 
 export default async function HomePage() {
-  const [home, session, rosterCards] = await Promise.all([
+  const [home, session, rosterCards, trustedClients] = await Promise.all([
     getHomePageSections(),
     auth(),
     loadRosterPreviewCards(),
+    loadTrustedClients(),
   ]);
   const canEdit = Boolean(
     session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
@@ -31,9 +34,11 @@ export default async function HomePage() {
     <>
       <HomeVisualEditor
         initial={home}
+        initialTrustedClients={trustedClients}
         canEdit={canEdit}
         rosterCards={rosterCards}
         saveAction={saveHomePage}
+        saveTrustedByAction={saveTrustedClientsList}
       />
       <LatestInsights />
     </>

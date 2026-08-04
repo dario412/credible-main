@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { MediaField } from "@/components/media-library";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type { InsightBlock } from "@/lib/insight-content";
 import { cn } from "@/lib/utils";
@@ -278,13 +279,11 @@ export function InsightEditorForm({
             />
           </Field>
         </div>
-        <Field label="Cover image URL" id="coverImage">
-          <TextInput
-            id="coverImage"
-            value={meta.coverImage}
-            onChange={(e) => setMeta({ ...meta, coverImage: e.target.value })}
-          />
-        </Field>
+        <MediaField
+          label="Cover image"
+          value={meta.coverImage ?? ""}
+          onChange={(coverImage) => setMeta({ ...meta, coverImage })}
+        />
         <Field label="SEO title" id="seoTitle">
           <TextInput
             id="seoTitle"

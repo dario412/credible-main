@@ -30,6 +30,20 @@ export default async function AdminHomePageEditor() {
           ← Pages
         </Link>
         <h1 className="mt-3 font-display text-3xl">Home</h1>
+        <p className="mt-2 text-sm text-muted">
+          Or edit live on the site with{" "}
+          <a href="/" className="font-medium text-forest hover:text-forest-dark">
+            Edit page
+          </a>
+          . Client logos are managed in{" "}
+          <a
+            href="/admin/trusted-by"
+            className="font-medium text-forest hover:text-forest-dark"
+          >
+            Trusted by
+          </a>
+          .
+        </p>
       </div>
       <HomePageEditorForm initial={sections} saveAction={saveHomePage} />
     </div>

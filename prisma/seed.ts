@@ -7,6 +7,10 @@ import { INSIGHT_BODIES } from "./insight-bodies";
 import { CASE_STUDIES } from "../src/lib/case-studies";
 import { caseStudyCardToRow, DEFAULT_HOME_SECTIONS } from "../src/lib/cms";
 import { parseInsightBody } from "../src/lib/insight-content";
+import {
+  DEFAULT_TRUSTED_CLIENTS,
+  trustedClientToRow,
+} from "../src/lib/trusted-by";
 
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -493,6 +497,15 @@ This data note helps buyers build a roster that expands reach instead of echoing
       sections: DEFAULT_HOME_SECTIONS,
     },
   });
+
+  const trustedCount = await prisma.trustedClient.count();
+  if (trustedCount === 0) {
+    await prisma.trustedClient.createMany({
+      data: DEFAULT_TRUSTED_CLIENTS.map((client, index) =>
+        trustedClientToRow(client, index),
+      ),
+    });
+  }
 
   // Remove older sample insights that no longer match the client taxonomy
   await prisma.insight.deleteMany({

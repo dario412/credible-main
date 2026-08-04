@@ -17,12 +17,19 @@ import {
   HeadlineStyleControls,
   TextStyleControls,
 } from "@/components/home-style-controls";
+import { MediaField } from "@/components/media-library";
 import { ImpactStats } from "@/components/impact-stats";
 import { KeyStudy } from "@/components/key-study";
 import type { RosterCardExpert } from "@/components/roster-card";
 import { TrustedBy } from "@/components/trusted-by";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type { HomePageSections } from "@/lib/cms";
+import {
+  TRUSTED_BY_LOGO_HINT,
+  emptyTrustedByClient,
+  emptyTrustedByTestimonial,
+  type TrustedByClient,
+} from "@/lib/trusted-by";
 
 type EditTarget =
   | "hero.headline"
@@ -47,6 +54,7 @@ type EditTarget =
   | "brandBrief.subhead"
   | "brandBrief.quote"
   | "brandBrief.formTitle"
+  | `trustedBy.client.${number}`
   | "footer.tagline"
   | "footer.companyLine"
   | "footer.email";
@@ -85,18 +93,25 @@ function targetTitle(target: EditTarget): string {
   if (target.startsWith("keyStudy.metric.")) {
     return `Case study metric ${Number(target.split(".")[2]) + 1}`;
   }
+  if (target.startsWith("trustedBy.client.")) {
+    return `Trusted by logo ${Number(target.split(".")[2]) + 1}`;
+  }
   return map[target] ?? "Edit";
 }
 
 function EditorPopover({
   target,
   sections,
+  trustedClients,
   onChange,
+  onTrustedClientsChange,
   onClose,
 }: {
   target: EditTarget;
   sections: HomePageSections;
+  trustedClients: TrustedByClient[];
   onChange: (next: HomePageSections) => void;
+  onTrustedClientsChange: (next: TrustedByClient[]) => void;
   onClose: () => void;
 }) {
   const titleId = useId();
@@ -131,6 +146,7 @@ function EditorPopover({
   const waysItemMatch = target.match(/^waysIn\.item\.(\d+)$/);
   const impactStatMatch = target.match(/^impact\.stat\.(\d+)$/);
   const keyMetricMatch = target.match(/^keyStudy\.metric\.(\d+)$/);
+  const trustedClientMatch = target.match(/^trustedBy\.client\.(\d+)$/);
 
   return (
     <div
@@ -722,6 +738,178 @@ function EditorPopover({
           </Field>
         ) : null}
 
+        {trustedClientMatch ? (
+          (() => {
+            const i = Number(trustedClientMatch[1]);
+            const client = trustedClients[i];
+            if (!client) return null;
+            const hasStory = Boolean(client.testimonial);
+
+            function updateClient(next: Partial<TrustedByClient>) {
+              onTrustedClientsChange(
+                trustedClients.map((row, idx) =>
+                  idx === i ? { ...row, ...next } : row,
+                ),
+              );
+            }
+
+            return (
+              <>
+                <p className="text-[0.7rem] leading-relaxed text-charcoal/55">
+                  {TRUSTED_BY_LOGO_HINT} Managed as a shared CMS resource — also
+                  editable under Admin → Trusted by.
+                </p>
+                <Field label="Client name" id="tb-name">
+                  <TextInput
+                    id="tb-name"
+                    value={client.name}
+                    onChange={(e) => updateClient({ name: e.target.value })}
+                  />
+                </Field>
+                <MediaField
+                  label="Logo"
+                  hint={TRUSTED_BY_LOGO_HINT}
+                  value={client.logoSrc}
+                  onChange={(logoSrc) => updateClient({ logoSrc })}
+                />
+                <Field
+                  label="Case study slug (optional)"
+                  id="tb-slug"
+                  hint="Powers the Customer story link, e.g. stage-to-boardroom"
+                >
+                  <TextInput
+                    id="tb-slug"
+                    value={client.caseStudySlug}
+                    onChange={(e) =>
+                      updateClient({ caseStudySlug: e.target.value })
+                    }
+                  />
+                </Field>
+
+                <div className="flex items-center justify-between gap-3 border-t border-charcoal/10 pt-3">
+                  <p className="text-sm font-medium text-charcoal">
+                    Customer story hover
+                  </p>
+                  <Button
+                    type="button"
+                    variant={hasStory ? "secondary" : "primary"}
+                    className="px-3! py-1.5! text-xs"
+                    onClick={() =>
+                      updateClient({
+                        testimonial: hasStory
+                          ? null
+                          : emptyTrustedByTestimonial(),
+                      })
+                    }
+                  >
+                    {hasStory ? "Remove story" : "Add story"}
+                  </Button>
+                </div>
+
+                {client.testimonial ? (
+                  <>
+                    <Field label="Testimonial" id="tb-quote">
+                      <TextArea
+                        id="tb-quote"
+                        rows={4}
+                        value={client.testimonial.quote}
+                        onChange={(e) =>
+                          updateClient({
+                            testimonial: {
+                              ...client.testimonial!,
+                              quote: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                    </Field>
+                    <Field label="Person name" id="tb-person">
+                      <TextInput
+                        id="tb-person"
+                        value={client.testimonial.name}
+                        onChange={(e) =>
+                          updateClient({
+                            testimonial: {
+                              ...client.testimonial!,
+                              name: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                    </Field>
+                    <Field label="Position / title" id="tb-title">
+                      <TextInput
+                        id="tb-title"
+                        value={client.testimonial.title}
+                        onChange={(e) =>
+                          updateClient({
+                            testimonial: {
+                              ...client.testimonial!,
+                              title: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                    </Field>
+                    <MediaField
+                      label="Person photo"
+                      hint="Square photo works best"
+                      value={client.testimonial.imageSrc}
+                      onChange={(imageSrc) =>
+                        updateClient({
+                          testimonial: {
+                            ...client.testimonial!,
+                            imageSrc,
+                          },
+                        })
+                      }
+                    />
+                  </>
+                ) : (
+                  <p className="text-[0.75rem] leading-relaxed text-charcoal/50">
+                    No story — logo only, like the empty cells in the grid.
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-2 border-t border-charcoal/10 pt-3">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="px-3! py-1.5! text-xs"
+                    onClick={() => {
+                      onTrustedClientsChange([
+                        ...trustedClients,
+                        emptyTrustedByClient(),
+                      ]);
+                    }}
+                  >
+                    Add logo
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="px-3! py-1.5! text-xs text-danger"
+                    onClick={() => {
+                      onTrustedClientsChange(
+                        trustedClients.filter((_, idx) => idx !== i),
+                      );
+                      onClose();
+                    }}
+                  >
+                    Remove this logo
+                  </Button>
+                  <a
+                    href="/admin/trusted-by"
+                    className="px-2 text-xs font-medium text-charcoal/55 hover:text-charcoal"
+                  >
+                    Open Trusted by CMS
+                  </a>
+                </div>
+              </>
+            );
+          })()
+        ) : null}
+
         {target === "footer.tagline" ? (
           <Field label="Tagline" id="ft-tagline">
             <TextArea
@@ -798,14 +986,18 @@ function hit(
 
 export function HomeVisualEditor({
   initial,
+  initialTrustedClients,
   canEdit,
   rosterCards,
   saveAction,
+  saveTrustedByAction,
 }: {
   initial: HomePageSections;
+  initialTrustedClients: TrustedByClient[];
   canEdit: boolean;
   rosterCards: RosterCardExpert[];
   saveAction: typeof import("@/lib/actions/admin-cms").saveHomePage;
+  saveTrustedByAction: typeof import("@/lib/actions/admin-trusted-by").saveTrustedClientsList;
 }) {
   const router = useRouter();
   const {
@@ -818,12 +1010,16 @@ export function HomeVisualEditor({
   const [editing, setEditing] = useState(false);
   const [sections, setSections] = useState(initial);
   const [baseline, setBaseline] = useState(initial);
+  const [trustedClients, setTrustedClients] = useState(initialTrustedClients);
+  const [trustedBaseline, setTrustedBaseline] = useState(initialTrustedClients);
   const [target, setTarget] = useState<EditTarget | null>(null);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
   const [ok, setOk] = useState(false);
 
-  const dirty = JSON.stringify(sections) !== JSON.stringify(baseline);
+  const dirty =
+    JSON.stringify(sections) !== JSON.stringify(baseline) ||
+    JSON.stringify(trustedClients) !== JSON.stringify(trustedBaseline);
 
   useEffect(() => {
     setCanEdit(canEdit);
@@ -847,18 +1043,46 @@ export function HomeVisualEditor({
 
   async function save() {
     setPending(true);
-    const result = await saveAction(sections);
-    setOk(result.ok);
-    setMessage(result.message);
+    const homeDirty = JSON.stringify(sections) !== JSON.stringify(baseline);
+    const trustedDirty =
+      JSON.stringify(trustedClients) !== JSON.stringify(trustedBaseline);
+
+    let homeResult: { ok: boolean; message: string } = {
+      ok: true,
+      message: "Home page saved.",
+    };
+    let trustedResult: { ok: boolean; message: string } = {
+      ok: true,
+      message: "Trusted by logos saved.",
+    };
+
+    if (homeDirty) homeResult = await saveAction(sections);
+    if (trustedDirty) trustedResult = await saveTrustedByAction(trustedClients);
+
+    const success = homeResult.ok && trustedResult.ok;
+    setOk(success);
+    setMessage(
+      success
+        ? homeDirty && trustedDirty
+          ? "Home page and Trusted by saved."
+          : homeDirty
+            ? homeResult.message
+            : trustedResult.message
+        : !homeResult.ok
+          ? homeResult.message
+          : trustedResult.message,
+    );
     setPending(false);
-    if (result.ok) {
-      setBaseline(sections);
+    if (success) {
+      if (homeDirty) setBaseline(sections);
+      if (trustedDirty) setTrustedBaseline(trustedClients);
       router.refresh();
     }
   }
 
   function discard() {
     setSections(baseline);
+    setTrustedClients(trustedBaseline);
     setTarget(null);
     setMessage("");
   }
@@ -908,7 +1132,27 @@ export function HomeVisualEditor({
         }
       />
 
-      <TrustedBy />
+      <TrustedBy
+        clients={trustedClients}
+        disableStoryLinks={editing}
+        editSlots={
+          editing
+            ? {
+                client: (index, node) =>
+                  hit(
+                    editing,
+                    `trustedBy.client.${index}`,
+                    target,
+                    setTarget,
+                    `trusted by logo ${index + 1}`,
+                    node,
+                    true,
+                    "ring-offset-charcoal",
+                  ),
+              }
+            : undefined
+        }
+      />
 
       <WaysInAccordion
         content={sections.waysIn}
@@ -1180,6 +1424,26 @@ export function HomeVisualEditor({
               >
                 Discard
               </Button>
+              <Button
+                  type="button"
+                  variant="ghost"
+                  className="px-3! py-2! text-xs"
+                  onClick={() => {
+                    setTrustedClients((prev) => {
+                      const next = [...prev, emptyTrustedByClient()];
+                      setTarget(`trustedBy.client.${next.length - 1}`);
+                      return next;
+                    });
+                  }}
+                >
+                  Add logo
+                </Button>
+              <a
+                href="/admin/trusted-by"
+                className="px-2 text-xs font-medium text-charcoal/55 hover:text-charcoal"
+              >
+                Trusted by CMS
+              </a>
               <a
                 href="/admin/pages/home"
                 className="px-2 text-xs font-medium text-charcoal/55 hover:text-charcoal"
@@ -1200,7 +1464,9 @@ export function HomeVisualEditor({
         <EditorPopover
           target={target}
           sections={sections}
+          trustedClients={trustedClients}
           onChange={setSections}
+          onTrustedClientsChange={setTrustedClients}
           onClose={() => setTarget(null)}
         />
       ) : null}

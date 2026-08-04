@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { MediaField } from "@/components/media-library";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type { CaseStudyCard } from "@/lib/case-studies";
 import { CASE_STUDY_PILLARS, CASE_STUDY_CLIENT_TYPES } from "@/lib/case-studies";
@@ -156,13 +157,11 @@ export function CaseStudyEditorForm({
             />
           </Field>
         </div>
-        <Field label="Cover image URL" id="coverImage">
-          <TextInput
-            id="coverImage"
-            value={card.coverImage}
-            onChange={(e) => setCard({ ...card, coverImage: e.target.value })}
-          />
-        </Field>
+        <MediaField
+          label="Cover image"
+          value={card.coverImage ?? ""}
+          onChange={(coverImage) => setCard({ ...card, coverImage })}
+        />
         <label className="flex items-center gap-2 self-end pb-3 text-sm">
           <input
             type="checkbox"

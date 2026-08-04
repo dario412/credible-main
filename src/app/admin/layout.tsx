@@ -25,6 +25,16 @@ const nav = [
     permission: "MANAGE_CONTENT" as const,
   },
   {
+    href: "/admin/trusted-by",
+    label: "Trusted by",
+    permission: "MANAGE_CONTENT" as const,
+  },
+  {
+    href: "/admin/media",
+    label: "Media",
+    permission: "MANAGE_CONTENT" as const,
+  },
+  {
     href: "/admin/pages",
     label: "Pages",
     permission: "MANAGE_CONTENT" as const,

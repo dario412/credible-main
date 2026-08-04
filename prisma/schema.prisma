@@ -148,3 +148,31 @@ model PageContent {
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 }
+
+/// Shared “Trusted by” logos — reusable across marketing pages.
+model TrustedClient {
+  id               String   @id @default(cuid())
+  name             String
+  logoSrc          String   @default("")
+  caseStudySlug    String   @default("")
+  testimonialQuote String?
+  testimonialName  String?
+  testimonialTitle String?
+  testimonialImage String?
+  sortOrder        Int      @default(0)
+  active           Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+/// Uploaded media library (images) — served at /api/media/[id].
+model MediaAsset {
+  id        String   @id @default(cuid())
+  fileName  String
+  mimeType  String
+  alt       String   @default("")
+  byteSize  Int      @default(0)
+  data      Bytes
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

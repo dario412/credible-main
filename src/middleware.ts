@@ -11,6 +11,8 @@ const routePermissions: Array<{ prefix: string; permission: Permission }> = [
   { prefix: "/admin/leads", permission: "VIEW_LEADS" },
   { prefix: "/admin/insights", permission: "MANAGE_CONTENT" },
   { prefix: "/admin/case-studies", permission: "MANAGE_CONTENT" },
+  { prefix: "/admin/trusted-by", permission: "MANAGE_CONTENT" },
+  { prefix: "/admin/media", permission: "MANAGE_CONTENT" },
   { prefix: "/admin/pages", permission: "MANAGE_CONTENT" },
 ];
 

@@ -381,6 +381,7 @@ function mergeFooter(raw: unknown): HomePageSections["footer"] {
   };
 }
 
+
 export function mergeHomeSections(raw: unknown): HomePageSections {
   const data = (raw && typeof raw === "object" ? raw : {}) as {
     hero?: Partial<HomePageSections["hero"]> & Record<string, unknown>;

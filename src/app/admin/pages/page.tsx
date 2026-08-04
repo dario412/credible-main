@@ -15,7 +15,8 @@ const pages = [
   {
     slug: "home",
     title: "Home",
-    description: "Hero headline, supporting copy, and CTAs.",
+    description:
+      "Hero, ways in, roster, impact stats, case study, brief, and footer. Logos live under Trusted by.",
   },
   {
     slug: "about",
