@@ -155,29 +155,35 @@ function FullKeyStudy({
 
           <ul className="min-w-0">
             {content.metrics.map((metric, index) => {
-              const node = (
-                <li className="border-b border-charcoal/12 py-5 first:pt-0 last:border-b-0 last:pb-0 md:py-6">
-                  <div className="flex items-baseline gap-4 sm:gap-5">
-                    <p className="shrink-0 font-display text-[2.35rem] leading-none tracking-tight text-charcoal sm:text-[2.75rem] md:text-[3.1rem]">
-                      <StatCounter value={metric.value} duration={1400} />
+              const row = (
+                <div className="flex items-baseline gap-4 sm:gap-5 md:gap-6">
+                  <p className="shrink-0 font-display text-[2.5rem] leading-none tracking-tight text-charcoal sm:text-[2.85rem] md:text-[3.25rem]">
+                    <StatCounter
+                      value={metric.value}
+                      duration={1400}
+                      delay={index * 100}
+                    />
+                  </p>
+                  <div className="min-w-0">
+                    <p className="text-[0.9rem] leading-snug font-medium text-charcoal md:text-[0.95rem]">
+                      {metric.label}
                     </p>
-                    <div className="min-w-0 pt-1">
-                      <p className="text-[0.9rem] leading-snug font-medium text-charcoal md:text-[0.95rem]">
-                        {metric.label}
+                    {metric.note ? (
+                      <p className="mt-1 text-[0.75rem] leading-snug text-charcoal/55">
+                        ({metric.note})
                       </p>
-                      {metric.note ? (
-                        <p className="mt-1 text-[0.75rem] text-charcoal/55">
-                          ({metric.note})
-                        </p>
-                      ) : null}
-                    </div>
+                    ) : null}
                   </div>
-                </li>
-              );
-              return (
-                <div key={`${metric.value}-${metric.label}`}>
-                  {editSlots?.metric ? editSlots.metric(index, node) : node}
                 </div>
+              );
+
+              return (
+                <li
+                  key={`${metric.value}-${metric.label}-${index}`}
+                  className="border-b border-charcoal/12 py-5 first:pt-0 last:border-b-0 last:pb-0 md:py-6"
+                >
+                  {editSlots?.metric ? editSlots.metric(index, row) : row}
+                </li>
               );
             })}
           </ul>

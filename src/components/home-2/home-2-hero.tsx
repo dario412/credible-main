@@ -2,8 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import type {
   CtaStyle,
@@ -19,15 +18,16 @@ import {
 } from "@/lib/home-styles";
 import { cn } from "@/lib/utils";
 
-import { HOME_2_SPEAKERS } from "./home-2-speakers";
+import type { HeroCastMember } from "./hero-cast";
 import { Home2WaveField } from "./home-2-wave-field";
 
-const PATTERN_LINE_COUNT = 84;
-const SPEAKER_COUNT = 8;
-const CHARCOAL = { r: 28, g: 26, b: 23 };
-/** Card height plus breathing room, used to keep cards inside the field */
-const CARD_HEIGHT = 268;
-const CARD_MARGIN = 18;
+export type { HeroCastMember };
+
+const PATTERN_LINE_COUNT = 64;
+const WAVE = { r: 42, g: 58, b: 48 };
+const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+const MOTION = "420ms";
+const MOTION_IMAGE = "650ms";
 
 export type Home2HeroProps = {
   headline?: string;
@@ -40,14 +40,13 @@ export type Home2HeroProps = {
   subheadStyle?: TextStyle;
   primaryCtaStyle?: CtaStyle;
   secondaryCtaStyle?: CtaStyle;
-  /** When set, editable regions wrap headline/subhead/CTAs instead of plain markup. */
+  cast?: HeroCastMember[];
   editSlots?: {
     headline?: (node: ReactNode) => ReactNode;
     subhead?: (node: ReactNode) => ReactNode;
     primaryCta?: (node: ReactNode) => ReactNode;
     secondaryCta?: (node: ReactNode) => ReactNode;
   };
-  /** Disable CTA navigation (edit mode). */
   disableCtaLinks?: boolean;
 };
 
@@ -66,6 +65,188 @@ export function heroPropsFromSections(hero: HomePageSections["hero"]): Home2Hero
   };
 }
 
+function CastCard({
+  member,
+  active,
+  dimmed,
+  reduceMotion,
+  onActivate,
+}: {
+  member: HeroCastMember;
+  active: boolean;
+  dimmed: boolean;
+  reduceMotion: boolean;
+  onActivate: () => void;
+}) {
+  const imageSrc = member.image?.trim() || "/images/creator-placeholder.png";
+
+  return (
+    <Link
+      href={`/roster/${member.slug}`}
+      onMouseEnter={onActivate}
+      onFocus={onActivate}
+      className={cn(
+        "group relative block w-[11.5rem] shrink-0 sm:w-[12.5rem] lg:w-[13.5rem]",
+        "origin-bottom will-change-transform",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest",
+      )}
+      style={{
+        transitionProperty: "transform, opacity, filter",
+        transitionDuration: MOTION,
+        transitionTimingFunction: EASE,
+        transform: active
+          ? "translate3d(0, -14px, 0) scale(1.025)"
+          : dimmed
+            ? "translate3d(0, 4px, 0) scale(0.985)"
+            : "translate3d(0, 0, 0) scale(1)",
+        opacity: dimmed ? 0.62 : 1,
+        filter: dimmed ? "saturate(0.82) brightness(0.94)" : "none",
+        zIndex: active ? 12 : 1,
+      }}
+      aria-label={`${member.name}${member.role ? `, ${member.role}` : ""}`}
+    >
+      <span
+        className="relative block aspect-3/4 overflow-hidden rounded-sm bg-cream-dark"
+        style={{
+          transitionProperty: "box-shadow",
+          transitionDuration: MOTION,
+          transitionTimingFunction: EASE,
+          boxShadow: active
+            ? "0 26px 52px rgba(28,26,23,0.2), 0 8px 20px rgba(28,26,23,0.1)"
+            : "0 16px 40px rgba(28,26,23,0.12)",
+        }}
+      >
+        <Image
+          src={imageSrc}
+          alt=""
+          fill
+          sizes="220px"
+          className={cn(
+            "object-cover object-[center_16%]",
+            active && !reduceMotion && "cast-drift",
+          )}
+          style={{
+            transitionProperty: "transform",
+            transitionDuration: MOTION_IMAGE,
+            transitionTimingFunction: EASE,
+            transform: active ? "scale(1.06)" : "scale(1)",
+          }}
+        />
+
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: active
+              ? "linear-gradient(to top, rgba(28,26,23,0.78) 0%, rgba(28,26,23,0.22) 42%, rgba(28,26,23,0.08) 100%)"
+              : "linear-gradient(to top, rgba(28,26,23,0.62) 0%, rgba(28,26,23,0.12) 38%, transparent 70%)",
+          }}
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-sm ring-1 ring-inset"
+          style={{
+            boxShadow: active
+              ? "inset 0 0 0 1px rgba(249,243,239,0.32)"
+              : "inset 0 0 0 1px rgba(249,243,239,0.16)",
+          }}
+        />
+
+        <span className="absolute inset-x-0 bottom-0 z-2 px-3.5 pb-3.5 pt-10 md:px-4 md:pb-4">
+          <span className="block font-display text-[1rem] leading-snug tracking-tight text-cream md:text-[1.0625rem]">
+            {member.name}
+          </span>
+          {member.role ? (
+            <span
+              className="mt-1 block text-[0.6875rem] leading-snug text-cream/70"
+              style={{
+                transition: `opacity ${MOTION} ${EASE}, transform ${MOTION} ${EASE}, max-height ${MOTION} ${EASE}`,
+                opacity: active ? 1 : 0,
+                transform: active ? "translate3d(0,0,0)" : "translate3d(0,6px,0)",
+                maxHeight: active ? "2.5rem" : "0",
+                overflow: "hidden",
+              }}
+            >
+              {member.role}
+            </span>
+          ) : null}
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+/** Enough portraits that one marquee half always fills a wide desktop. */
+function marqueeBase(cast: HeroCastMember[]) {
+  if (cast.length === 0) return [];
+  let base = [...cast];
+  while (base.length < 8) {
+    base = [...base, ...cast];
+  }
+  return base;
+}
+
+function CastRow({ cast }: { cast: HeroCastMember[] }) {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduceMotion(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const base = marqueeBase(cast);
+  // Two identical halves → seamless loop at -50%.
+  const loop = [...base, ...base];
+  const hasFocus = hovered !== null;
+
+  if (base.length === 0) return null;
+
+  return (
+    <div
+      className={cn(
+        "cast-marquee-window relative z-10 w-full overflow-hidden py-8 md:py-10",
+      )}
+      aria-label="Featured creators"
+      onMouseLeave={() => setHovered(null)}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          setHovered(null);
+        }
+      }}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 left-0 z-20 w-12 bg-linear-to-r from-cream via-cream/80 to-transparent md:w-20 lg:w-28"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 z-20 w-12 bg-linear-to-l from-cream via-cream/80 to-transparent md:w-20 lg:w-28"
+      />
+      <div
+        className={cn(
+          "flex w-max items-stretch gap-3.5 sm:gap-4",
+          !reduceMotion && "cast-marquee-track",
+        )}
+      >
+        {loop.map((member, index) => (
+          <CastCard
+            key={`${member.id}-${index}`}
+            member={member}
+            active={hovered === index}
+            dimmed={hasFocus && hovered !== index}
+            reduceMotion={reduceMotion}
+            onActivate={() => setHovered(index)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function Home2Hero({
   headline = DEFAULT_HOME_SECTIONS.hero.headline,
   subhead = DEFAULT_HOME_SECTIONS.hero.subhead,
@@ -77,25 +258,10 @@ export function Home2Hero({
   subheadStyle = DEFAULT_HOME_SECTIONS.hero.subheadStyle,
   primaryCtaStyle = DEFAULT_HOME_SECTIONS.hero.primaryCtaStyle,
   secondaryCtaStyle = DEFAULT_HOME_SECTIONS.hero.secondaryCtaStyle,
+  cast = [],
   editSlots,
   disableCtaLinks = false,
 }: Home2HeroProps) {
-  const router = useRouter();
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [cardBottom, setCardBottom] = useState<number | null>(null);
-
-  /** Anchor the card just above the point the pointer entered on */
-  function handleEnter(index: number, event: React.MouseEvent<HTMLButtonElement>) {
-    const field = event.currentTarget.getBoundingClientRect();
-    const pointerY = event.clientY - field.top;
-    const maxBottom = Math.max(CARD_MARGIN, field.height - CARD_HEIGHT - CARD_MARGIN);
-
-    setCardBottom(
-      Math.min(Math.max(field.height - pointerY + CARD_MARGIN, CARD_MARGIN), maxBottom),
-    );
-    setHoveredIndex(index);
-  }
-
   const headlineNode = (
     <h1 className={headlineClassName(headlineStyle)}>{headline}</h1>
   );
@@ -126,9 +292,41 @@ export function Home2Hero({
     </Link>
   );
 
+  // Soft peak mid-band, dissolve into cream at both top and bottom
+  const waveMask =
+    "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.04) 12%, rgba(0,0,0,0.14) 28%, rgba(0,0,0,0.38) 48%, rgba(0,0,0,0.55) 62%, rgba(0,0,0,0.42) 76%, rgba(0,0,0,0.18) 88%, transparent 100%)";
+
   return (
-    <section className="relative bg-cream" data-site-hero>
-      <div className="relative z-10 mx-auto max-w-3xl px-6 pb-10 pt-16 text-center md:px-10 md:pb-12 md:pt-20 lg:pt-24">
+    <section className="relative overflow-hidden bg-cream" data-site-hero>
+      {/* Wave stage — forest-tinted, soft mid-band presence */}
+      <div
+        className="pointer-events-none absolute inset-0 z-0"
+        aria-hidden
+        style={{
+          opacity: 0.22,
+          maskImage: waveMask,
+          WebkitMaskImage: waveMask,
+        }}
+      >
+        <Home2WaveField
+          lineCount={PATTERN_LINE_COUNT}
+          color={WAVE}
+          baseWidth={1.85}
+          edgeFade
+        />
+      </div>
+
+      {/* Bottom dissolve into next cream section — sits above cast so portraits ease out */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-40 md:h-48 lg:h-56"
+        aria-hidden
+        style={{
+          background:
+            "linear-gradient(to top, #F9F3EF 0%, rgba(249,243,239,0.92) 22%, rgba(249,243,239,0.55) 48%, rgba(249,243,239,0.18) 72%, transparent 100%)",
+        }}
+      />
+
+      <div className="relative z-10 mx-auto max-w-3xl px-6 pb-8 pt-16 text-center md:px-10 md:pb-10 md:pt-20 lg:pt-24">
         {editSlots?.headline ? editSlots.headline(headlineNode) : headlineNode}
         {editSlots?.subhead ? editSlots.subhead(subheadNode) : subheadNode}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -141,96 +339,8 @@ export function Home2Hero({
         </div>
       </div>
 
-      <div className="relative mx-auto h-75 max-w-352 md:h-95 lg:h-105">
-        <Home2WaveField
-          lineCount={PATTERN_LINE_COUNT}
-          color={CHARCOAL}
-          baseWidth={2.1}
-        />
-
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-linear-to-b from-cream to-transparent"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-12 bg-linear-to-t from-cream to-transparent"
-          aria-hidden
-        />
-
-        <div className="absolute inset-0 z-20 hidden md:block">
-          {HOME_2_SPEAKERS.slice(0, SPEAKER_COUNT).map((speaker, index) => {
-            const active = hoveredIndex === index;
-            // Spread 24 hotspots evenly across denser pattern columns
-            const left = ((index + 0.5) / SPEAKER_COUNT) * 100;
-            const edge =
-              index === 0
-                ? "left"
-                : index === SPEAKER_COUNT - 1
-                  ? "right"
-                  : "center";
-
-            return (
-              <button
-                key={speaker.id}
-                type="button"
-                className={cn(
-                  "pointer-events-auto absolute top-0 bottom-0 w-[12%] -translate-x-1/2 bg-transparent",
-                  active && "z-30",
-                )}
-                style={{ left: `${left}%` }}
-                onMouseEnter={(event) => handleEnter(index, event)}
-                onMouseLeave={() =>
-                  setHoveredIndex((current) =>
-                    current === index ? null : current,
-                  )
-                }
-                onClick={() => router.push(`/roster/${speaker.slug}`)}
-                aria-label={`${speaker.name}, ${speaker.title}`}
-              >
-                <span
-                  style={
-                    active && cardBottom !== null
-                      ? { bottom: `${cardBottom}px` }
-                      : undefined
-                  }
-                  className={cn(
-                    "pointer-events-none absolute bottom-[54%] z-40 w-58 overflow-hidden rounded-sm bg-cream text-left shadow-[0_22px_54px_rgba(28,26,23,0.16)] ring-1 ring-charcoal/8 transition-[opacity,transform] duration-[1250ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]",
-                    edge === "left" && "left-0",
-                    edge === "right" && "right-0",
-                    edge === "center" && "left-1/2 -translate-x-1/2",
-                    active
-                      ? "translate-y-0 scale-100 opacity-100"
-                      : "translate-y-1 scale-[0.992] opacity-0",
-                  )}
-                >
-                  <span className="relative block h-38 w-full overflow-hidden bg-cream-dark">
-                    <Image
-                      src="/images/creator-placeholder.png"
-                      alt=""
-                      fill
-                      sizes="232px"
-                      className={cn(
-                        "object-cover object-[center_18%] transition-transform duration-[1500ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]",
-                        active ? "scale-100" : "scale-[1.03]",
-                      )}
-                    />
-                  </span>
-                  <span className="block px-3.5 py-3">
-                    <span className="block font-display text-[0.95rem] leading-tight text-charcoal">
-                      {speaker.name}
-                    </span>
-                    <span className="mt-0.5 block text-[0.7rem] text-charcoal/55">
-                      {speaker.title}
-                    </span>
-                    <span className="mt-2 block text-[0.72rem] leading-snug text-forest">
-                      {speaker.prompt}
-                    </span>
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
+      <div className="relative z-10 w-full pb-20 pt-10 md:pb-24 md:pt-14">
+        {cast.length > 0 ? <CastRow cast={cast} /> : null}
       </div>
     </section>
   );

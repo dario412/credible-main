@@ -6,22 +6,47 @@ import { useEffect, useState } from "react";
 
 import { PatternField } from "@/components/pattern-field";
 import { EditableHit } from "@/components/editable-hit";
-import { useHomeCms } from "@/components/home-cms-context";
+import { useSiteChrome } from "@/components/site-chrome-context";
 import { ShortlistMenu } from "@/components/shortlist-menu";
+import type { SocialNetwork } from "@/lib/site-chrome";
 import { cn } from "@/lib/utils";
 
 const FOOTER_PATTERN_COLOR = { r: 249, g: 243, b: 239 };
 
-const links = [
-  { href: "/roster", label: "Roster" },
-  { href: "/what-we-do", label: "What we do" },
-  { href: "/case-studies", label: "Case Studies" },
-  { href: "/insights", label: "Insights" },
-  { href: "/about", label: "About" },
-];
+function SocialIcon({ network }: { network: SocialNetwork }) {
+  const className = "size-[22px]";
+  if (network === "linkedin") {
+    return (
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden className={className}>
+        <path d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z" />
+      </svg>
+    );
+  }
+  if (network === "youtube") {
+    return (
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden className={className}>
+        <path d="M164.44,121.34l-48-32A8,8,0,0,0,104,96v64a8,8,0,0,0,12.44,6.66l48-32a8,8,0,0,0,0-13.32ZM120,145.05V111l25.58,17ZM234.33,69.52a24,24,0,0,0-14.49-16.4C185.56,39.88,131,40,128,40s-57.56-.12-91.84,13.12a24,24,0,0,0-14.49,16.4C19.08,79.5,16,97.74,16,128s3.08,48.5,5.67,58.48a24,24,0,0,0,14.49,16.41C69,215.56,120.4,216,127.34,216h1.32c6.94,0,58.37-.44,91.18-13.11a24,24,0,0,0,14.49-16.41c2.59-10,5.67-28.22,5.67-58.48S236.92,79.5,234.33,69.52Zm-15.49,113a8,8,0,0,1-4.77,5.49c-31.65,12.22-85.48,12-86,12H128c-.54,0-54.33.2-86-12a8,8,0,0,1-4.77-5.49C34.8,173.39,32,156.57,32,128s2.8-45.39,5.16-54.47A8,8,0,0,1,41.93,68c30.52-11.79,81.66-12,85.85-12h.27c.54,0,54.38-.18,86,12a8,8,0,0,1,4.77,5.49C221.2,82.61,224,99.43,224,128S221.2,173.39,218.84,182.47Z" />
+      </svg>
+    );
+  }
+  if (network === "x") {
+    return (
+      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden className={className}>
+        <path d="M214.75,211.1l-62.6-98.35,61.4-66.85a8,8,0,0,0-11.9-10.7L143.07,98.93,95.16,23.6A8,8,0,0,0,88,20H40a8,8,0,0,0-6.63,12.5l66.35,104.25L36.9,211.1A8,8,0,0,0,42.75,224h47.41a8,8,0,0,0,6.63-3.5l48.56-66.6,41.05,64.5A8,8,0,0,0,193.25,224h47.41a8,8,0,0,0,6.63-12.5ZM92.41,40h18.31l94.87,149.1H187.28Z" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden className={className}>
+      <path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z" />
+    </svg>
+  );
+}
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { chrome } = useSiteChrome();
+  const links = chrome.header.links;
   const insightArticle =
     /^\/insights\/[^/]+\/?$/.test(pathname) ||
     /^\/insights\/authors\//.test(pathname);
@@ -114,7 +139,7 @@ export function SiteHeader() {
           >
             {links.map((link) => (
               <Link
-                key={link.href}
+                key={`${link.href}-${link.label}`}
                 href={link.href}
                 className={cn(
                   "text-[0.8125rem] transition-colors duration-300",
@@ -130,10 +155,10 @@ export function SiteHeader() {
         </div>
 
         <Link
-          href="/contact"
+          href={chrome.header.ctaHref}
           className="inline-flex shrink-0 items-center justify-center rounded-sm bg-forest px-5 text-[0.8125rem] font-medium text-cream shadow-[0_10px_40px_rgba(28,26,23,0.12)] transition-colors hover:bg-forest-dark md:px-6"
         >
-          Send brief
+          {chrome.header.ctaLabel}
         </Link>
 
         <ShortlistMenu />
@@ -145,7 +170,7 @@ export function SiteHeader() {
       >
         {links.map((link) => (
           <Link
-            key={link.href}
+            key={`m-${link.href}-${link.label}`}
             href={link.href}
             className={cn(
               "whitespace-nowrap text-sm transition-colors duration-300",
@@ -160,73 +185,16 @@ export function SiteHeader() {
   );
 }
 
-
-const footerColumns = [
-  {
-    title: "Roster",
-    links: [
-      { href: "/roster", label: "All creators" },
-      {
-        href: `/roster?archetype=${encodeURIComponent("Founder / C-Suite")}`,
-        label: "Founders/Csuite",
-      },
-      {
-        href: `/roster?archetype=${encodeURIComponent("Subject Matter Expert")}`,
-        label: "Subject Matter Experts",
-      },
-      {
-        href: `/roster?archetype=${encodeURIComponent("Investor / Analyst")}`,
-        label: "Investors",
-      },
-      {
-        href: `/roster?archetype=${encodeURIComponent("Category Specialist")}`,
-        label: "Category Specialists",
-      },
-    ],
-  },
-  {
-    title: "What we do",
-    links: [
-      { href: "/what-we-do", label: "What we do" },
-      { href: "/contact", label: "For Brands" },
-      { href: "/contact?type=creator", label: "For Creators" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { href: "/about", label: "About" },
-      { href: "/case-studies", label: "Case studies" },
-      { href: "/insights", label: "Insights" },
-      { href: "/contact", label: "Contact" },
-    ],
-  },
-] as const;
-
-const socials = [
-  {
-    label: "LinkedIn",
-    href: "https://www.linkedin.com/",
-    icon: (
-      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden className="size-[22px]">
-        <path d="M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z" />
-      </svg>
-    ),
-  },
-  {
-    label: "YouTube",
-    href: "https://www.youtube.com/",
-    icon: (
-      <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden className="size-[22px]">
-        <path d="M164.44,121.34l-48-32A8,8,0,0,0,104,96v64a8,8,0,0,0,12.44,6.66l48-32a8,8,0,0,0,0-13.32ZM120,145.05V111l25.58,17ZM234.33,69.52a24,24,0,0,0-14.49-16.4C185.56,39.88,131,40,128,40s-57.56-.12-91.84,13.12a24,24,0,0,0-14.49,16.4C19.08,79.5,16,97.74,16,128s3.08,48.5,5.67,58.48a24,24,0,0,0,14.49,16.41C69,215.56,120.4,216,127.34,216h1.32c6.94,0,58.37-.44,91.18-13.11a24,24,0,0,0,14.49-16.41c2.59-10,5.67-28.22,5.67-58.48S236.92,79.5,234.33,69.52Zm-15.49,113a8,8,0,0,1-4.77,5.49c-31.65,12.22-85.48,12-86,12H128c-.54,0-54.33.2-86-12a8,8,0,0,1-4.77-5.49C34.8,173.39,32,156.57,32,128s2.8-45.39,5.16-54.47A8,8,0,0,1,41.93,68c30.52-11.79,81.66-12,85.85-12h.27c.54,0,54.38-.18,86,12a8,8,0,0,1,4.77,5.49C221.2,82.61,224,99.43,224,128S221.2,173.39,218.84,182.47Z" />
-      </svg>
-    ),
-  },
-] as const;
-
 export function SiteFooter() {
   const year = new Date().getFullYear();
-  const cms = useHomeCms();
+  const {
+    chrome,
+    editing,
+    canEdit,
+    selected,
+    onSelectFooterField,
+  } = useSiteChrome();
+  const footer = chrome.footer;
 
   return (
     <footer className="mt-auto bg-cream px-6 py-8 md:px-10 md:py-10 lg:px-12">
@@ -251,61 +219,64 @@ export function SiteFooter() {
             </Link>
 
             <EditableHit
-              active={cms.editing && cms.canEdit}
-              selected={cms.selected === "footer.tagline"}
+              active={editing && canEdit}
+              selected={selected === "footer.tagline"}
               label="footer tagline"
               block
               ringOffset="ring-offset-charcoal"
-              onSelect={() => cms.onSelectFooterField?.("tagline")}
+              onSelect={() => onSelectFooterField?.("tagline")}
             >
               <p className="mt-6 text-base leading-relaxed text-cream/70">
-                {cms.footer.tagline}
+                {footer.tagline}
               </p>
             </EditableHit>
             <EditableHit
-              active={cms.editing && cms.canEdit}
-              selected={cms.selected === "footer.companyLine"}
+              active={editing && canEdit}
+              selected={selected === "footer.companyLine"}
               label="footer company line"
               block
               ringOffset="ring-offset-charcoal"
-              onSelect={() => cms.onSelectFooterField?.("companyLine")}
+              onSelect={() => onSelectFooterField?.("companyLine")}
             >
               <p className="mt-1.5 text-sm text-cream/50">
-                {cms.footer.companyLine}
+                {footer.companyLine}
               </p>
             </EditableHit>
 
             <div className="mt-10">
               <EditableHit
-                active={cms.editing && cms.canEdit}
-                selected={cms.selected === "footer.email"}
+                active={editing && canEdit}
+                selected={selected === "footer.email"}
                 label="footer email"
                 ringOffset="ring-offset-charcoal"
-                onSelect={() => cms.onSelectFooterField?.("email")}
+                onSelect={() => onSelectFooterField?.("email")}
               >
                 <a
-                  href={`mailto:${cms.footer.email}`}
+                  href={`mailto:${footer.email}`}
                   className="block w-fit text-sm font-medium text-cream/90 transition-colors hover:text-cream"
                   onClick={(e) => {
-                    if (cms.editing) e.preventDefault();
+                    if (editing) e.preventDefault();
                   }}
                 >
-                  {cms.footer.email}
+                  {footer.email}
                 </a>
               </EditableHit>
             </div>
 
             <div className="mt-8 flex items-center gap-5">
-              {socials.map((social) => (
+              {footer.socials.map((social) => (
                 <a
-                  key={social.label}
+                  key={`${social.network}-${social.href}`}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
                   className="text-cream/70 transition-colors hover:text-cream"
+                  onClick={(e) => {
+                    if (editing) e.preventDefault();
+                  }}
                 >
-                  {social.icon}
+                  <SocialIcon network={social.network} />
                 </a>
               ))}
             </div>
@@ -315,13 +286,16 @@ export function SiteFooter() {
             className="grid grid-cols-2 gap-x-10 gap-y-10 sm:grid-cols-3 sm:gap-x-16"
             aria-label="Footer"
           >
-            {footerColumns.map((column) => (
-              <ul key={column.title} className="space-y-3.5">
-                {column.links.map((link) => (
-                  <li key={`${column.title}-${link.label}`}>
+            {footer.columns.map((column, columnIndex) => (
+              <ul key={`${column.title}-${columnIndex}`} className="space-y-3.5">
+                {column.links.map((link, linkIndex) => (
+                  <li key={`${columnIndex}-${linkIndex}-${link.label}`}>
                     <Link
                       href={link.href}
                       className="text-sm font-medium text-cream/90 transition-colors hover:text-cream"
+                      onClick={(e) => {
+                        if (editing) e.preventDefault();
+                      }}
                     >
                       {link.label}
                     </Link>
@@ -345,21 +319,21 @@ export function SiteFooter() {
         {/* Bottom bar */}
         <div className="relative z-2 mt-10 flex flex-col gap-4 border-t border-cream/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-cream/60">
-            © {year} Credible Talent Ltd. All rights reserved.
+            © {year} {footer.copyright}
           </p>
           <div className="flex flex-wrap items-center gap-6 text-sm text-cream/60">
-            <Link
-              href="/privacy"
-              className="transition-colors hover:text-cream"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="/terms"
-              className="transition-colors hover:text-cream"
-            >
-              Terms of Service
-            </Link>
+            {footer.legalLinks.map((link) => (
+              <Link
+                key={`${link.href}-${link.label}`}
+                href={link.href}
+                className="transition-colors hover:text-cream"
+                onClick={(e) => {
+                  if (editing) e.preventDefault();
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

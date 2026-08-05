@@ -1,9 +1,14 @@
 import { HomeVisualEditor } from "@/components/home-visual-editor";
 import { LatestInsights } from "@/components/latest-insights";
-import { loadRosterPreviewCards } from "@/lib/roster-preview-server";
+import {
+  loadHeroCast,
+  loadRosterPreviewCards,
+} from "@/lib/roster-preview-server";
 import {
   getHomePageSections,
+  getSiteChrome,
   saveHomePage,
+  saveSiteChrome,
 } from "@/lib/actions/admin-cms";
 import { saveTrustedClientsList } from "@/lib/actions/admin-trusted-by";
 import { auth } from "@/lib/auth";
@@ -20,12 +25,15 @@ export const metadata = createMetadata({
 });
 
 export default async function HomePage() {
-  const [home, session, rosterCards, trustedClients] = await Promise.all([
-    getHomePageSections(),
-    auth(),
-    loadRosterPreviewCards(),
-    loadTrustedClients(),
-  ]);
+  const [home, chrome, session, rosterCards, heroCast, trustedClients] =
+    await Promise.all([
+      getHomePageSections(),
+      getSiteChrome(),
+      auth(),
+      loadRosterPreviewCards(),
+      loadHeroCast(),
+      loadTrustedClients(),
+    ]);
   const canEdit = Boolean(
     session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
   );
@@ -34,10 +42,13 @@ export default async function HomePage() {
     <>
       <HomeVisualEditor
         initial={home}
+        initialChrome={chrome}
         initialTrustedClients={trustedClients}
         canEdit={canEdit}
         rosterCards={rosterCards}
+        heroCast={heroCast}
         saveAction={saveHomePage}
+        saveChromeAction={saveSiteChrome}
         saveTrustedByAction={saveTrustedClientsList}
       />
       <LatestInsights />

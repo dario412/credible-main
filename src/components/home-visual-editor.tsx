@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 
 import { BrandBrief } from "@/components/brand-brief";
 import { EditableHit } from "@/components/editable-hit";
-import { useHomeCms } from "@/components/home-cms-context";
+import { useHomeCms, useSiteChrome } from "@/components/home-cms-context";
 import {
   Home2Hero,
   heroPropsFromSections,
 } from "@/components/home-2/home-2-hero";
+import type { HeroCastMember } from "@/components/home-2/hero-cast";
 import { RosterPreviewSection } from "@/components/home-2/roster-preview-section";
 import { WaysInAccordion } from "@/components/home-2/ways-in-accordion";
 import {
@@ -24,6 +25,7 @@ import type { RosterCardExpert } from "@/components/roster-card";
 import { TrustedBy } from "@/components/trusted-by";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type { HomePageSections } from "@/lib/cms";
+import type { SiteChromeSections } from "@/lib/site-chrome";
 import {
   TRUSTED_BY_LOGO_HINT,
   emptyTrustedByClient,
@@ -102,15 +104,19 @@ function targetTitle(target: EditTarget): string {
 function EditorPopover({
   target,
   sections,
+  footer,
   trustedClients,
   onChange,
+  onFooterChange,
   onTrustedClientsChange,
   onClose,
 }: {
   target: EditTarget;
   sections: HomePageSections;
+  footer: SiteChromeSections["footer"];
   trustedClients: TrustedByClient[];
   onChange: (next: HomePageSections) => void;
+  onFooterChange: (next: Partial<SiteChromeSections["footer"]>) => void;
   onTrustedClientsChange: (next: TrustedByClient[]) => void;
   onClose: () => void;
 }) {
@@ -915,13 +921,8 @@ function EditorPopover({
             <TextArea
               id="ft-tagline"
               rows={2}
-              value={sections.footer.tagline}
-              onChange={(e) =>
-                patch("footer", {
-                  ...sections.footer,
-                  tagline: e.target.value,
-                })
-              }
+              value={footer.tagline}
+              onChange={(e) => onFooterChange({ tagline: e.target.value })}
             />
           </Field>
         ) : null}
@@ -930,13 +931,8 @@ function EditorPopover({
           <Field label="Company line" id="ft-company">
             <TextInput
               id="ft-company"
-              value={sections.footer.companyLine}
-              onChange={(e) =>
-                patch("footer", {
-                  ...sections.footer,
-                  companyLine: e.target.value,
-                })
-              }
+              value={footer.companyLine}
+              onChange={(e) => onFooterChange({ companyLine: e.target.value })}
             />
           </Field>
         ) : null}
@@ -945,15 +941,19 @@ function EditorPopover({
           <Field label="Email" id="ft-email">
             <TextInput
               id="ft-email"
-              value={sections.footer.email}
-              onChange={(e) =>
-                patch("footer", {
-                  ...sections.footer,
-                  email: e.target.value,
-                })
-              }
+              value={footer.email}
+              onChange={(e) => onFooterChange({ email: e.target.value })}
             />
           </Field>
+        ) : null}
+
+        {target.startsWith("footer.") ? (
+          <a
+            href="/admin/pages/site"
+            className="mt-2 block text-xs font-medium text-charcoal/55 hover:text-charcoal"
+          >
+            Edit full header & footer in admin →
+          </a>
         ) : null}
       </div>
     </div>
@@ -986,17 +986,23 @@ function hit(
 
 export function HomeVisualEditor({
   initial,
+  initialChrome,
   initialTrustedClients,
   canEdit,
   rosterCards,
+  heroCast,
   saveAction,
+  saveChromeAction,
   saveTrustedByAction,
 }: {
   initial: HomePageSections;
+  initialChrome: SiteChromeSections;
   initialTrustedClients: TrustedByClient[];
   canEdit: boolean;
   rosterCards: RosterCardExpert[];
+  heroCast: HeroCastMember[];
   saveAction: typeof import("@/lib/actions/admin-cms").saveHomePage;
+  saveChromeAction: typeof import("@/lib/actions/admin-cms").saveSiteChrome;
   saveTrustedByAction: typeof import("@/lib/actions/admin-trusted-by").saveTrustedClientsList;
 }) {
   const router = useRouter();
@@ -1004,12 +1010,13 @@ export function HomeVisualEditor({
     setCanEdit,
     setEditing: setCmsEditing,
     setSelected,
-    setFooter,
     setOnSelectFooterField,
   } = useHomeCms();
+  const { chrome, setChrome } = useSiteChrome();
   const [editing, setEditing] = useState(false);
   const [sections, setSections] = useState(initial);
   const [baseline, setBaseline] = useState(initial);
+  const [chromeBaseline, setChromeBaseline] = useState(initialChrome);
   const [trustedClients, setTrustedClients] = useState(initialTrustedClients);
   const [trustedBaseline, setTrustedBaseline] = useState(initialTrustedClients);
   const [target, setTarget] = useState<EditTarget | null>(null);
@@ -1019,6 +1026,7 @@ export function HomeVisualEditor({
 
   const dirty =
     JSON.stringify(sections) !== JSON.stringify(baseline) ||
+    JSON.stringify(chrome) !== JSON.stringify(chromeBaseline) ||
     JSON.stringify(trustedClients) !== JSON.stringify(trustedBaseline);
 
   useEffect(() => {
@@ -1031,10 +1039,6 @@ export function HomeVisualEditor({
   }, [editing, target, setCmsEditing, setSelected]);
 
   useEffect(() => {
-    setFooter(sections.footer);
-  }, [sections.footer, setFooter]);
-
-  useEffect(() => {
     setOnSelectFooterField((field) => {
       setTarget(`footer.${field}`);
     });
@@ -1044,6 +1048,8 @@ export function HomeVisualEditor({
   async function save() {
     setPending(true);
     const homeDirty = JSON.stringify(sections) !== JSON.stringify(baseline);
+    const chromeDirty =
+      JSON.stringify(chrome) !== JSON.stringify(chromeBaseline);
     const trustedDirty =
       JSON.stringify(trustedClients) !== JSON.stringify(trustedBaseline);
 
@@ -1051,30 +1057,39 @@ export function HomeVisualEditor({
       ok: true,
       message: "Home page saved.",
     };
+    let chromeResult: { ok: boolean; message: string } = {
+      ok: true,
+      message: "Header & footer saved.",
+    };
     let trustedResult: { ok: boolean; message: string } = {
       ok: true,
       message: "Trusted by logos saved.",
     };
 
     if (homeDirty) homeResult = await saveAction(sections);
+    if (chromeDirty) chromeResult = await saveChromeAction(chrome);
     if (trustedDirty) trustedResult = await saveTrustedByAction(trustedClients);
 
-    const success = homeResult.ok && trustedResult.ok;
+    const success = homeResult.ok && chromeResult.ok && trustedResult.ok;
     setOk(success);
+    const parts = [
+      homeDirty ? "Home" : null,
+      chromeDirty ? "footer" : null,
+      trustedDirty ? "Trusted by" : null,
+    ].filter(Boolean);
     setMessage(
       success
-        ? homeDirty && trustedDirty
-          ? "Home page and Trusted by saved."
-          : homeDirty
-            ? homeResult.message
-            : trustedResult.message
+        ? `${parts.join(" & ")} saved.`
         : !homeResult.ok
           ? homeResult.message
-          : trustedResult.message,
+          : !chromeResult.ok
+            ? chromeResult.message
+            : trustedResult.message,
     );
     setPending(false);
     if (success) {
       if (homeDirty) setBaseline(sections);
+      if (chromeDirty) setChromeBaseline(chrome);
       if (trustedDirty) setTrustedBaseline(trustedClients);
       router.refresh();
     }
@@ -1082,6 +1097,7 @@ export function HomeVisualEditor({
 
   function discard() {
     setSections(baseline);
+    setChrome(chromeBaseline);
     setTrustedClients(trustedBaseline);
     setTarget(null);
     setMessage("");
@@ -1093,6 +1109,7 @@ export function HomeVisualEditor({
     <>
       <Home2Hero
         {...heroProps}
+        cast={heroCast}
         disableCtaLinks={editing}
         editSlots={
           editing
@@ -1464,8 +1481,15 @@ export function HomeVisualEditor({
         <EditorPopover
           target={target}
           sections={sections}
+          footer={chrome.footer}
           trustedClients={trustedClients}
           onChange={setSections}
+          onFooterChange={(patch) =>
+            setChrome({
+              ...chrome,
+              footer: { ...chrome.footer, ...patch },
+            })
+          }
           onTrustedClientsChange={setTrustedClients}
           onClose={() => setTarget(null)}
         />

@@ -196,6 +196,49 @@ h6.font-display {
   }
 }
 
+/* Home cast — slow drift while a portrait is focused */
+@keyframes cast-drift {
+  from {
+    object-position: center 16%;
+  }
+  to {
+    object-position: center 22%;
+  }
+}
+
+.cast-drift {
+  animation: cast-drift 5.5s cubic-bezier(0.33, 0.1, 0.25, 1) infinite alternate;
+}
+
+@keyframes cast-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.cast-marquee-track {
+  animation: cast-marquee 55s linear infinite;
+  will-change: transform;
+}
+
+.cast-marquee-window:hover .cast-marquee-track,
+.cast-marquee-window:focus-within .cast-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cast-drift {
+    animation: none;
+  }
+
+  .cast-marquee-track {
+    animation: none;
+  }
+}
+
 .animate-delay-1 { animation-delay: 0.12s; }
 .animate-delay-2 { animation-delay: 0.24s; }
 .animate-delay-3 { animation-delay: 0.36s; }

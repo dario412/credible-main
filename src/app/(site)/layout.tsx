@@ -1,19 +1,19 @@
-import { HomeCmsProvider } from "@/components/home-cms-context";
+import { SiteChromeProvider } from "@/components/site-chrome-context";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { getHomePageSections } from "@/lib/actions/admin-cms";
+import { getSiteChrome } from "@/lib/actions/admin-cms";
 
 export default async function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const home = await getHomePageSections();
+  const chrome = await getSiteChrome();
 
   return (
-    <HomeCmsProvider initialFooter={home.footer}>
+    <SiteChromeProvider initialChrome={chrome}>
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter />
-    </HomeCmsProvider>
+    </SiteChromeProvider>
   );
 }

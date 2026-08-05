@@ -1,0 +1,478 @@
+"use client";
+
+import { useState } from "react";
+
+import { Button, Field, TextArea, TextInput } from "@/components/ui";
+import {
+  emptyFooterColumn,
+  emptyNavLink,
+  emptySocialLink,
+  SOCIAL_NETWORKS,
+  type FooterColumn,
+  type NavLink,
+  type SiteChromeSections,
+  type SocialLink,
+  type SocialNetwork,
+} from "@/lib/site-chrome";
+import { cn } from "@/lib/utils";
+
+function MoveButtons({
+  index,
+  total,
+  onMove,
+}: {
+  index: number;
+  total: number;
+  onMove: (from: number, to: number) => void;
+}) {
+  return (
+    <div className="flex gap-1">
+      <button
+        type="button"
+        disabled={index === 0}
+        onClick={() => onMove(index, index - 1)}
+        className="rounded-sm border border-charcoal/15 px-2 py-0.5 text-xs text-charcoal/70 disabled:opacity-30"
+        aria-label="Move up"
+      >
+        ↑
+      </button>
+      <button
+        type="button"
+        disabled={index >= total - 1}
+        onClick={() => onMove(index, index + 1)}
+        className="rounded-sm border border-charcoal/15 px-2 py-0.5 text-xs text-charcoal/70 disabled:opacity-30"
+        aria-label="Move down"
+      >
+        ↓
+      </button>
+    </div>
+  );
+}
+
+function NavLinkRows({
+  links,
+  onChange,
+  idPrefix,
+}: {
+  links: NavLink[];
+  onChange: (links: NavLink[]) => void;
+  idPrefix: string;
+}) {
+  function move(from: number, to: number) {
+    if (to < 0 || to >= links.length) return;
+    const next = [...links];
+    const [item] = next.splice(from, 1);
+    next.splice(to, 0, item);
+    onChange(next);
+  }
+
+  return (
+    <div className="space-y-3">
+      {links.map((link, index) => (
+        <div
+          key={`${idPrefix}-${index}`}
+          className="flex flex-col gap-2 rounded-sm border border-charcoal/10 bg-cream/40 p-3 sm:flex-row sm:items-end"
+        >
+          <div className="flex-1">
+            <Field label="Label" id={`${idPrefix}-label-${index}`}>
+              <TextInput
+                id={`${idPrefix}-label-${index}`}
+                value={link.label}
+                onChange={(e) => {
+                  const next = [...links];
+                  next[index] = { ...link, label: e.target.value };
+                  onChange(next);
+                }}
+              />
+            </Field>
+          </div>
+          <div className="flex-[1.4]">
+            <Field label="URL" id={`${idPrefix}-href-${index}`}>
+              <TextInput
+                id={`${idPrefix}-href-${index}`}
+                value={link.href}
+                onChange={(e) => {
+                  const next = [...links];
+                  next[index] = { ...link, href: e.target.value };
+                  onChange(next);
+                }}
+              />
+            </Field>
+          </div>
+          <div className="flex items-center gap-2 pb-0.5">
+            <MoveButtons index={index} total={links.length} onMove={move} />
+            <button
+              type="button"
+              onClick={() => onChange(links.filter((_, i) => i !== index))}
+              className="text-xs font-medium text-danger hover:underline"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => onChange([...links, emptyNavLink()])}
+        className="text-sm font-medium text-forest hover:text-forest-dark"
+      >
+        + Add link
+      </button>
+    </div>
+  );
+}
+
+export function SiteChromeEditorForm({
+  initial,
+  saveAction,
+}: {
+  initial: SiteChromeSections;
+  saveAction: typeof import("@/lib/actions/admin-cms").saveSiteChrome;
+}) {
+  const [sections, setSections] = useState(initial);
+  const [message, setMessage] = useState("");
+  const [ok, setOk] = useState(false);
+  const [pending, setPending] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setPending(true);
+    const result = await saveAction(sections);
+    setOk(result.ok);
+    setMessage(result.message);
+    setPending(false);
+  }
+
+  function setHeader(header: SiteChromeSections["header"]) {
+    setSections({ ...sections, header });
+  }
+
+  function setFooter(footer: SiteChromeSections["footer"]) {
+    setSections({ ...sections, footer });
+  }
+
+  function moveColumn(from: number, to: number) {
+    const columns = [...sections.footer.columns];
+    if (to < 0 || to >= columns.length) return;
+    const [item] = columns.splice(from, 1);
+    columns.splice(to, 0, item);
+    setFooter({ ...sections.footer, columns });
+  }
+
+  function updateColumn(index: number, column: FooterColumn) {
+    const columns = [...sections.footer.columns];
+    columns[index] = column;
+    setFooter({ ...sections.footer, columns });
+  }
+
+  function updateSocial(index: number, social: SocialLink) {
+    const socials = [...sections.footer.socials];
+    socials[index] = social;
+    setFooter({ ...sections.footer, socials });
+  }
+
+  function moveSocial(from: number, to: number) {
+    const socials = [...sections.footer.socials];
+    if (to < 0 || to >= socials.length) return;
+    const [item] = socials.splice(from, 1);
+    socials.splice(to, 0, item);
+    setFooter({ ...sections.footer, socials });
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-10">
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Header</h2>
+          <p className="mt-1 text-sm text-muted">
+            Primary nav links and the green CTA. Add or remove links as needed.
+          </p>
+        </div>
+        <NavLinkRows
+          idPrefix="nav"
+          links={sections.header.links}
+          onChange={(links) => setHeader({ ...sections.header, links })}
+        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="CTA label" id="cta-label">
+            <TextInput
+              id="cta-label"
+              value={sections.header.ctaLabel}
+              onChange={(e) =>
+                setHeader({ ...sections.header, ctaLabel: e.target.value })
+              }
+              required
+            />
+          </Field>
+          <Field label="CTA URL" id="cta-href">
+            <TextInput
+              id="cta-href"
+              value={sections.header.ctaHref}
+              onChange={(e) =>
+                setHeader({ ...sections.header, ctaHref: e.target.value })
+              }
+              required
+            />
+          </Field>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Footer — intro</h2>
+          <p className="mt-1 text-sm text-muted">
+            Tagline, company line, and contact email shown under the wordmark.
+          </p>
+        </div>
+        <Field label="Tagline" id="ft-tagline">
+          <TextArea
+            id="ft-tagline"
+            rows={2}
+            value={sections.footer.tagline}
+            onChange={(e) =>
+              setFooter({ ...sections.footer, tagline: e.target.value })
+            }
+          />
+        </Field>
+        <Field label="Company line" id="ft-company">
+          <TextInput
+            id="ft-company"
+            value={sections.footer.companyLine}
+            onChange={(e) =>
+              setFooter({ ...sections.footer, companyLine: e.target.value })
+            }
+          />
+        </Field>
+        <Field label="Email" id="ft-email">
+          <TextInput
+            id="ft-email"
+            value={sections.footer.email}
+            onChange={(e) =>
+              setFooter({ ...sections.footer, email: e.target.value })
+            }
+          />
+        </Field>
+        <Field
+          label="Copyright (after year)"
+          id="ft-copyright"
+          hint={`Rendered as “© ${new Date().getFullYear()} …”`}
+        >
+          <TextInput
+            id="ft-copyright"
+            value={sections.footer.copyright}
+            onChange={(e) =>
+              setFooter({ ...sections.footer, copyright: e.target.value })
+            }
+          />
+        </Field>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Footer — social</h2>
+          <p className="mt-1 text-sm text-muted">
+            Pick a network for the icon, then set the label and URL. Add or remove freely.
+          </p>
+        </div>
+        {sections.footer.socials.map((social, index) => (
+          <div
+            key={`social-${index}`}
+            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-medium">Social {index + 1}</p>
+              <div className="flex items-center gap-2">
+                <MoveButtons
+                  index={index}
+                  total={sections.footer.socials.length}
+                  onMove={moveSocial}
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFooter({
+                      ...sections.footer,
+                      socials: sections.footer.socials.filter((_, i) => i !== index),
+                    })
+                  }
+                  className="text-xs font-medium text-danger hover:underline"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <Field label="Network" id={`social-net-${index}`}>
+                <select
+                  id={`social-net-${index}`}
+                  value={social.network}
+                  onChange={(e) => {
+                    const network = e.target.value as SocialNetwork;
+                    const preset = SOCIAL_NETWORKS.find((n) => n.value === network);
+                    updateSocial(index, {
+                      ...social,
+                      network,
+                      label: preset?.label ?? social.label,
+                    });
+                  }}
+                  className="w-full rounded-sm border border-charcoal/15 bg-white px-3 py-2 text-sm"
+                >
+                  {SOCIAL_NETWORKS.map((n) => (
+                    <option key={n.value} value={n.value}>
+                      {n.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Label" id={`social-label-${index}`}>
+                <TextInput
+                  id={`social-label-${index}`}
+                  value={social.label}
+                  onChange={(e) =>
+                    updateSocial(index, { ...social, label: e.target.value })
+                  }
+                />
+              </Field>
+              <Field label="URL" id={`social-href-${index}`}>
+                <TextInput
+                  id={`social-href-${index}`}
+                  value={social.href}
+                  onChange={(e) =>
+                    updateSocial(index, { ...social, href: e.target.value })
+                  }
+                />
+              </Field>
+            </div>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setFooter({
+              ...sections.footer,
+              socials: [...sections.footer.socials, emptySocialLink()],
+            })
+          }
+          className="text-sm font-medium text-forest hover:text-forest-dark"
+        >
+          + Add social link
+        </button>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Footer — link columns</h2>
+          <p className="mt-1 text-sm text-muted">
+            Each column is a list of links. Add or remove columns and links independently
+            (titles are for your organization in admin; the live footer shows the links).
+          </p>
+        </div>
+        {sections.footer.columns.map((column, columnIndex) => (
+          <div
+            key={`col-${columnIndex}`}
+            className="space-y-4 rounded-sm border border-charcoal/10 p-4"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="min-w-[12rem] flex-1">
+                <Field
+                  label={`Column ${columnIndex + 1} title`}
+                  id={`col-title-${columnIndex}`}
+                >
+                  <TextInput
+                    id={`col-title-${columnIndex}`}
+                    value={column.title}
+                    onChange={(e) =>
+                      updateColumn(columnIndex, {
+                        ...column,
+                        title: e.target.value,
+                      })
+                    }
+                  />
+                </Field>
+              </div>
+              <div className="flex items-center gap-2">
+                <MoveButtons
+                  index={columnIndex}
+                  total={sections.footer.columns.length}
+                  onMove={moveColumn}
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setFooter({
+                      ...sections.footer,
+                      columns: sections.footer.columns.filter(
+                        (_, i) => i !== columnIndex,
+                      ),
+                    })
+                  }
+                  className="text-xs font-medium text-danger hover:underline"
+                >
+                  Remove column
+                </button>
+              </div>
+            </div>
+            <NavLinkRows
+              idPrefix={`col-${columnIndex}`}
+              links={column.links}
+              onChange={(links) =>
+                updateColumn(columnIndex, { ...column, links })
+              }
+            />
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setFooter({
+              ...sections.footer,
+              columns: [...sections.footer.columns, emptyFooterColumn()],
+            })
+          }
+          className="text-sm font-medium text-forest hover:text-forest-dark"
+        >
+          + Add column
+        </button>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Footer — legal links</h2>
+          <p className="mt-1 text-sm text-muted">
+            Bottom-bar links next to the copyright line.
+          </p>
+        </div>
+        <NavLinkRows
+          idPrefix="legal"
+          links={sections.footer.legalLinks}
+          onChange={(legalLinks) =>
+            setFooter({ ...sections.footer, legalLinks })
+          }
+        />
+      </section>
+
+      <div
+        className={cn(
+          "sticky bottom-4 z-10 flex flex-wrap items-center gap-3 rounded-sm border border-charcoal/10 bg-white/95 px-4 py-3 shadow-[0_10px_30px_rgba(28,26,23,0.08)] backdrop-blur",
+        )}
+      >
+        <Button type="submit" variant="primary" disabled={pending}>
+          {pending ? "Saving…" : "Save header & footer"}
+        </Button>
+        <a
+          href="/"
+          target="_blank"
+          rel="noreferrer"
+          className="text-sm font-medium text-charcoal/60 hover:text-charcoal"
+        >
+          View site ↗
+        </a>
+        {message ? (
+          <p className={`text-sm ${ok ? "text-success" : "text-danger"}`}>
+            {message}
+          </p>
+        ) : null}
+      </div>
+    </form>
+  );
+}

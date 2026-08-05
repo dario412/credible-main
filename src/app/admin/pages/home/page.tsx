@@ -35,6 +35,13 @@ export default async function AdminHomePageEditor() {
           <a href="/" className="font-medium text-forest hover:text-forest-dark">
             Edit page
           </a>
+          . Header, footer, and nav live under{" "}
+          <a
+            href="/admin/pages/site"
+            className="font-medium text-forest hover:text-forest-dark"
+          >
+            Header & footer
+          </a>
           . Client logos are managed in{" "}
           <a
             href="/admin/trusted-by"

@@ -20,6 +20,10 @@ import {
 } from "@/lib/insight-content";
 import { hasPermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
+import {
+  mergeSiteChrome,
+  type SiteChromeSections,
+} from "@/lib/site-chrome";
 
 async function requireContentEditor() {
   const session = await auth();
@@ -215,4 +219,56 @@ export async function saveHomePage(sections: HomePageSections) {
 export async function getHomePageSections(): Promise<HomePageSections> {
   const page = await prisma.pageContent.findUnique({ where: { slug: "home" } });
   return mergeHomeSections(page?.sections);
+}
+
+export async function getSiteChrome(): Promise<SiteChromeSections> {
+  const page = await prisma.pageContent.findUnique({ where: { slug: "site" } });
+  if (page?.sections) {
+    return mergeSiteChrome(page.sections);
+  }
+
+  // Migrate tagline / company / email from older home-page footer CMS if present.
+  const home = await prisma.pageContent.findUnique({ where: { slug: "home" } });
+  const homeSections =
+    home?.sections && typeof home.sections === "object"
+      ? (home.sections as { footer?: Record<string, unknown> })
+      : null;
+  const legacyFooter = homeSections?.footer;
+
+  if (legacyFooter && typeof legacyFooter === "object") {
+    return mergeSiteChrome({
+      footer: {
+        tagline: legacyFooter.tagline,
+        companyLine: legacyFooter.companyLine,
+        email: legacyFooter.email,
+      },
+    });
+  }
+
+  return mergeSiteChrome(null);
+}
+
+export async function saveSiteChrome(sections: SiteChromeSections) {
+  const session = await requireContentEditor();
+  if (!session) return { ok: false as const, message: "Unauthorized" };
+
+  const merged = mergeSiteChrome(sections);
+
+  await prisma.pageContent.upsert({
+    where: { slug: "site" },
+    create: {
+      slug: "site",
+      title: "Header & footer",
+      sections: merged,
+    },
+    update: {
+      title: "Header & footer",
+      sections: merged,
+    },
+  });
+
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/pages");
+  revalidatePath("/admin/pages/site");
+  return { ok: true as const, message: "Header & footer saved." };
 }

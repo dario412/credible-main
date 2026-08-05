@@ -532,39 +532,15 @@ export function HomePageEditorForm({
         </Field>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="font-display text-xl">Footer</h2>
-        <Field label="Tagline" id="ft-tagline">
-          <TextArea
-            id="ft-tagline"
-            rows={2}
-            value={sections.footer.tagline}
-            onChange={(e) =>
-              patch("footer", { ...sections.footer, tagline: e.target.value })
-            }
-          />
-        </Field>
-        <Field label="Company line" id="ft-company">
-          <TextInput
-            id="ft-company"
-            value={sections.footer.companyLine}
-            onChange={(e) =>
-              patch("footer", {
-                ...sections.footer,
-                companyLine: e.target.value,
-              })
-            }
-          />
-        </Field>
-        <Field label="Email" id="ft-email">
-          <TextInput
-            id="ft-email"
-            value={sections.footer.email}
-            onChange={(e) =>
-              patch("footer", { ...sections.footer, email: e.target.value })
-            }
-          />
-        </Field>
+      <section className="rounded-sm border border-charcoal/10 bg-cream/50 px-4 py-4 text-sm text-muted">
+        Header, footer copy, nav links, socials, and columns are edited in{" "}
+        <a
+          href="/admin/pages/site"
+          className="font-medium text-forest hover:text-forest-dark"
+        >
+          Header & footer
+        </a>
+        .
       </section>
 
       <div

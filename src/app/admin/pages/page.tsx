@@ -16,7 +16,13 @@ const pages = [
     slug: "home",
     title: "Home",
     description:
-      "Hero, ways in, roster, impact stats, case study, brief, and footer. Logos live under Trusted by.",
+      "Hero, ways in, roster, impact stats, case study, and brief. Logos live under Trusted by.",
+  },
+  {
+    slug: "site",
+    title: "Header & footer",
+    description:
+      "Nav links, Send brief CTA, footer copy, socials, link columns, and legal links — used site-wide.",
   },
   {
     slug: "about",
