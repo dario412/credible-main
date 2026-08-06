@@ -35,6 +35,11 @@ const nav = [
     permission: "MANAGE_CONTENT" as const,
   },
   {
+    href: "/admin/roster",
+    label: "Roster",
+    permission: "MANAGE_CONTENT" as const,
+  },
+  {
     href: "/admin/pages",
     label: "Pages",
     permission: "MANAGE_CONTENT" as const,

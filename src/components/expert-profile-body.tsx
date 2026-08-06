@@ -290,12 +290,16 @@ function TopicsAndAudience({
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-4 md:mt-12 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-5">
         <TopicMixPie topics={topicShares} className="sm:col-span-2 lg:col-span-1" />
-        <AudienceShareList title="Audience" items={audience.seniority} />
-        <AudienceShareList
-          title="Best for"
-          items={audience.industry}
-          delay={120}
-        />
+        {audience.seniority.length > 0 ? (
+          <AudienceShareList title="Audience" items={audience.seniority} />
+        ) : null}
+        {audience.industry.length > 0 ? (
+          <AudienceShareList
+            title="Best for"
+            items={audience.industry}
+            delay={120}
+          />
+        ) : null}
       </div>
     </section>
   );

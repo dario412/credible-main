@@ -7,11 +7,22 @@ import {
 import { ExpertProfileShell } from "@/components/expert-profile-hero";
 import { ExpertProfileStageHero } from "@/components/expert-profile-stage-hero";
 import type { RosterCardExpert } from "@/components/roster-card";
+import {
+  brandsWithLogos,
+  withResolvedLogos,
+  type TrustedBrand,
+} from "@/lib/brand-logos";
+import type { AirtableProfileSections } from "@/lib/airtable/map-profile-sections";
 import { parseExpertChannels } from "@/lib/expert-channels";
 import {
   getExpertProfileEnrichment,
   isLinkedInTopVoice,
+  type ExpertAudience,
+  type ExpertChannelPresence,
+  type ExpertFormatOffering,
+  type ExpertProfileEnrichment,
   type ExpertProfileStat,
+  type ExpertTopicShare,
 } from "@/lib/expert-profiles";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
@@ -19,6 +30,68 @@ import { createMetadata } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
+
+type ProfileExtras = {
+  nameFirst?: string | null;
+  bannerImage?: string | null;
+  highlight2?: string | null;
+  highlight3?: string | null;
+  exclusive?: boolean;
+  quote?: string | null;
+  quoteSource?: string | null;
+  brandPartnershipsCopy?: string | null;
+  trustedBy?: TrustedBrand[];
+  profileSections?: AirtableProfileSections;
+};
+
+function parseProfileExtras(value: unknown): ProfileExtras {
+  if (!value || typeof value !== "object") return {};
+  return value as ProfileExtras;
+}
+
+/** Prefer Airtable section data when present; fall back to hardcoded enrichment. */
+function mergeProfileContent(
+  extras: ProfileExtras,
+  enrichment: ExpertProfileEnrichment,
+): {
+  quote?: string;
+  quoteAttribution?: string;
+  channels?: ExpertChannelPresence[];
+  topicShares?: ExpertTopicShare[];
+  audience?: ExpertAudience;
+  formats?: ExpertFormatOffering[];
+  linkedinTopVoice: boolean;
+} {
+  const sections = extras.profileSections;
+  const channels =
+    sections?.channels?.length ? sections.channels : enrichment.channels;
+  const topicShares =
+    sections?.topicShares?.length
+      ? sections.topicShares
+      : enrichment.topicShares;
+  const audience = sections?.audience ?? enrichment.audience;
+  const formats =
+    sections?.formats?.length ? sections.formats : enrichment.formats;
+  const quote =
+    sections?.quote ?? extras.quote ?? enrichment.quote ?? undefined;
+  const quoteAttribution =
+    sections?.quoteAttribution ??
+    extras.quoteSource ??
+    enrichment.quoteAttribution ??
+    undefined;
+
+  return {
+    quote: quote ?? undefined,
+    quoteAttribution: quoteAttribution ?? undefined,
+    channels,
+    topicShares,
+    audience,
+    formats,
+    linkedinTopVoice:
+      Boolean(sections?.linkedinTopVoice) ||
+      Boolean(enrichment.linkedinTopVoice),
+  };
+}
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
@@ -40,6 +113,7 @@ function buildStats(
     combinedReach: string | null;
     growth90d: string | null;
   },
+  extras: ProfileExtras,
   enrichmentStats?: ExpertProfileStat[],
 ): ExpertProfileStat[] {
   if (enrichmentStats?.length) return enrichmentStats;
@@ -47,6 +121,22 @@ function buildStats(
   const stats: ExpertProfileStat[] = [];
   if (expert.combinedReach) {
     stats.push({ label: "Combined reach", value: expert.combinedReach });
+  }
+  if (extras.highlight2) {
+    const value = extras.highlight2.replace(/\s+/g, " ").trim();
+    const metric = value.match(/^([+-]?[\d.,]+\s*[KkMmBb%+]*)/);
+    stats.push({
+      label: value.replace(metric?.[1] ?? "", "").trim() || "Highlight",
+      value: (metric?.[1] ?? value).replace(/\s+/g, ""),
+    });
+  }
+  if (extras.highlight3) {
+    const value = extras.highlight3.replace(/\s+/g, " ").trim();
+    const metric = value.match(/^([+-]?[\d.,]+\s*[KkMmBb%+]*)/);
+    stats.push({
+      label: value.replace(metric?.[1] ?? "", "").trim() || "Highlight",
+      value: (metric?.[1] ?? value).replace(/\s+/g, ""),
+    });
   }
   if (expert.growth90d) {
     stats.push({
@@ -56,6 +146,18 @@ function buildStats(
     });
   }
   return stats;
+}
+
+function resolveTrustedBy(
+  extras: ProfileExtras,
+  enrichmentTrustedBy?: TrustedBrand[],
+): TrustedBrand[] {
+  const fromAirtable = withResolvedLogos(extras.trustedBy ?? []);
+  const fromEnrichment = withResolvedLogos(enrichmentTrustedBy ?? []);
+  // Prefer Airtable orgs when present; otherwise enrichment fallback
+  const merged =
+    brandsWithLogos(fromAirtable).length > 0 ? fromAirtable : fromEnrichment;
+  return brandsWithLogos(merged);
 }
 
 function toRosterCard(expert: {
@@ -95,7 +197,10 @@ export default async function ExpertPage({ params }: Props) {
   if (!expert) notFound();
 
   const enrichment = getExpertProfileEnrichment(expert.slug);
+  const extras = parseProfileExtras(expert.profileExtras);
+  const content = mergeProfileContent(extras, enrichment);
   const primaryCategory = expert.categories[0];
+  const trustedBy = resolveTrustedBy(extras, enrichment.trustedBy);
 
   const similarPool = await prisma.expert.findMany({
     where: { slug: { not: expert.slug } },
@@ -128,7 +233,11 @@ export default async function ExpertPage({ params }: Props) {
     .slice(0, 3)
     .map(toRosterCard);
 
-  const heroStats = buildStats(expert, enrichment.stats);
+  const heroStats = buildStats(expert, extras, enrichment.stats);
+  const heroProof =
+    enrichment.heroProof ??
+    ([expert.shortBio, expert.categories[0]].filter(Boolean).join(" · ") ||
+      expert.title);
 
   return (
     <>
@@ -138,39 +247,14 @@ export default async function ExpertPage({ params }: Props) {
         title={expert.title}
         archetype={expert.categories[0] ?? null}
         based={enrichment.based}
-        stageImage={enrichment.stageImage}
+        stageImage={
+          enrichment.stageImage ?? extras.bannerImage ?? undefined
+        }
         stageImagePosition={enrichment.stageImagePosition}
         portraitImage={expert.image}
-        heroProof={enrichment.heroProof}
-        trustedBy={enrichment.trustedBy}
+        heroProof={heroProof}
+        trustedBy={trustedBy}
         stats={heroStats}
-      />
-
-      {/* Client review: new-creator hero without Trusted by logos */}
-      <div className="bg-cream px-6 py-5 md:px-10 lg:px-12">
-        <div className="mx-auto max-w-352">
-          <p className="text-[0.65rem] font-medium tracking-[0.14em] text-charcoal/40 uppercase">
-            Layout option · New creator (no Trusted by)
-          </p>
-          <p className="mt-1.5 max-w-xl text-[0.875rem] leading-relaxed text-charcoal/50">
-            Same hero — name, proof, brief CTA, and stats — without the logo
-            strip, for creators who do not have brand clients yet.
-          </p>
-        </div>
-      </div>
-      <ExpertProfileStageHero
-        slug={expert.slug}
-        name={expert.name}
-        title={expert.title}
-        archetype={expert.categories[0] ?? null}
-        based={enrichment.based}
-        stageImage={enrichment.stageImage}
-        stageImagePosition={enrichment.stageImagePosition}
-        portraitImage={expert.image}
-        heroProof={enrichment.heroProof}
-        trustedBy={[]}
-        stats={heroStats}
-        preview
       />
 
       <ExpertProfileShell
@@ -182,17 +266,20 @@ export default async function ExpertPage({ params }: Props) {
         topics={expert.topics ?? []}
         based={enrichment.based}
         languages={enrichment.languages}
-        representationStatus={enrichment.representationStatus}
+        representationStatus={
+          enrichment.representationStatus ??
+          (extras.exclusive ? "SIGNED" : "AVAILABLE")
+        }
         stats={heroStats}
         nav={[
           { href: "#overview", label: "Overview" },
-          ...(enrichment.channels?.length
+          ...(content.channels?.length
             ? [{ href: "#channels", label: "Channels" }]
             : []),
-          ...(enrichment.topicShares?.length && enrichment.audience
+          ...(content.topicShares?.length && content.audience
             ? [{ href: "#topics", label: "Topics & audience" }]
             : []),
-          ...(enrichment.formats?.length
+          ...(content.formats?.length
             ? [{ href: "#formats", label: "Formats" }]
             : []),
           ...(enrichment.recentWork?.length
@@ -203,12 +290,12 @@ export default async function ExpertPage({ params }: Props) {
         <ExpertProfileMain
           name={expert.name}
           bio={expert.bio}
-          quote={enrichment.quote}
-          quoteAttribution={enrichment.quoteAttribution}
-          channels={enrichment.channels}
-          topicShares={enrichment.topicShares}
-          audience={enrichment.audience}
-          formats={enrichment.formats}
+          quote={content.quote}
+          quoteAttribution={content.quoteAttribution}
+          channels={content.channels}
+          topicShares={content.topicShares}
+          audience={content.audience}
+          formats={content.formats}
           recentWork={enrichment.recentWork}
         />
       </ExpertProfileShell>
@@ -218,7 +305,10 @@ export default async function ExpertPage({ params }: Props) {
         slug={expert.slug}
         similar={similarSorted}
         backgroundImage={
-          enrichment.ctaImage ?? enrichment.stageImage ?? expert.image
+          enrichment.ctaImage ??
+          enrichment.stageImage ??
+          extras.bannerImage ??
+          expert.image
         }
       />
     </>

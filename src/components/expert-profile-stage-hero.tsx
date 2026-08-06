@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { ExpertHeroStats } from "@/components/expert-hero-stats";
+import { brandsWithLogos } from "@/lib/brand-logos";
 import { firstName, type ExpertProfileStat } from "@/lib/expert-profiles";
 import { cn } from "@/lib/utils";
 
@@ -18,8 +19,6 @@ export function ExpertProfileStageHero({
   heroProof,
   trustedBy = [],
   stats,
-  /** Client-review variant: no under-nav overlap; hides Trusted by. */
-  preview = false,
 }: {
   slug: string;
   name: string;
@@ -32,30 +31,34 @@ export function ExpertProfileStageHero({
   heroProof?: string;
   trustedBy?: { name: string; logo?: string }[];
   stats: ExpertProfileStat[];
-  preview?: boolean;
 }) {
   const first = firstName(name);
   const cover = stageImage ?? portraitImage ?? "/images/case-studies/notion.jpg";
   const proof =
     heroProof ??
     [title, archetype, based].filter(Boolean).join(" · ");
-  const showTrustedBy = !preview && trustedBy.length > 0;
+
+  // Tall Trusted-by hero only when we have real logos; otherwise compact new-creator layout
+  const logoBrands = brandsWithLogos(trustedBy);
+  const showTrustedBy = logoBrands.length > 0;
 
   return (
     <section
       className={cn(
         "relative isolate w-full overflow-hidden",
-        preview
-          ? "min-h-[min(72vh,40rem)] md:min-h-[min(76vh,44rem)]"
-          : "min-h-[min(88vh,48rem)] -mt-[7.25rem] md:min-h-[min(90vh,52rem)] md:-mt-[5.5rem]",
+        showTrustedBy
+          ? "min-h-[min(88vh,48rem)] -mt-[7.25rem] md:min-h-[min(90vh,52rem)] md:-mt-[5.5rem]"
+          : "min-h-[min(72vh,40rem)] md:min-h-[min(76vh,44rem)]",
       )}
-      aria-label={preview ? "Hero layout without Trusted by" : undefined}
+      aria-label={
+        showTrustedBy ? undefined : "Creator profile hero without Trusted by"
+      }
     >
       <Image
         src={cover}
         alt=""
         fill
-        priority={!preview}
+        priority
         sizes="100vw"
         className="object-cover"
         style={
@@ -76,9 +79,9 @@ export function ExpertProfileStageHero({
       <div
         className={cn(
           "relative flex flex-col px-6 pb-12 md:px-10 md:pb-14 lg:px-12 lg:pb-16",
-          preview
-            ? "min-h-[min(72vh,40rem)] pt-16 md:min-h-[min(76vh,44rem)] md:pt-20"
-            : "min-h-[min(88vh,48rem)] pt-48 md:min-h-[min(90vh,52rem)] md:pt-56",
+          showTrustedBy
+            ? "min-h-[min(88vh,48rem)] pt-48 md:min-h-[min(90vh,52rem)] md:pt-56"
+            : "min-h-[min(72vh,40rem)] pt-16 md:min-h-[min(76vh,44rem)] md:pt-20",
         )}
       >
         <div
@@ -89,15 +92,9 @@ export function ExpertProfileStageHero({
         >
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-16">
             <div className="max-w-3xl">
-              {preview ? (
-                <p className="max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:text-[4.5rem] lg:text-[5rem]">
-                  {name}.
-                </p>
-              ) : (
-                <h1 className="max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:text-[4.5rem] lg:text-[5rem]">
-                  {name}.
-                </h1>
-              )}
+              <h1 className="max-w-[12ch] font-display text-[3rem] leading-[1.02] tracking-tight text-cream drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] sm:text-[3.75rem] md:text-[4.5rem] lg:text-[5rem]">
+                {name}.
+              </h1>
 
               <p className="mt-5 max-w-xl text-[1.1rem] leading-relaxed text-cream/90 md:mt-6 md:text-[1.2rem]">
                 {proof}
@@ -127,19 +124,13 @@ export function ExpertProfileStageHero({
                 Trusted by
               </p>
               <ul className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-5 md:gap-x-8">
-                {trustedBy.map((brand) => (
+                {logoBrands.map((brand) => (
                   <li key={brand.name} className="flex h-6 items-center md:h-7">
-                    {brand.logo ? (
-                      <img
-                        src={brand.logo}
-                        alt={brand.name}
-                        className="h-5 w-auto object-contain brightness-0 invert md:h-6"
-                      />
-                    ) : (
-                      <span className="font-display text-[1.15rem] tracking-tight text-cream md:text-[1.3rem]">
-                        {brand.name}
-                      </span>
-                    )}
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="h-5 w-auto object-contain brightness-0 invert md:h-6"
+                    />
                   </li>
                 ))}
               </ul>

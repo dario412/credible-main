@@ -43,6 +43,13 @@ const icons: Record<string, React.ReactNode> = {
       <path d="M2.5 10.5 6 7.5l2.2 2 2-2.5 3.3 3.5" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round" />
     </svg>
   ),
+  "/admin/roster": (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <circle cx="5.5" cy="5" r="2" stroke="currentColor" strokeWidth="1.25" />
+      <circle cx="10.5" cy="5" r="2" stroke="currentColor" strokeWidth="1.25" />
+      <path d="M2.5 13c.5-2 1.8-3 3-3s2.5 1 3 3M7.5 13c.5-2 1.8-3 3-3s2.5 1 3 3" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+    </svg>
+  ),
   "/admin/pages": (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
       <path d="M4 2.5h5.5L12 5v8.5H4z" stroke="currentColor" strokeWidth="1.25" />

@@ -1,0 +1,377 @@
+import type {
+  ExpertAudience,
+  ExpertChannelPresence,
+  ExpertFormatChannel,
+  ExpertFormatOffering,
+  ExpertTopicShare,
+} from "@/lib/expert-profiles";
+import type { AirtableRecord } from "./client";
+
+function field(fields: Record<string, unknown>, ...aliases: string[]): unknown {
+  const byNorm = new Map(
+    Object.entries(fields).map(([k, v]) => [
+      k.replace(/\uFEFF/g, "").trim().toLowerCase(),
+      v,
+    ]),
+  );
+  for (const alias of aliases) {
+    const hit = byNorm.get(alias.replace(/\uFEFF/g, "").trim().toLowerCase());
+    if (hit !== undefined && hit !== null && hit !== "") return hit;
+  }
+  return undefined;
+}
+
+function asString(value: unknown): string | null {
+  if (typeof value === "string" && value.trim()) return value.trim();
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const s = asString(item);
+      if (s) return s;
+    }
+  }
+  return null;
+}
+
+function asNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim()) {
+    const n = Number(value.replace(/,/g, ""));
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+function firstUrl(value: unknown): string | null {
+  const s = asString(value);
+  if (s && /^https?:\/\//i.test(s)) return s;
+  return null;
+}
+
+function formatFollowers(count: number | null): string | null {
+  if (count == null || count <= 0) return null;
+  if (count >= 1_000_000) {
+    const m = count / 1_000_000;
+    return `${m >= 10 ? Math.round(m) : m.toFixed(1).replace(/\.0$/, "")}M`;
+  }
+  if (count >= 1_000) {
+    const k = count / 1_000;
+    return `${k >= 100 ? Math.round(k) : k.toFixed(k >= 10 ? 0 : 1).replace(/\.0$/, "")}k`;
+  }
+  return String(count);
+}
+
+function handleFromUrl(url: string, platform: string): string {
+  try {
+    const u = new URL(url);
+    const parts = u.pathname.split("/").filter(Boolean);
+    const last = parts[parts.length - 1] ?? "";
+    if (!last) return platform;
+    if (last.startsWith("@")) return last;
+    if (platform === "LinkedIn" && parts[0] === "in") return `@${last}`;
+    if (platform === "YouTube" && last.startsWith("@")) return last;
+    if (["X / Twitter", "Instagram", "TikTok"].includes(platform)) {
+      return last.startsWith("@") ? last : `@${last}`;
+    }
+    return last.replace(/[-_]/g, " ");
+  } catch {
+    return platform;
+  }
+}
+
+function splitLines(value: unknown): string[] {
+  const raw = asString(value);
+  if (!raw) return [];
+  return raw
+    .split(/[\n\r]+|•|\u2022|,|;/)
+    .map((part) => part.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+}
+
+function splitQuote(raw: string | null): {
+  quote: string | null;
+  attribution: string | null;
+} {
+  if (!raw) return { quote: null, attribution: null };
+  const fromMatch = raw.match(/^(.*?)\s+(from\s+.+)$/i);
+  if (fromMatch) {
+    return {
+      quote: fromMatch[1]!.trim().replace(/^["“]|["”]$/g, ""),
+      attribution: fromMatch[2]!.trim(),
+    };
+  }
+  return { quote: raw.replace(/^["“]|["”]$/g, ""), attribution: null };
+}
+
+export type AirtableProfileSections = {
+  quote: string | null;
+  quoteAttribution: string | null;
+  channels: ExpertChannelPresence[];
+  topicShares: ExpertTopicShare[];
+  audience: ExpertAudience | null;
+  formats: ExpertFormatOffering[];
+  linkedinTopVoice: boolean;
+};
+
+function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[] {
+  const defs: Array<{
+    icon: ExpertChannelPresence["icon"];
+    platform: string;
+    urlAliases: string[];
+    followerAliases: string[];
+  }> = [
+    {
+      icon: "linkedin",
+      platform: "LinkedIn",
+      urlAliases: ["Channel | LinkedIn | URL", "LinkedIn"],
+      followerAliases: ["Channel | LinkedIn | Followers"],
+    },
+    {
+      icon: "youtube",
+      platform: "YouTube",
+      urlAliases: ["Channel | YouTube | URL", "YouTube"],
+      followerAliases: ["Channel | YouTube | Followers"],
+    },
+    {
+      icon: "x",
+      platform: "X / Twitter",
+      urlAliases: ["Channel | x.com | URL", "X", "Twitter"],
+      followerAliases: ["Channel | x.com | Followers"],
+    },
+    {
+      icon: "newsletter",
+      platform: "Newsletter",
+      urlAliases: ["Channel | Newsletter | URL"],
+      followerAliases: ["Channel | Newsletter | Followers"],
+    },
+    {
+      icon: "podcast",
+      platform: "Podcast",
+      urlAliases: ["Channel | Podcast | URL", "Podcast"],
+      followerAliases: ["Channel | Podcast | Followers"],
+    },
+  ];
+
+  // Instagram / TikTok use same icon set loosely via x or youtube — map as x for IG? 
+  // ExpertChannelPresence icons are limited — skip IG/TikTok or map to youtube/x
+  const extra: typeof defs = [
+    {
+      icon: "youtube",
+      platform: "TikTok",
+      urlAliases: ["Channel | TikTok | URL", "TikTok"],
+      followerAliases: ["Channel | TikTok | Followers"],
+    },
+    {
+      icon: "x",
+      platform: "Instagram",
+      urlAliases: ["Channel | Instagram | URL", "Instagram"],
+      followerAliases: ["Channel | Instagram | Followers"],
+    },
+  ];
+
+  const channels: ExpertChannelPresence[] = [];
+  for (const def of [...defs, ...extra]) {
+    const url = firstUrl(field(fields, ...def.urlAliases));
+    const followers = formatFollowers(
+      asNumber(field(fields, ...def.followerAliases)),
+    );
+    if (!url && !followers) continue;
+    channels.push({
+      icon: def.icon,
+      platform: def.platform,
+      handle: url ? handleFromUrl(url, def.platform) : def.platform,
+      followers: followers ?? "—",
+      growth90d: "—",
+      engagement: "—",
+      url: url ?? undefined,
+    });
+  }
+  return channels;
+}
+
+function buildTopicShares(fields: Record<string, unknown>): ExpertTopicShare[] {
+  const themes = splitLines(
+    field(fields, "Creator | Profile | Key themes", "Key themes", "Topics"),
+  ).slice(0, 6);
+  if (themes.length === 0) return [];
+  const weights = [32, 22, 16, 12, 10, 8].slice(0, themes.length);
+  const sum = weights.reduce((a, b) => a + b, 0);
+  return themes.map((label, i) => ({
+    label,
+    percent: Math.round(((weights[i] ?? 8) / sum) * 100),
+  }));
+}
+
+function buildAudience(fields: Record<string, unknown>): ExpertAudience | null {
+  const raw = asString(
+    field(fields, "Creator | Profile | Audience", "Audience"),
+  );
+  if (!raw) return null;
+  const parts = splitLines(raw).slice(0, 6);
+  if (parts.length === 0) return null;
+  const weight = Math.floor(100 / parts.length);
+  const seniority = parts.map((label, i) => ({
+    label,
+    percent: i === parts.length - 1 ? 100 - weight * (parts.length - 1) : weight,
+  }));
+  return { seniority, industry: [], geography: [] };
+}
+
+function ratePositive(fields: Record<string, unknown>, ...aliases: string[]) {
+  const n = asNumber(field(fields, ...aliases));
+  return n != null && n > 0;
+}
+
+function buildBrandPartnershipChannels(
+  fields: Record<string, unknown>,
+): ExpertFormatChannel[] {
+  const rows: ExpertFormatChannel[] = [];
+
+  const linkedin: string[] = [];
+  if (ratePositive(fields, "Creator | Rate | LinkedIn Video Post | Gross", "Creator | Rate | LinkedIn Video Post | Internal")) {
+    linkedin.push("Video Post");
+  }
+  if (ratePositive(fields, "Creator | Rate | LinkedIn Image Post | Gross", "Creator | Rate | LinkedIn Image Post | Internal")) {
+    linkedin.push("Image Post");
+  }
+  if (linkedin.length) rows.push({ channel: "LinkedIn", formats: linkedin });
+
+  const xFormats: string[] = [];
+  if (ratePositive(fields, "Creator | Rate | x.com post | Gross", "Creator | Rate | x.com post | Internal")) {
+    xFormats.push("Post");
+  }
+  if (xFormats.length) rows.push({ channel: "X", formats: xFormats });
+
+  const ig: string[] = [];
+  if (ratePositive(fields, "Creator | Rate | Instagram Static Post | Gross", "Creator | Rate | Instagram Static Post | Internal")) {
+    ig.push("Static Post");
+  }
+  if (ratePositive(fields, "Creator | Rate | Instagram Reel | Gross", "Creator | Rate | Instagram Reel | Internal")) {
+    ig.push("Reel");
+  }
+  if (ratePositive(fields, "Creator | Rate | Instagram Story Set | Gross", "Creator | Rate | Instagram Story Set | Internal")) {
+    ig.push("Story");
+  }
+  if (ig.length) rows.push({ channel: "Instagram", formats: ig });
+
+  const tiktok: string[] = [];
+  if (ratePositive(fields, "Creator | Rate | TikTok video | Gross", "Creator | Rate | TikTok video | Internal")) {
+    tiktok.push("Video");
+  }
+  if (tiktok.length) rows.push({ channel: "TikTok", formats: tiktok });
+
+  const newsletter: string[] = [];
+  if (ratePositive(fields, "Creator | Rate | Owned newsletter dedicated | Gross", "Creator | Rate | Owned newsletter dedicated | Internal")) {
+    newsletter.push("Dedicated Send");
+  }
+  if (ratePositive(fields, "Creator | Rate | Owned newsletter mention | Gross", "Creator | Rate | Owned newsletter mention | Internal")) {
+    newsletter.push("Brand Feature");
+  }
+  if (newsletter.length) rows.push({ channel: "Newsletter", formats: newsletter });
+
+  const youtube: string[] = [];
+  if (ratePositive(fields, "Creator | Rate | YouTube video | Gross", "Creator | Rate | YouTube video | Internal")) {
+    youtube.push("Video");
+  }
+  if (ratePositive(fields, "Creator | Rate | YouTube short | Gross", "Creator | Rate | YouTube short | Internal")) {
+    youtube.push("Short");
+  }
+  if (youtube.length) rows.push({ channel: "YouTube", formats: youtube });
+
+  return rows;
+}
+
+function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
+  const formats: ExpertFormatOffering[] = [];
+  const brandCopy = asString(
+    field(
+      fields,
+      "Creator | Website | Brand partnerships",
+      "Brand partnerships copy",
+    ),
+  );
+  const brandChannels = buildBrandPartnershipChannels(fields);
+  if (brandCopy || brandChannels.length > 0) {
+    formats.push({
+      category: "01",
+      title: "Brand partnerships",
+      description:
+        brandCopy ??
+        "Hosted or co-produced brand integrations across the channels this creator already owns.",
+      channels: brandChannels.length ? brandChannels : undefined,
+      formats: brandChannels.length ? undefined : ["Sponsored content"],
+    });
+  }
+
+  const speakingCopy = asString(
+    field(fields, "Creator | Website | Speaking copy", "Speaking copy"),
+  );
+  const keynote = field(fields, "Creator | Profile | Keynote Speaking") === true;
+  if (speakingCopy || keynote) {
+    formats.push({
+      category: String(formats.length + 1).padStart(2, "0"),
+      title: "Speaking",
+      description:
+        speakingCopy ??
+        "Keynotes, firesides and executive briefings tailored to the brief.",
+      formats: [
+        "In-Person Keynote",
+        "Virtual Keynote / Webinar",
+        "Podcast Guest",
+        "Fireside Chat",
+      ],
+    });
+  }
+
+  const liveCopy = asString(
+    field(fields, "Creator | Website | Live events copy", "Live events copy"),
+  );
+  if (liveCopy) {
+    formats.push({
+      category: String(formats.length + 1).padStart(2, "0"),
+      title: "Live events",
+      description: liveCopy,
+      formats: ["Panel", "Retreat / Summit", "Roundtable"],
+    });
+  }
+
+  const ambassadorCopy = asString(
+    field(
+      fields,
+      "Creator | Website | Ambassador program copy",
+      "Ambassador program copy",
+    ),
+  );
+  if (ambassadorCopy) {
+    formats.push({
+      category: String(formats.length + 1).padStart(2, "0"),
+      title: "Ambassador program",
+      description: ambassadorCopy,
+      formats: ["Brand Ambassador", "Category Ambassador"],
+    });
+  }
+
+  return formats;
+}
+
+/** Extract quote / channels / topics / audience / formats from a Credible | Data record. */
+export function mapAirtableProfileSections(
+  record: AirtableRecord,
+): AirtableProfileSections {
+  const { fields } = record;
+  const quoteRaw = asString(
+    field(fields, "Creator | Website | Quote", "Quote"),
+  );
+  const { quote, attribution } = splitQuote(quoteRaw);
+
+  return {
+    quote,
+    quoteAttribution: attribution,
+    channels: buildChannels(fields),
+    topicShares: buildTopicShares(fields),
+    audience: buildAudience(fields),
+    formats: buildFormats(fields),
+    linkedinTopVoice:
+      field(fields, "Channel | LinkedIn | Top Voice") === true,
+  };
+}

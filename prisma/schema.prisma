@@ -42,6 +42,8 @@ model User {
 
 model Expert {
   id             String   @id @default(cuid())
+  /// Airtable record id (rec…) — stable upsert key for roster sync
+  airtableId     String?  @unique
   slug           String   @unique
   name           String
   title          String
@@ -57,6 +59,8 @@ model Expert {
   audienceWhere  String?
   /// [{ "type": "linkedin"|"youtube"|"podcast"|"x", "url": "https://..." }]
   channels       Json     @default("[]")
+  /// Template extras from Airtable (banner, highlights 2–3, quote, exclusive, …)
+  profileExtras  Json     @default("{}")
   featured       Boolean  @default(false)
   seoTitle       String?
   seoDescription String?
