@@ -25,7 +25,7 @@ export default async function AdminMediaPage() {
       <div>
         <h1 className="font-display text-3xl">Media</h1>
         <p className="mt-2 text-sm text-muted">
-          Upload and manage images used across Trusted by, insights, case
+          Upload and manage images used across Homepage logos, insights, case
           studies, and page editors.
         </p>
       </div>
@@ -37,7 +37,7 @@ export default async function AdminMediaPage() {
         <span className="font-medium text-charcoal/70">Select from media</span>{" "}
         to pick or upload without pasting URLs.{" "}
         <Link href="/admin/trusted-by" className="text-forest hover:text-forest-dark">
-          Trusted by
+          Homepage logos
         </Link>
       </p>
     </div>

@@ -9,12 +9,13 @@ import {
 } from "@/components/expert-audience-map";
 import { ExpertFormatsGrid } from "@/components/expert-formats-grid";
 import { ExpertInterestCta } from "@/components/expert-interest-cta";
+import { ExpertProfileSimilarIntro } from "@/components/expert-profile-similar-intro";
 import { ExpertQuoteCard } from "@/components/expert-quote-card";
 import { ExpertWorkLayoutPreviews } from "@/components/expert-work-layouts";
+import { PatternField } from "@/components/pattern-field";
 import type { RosterCardExpert } from "@/components/roster-card";
 import { SimilarCreatorsGrid } from "@/components/similar-creators-grid";
 import { StatCounter } from "@/components/stat-counter";
-import { ViewMoreLink } from "@/components/view-more-link";
 import {
   channelPresenceUrl,
   firstName,
@@ -305,11 +306,17 @@ function TopicsAndAudience({
   );
 }
 
-function FormatsSection({ formats }: { formats: ExpertFormatOffering[] }) {
+function FormatsSection({
+  formats,
+  name,
+}: {
+  formats: ExpertFormatOffering[];
+  name: string;
+}) {
   return (
     <section id="formats" className="scroll-mt-28">
       <SectionHeading>Formats available.</SectionHeading>
-      <ExpertFormatsGrid formats={formats} />
+      <ExpertFormatsGrid formats={formats} name={name} />
     </section>
   );
 }
@@ -449,7 +456,7 @@ export function ExpertProfileMain({
       ) : null}
 
       {formats && formats.length > 0 ? (
-        <FormatsSection formats={formats} />
+        <FormatsSection formats={formats} name={name} />
       ) : null}
 
       {recentWork && recentWork.length > 0 ? (
@@ -468,47 +475,31 @@ export function ExpertProfileMain({
   );
 }
 
+const CTA_PATTERN_COLOR = { r: 249, g: 243, b: 239 };
+
 export function ExpertProfileFooter({
   name,
   slug,
   similar,
-  backgroundImage,
 }: {
   name: string;
   slug: string;
   similar: RosterCardExpert[];
-  backgroundImage?: string | null;
 }) {
-  const first = firstName(name);
-  const cover = backgroundImage ?? null;
-
   return (
     <>
       <section className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
         <div className="mx-auto max-w-352">
           <div className="relative isolate overflow-hidden rounded-sm bg-charcoal px-6 py-12 text-center shadow-[0_24px_60px_rgba(28,26,23,0.18)] md:px-12 md:py-14">
-            {cover ? (
-              <>
-                <Image
-                  src={cover}
-                  alt=""
-                  fill
-                  priority
-                  sizes="(min-width: 1400px) 1312px, 100vw"
-                  className="absolute inset-0 h-full w-full scale-105 object-cover object-center blur-[2px]"
-                />
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-charcoal/55"
-                />
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-linear-to-t from-charcoal/75 via-charcoal/35 to-charcoal/50"
-                />
-              </>
-            ) : null}
+            <PatternField
+              color={CTA_PATTERN_COLOR}
+              className="opacity-[0.12]"
+              mask="radial-gradient(120% 100% at 100% 50%, black 0%, rgba(0,0,0,0.55) 38%, transparent 78%)"
+            />
 
-            <ExpertInterestCta first={first} slug={slug} />
+            <div className="relative z-2">
+              <ExpertInterestCta name={name} slug={slug} />
+            </div>
           </div>
         </div>
       </section>
@@ -516,12 +507,7 @@ export function ExpertProfileFooter({
       {similar.length > 0 ? (
         <section className="bg-cream px-6 pt-4 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
           <div className="mx-auto max-w-352">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <h2 className="font-display text-[1.75rem] leading-[1.08] tracking-tight text-charcoal md:text-[2rem]">
-                Similar creators.
-              </h2>
-              <ViewMoreLink href="/roster">View roster</ViewMoreLink>
-            </div>
+            <ExpertProfileSimilarIntro />
 
             <SimilarCreatorsGrid experts={similar} />
           </div>

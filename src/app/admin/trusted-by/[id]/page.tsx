@@ -12,7 +12,7 @@ import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Edit trusted by client",
+  title: "Edit homepage logo",
   path: "/admin/trusted-by",
   noIndex: true,
 });
@@ -37,7 +37,7 @@ export default async function AdminTrustedByEditPage({
           href="/admin/trusted-by"
           className="text-sm text-charcoal/55 hover:text-charcoal"
         >
-          ← Trusted by
+          ← Homepage logos
         </Link>
         <h1 className="mt-3 font-display text-3xl">{client.name || "Client"}</h1>
       </div>

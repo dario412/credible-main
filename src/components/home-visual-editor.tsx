@@ -25,6 +25,7 @@ import type { RosterCardExpert } from "@/components/roster-card";
 import { TrustedBy } from "@/components/trusted-by";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type { HomePageSections } from "@/lib/cms";
+import { DEFAULT_HOME_SECTIONS } from "@/lib/cms";
 import type { SiteChromeSections } from "@/lib/site-chrome";
 import {
   TRUSTED_BY_LOGO_HINT,
@@ -56,6 +57,13 @@ type EditTarget =
   | "brandBrief.subhead"
   | "brandBrief.quote"
   | "brandBrief.formTitle"
+  | "brandBrief.formFootnote"
+  | "brandBrief.briefedBy"
+  | "creatorCta.eyebrow"
+  | "creatorCta.headline"
+  | "creatorCta.subhead"
+  | "creatorCta.stats"
+  | "creatorCta.buttons"
   | `trustedBy.client.${number}`
   | "footer.tagline"
   | "footer.companyLine"
@@ -82,6 +90,13 @@ function targetTitle(target: EditTarget): string {
     "brandBrief.subhead": "Brief supporting line",
     "brandBrief.quote": "Brief quote",
     "brandBrief.formTitle": "Brief form title",
+    "brandBrief.formFootnote": "Brief form footnote",
+    "brandBrief.briefedBy": "Briefed-by logos",
+    "creatorCta.eyebrow": "Creators eyebrow",
+    "creatorCta.headline": "Creators headline",
+    "creatorCta.subhead": "Creators supporting line",
+    "creatorCta.stats": "Creators stats strip",
+    "creatorCta.buttons": "Creators buttons",
     "footer.tagline": "Footer tagline",
     "footer.companyLine": "Footer company line",
     "footer.email": "Footer email",
@@ -96,7 +111,7 @@ function targetTitle(target: EditTarget): string {
     return `Case study metric ${Number(target.split(".")[2]) + 1}`;
   }
   if (target.startsWith("trustedBy.client.")) {
-    return `Trusted by logo ${Number(target.split(".")[2]) + 1}`;
+    return `Homepage logo ${Number(target.split(".")[2]) + 1}`;
   }
   return map[target] ?? "Edit";
 }
@@ -504,72 +519,136 @@ function EditorPopover({
 
         {target === "keyStudy.meta" ? (
           <>
-            <Field label="Pillar" id="ks-pillar">
-              <TextInput
-                id="ks-pillar"
-                value={sections.keyStudy.pillar}
-                onChange={(e) =>
-                  patch("keyStudy", {
-                    ...sections.keyStudy,
-                    pillar: e.target.value,
-                  })
-                }
-              />
-            </Field>
-            <Field label="Lead" id="ks-lead">
-              <TextInput
-                id="ks-lead"
-                value={sections.keyStudy.lead}
-                onChange={(e) =>
-                  patch("keyStudy", {
-                    ...sections.keyStudy,
-                    lead: e.target.value,
-                  })
-                }
-              />
-            </Field>
-            <Field label="Term" id="ks-term">
-              <TextInput
-                id="ks-term"
-                value={sections.keyStudy.term}
-                onChange={(e) =>
-                  patch("keyStudy", {
-                    ...sections.keyStudy,
-                    term: e.target.value,
-                  })
-                }
-              />
-            </Field>
+            <p className="text-sm text-muted">
+              Edit titles and values. Add or remove items freely.
+            </p>
+            {sections.keyStudy.meta.map((item, index) => (
+              <div
+                key={`ks-meta-${index}`}
+                className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium">Item {index + 1}</p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patch("keyStudy", {
+                        ...sections.keyStudy,
+                        meta: sections.keyStudy.meta.filter((_, i) => i !== index),
+                      })
+                    }
+                    className="text-xs font-medium text-danger hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <Field label="Title" id={`ks-meta-label-${index}`}>
+                  <TextInput
+                    id={`ks-meta-label-${index}`}
+                    value={item.label}
+                    onChange={(e) => {
+                      const meta = sections.keyStudy.meta.map((row, i) =>
+                        i === index ? { ...row, label: e.target.value } : row,
+                      );
+                      patch("keyStudy", { ...sections.keyStudy, meta });
+                    }}
+                  />
+                </Field>
+                <Field label="Value" id={`ks-meta-value-${index}`}>
+                  <TextInput
+                    id={`ks-meta-value-${index}`}
+                    value={item.value}
+                    onChange={(e) => {
+                      const meta = sections.keyStudy.meta.map((row, i) =>
+                        i === index ? { ...row, value: e.target.value } : row,
+                      );
+                      patch("keyStudy", { ...sections.keyStudy, meta });
+                    }}
+                  />
+                </Field>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                patch("keyStudy", {
+                  ...sections.keyStudy,
+                  meta: [...sections.keyStudy.meta, { label: "", value: "" }],
+                })
+              }
+              className="text-sm font-medium text-forest hover:text-forest-dark"
+            >
+              + Add meta item
+            </button>
           </>
         ) : null}
 
         {target === "keyStudy.cta" ? (
-          <>
-            <Field label="Label" id="ks-cta">
-              <TextInput
-                id="ks-cta"
-                value={sections.keyStudy.ctaLabel}
-                onChange={(e) =>
+          sections.keyStudy.showCta ? (
+            <>
+              <Field label="Label" id="ks-cta">
+                <TextInput
+                  id="ks-cta"
+                  value={sections.keyStudy.ctaLabel}
+                  onChange={(e) =>
+                    patch("keyStudy", {
+                      ...sections.keyStudy,
+                      ctaLabel: e.target.value,
+                    })
+                  }
+                />
+              </Field>
+              <Field label="Link" id="ks-href">
+                <TextInput
+                  id="ks-href"
+                  value={sections.keyStudy.ctaHref}
+                  onChange={(e) =>
+                    patch("keyStudy", {
+                      ...sections.keyStudy,
+                      ctaHref: e.target.value,
+                    })
+                  }
+                />
+              </Field>
+              <button
+                type="button"
+                onClick={() =>
                   patch("keyStudy", {
                     ...sections.keyStudy,
-                    ctaLabel: e.target.value,
+                    showCta: false,
                   })
                 }
-              />
-            </Field>
-            <Field label="Link" id="ks-href">
-              <TextInput
-                id="ks-href"
-                value={sections.keyStudy.ctaHref}
-                onChange={(e) =>
+                className="text-sm font-medium text-danger hover:underline"
+              >
+                Remove button
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted">
+                The case study button is hidden on the live page.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  const defaults = DEFAULT_HOME_SECTIONS.keyStudy;
                   patch("keyStudy", {
                     ...sections.keyStudy,
-                    ctaHref: e.target.value,
-                  })
-                }
-              />
-            </Field>
-          </>
+                    showCta: true,
+                    ctaLabel: sections.keyStudy.ctaLabel.trim()
+                      ? sections.keyStudy.ctaLabel
+                      : defaults.ctaLabel,
+                    ctaHref: sections.keyStudy.ctaHref.trim()
+                      ? sections.keyStudy.ctaHref
+                      : defaults.ctaHref,
+                  });
+                }}
+                className="text-sm font-medium text-forest hover:text-forest-dark"
+              >
+                + Add case study button
+              </button>
+            </>
+          )
         ) : null}
 
         {keyMetricMatch ? (
@@ -726,6 +805,39 @@ function EditorPopover({
                 }
               />
             </Field>
+            <MediaField
+              label="Person photo"
+              value={sections.brandBrief.quotePhoto}
+              onChange={(quotePhoto) =>
+                patch("brandBrief", {
+                  ...sections.brandBrief,
+                  quotePhoto,
+                })
+              }
+            />
+            <MediaField
+              label="Company logo"
+              hint={TRUSTED_BY_LOGO_HINT}
+              value={sections.brandBrief.quoteLogo}
+              onChange={(quoteLogo) =>
+                patch("brandBrief", {
+                  ...sections.brandBrief,
+                  quoteLogo,
+                })
+              }
+            />
+            <Field label="Logo name (alt text)" id="bb-logo-name">
+              <TextInput
+                id="bb-logo-name"
+                value={sections.brandBrief.quoteLogoName}
+                onChange={(e) =>
+                  patch("brandBrief", {
+                    ...sections.brandBrief,
+                    quoteLogoName: e.target.value,
+                  })
+                }
+              />
+            </Field>
           </>
         ) : null}
 
@@ -742,6 +854,344 @@ function EditorPopover({
               }
             />
           </Field>
+        ) : null}
+
+        {target === "brandBrief.formFootnote" ? (
+          <>
+            <Field label="Footnote" id="bb-footnote">
+              <TextInput
+                id="bb-footnote"
+                value={sections.brandBrief.formFootnote}
+                onChange={(e) =>
+                  patch("brandBrief", {
+                    ...sections.brandBrief,
+                    formFootnote: e.target.value,
+                  })
+                }
+              />
+            </Field>
+            {sections.brandBrief.formFootnote.trim() ? (
+              <button
+                type="button"
+                onClick={() =>
+                  patch("brandBrief", {
+                    ...sections.brandBrief,
+                    formFootnote: "",
+                  })
+                }
+                className="text-sm font-medium text-danger hover:underline"
+              >
+                Remove footnote
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() =>
+                  patch("brandBrief", {
+                    ...sections.brandBrief,
+                    formFootnote: DEFAULT_HOME_SECTIONS.brandBrief.formFootnote,
+                  })
+                }
+                className="text-sm font-medium text-forest hover:text-forest-dark"
+              >
+                + Restore default footnote
+              </button>
+            )}
+          </>
+        ) : null}
+
+        {target === "brandBrief.briefedBy" ? (
+          <>
+            <Field label="Label" id="bb-briefed-label">
+              <TextInput
+                id="bb-briefed-label"
+                value={sections.brandBrief.briefedByLabel}
+                onChange={(e) =>
+                  patch("brandBrief", {
+                    ...sections.brandBrief,
+                    briefedByLabel: e.target.value,
+                  })
+                }
+              />
+            </Field>
+            {sections.brandBrief.briefedByLogos.map((logo, index) => (
+              <div
+                key={`bb-logo-${index}`}
+                className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium">Logo {index + 1}</p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patch("brandBrief", {
+                        ...sections.brandBrief,
+                        briefedByLogos: sections.brandBrief.briefedByLogos.filter(
+                          (_, i) => i !== index,
+                        ),
+                      })
+                    }
+                    className="text-xs font-medium text-danger hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <Field label="Name" id={`bb-logo-name-${index}`}>
+                  <TextInput
+                    id={`bb-logo-name-${index}`}
+                    value={logo.name}
+                    onChange={(e) => {
+                      const briefedByLogos = sections.brandBrief.briefedByLogos.map(
+                        (row, i) =>
+                          i === index ? { ...row, name: e.target.value } : row,
+                      );
+                      patch("brandBrief", {
+                        ...sections.brandBrief,
+                        briefedByLogos,
+                      });
+                    }}
+                  />
+                </Field>
+                <MediaField
+                  label="Logo image"
+                  hint={TRUSTED_BY_LOGO_HINT}
+                  value={logo.src}
+                  onChange={(src) => {
+                    const briefedByLogos = sections.brandBrief.briefedByLogos.map(
+                      (row, i) => (i === index ? { ...row, src } : row),
+                    );
+                    patch("brandBrief", {
+                      ...sections.brandBrief,
+                      briefedByLogos,
+                    });
+                  }}
+                />
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                patch("brandBrief", {
+                  ...sections.brandBrief,
+                  briefedByLogos: [
+                    ...sections.brandBrief.briefedByLogos,
+                    { name: "", src: "" },
+                  ],
+                })
+              }
+              className="text-sm font-medium text-forest hover:text-forest-dark"
+            >
+              + Add logo
+            </button>
+          </>
+        ) : null}
+
+        {target === "creatorCta.eyebrow" ? (
+          <Field label="Eyebrow" id="cc-eyebrow">
+            <TextInput
+              id="cc-eyebrow"
+              value={sections.creatorCta.eyebrow}
+              onChange={(e) =>
+                patch("creatorCta", {
+                  ...sections.creatorCta,
+                  eyebrow: e.target.value,
+                })
+              }
+            />
+          </Field>
+        ) : null}
+
+        {target === "creatorCta.headline" ? (
+          <Field label="Headline" id="cc-headline">
+            <TextArea
+              id="cc-headline"
+              rows={3}
+              value={sections.creatorCta.headline}
+              onChange={(e) =>
+                patch("creatorCta", {
+                  ...sections.creatorCta,
+                  headline: e.target.value,
+                })
+              }
+            />
+          </Field>
+        ) : null}
+
+        {target === "creatorCta.subhead" ? (
+          <Field label="Supporting line" id="cc-subhead">
+            <TextArea
+              id="cc-subhead"
+              rows={3}
+              value={sections.creatorCta.subhead}
+              onChange={(e) =>
+                patch("creatorCta", {
+                  ...sections.creatorCta,
+                  subhead: e.target.value,
+                })
+              }
+            />
+          </Field>
+        ) : null}
+
+        {target === "creatorCta.stats" ? (
+          <>
+            <label className="flex items-center gap-2 text-sm text-charcoal">
+              <input
+                type="checkbox"
+                checked={sections.creatorCta.showFacesMarquee}
+                onChange={(e) =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    showFacesMarquee: e.target.checked,
+                  })
+                }
+                className="rounded-sm border-charcoal/20"
+              />
+              Show creator faces marquee
+            </label>
+            <Field label="Stat 1" id="cc-stat1">
+              <TextInput
+                id="cc-stat1"
+                value={sections.creatorCta.stat1}
+                onChange={(e) =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    stat1: e.target.value,
+                  })
+                }
+              />
+            </Field>
+            <Field label="Stat 2" id="cc-stat2">
+              <TextInput
+                id="cc-stat2"
+                value={sections.creatorCta.stat2}
+                onChange={(e) =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    stat2: e.target.value,
+                  })
+                }
+              />
+            </Field>
+          </>
+        ) : null}
+
+        {target === "creatorCta.buttons" ? (
+          <>
+            <p className="text-sm font-medium text-charcoal">Primary button</p>
+            <Field label="Label" id="cc-primary-label">
+              <TextInput
+                id="cc-primary-label"
+                value={sections.creatorCta.primaryCtaLabel}
+                onChange={(e) =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    primaryCtaLabel: e.target.value,
+                  })
+                }
+              />
+            </Field>
+            <Field label="Link" id="cc-primary-href">
+              <TextInput
+                id="cc-primary-href"
+                value={sections.creatorCta.primaryCtaHref}
+                onChange={(e) =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    primaryCtaHref: e.target.value,
+                  })
+                }
+              />
+            </Field>
+            {sections.creatorCta.primaryCtaLabel.trim() ? (
+              <button
+                type="button"
+                onClick={() =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    primaryCtaLabel: "",
+                  })
+                }
+                className="text-sm font-medium text-danger hover:underline"
+              >
+                Remove primary button
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    primaryCtaLabel:
+                      DEFAULT_HOME_SECTIONS.creatorCta.primaryCtaLabel,
+                    primaryCtaHref:
+                      DEFAULT_HOME_SECTIONS.creatorCta.primaryCtaHref,
+                  })
+                }
+                className="text-sm font-medium text-forest hover:text-forest-dark"
+              >
+                + Add primary button
+              </button>
+            )}
+
+            <p className="border-t border-charcoal/10 pt-3 text-sm font-medium text-charcoal">
+              Secondary button
+            </p>
+            <Field label="Label" id="cc-secondary-label">
+              <TextInput
+                id="cc-secondary-label"
+                value={sections.creatorCta.secondaryCtaLabel}
+                onChange={(e) =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    secondaryCtaLabel: e.target.value,
+                  })
+                }
+              />
+            </Field>
+            <Field label="Link" id="cc-secondary-href">
+              <TextInput
+                id="cc-secondary-href"
+                value={sections.creatorCta.secondaryCtaHref}
+                onChange={(e) =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    secondaryCtaHref: e.target.value,
+                  })
+                }
+              />
+            </Field>
+            {sections.creatorCta.secondaryCtaLabel.trim() ? (
+              <button
+                type="button"
+                onClick={() =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    secondaryCtaLabel: "",
+                  })
+                }
+                className="text-sm font-medium text-danger hover:underline"
+              >
+                Remove secondary button
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() =>
+                  patch("creatorCta", {
+                    ...sections.creatorCta,
+                    secondaryCtaLabel:
+                      DEFAULT_HOME_SECTIONS.creatorCta.secondaryCtaLabel,
+                    secondaryCtaHref:
+                      DEFAULT_HOME_SECTIONS.creatorCta.secondaryCtaHref,
+                  })
+                }
+                className="text-sm font-medium text-forest hover:text-forest-dark"
+              >
+                + Add secondary button
+              </button>
+            )}
+          </>
         ) : null}
 
         {trustedClientMatch ? (
@@ -763,7 +1213,7 @@ function EditorPopover({
               <>
                 <p className="text-[0.7rem] leading-relaxed text-charcoal/55">
                   {TRUSTED_BY_LOGO_HINT} Managed as a shared CMS resource — also
-                  editable under Admin → Trusted by.
+                  editable under Admin → Homepage logos.
                 </p>
                 <Field label="Client name" id="tb-name">
                   <TextInput
@@ -908,7 +1358,7 @@ function EditorPopover({
                     href="/admin/trusted-by"
                     className="px-2 text-xs font-medium text-charcoal/55 hover:text-charcoal"
                   >
-                    Open Trusted by CMS
+                    Open Homepage logos CMS
                   </a>
                 </div>
               </>
@@ -1063,7 +1513,7 @@ export function HomeVisualEditor({
     };
     let trustedResult: { ok: boolean; message: string } = {
       ok: true,
-      message: "Trusted by logos saved.",
+      message: "Homepage logos saved.",
     };
 
     if (homeDirty) homeResult = await saveAction(sections);
@@ -1075,7 +1525,7 @@ export function HomeVisualEditor({
     const parts = [
       homeDirty ? "Home" : null,
       chromeDirty ? "footer" : null,
-      trustedDirty ? "Trusted by" : null,
+      trustedDirty ? "Homepage logos" : null,
     ].filter(Boolean);
     setMessage(
       success
@@ -1345,6 +1795,7 @@ export function HomeVisualEditor({
       <BrandBrief
         variant="boxed"
         content={sections.brandBrief}
+        creatorCta={sections.creatorCta}
         editSlots={
           editing
             ? {
@@ -1401,6 +1852,86 @@ export function HomeVisualEditor({
                     "brief form title",
                     node,
                     true,
+                  ),
+                formFootnote: (node) =>
+                  hit(
+                    editing,
+                    "brandBrief.formFootnote",
+                    target,
+                    setTarget,
+                    "brief form footnote",
+                    node,
+                  ),
+                briefedBy: (node) =>
+                  hit(
+                    editing,
+                    "brandBrief.briefedBy",
+                    target,
+                    setTarget,
+                    "briefed-by logos",
+                    node,
+                    true,
+                  ),
+              }
+            : undefined
+        }
+        creatorCtaEditSlots={
+          editing
+            ? {
+                eyebrow: (node) =>
+                  hit(
+                    editing,
+                    "creatorCta.eyebrow",
+                    target,
+                    setTarget,
+                    "creators eyebrow",
+                    node,
+                    true,
+                    "ring-offset-rust",
+                  ),
+                headline: (node) =>
+                  hit(
+                    editing,
+                    "creatorCta.headline",
+                    target,
+                    setTarget,
+                    "creators headline",
+                    node,
+                    true,
+                    "ring-offset-rust",
+                  ),
+                subhead: (node) =>
+                  hit(
+                    editing,
+                    "creatorCta.subhead",
+                    target,
+                    setTarget,
+                    "creators supporting line",
+                    node,
+                    true,
+                    "ring-offset-rust",
+                  ),
+                stats: (node) =>
+                  hit(
+                    editing,
+                    "creatorCta.stats",
+                    target,
+                    setTarget,
+                    "creators stats strip",
+                    node,
+                    true,
+                    "ring-offset-rust",
+                  ),
+                buttons: (node) =>
+                  hit(
+                    editing,
+                    "creatorCta.buttons",
+                    target,
+                    setTarget,
+                    "creators buttons",
+                    node,
+                    true,
+                    "ring-offset-rust",
                   ),
               }
             : undefined
@@ -1459,7 +1990,7 @@ export function HomeVisualEditor({
                 href="/admin/trusted-by"
                 className="px-2 text-xs font-medium text-charcoal/55 hover:text-charcoal"
               >
-                Trusted by CMS
+                Homepage logos CMS
               </a>
               <a
                 href="/admin/pages/home"

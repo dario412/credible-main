@@ -293,11 +293,10 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
   const brandChannels = buildBrandPartnershipChannels(fields);
   if (brandCopy || brandChannels.length > 0) {
     formats.push({
+      kind: "brandPartnerships",
       category: "01",
       title: "Brand partnerships",
-      description:
-        brandCopy ??
-        "Hosted or co-produced brand integrations across the channels this creator already owns.",
+      description: "",
       channels: brandChannels.length ? brandChannels : undefined,
       formats: brandChannels.length ? undefined : ["Sponsored content"],
     });
@@ -309,11 +308,10 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
   const keynote = field(fields, "Creator | Profile | Keynote Speaking") === true;
   if (speakingCopy || keynote) {
     formats.push({
+      kind: "speaking",
       category: String(formats.length + 1).padStart(2, "0"),
       title: "Speaking",
-      description:
-        speakingCopy ??
-        "Keynotes, firesides and executive briefings tailored to the brief.",
+      description: "",
       formats: [
         "In-Person Keynote",
         "Virtual Keynote / Webinar",
@@ -328,9 +326,10 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
   );
   if (liveCopy) {
     formats.push({
+      kind: "liveEvents",
       category: String(formats.length + 1).padStart(2, "0"),
       title: "Live events",
-      description: liveCopy,
+      description: "",
       formats: ["Panel", "Retreat / Summit", "Roundtable"],
     });
   }
@@ -344,9 +343,10 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
   );
   if (ambassadorCopy) {
     formats.push({
+      kind: "ambassador",
       category: String(formats.length + 1).padStart(2, "0"),
       title: "Ambassador program",
-      description: ambassadorCopy,
+      description: "",
       formats: ["Brand Ambassador", "Category Ambassador"],
     });
   }

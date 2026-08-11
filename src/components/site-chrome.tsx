@@ -50,8 +50,10 @@ export function SiteHeader() {
   const insightArticle =
     /^\/insights\/[^/]+\/?$/.test(pathname) ||
     /^\/insights\/authors\//.test(pathname);
-  // Full-bleed image heroes — nav sits inside the frame with inverted colors.
+  const isHome = pathname === "/";
+  // Full-bleed heroes — nav sits inside the frame with inverted colors.
   const overlay =
+    isHome ||
     /^\/roster\/[^/]+\/?$/.test(pathname) ||
     /^\/case-studies\/[^/]+\/?$/.test(pathname);
   const [scrolled, setScrolled] = useState(false);
@@ -60,7 +62,7 @@ export function SiteHeader() {
     const onScroll = () => {
       const y = window.scrollY;
 
-      if (overlay) {
+      if (overlay && !isHome) {
         setScrolled(y > window.innerHeight * 0.6);
         return;
       }
@@ -75,11 +77,11 @@ export function SiteHeader() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [overlay]);
+  }, [overlay, isHome]);
 
   const pageSurface = insightArticle ? "bg-cream-dark" : "bg-cream";
-  // Over the stage image: invert the charcoal pill to cream with dark type.
-  const onImage = overlay && !scrolled;
+  // Dark full-bleed heroes invert the pill to cream; home keeps the charcoal bar.
+  const onDarkHero = overlay && !scrolled && !isHome;
 
   return (
     <header
@@ -116,13 +118,13 @@ export function SiteHeader() {
         <div
           className={cn(
             "flex flex-1 items-center gap-3 rounded-sm p-3 shadow-[0_10px_40px_rgba(28,26,23,0.12)] transition-[background-color,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:gap-8 md:p-3.5",
-            onImage ? "bg-cream" : "bg-charcoal",
+            onDarkHero ? "bg-cream" : "bg-charcoal",
           )}
         >
           <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
             <img
               src={
-                onImage
+                onDarkHero
                   ? "/brand/credible-wordmark.svg"
                   : "/brand/credible-wordmark-cream.svg"
               }
@@ -143,7 +145,7 @@ export function SiteHeader() {
                 href={link.href}
                 className={cn(
                   "text-[0.8125rem] transition-colors duration-300",
-                  onImage
+                  onDarkHero
                     ? "text-charcoal/70 hover:text-charcoal"
                     : "text-cream/85 hover:text-cream",
                 )}
@@ -174,7 +176,7 @@ export function SiteHeader() {
             href={link.href}
             className={cn(
               "whitespace-nowrap text-sm transition-colors duration-300",
-              onImage ? "text-cream/85" : "text-charcoal/75",
+              onDarkHero ? "text-cream/85" : "text-charcoal/75",
             )}
           >
             {link.label}

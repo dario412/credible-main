@@ -16,13 +16,19 @@ const pages = [
     slug: "home",
     title: "Home",
     description:
-      "Hero, ways in, roster, impact stats, case study, and brief. Logos live under Trusted by.",
+      "Hero, ways in, roster, impact stats, case study, and brief. Logos live under Homepage logos.",
   },
   {
     slug: "site",
-    title: "Header & footer",
+    title: "Header, footer & profile template",
     description:
-      "Nav links, Send brief CTA, footer copy, socials, link columns, and legal links — used site-wide.",
+      "Nav, Send brief CTA, footer, profile template, format cards, Insights promos, and article sidebar CTA.",
+  },
+  {
+    slug: "contact",
+    title: "Contact",
+    description:
+      "Briefed-by logos and What happens next sidebar on /contact.",
   },
   {
     slug: "about",

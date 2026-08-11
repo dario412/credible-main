@@ -1,18 +1,24 @@
-import Image from "next/image";
 import Link from "next/link";
 
-import { CASE_STUDY_LOGO, type CaseStudyCard } from "@/lib/case-studies";
+import { SiteImage } from "@/components/site-image";
+import {
+  CASE_STUDY_LOGO,
+  formatCaseStudyPillars,
+  type CaseStudyCard,
+} from "@/lib/case-studies";
 
 export function CaseStudyClientMark({
   client,
+  logo,
   className,
 }: {
   client: string;
+  logo?: string | null;
   className?: string;
 }) {
   return (
-    <Image
-      src={CASE_STUDY_LOGO}
+    <SiteImage
+      src={logo?.trim() || CASE_STUDY_LOGO}
       alt={client}
       width={40}
       height={40}
@@ -45,6 +51,7 @@ export function CaseStudyArchiveCard({ study }: { study: CaseStudyCard }) {
         />
         <CaseStudyClientMark
           client={study.client}
+          logo={study.logo}
           className="relative z-2 size-14 object-contain transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 md:size-16"
         />
       </div>
@@ -53,7 +60,7 @@ export function CaseStudyArchiveCard({ study }: { study: CaseStudyCard }) {
         {study.title}
       </h3>
       <p className="mt-2 text-[10px] font-medium tracking-[0.12em] text-charcoal/45 uppercase">
-        {study.pillar}
+        {formatCaseStudyPillars(study)}
       </p>
     </Link>
   );

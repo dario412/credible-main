@@ -26,7 +26,7 @@ const nav = [
   },
   {
     href: "/admin/trusted-by",
-    label: "Trusted by",
+    label: "Homepage logos",
     permission: "MANAGE_CONTENT" as const,
   },
   {

@@ -1,21 +1,24 @@
 import {
   CASE_STUDIES,
   filterCaseStudies,
+  normalizeCaseStudyPillars,
   type CaseStudyCard,
 } from "@/lib/case-studies";
 import { caseStudyToCard } from "@/lib/cms";
 import { prisma } from "@/lib/prisma";
 
-/** Prefer CMS DB rows, fall back to static CASE_STUDIES. */
+/** Prefer CMS DB rows; keep unique static fallbacks that aren't in the DB yet. */
 export async function loadCaseStudies(): Promise<CaseStudyCard[]> {
   try {
     const rows = await prisma.caseStudy.findMany({
       orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
     });
     if (rows.length === 0) return CASE_STUDIES;
-    const cards = rows.map(caseStudyToCard);
-    const hasCms = cards.some((c) => c.client);
-    return hasCms ? cards : CASE_STUDIES;
+
+    const fromDb = rows.map(caseStudyToCard);
+    const dbSlugs = new Set(fromDb.map((study) => study.slug));
+    const staticOnly = CASE_STUDIES.filter((study) => !dbSlugs.has(study.slug));
+    return [...fromDb, ...staticOnly];
   } catch {
     return CASE_STUDIES;
   }
@@ -43,8 +46,14 @@ export async function loadSimilarCaseStudies(slug: string, limit = 3) {
   const current = all.find((study) => study.slug === slug);
   const others = all.filter((study) => study.slug !== slug);
   if (!current) return others.slice(0, limit);
-  const samePillar = others.filter((study) => study.pillar === current.pillar);
-  const rest = others.filter((study) => study.pillar !== current.pillar);
+  const currentPillars = new Set(normalizeCaseStudyPillars(current));
+  const samePillar = others.filter((study) =>
+    normalizeCaseStudyPillars(study).some((p) => currentPillars.has(p)),
+  );
+  const rest = others.filter(
+    (study) =>
+      !normalizeCaseStudyPillars(study).some((p) => currentPillars.has(p)),
+  );
   return [...samePillar, ...rest].slice(0, limit);
 }
 

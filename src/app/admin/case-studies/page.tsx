@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/lib/auth";
 import { listCaseStudyCards } from "@/lib/actions/admin-cms";
+import { formatCaseStudyPillars } from "@/lib/case-studies";
 import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
 
@@ -42,7 +43,7 @@ export default async function AdminCaseStudiesPage() {
             <tr>
               <th className="px-4 py-3 font-medium">Title</th>
               <th className="px-4 py-3 font-medium">Client</th>
-              <th className="px-4 py-3 font-medium">Pillar</th>
+              <th className="px-4 py-3 font-medium">Pillars</th>
               <th className="px-4 py-3 font-medium" />
             </tr>
           </thead>
@@ -61,7 +62,9 @@ export default async function AdminCaseStudiesPage() {
                   ) : null}
                 </td>
                 <td className="px-4 py-3 text-charcoal/60">{study.client}</td>
-                <td className="px-4 py-3 text-charcoal/60">{study.pillar}</td>
+                <td className="px-4 py-3 text-charcoal/60">
+                  {formatCaseStudyPillars(study)}
+                </td>
                 <td className="px-4 py-3 text-right">
                   <Link
                     href={`/admin/case-studies/${study.slug}`}

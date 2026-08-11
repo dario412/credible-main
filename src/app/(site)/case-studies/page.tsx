@@ -1,20 +1,28 @@
-import Image from "next/image";
-import Link from "next/link";
-
+import { CaseStudyArchiveCard } from "@/components/case-study-archive-card";
 import {
-  CaseStudyArchiveCard,
-  CaseStudyClientMark,
-} from "@/components/case-study-archive-card";
+  CASE_STUDIES_FEATURED_LAYOUT,
+  CaseStudiesFeatured,
+} from "@/components/case-studies-featured";
 import { CaseStudyFilters } from "@/components/case-study-filters";
 import { ImpactStats } from "@/components/impact-stats";
-import {
-  loadFeaturedCaseStudy,
-  loadFilteredCaseStudies,
-  loadSecondaryCaseStudies,
-} from "@/lib/case-studies-server";
+import { filterCaseStudies } from "@/lib/case-studies";
+import { loadCaseStudies } from "@/lib/case-studies-server";
 import { createMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+/**
+ * Search / client type / pillar bar under “All stories”.
+ * Flip to true when the catalogue is large enough to need filtering.
+ */
+const SHOW_CASE_STUDY_FILTERS = false;
+
+/** How many CMS stories lead the featured hero (pair = 2, rail = 5). */
+function featuredLeadCount(
+  layout: typeof CASE_STUDIES_FEATURED_LAYOUT,
+) {
+  return layout === "featured-rail" ? 5 : 2;
+}
 
 export const metadata = createMetadata({
   title: "Case studies",
@@ -35,13 +43,18 @@ export default async function CaseStudiesPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const clientType = params.clientType?.trim();
-  const pillar = params.pillar?.trim();
-  const q = params.q?.trim();
+  const clientType = SHOW_CASE_STUDY_FILTERS
+    ? params.clientType?.trim()
+    : undefined;
+  const pillar = SHOW_CASE_STUDY_FILTERS ? params.pillar?.trim() : undefined;
+  const q = SHOW_CASE_STUDY_FILTERS ? params.q?.trim() : undefined;
 
-  const featured = await loadFeaturedCaseStudy();
-  const secondary = await loadSecondaryCaseStudies();
-  const stories = await loadFilteredCaseStudies({ clientType, pillar, q });
+  const all = await loadCaseStudies();
+  const lead = featuredLeadCount(CASE_STUDIES_FEATURED_LAYOUT);
+  const rest = all.slice(lead);
+  const stories = SHOW_CASE_STUDY_FILTERS
+    ? filterCaseStudies({ clientType, pillar, q }, rest)
+    : rest;
 
   return (
     <>
@@ -60,69 +73,7 @@ export default async function CaseStudiesPage({
       </section>
 
       <section className="px-6 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
-        <div className="mx-auto grid max-w-352 items-start gap-5 lg:grid-cols-2 lg:gap-6 xl:gap-7">
-          <div className="lg:sticky lg:top-6 lg:self-start lg:h-[calc(100dvh-3rem)]">
-            <Link
-              href={`/case-studies/${featured.slug}`}
-              className="group relative block min-h-[28rem] overflow-hidden rounded-sm md:min-h-[34rem] lg:h-full lg:min-h-0"
-            >
-              <Image
-                src={featured.coverImage}
-                alt=""
-                fill
-                priority
-                sizes="(min-width: 1024px) 45vw, 100vw"
-                className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-charcoal/85 via-charcoal/35 to-charcoal/15" />
-
-              <div className="absolute inset-0 flex flex-col justify-between p-6 md:p-8 lg:p-9">
-                <CaseStudyClientMark client={featured.client} />
-
-                <div>
-                  <h2 className="max-w-lg font-display text-[1.65rem] leading-[1.12] tracking-tight text-cream sm:text-[1.9rem] md:text-[2.15rem]">
-                    {featured.title}
-                  </h2>
-                  <p className="mt-5 text-[10px] font-medium tracking-[0.14em] text-cream/55 uppercase">
-                    {featured.pillar}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          </div>
-
-          <div className="flex flex-col gap-5 lg:gap-6">
-            <ul className="grid gap-5 sm:grid-cols-2 sm:gap-5 lg:gap-6">
-              {secondary.map((study) => (
-                <li key={study.slug}>
-                  <Link
-                    href={`/case-studies/${study.slug}`}
-                    className="group block cursor-pointer"
-                  >
-                    <div className="relative aspect-3/4 overflow-hidden rounded-sm bg-[#E4EBE6]">
-                      <Image
-                        src={study.coverImage}
-                        alt=""
-                        fill
-                        sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 100vw"
-                        className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
-                      />
-                      <div className="absolute top-3 left-3">
-                        <CaseStudyClientMark client={study.client} />
-                      </div>
-                    </div>
-                    <h3 className="mt-3.5 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal transition-colors group-hover:text-forest md:text-[1.25rem]">
-                      {study.title}
-                    </h3>
-                    <p className="mt-2 text-[10px] font-medium tracking-[0.12em] text-charcoal/45 uppercase">
-                      {study.pillar}
-                    </p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        <CaseStudiesFeatured studies={all} />
       </section>
 
       <ImpactStats />
@@ -136,13 +87,15 @@ export default async function CaseStudiesPage({
             All stories
           </h2>
 
-          <div className="mx-auto mt-8 max-w-4xl md:mt-10">
-            <CaseStudyFilters
-              currentClientType={clientType}
-              currentPillar={pillar}
-              currentQuery={q}
-            />
-          </div>
+          {SHOW_CASE_STUDY_FILTERS ? (
+            <div className="mx-auto mt-8 max-w-4xl md:mt-10">
+              <CaseStudyFilters
+                currentClientType={clientType}
+                currentPillar={pillar}
+                currentQuery={q}
+              />
+            </div>
+          ) : null}
 
           {stories.length > 0 ? (
             <ul className="mt-10 grid gap-8 sm:grid-cols-2 md:mt-12 lg:grid-cols-3 lg:gap-10">
@@ -154,7 +107,9 @@ export default async function CaseStudiesPage({
             </ul>
           ) : (
             <p className="mt-10 text-sm text-charcoal/50 md:mt-12">
-              No case studies match these filters.
+              {all.length > 0
+                ? "More stories will land here as the catalogue grows."
+                : "No case studies yet."}
             </p>
           )}
         </div>

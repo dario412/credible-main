@@ -6,6 +6,7 @@ import {
 } from "@/components/expert-profile-body";
 import { ExpertProfileShell } from "@/components/expert-profile-hero";
 import { ExpertProfileStageHero } from "@/components/expert-profile-stage-hero";
+import { ProfileVisualEditor } from "@/components/profile-visual-editor";
 import type { RosterCardExpert } from "@/components/roster-card";
 import {
   brandsWithLogos,
@@ -17,6 +18,8 @@ import { parseExpertChannels } from "@/lib/expert-channels";
 import {
   getExpertProfileEnrichment,
   isLinkedInTopVoice,
+  mergeAudience,
+  mergeFormats,
   type ExpertAudience,
   type ExpertChannelPresence,
   type ExpertFormatOffering,
@@ -26,6 +29,9 @@ import {
 } from "@/lib/expert-profiles";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
+import { getSiteChrome, saveSiteChrome } from "@/lib/actions/admin-cms";
+import { auth } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -69,9 +75,8 @@ function mergeProfileContent(
     sections?.topicShares?.length
       ? sections.topicShares
       : enrichment.topicShares;
-  const audience = sections?.audience ?? enrichment.audience;
-  const formats =
-    sections?.formats?.length ? sections.formats : enrichment.formats;
+  const audience = mergeAudience(sections?.audience, enrichment.audience);
+  const formats = mergeFormats(sections?.formats, enrichment.formats);
   const quote =
     sections?.quote ?? extras.quote ?? enrichment.quote ?? undefined;
   const quoteAttribution =
@@ -196,6 +201,13 @@ export default async function ExpertPage({ params }: Props) {
   const expert = await prisma.expert.findUnique({ where: { slug } });
   if (!expert) notFound();
 
+  const [siteChrome, session] = await Promise.all([
+    getSiteChrome(),
+    auth(),
+  ]);
+  const canEdit = Boolean(
+    session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
+  );
   const enrichment = getExpertProfileEnrichment(expert.slug);
   const extras = parseProfileExtras(expert.profileExtras);
   const content = mergeProfileContent(extras, enrichment);
@@ -271,21 +283,14 @@ export default async function ExpertPage({ params }: Props) {
           (extras.exclusive ? "SIGNED" : "AVAILABLE")
         }
         stats={heroStats}
-        nav={[
-          { href: "#overview", label: "Overview" },
-          ...(content.channels?.length
-            ? [{ href: "#channels", label: "Channels" }]
-            : []),
-          ...(content.topicShares?.length && content.audience
-            ? [{ href: "#topics", label: "Topics & audience" }]
-            : []),
-          ...(content.formats?.length
-            ? [{ href: "#formats", label: "Formats" }]
-            : []),
-          ...(enrichment.recentWork?.length
-            ? [{ href: "#work", label: "Recent work" }]
-            : []),
-        ]}
+        navSections={{
+          hasChannels: Boolean(content.channels?.length),
+          hasTopics: Boolean(
+            content.topicShares?.length && content.audience,
+          ),
+          hasFormats: Boolean(content.formats?.length),
+          hasWork: Boolean(enrichment.recentWork?.length),
+        }}
       >
         <ExpertProfileMain
           name={expert.name}
@@ -304,13 +309,14 @@ export default async function ExpertPage({ params }: Props) {
         name={expert.name}
         slug={expert.slug}
         similar={similarSorted}
-        backgroundImage={
-          enrichment.ctaImage ??
-          enrichment.stageImage ??
-          extras.bannerImage ??
-          expert.image
-        }
       />
+      {canEdit ? (
+        <ProfileVisualEditor
+          initialChrome={siteChrome}
+          canEdit={canEdit}
+          saveAction={saveSiteChrome}
+        />
+      ) : null}
     </>
   );
 }

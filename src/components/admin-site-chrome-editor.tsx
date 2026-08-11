@@ -7,6 +7,7 @@ import {
   emptyFooterColumn,
   emptyNavLink,
   emptySocialLink,
+  PROFILE_FORMAT_KINDS,
   SOCIAL_NETWORKS,
   type FooterColumn,
   type NavLink,
@@ -147,6 +148,32 @@ export function SiteChromeEditorForm({
     setSections({ ...sections, header });
   }
 
+  function setProfileRail(profileRail: SiteChromeSections["profileRail"]) {
+    setSections({ ...sections, profileRail });
+  }
+
+  function setProfileCta(profileCta: SiteChromeSections["profileCta"]) {
+    setSections({ ...sections, profileCta });
+  }
+
+  function setProfileFormats(
+    profileFormats: SiteChromeSections["profileFormats"],
+  ) {
+    setSections({ ...sections, profileFormats });
+  }
+
+  function setInsightsPromo(
+    insightsPromo: SiteChromeSections["insightsPromo"],
+  ) {
+    setSections({ ...sections, insightsPromo });
+  }
+
+  function setArticleSidebarCta(
+    articleSidebarCta: SiteChromeSections["articleSidebarCta"],
+  ) {
+    setSections({ ...sections, articleSidebarCta });
+  }
+
   function setFooter(footer: SiteChromeSections["footer"]) {
     setSections({ ...sections, footer });
   }
@@ -212,6 +239,584 @@ export function SiteChromeEditorForm({
                 setHeader({ ...sections.header, ctaHref: e.target.value })
               }
               required
+            />
+          </Field>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Creator profile sidebar</h2>
+          <p className="mt-1 text-sm text-muted">
+            Sticky rail on every roster profile. Use {"{first}"} or {"{name}"}{" "}
+            in titles and descriptions — they are replaced per creator.
+          </p>
+        </div>
+        <Field label="Availability label" id="pr-availability">
+          <TextInput
+            id="pr-availability"
+            value={sections.profileRail.availabilityLabel}
+            onChange={(e) =>
+              setProfileRail({
+                ...sections.profileRail,
+                availabilityLabel: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Signed badge" id="pr-signed">
+            <TextInput
+              id="pr-signed"
+              value={sections.profileRail.signedBadgeLabel}
+              onChange={(e) =>
+                setProfileRail({
+                  ...sections.profileRail,
+                  signedBadgeLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Open badge" id="pr-open">
+            <TextInput
+              id="pr-open"
+              value={sections.profileRail.openBadgeLabel}
+              onChange={(e) =>
+                setProfileRail({
+                  ...sections.profileRail,
+                  openBadgeLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+        </div>
+        <Field label="Focus label (when nav is hidden)" id="pr-focus">
+          <TextInput
+            id="pr-focus"
+            value={sections.profileRail.focusLabel}
+            onChange={(e) =>
+              setProfileRail({
+                ...sections.profileRail,
+                focusLabel: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <div className="space-y-3 rounded-sm border border-charcoal/10 p-4">
+          <p className="text-sm font-medium">On-page nav labels</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {(
+              [
+                ["overview", "Overview"],
+                ["channels", "Channels"],
+                ["topics", "Topics & audience"],
+                ["formats", "Formats"],
+                ["work", "Recent work"],
+              ] as const
+            ).map(([key, hint]) => (
+              <Field key={key} label={hint} id={`pr-nav-${key}`}>
+                <TextInput
+                  id={`pr-nav-${key}`}
+                  value={sections.profileRail.nav[key]}
+                  onChange={(e) =>
+                    setProfileRail({
+                      ...sections.profileRail,
+                      nav: {
+                        ...sections.profileRail.nav,
+                        [key]: e.target.value,
+                      },
+                    })
+                  }
+                />
+              </Field>
+            ))}
+          </div>
+        </div>
+        <Field label="Work-with title" id="pr-work-title">
+          <TextInput
+            id="pr-work-title"
+            value={sections.profileRail.workWithTitle}
+            onChange={(e) =>
+              setProfileRail({
+                ...sections.profileRail,
+                workWithTitle: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Work-with description" id="pr-work-desc">
+          <TextArea
+            id="pr-work-desc"
+            rows={2}
+            value={sections.profileRail.workWithDescription}
+            onChange={(e) =>
+              setProfileRail({
+                ...sections.profileRail,
+                workWithDescription: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Primary button label" id="pr-primary-cta">
+            <TextInput
+              id="pr-primary-cta"
+              value={sections.profileRail.primaryCtaLabel}
+              onChange={(e) =>
+                setProfileRail({
+                  ...sections.profileRail,
+                  primaryCtaLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Footnote" id="pr-footnote">
+            <TextInput
+              id="pr-footnote"
+              value={sections.profileRail.footnote}
+              onChange={(e) =>
+                setProfileRail({
+                  ...sections.profileRail,
+                  footnote: e.target.value,
+                })
+              }
+            />
+          </Field>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Shortlist button" id="pr-shortlist">
+            <TextInput
+              id="pr-shortlist"
+              value={sections.profileRail.shortlistLabel}
+              onChange={(e) =>
+                setProfileRail({
+                  ...sections.profileRail,
+                  shortlistLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Shortlisted button" id="pr-shortlisted">
+            <TextInput
+              id="pr-shortlisted"
+              value={sections.profileRail.shortlistedLabel}
+              onChange={(e) =>
+                setProfileRail({
+                  ...sections.profileRail,
+                  shortlistedLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Creator profile formats</h2>
+          <p className="mt-1 text-sm text-muted">
+            Left-side title and description on every roster profile. Use{" "}
+            {"{first}"} or {"{name}"} — channel pills on the right come from
+            Airtable.
+          </p>
+        </div>
+        {PROFILE_FORMAT_KINDS.map(({ key, hint }) => (
+          <div
+            key={key}
+            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+          >
+            <p className="text-sm font-medium">{hint}</p>
+            <Field label="Title" id={`pf-title-${key}`}>
+              <TextInput
+                id={`pf-title-${key}`}
+                value={sections.profileFormats[key].title}
+                onChange={(e) =>
+                  setProfileFormats({
+                    ...sections.profileFormats,
+                    [key]: {
+                      ...sections.profileFormats[key],
+                      title: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+            <Field label="Description" id={`pf-desc-${key}`}>
+              <TextArea
+                id={`pf-desc-${key}`}
+                rows={3}
+                value={sections.profileFormats[key].description}
+                onChange={(e) =>
+                  setProfileFormats({
+                    ...sections.profileFormats,
+                    [key]: {
+                      ...sections.profileFormats[key],
+                      description: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+          </div>
+        ))}
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Creator profile footer CTA</h2>
+          <p className="mt-1 text-sm text-muted">
+            Charcoal closing block on every roster profile. Use {"{first}"},{" "}
+            {"{name}"}, or {"{slug}"} in copy and links.
+          </p>
+        </div>
+        <Field label="Headline" id="pc-headline">
+          <TextInput
+            id="pc-headline"
+            value={sections.profileCta.headline}
+            onChange={(e) =>
+              setProfileCta({
+                ...sections.profileCta,
+                headline: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Description" id="pc-description">
+          <TextArea
+            id="pc-description"
+            rows={3}
+            value={sections.profileCta.description}
+            onChange={(e) =>
+              setProfileCta({
+                ...sections.profileCta,
+                description: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Primary button label" id="pc-primary-label">
+            <TextInput
+              id="pc-primary-label"
+              value={sections.profileCta.primaryCtaLabel}
+              onChange={(e) =>
+                setProfileCta({
+                  ...sections.profileCta,
+                  primaryCtaLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Primary button link" id="pc-primary-href">
+            <TextInput
+              id="pc-primary-href"
+              value={sections.profileCta.primaryCtaHref}
+              onChange={(e) =>
+                setProfileCta({
+                  ...sections.profileCta,
+                  primaryCtaHref: e.target.value,
+                })
+              }
+            />
+          </Field>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Secondary button label" id="pc-secondary-label">
+            <TextInput
+              id="pc-secondary-label"
+              value={sections.profileCta.secondaryCtaLabel}
+              onChange={(e) =>
+                setProfileCta({
+                  ...sections.profileCta,
+                  secondaryCtaLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Secondary button link" id="pc-secondary-href">
+            <TextInput
+              id="pc-secondary-href"
+              value={sections.profileCta.secondaryCtaHref}
+              onChange={(e) =>
+                setProfileCta({
+                  ...sections.profileCta,
+                  secondaryCtaHref: e.target.value,
+                })
+              }
+            />
+          </Field>
+        </div>
+        <div className="space-y-3 rounded-sm border border-charcoal/10 p-4">
+          <p className="text-sm font-medium">Similar creators strip</p>
+          <Field label="Headline" id="pc-similar-headline">
+            <TextInput
+              id="pc-similar-headline"
+              value={sections.profileCta.similarHeadline}
+              onChange={(e) =>
+                setProfileCta({
+                  ...sections.profileCta,
+                  similarHeadline: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Link label" id="pc-similar-link-label">
+              <TextInput
+                id="pc-similar-link-label"
+                value={sections.profileCta.similarLinkLabel}
+                onChange={(e) =>
+                  setProfileCta({
+                    ...sections.profileCta,
+                    similarLinkLabel: e.target.value,
+                  })
+                }
+              />
+            </Field>
+            <Field label="Link URL" id="pc-similar-link-href">
+              <TextInput
+                id="pc-similar-link-href"
+                value={sections.profileCta.similarLinkHref}
+                onChange={(e) =>
+                  setProfileCta({
+                    ...sections.profileCta,
+                    similarLinkHref: e.target.value,
+                  })
+                }
+              />
+            </Field>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Insights page promos</h2>
+          <p className="mt-1 text-sm text-muted">
+            Newsletter and roster cards at the bottom of /insights. Clear both
+            sides to hide the strip.
+          </p>
+        </div>
+        <div className="space-y-3 rounded-sm border border-charcoal/10 p-4">
+          <p className="text-sm font-medium">Newsletter card</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Eyebrow" id="ip-nl-eyebrow">
+              <TextInput
+                id="ip-nl-eyebrow"
+                value={sections.insightsPromo.newsletter.eyebrow}
+                onChange={(e) =>
+                  setInsightsPromo({
+                    ...sections.insightsPromo,
+                    newsletter: {
+                      ...sections.insightsPromo.newsletter,
+                      eyebrow: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+            <Field label="Button label" id="ip-nl-button">
+              <TextInput
+                id="ip-nl-button"
+                value={sections.insightsPromo.newsletter.buttonLabel}
+                onChange={(e) =>
+                  setInsightsPromo({
+                    ...sections.insightsPromo,
+                    newsletter: {
+                      ...sections.insightsPromo.newsletter,
+                      buttonLabel: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+          </div>
+          <Field label="Headline" id="ip-nl-headline">
+            <TextInput
+              id="ip-nl-headline"
+              value={sections.insightsPromo.newsletter.headline}
+              onChange={(e) =>
+                setInsightsPromo({
+                  ...sections.insightsPromo,
+                  newsletter: {
+                    ...sections.insightsPromo.newsletter,
+                    headline: e.target.value,
+                  },
+                })
+              }
+            />
+          </Field>
+          <Field label="Description" id="ip-nl-desc">
+            <TextArea
+              id="ip-nl-desc"
+              rows={2}
+              value={sections.insightsPromo.newsletter.description}
+              onChange={(e) =>
+                setInsightsPromo({
+                  ...sections.insightsPromo,
+                  newsletter: {
+                    ...sections.insightsPromo.newsletter,
+                    description: e.target.value,
+                  },
+                })
+              }
+            />
+          </Field>
+          <Field label="Email placeholder" id="ip-nl-placeholder">
+            <TextInput
+              id="ip-nl-placeholder"
+              value={sections.insightsPromo.newsletter.emailPlaceholder}
+              onChange={(e) =>
+                setInsightsPromo({
+                  ...sections.insightsPromo,
+                  newsletter: {
+                    ...sections.insightsPromo.newsletter,
+                    emailPlaceholder: e.target.value,
+                  },
+                })
+              }
+            />
+          </Field>
+        </div>
+        <div className="space-y-3 rounded-sm border border-charcoal/10 p-4">
+          <p className="text-sm font-medium">Roster card</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Field label="Eyebrow" id="ip-roster-eyebrow">
+              <TextInput
+                id="ip-roster-eyebrow"
+                value={sections.insightsPromo.roster.eyebrow}
+                onChange={(e) =>
+                  setInsightsPromo({
+                    ...sections.insightsPromo,
+                    roster: {
+                      ...sections.insightsPromo.roster,
+                      eyebrow: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+            <Field label="Button label" id="ip-roster-cta">
+              <TextInput
+                id="ip-roster-cta"
+                value={sections.insightsPromo.roster.ctaLabel}
+                onChange={(e) =>
+                  setInsightsPromo({
+                    ...sections.insightsPromo,
+                    roster: {
+                      ...sections.insightsPromo.roster,
+                      ctaLabel: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+          </div>
+          <Field label="Headline" id="ip-roster-headline">
+            <TextInput
+              id="ip-roster-headline"
+              value={sections.insightsPromo.roster.headline}
+              onChange={(e) =>
+                setInsightsPromo({
+                  ...sections.insightsPromo,
+                  roster: {
+                    ...sections.insightsPromo.roster,
+                    headline: e.target.value,
+                  },
+                })
+              }
+            />
+          </Field>
+          <Field label="Description" id="ip-roster-desc">
+            <TextArea
+              id="ip-roster-desc"
+              rows={2}
+              value={sections.insightsPromo.roster.description}
+              onChange={(e) =>
+                setInsightsPromo({
+                  ...sections.insightsPromo,
+                  roster: {
+                    ...sections.insightsPromo.roster,
+                    description: e.target.value,
+                  },
+                })
+              }
+            />
+          </Field>
+          <Field label="Button link" id="ip-roster-href">
+            <TextInput
+              id="ip-roster-href"
+              value={sections.insightsPromo.roster.ctaHref}
+              onChange={(e) =>
+                setInsightsPromo({
+                  ...sections.insightsPromo,
+                  roster: {
+                    ...sections.insightsPromo.roster,
+                    ctaHref: e.target.value,
+                  },
+                })
+              }
+            />
+          </Field>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Article sidebar CTA</h2>
+          <p className="mt-1 text-sm text-muted">
+            Forest card in the sidebar on insight and case study articles. Clear
+            headline, description, and CTA label to hide it.
+          </p>
+        </div>
+        <Field label="Headline" id="asc-headline">
+          <TextInput
+            id="asc-headline"
+            value={sections.articleSidebarCta.headline}
+            onChange={(e) =>
+              setArticleSidebarCta({
+                ...sections.articleSidebarCta,
+                headline: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Description" id="asc-description">
+          <TextArea
+            id="asc-description"
+            rows={3}
+            value={sections.articleSidebarCta.description}
+            onChange={(e) =>
+              setArticleSidebarCta({
+                ...sections.articleSidebarCta,
+                description: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="CTA label" id="asc-cta-label">
+            <TextInput
+              id="asc-cta-label"
+              value={sections.articleSidebarCta.ctaLabel}
+              onChange={(e) =>
+                setArticleSidebarCta({
+                  ...sections.articleSidebarCta,
+                  ctaLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="CTA URL" id="asc-cta-href">
+            <TextInput
+              id="asc-cta-href"
+              value={sections.articleSidebarCta.ctaHref}
+              onChange={(e) =>
+                setArticleSidebarCta({
+                  ...sections.articleSidebarCta,
+                  ctaHref: e.target.value,
+                })
+              }
             />
           </Field>
         </div>

@@ -5,7 +5,7 @@ import {
   type InsightBlock,
 } from "@/lib/insight-content";
 import type { CaseStudyCard } from "@/lib/case-studies";
-import { CASE_STUDY_LOGO } from "@/lib/case-studies";
+import { CASE_STUDY_LOGO, normalizeCaseStudyPillars } from "@/lib/case-studies";
 
 export const BRAND_COLORS = [
   "charcoal",
@@ -70,9 +70,8 @@ export type HomePageSections = {
     headline: string;
     headlineAccent: string;
     summary: string;
-    pillar: string;
-    lead: string;
-    term: string;
+    meta: Array<{ label: string; value: string }>;
+    showCta: boolean;
     ctaLabel: string;
     ctaHref: string;
     metrics: Array<{ value: string; label: string; note: string }>;
@@ -85,7 +84,25 @@ export type HomePageSections = {
     quote: string;
     quoteName: string;
     quoteRole: string;
+    quotePhoto: string;
+    quoteLogo: string;
+    quoteLogoName: string;
     formTitle: string;
+    formFootnote: string;
+    briefedByLabel: string;
+    briefedByLogos: Array<{ name: string; src: string }>;
+  };
+  creatorCta: {
+    eyebrow: string;
+    headline: string;
+    subhead: string;
+    showFacesMarquee: boolean;
+    stat1: string;
+    stat2: string;
+    primaryCtaLabel: string;
+    primaryCtaHref: string;
+    secondaryCtaLabel: string;
+    secondaryCtaHref: string;
   };
   footer: {
     tagline: string;
@@ -164,9 +181,12 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
     headlineAccent: "without a studio.",
     summary:
       "One operator voice. Twelve episodes. End-to-end casting, format, and distribution — so Notion owned the category without standing up an in-house media team.",
-    pillar: "Content",
-    lead: "Alex Lieberman",
-    term: "22 months",
+    meta: [
+      { label: "Pillar", value: "Content" },
+      { label: "Lead", value: "Alex Lieberman" },
+      { label: "Term", value: "22 months" },
+    ],
+    showCta: true,
     ctaLabel: "Read the full case study",
     ctaHref: "/case-studies/notion-founders-journal",
     metrics: [
@@ -197,7 +217,32 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
       "Credible turned a single keynote into a year-long advisory partnership — exactly the kind of credibility our buyers trust.",
     quoteName: "Maya Chen",
     quoteRole: "Head of Brand Partnerships, Stripe",
+    quotePhoto: "/images/experts/amara-chen.jpg",
+    quoteLogo: "/brand/clients/stripe-wordmark-white.svg",
+    quoteLogoName: "Stripe",
     formTitle: "Send a brief",
+    formFootnote: "Shortlist within 48 hours · no pitch deck required",
+    briefedByLabel: "Briefed by teams at",
+    briefedByLogos: [
+      { name: "Stripe", src: "/brand/clients/stripe-wordmark-white.svg" },
+      { name: "Figma", src: "/brand/clients/figma-wordmark-white.svg" },
+      { name: "Notion", src: "/brand/clients/notion-wordmark-white.png" },
+      { name: "Linear", src: "/brand/clients/linear-wordmark-white.svg" },
+      { name: "Vercel", src: "/brand/clients/vercel-wordmark-white.svg" },
+    ],
+  },
+  creatorCta: {
+    eyebrow: "For creators",
+    headline: "Your audience is already a business. Run it like one.",
+    subhead:
+      "We represent 24 founders, operators and investors. You keep the voice. We handle the inbound, the pricing and the delivery.",
+    showFacesMarquee: true,
+    stat1: "24 creators represented",
+    stat2: "Applications reviewed fortnightly",
+    primaryCtaLabel: "Apply for representation",
+    primaryCtaHref: "/contact?type=creator",
+    secondaryCtaLabel: "What we offer creators",
+    secondaryCtaHref: "/what-we-do",
   },
   footer: {
     tagline: "The talent agency for the expert economy.",
@@ -324,6 +369,42 @@ function mergeImpact(raw: unknown): HomePageSections["impact"] {
   };
 }
 
+function mergeKeyStudyMeta(
+  raw: unknown,
+  defaults: HomePageSections["keyStudy"]["meta"],
+): HomePageSections["keyStudy"]["meta"] {
+  const data = (raw && typeof raw === "object" ? raw : {}) as Record<
+    string,
+    unknown
+  >;
+
+  if (Array.isArray(data.meta)) {
+    const merged = data.meta
+      .map((item, i) => {
+        const row = (item && typeof item === "object" ? item : {}) as Partial<{
+          label: string;
+          value: string;
+        }>;
+        const fallback = defaults[i] ?? { label: "", value: "" };
+        const label = asString(row.label, fallback.label);
+        const value = asString(row.value, fallback.value);
+        if (!label.trim() && !value.trim()) return null;
+        return { label, value };
+      })
+      .filter((item): item is { label: string; value: string } => item !== null);
+
+    if (merged.length > 0) return merged;
+  }
+
+  const legacy = [
+    { label: "Pillar", value: asString(data.pillar, defaults[0]?.value ?? "") },
+    { label: "Lead", value: asString(data.lead, defaults[1]?.value ?? "") },
+    { label: "Term", value: asString(data.term, defaults[2]?.value ?? "") },
+  ].filter((item) => item.value.trim());
+
+  return legacy.length > 0 ? legacy : defaults;
+}
+
 function mergeKeyStudy(raw: unknown): HomePageSections["keyStudy"] {
   const defaults = DEFAULT_HOME_SECTIONS.keyStudy;
   const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
@@ -334,9 +415,13 @@ function mergeKeyStudy(raw: unknown): HomePageSections["keyStudy"] {
     headline: asString(data.headline, defaults.headline),
     headlineAccent: asString(data.headlineAccent, defaults.headlineAccent),
     summary: asString(data.summary, defaults.summary),
-    pillar: asString(data.pillar, defaults.pillar),
-    lead: asString(data.lead, defaults.lead),
-    term: asString(data.term, defaults.term),
+    meta: mergeKeyStudyMeta(raw, defaults.meta),
+    showCta:
+      typeof data.showCta === "boolean"
+        ? data.showCta
+        : !asString(data.ctaLabel, defaults.ctaLabel).trim()
+          ? false
+          : defaults.showCta,
     ctaLabel: asString(data.ctaLabel, defaults.ctaLabel),
     ctaHref: asString(data.ctaHref, defaults.ctaHref),
     metrics: defaults.metrics.map((metric, i) => {
@@ -352,6 +437,31 @@ function mergeKeyStudy(raw: unknown): HomePageSections["keyStudy"] {
   };
 }
 
+function mergeBriefedByLogos(
+  raw: unknown,
+  defaults: HomePageSections["brandBrief"]["briefedByLogos"],
+): HomePageSections["brandBrief"]["briefedByLogos"] {
+  if (!Array.isArray(raw)) return defaults;
+
+  const merged = raw
+    .map((item, i) => {
+      const row = (item && typeof item === "object" ? item : {}) as Partial<{
+        name: string;
+        src: string;
+      }>;
+      const fallback = defaults[i] ?? { name: "", src: "" };
+      const name = asString(row.name, fallback.name);
+      const src = asString(row.src, fallback.src);
+      if (!name.trim() && !src.trim()) return null;
+      return { name, src };
+    })
+    .filter(
+      (item): item is { name: string; src: string } => item !== null,
+    );
+
+  return merged.length > 0 ? merged : defaults;
+}
+
 function mergeBrandBrief(raw: unknown): HomePageSections["brandBrief"] {
   const defaults = DEFAULT_HOME_SECTIONS.brandBrief;
   const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
@@ -365,7 +475,41 @@ function mergeBrandBrief(raw: unknown): HomePageSections["brandBrief"] {
     quote: asString(data.quote, defaults.quote),
     quoteName: asString(data.quoteName, defaults.quoteName),
     quoteRole: asString(data.quoteRole, defaults.quoteRole),
+    quotePhoto: asString(data.quotePhoto, defaults.quotePhoto),
+    quoteLogo: asString(data.quoteLogo, defaults.quoteLogo),
+    quoteLogoName: asString(data.quoteLogoName, defaults.quoteLogoName),
     formTitle: asString(data.formTitle, defaults.formTitle),
+    formFootnote: asString(data.formFootnote, defaults.formFootnote),
+    briefedByLabel: asString(data.briefedByLabel, defaults.briefedByLabel),
+    briefedByLogos: mergeBriefedByLogos(data.briefedByLogos, defaults.briefedByLogos),
+  };
+}
+
+function mergeCreatorCta(raw: unknown): HomePageSections["creatorCta"] {
+  const defaults = DEFAULT_HOME_SECTIONS.creatorCta;
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    HomePageSections["creatorCta"]
+  >;
+  return {
+    eyebrow: asString(data.eyebrow, defaults.eyebrow),
+    headline: asString(data.headline, defaults.headline),
+    subhead: asString(data.subhead, defaults.subhead),
+    showFacesMarquee:
+      typeof data.showFacesMarquee === "boolean"
+        ? data.showFacesMarquee
+        : defaults.showFacesMarquee,
+    stat1: asString(data.stat1, defaults.stat1),
+    stat2: asString(data.stat2, defaults.stat2),
+    primaryCtaLabel: asString(data.primaryCtaLabel, defaults.primaryCtaLabel),
+    primaryCtaHref: asString(data.primaryCtaHref, defaults.primaryCtaHref),
+    secondaryCtaLabel: asString(
+      data.secondaryCtaLabel,
+      defaults.secondaryCtaLabel,
+    ),
+    secondaryCtaHref: asString(
+      data.secondaryCtaHref,
+      defaults.secondaryCtaHref,
+    ),
   };
 }
 
@@ -390,6 +534,7 @@ export function mergeHomeSections(raw: unknown): HomePageSections {
     impact?: unknown;
     keyStudy?: unknown;
     brandBrief?: unknown;
+    creatorCta?: unknown;
     footer?: unknown;
   };
   const hero = data.hero ?? {};
@@ -416,6 +561,7 @@ export function mergeHomeSections(raw: unknown): HomePageSections {
     impact: mergeImpact(data.impact),
     keyStudy: mergeKeyStudy(data.keyStudy),
     brandBrief: mergeBrandBrief(data.brandBrief),
+    creatorCta: mergeCreatorCta(data.creatorCta),
     footer: mergeFooter(data.footer),
   };
 }
@@ -433,6 +579,7 @@ export function blocksFromLegacyBody(body: string): InsightBlock[] {
 }
 
 type CaseStudyRow = {
+  id?: string;
   slug: string;
   title: string;
   summary: string;
@@ -456,7 +603,14 @@ export function caseStudyToCard(row: CaseStudyRow): CaseStudyCard {
       ? (row.data as Partial<CaseStudyCard>)
       : {};
 
+  const pillars = normalizeCaseStudyPillars({
+    pillar: (row.pillar as CaseStudyCard["pillar"]) || "Content",
+    pillars: Array.isArray(data.pillars) ? data.pillars : undefined,
+    meta: data.meta,
+  });
+
   return {
+    id: row.id,
     slug: row.slug,
     client: row.client || data.client || "",
     title: row.title,
@@ -468,8 +622,10 @@ export function caseStudyToCard(row: CaseStudyRow): CaseStudyCard {
     results: data.results,
     quote: data.quote,
     story: data.story,
+    blocks: Array.isArray(data.blocks) ? data.blocks : undefined,
     ctaCreator: data.ctaCreator,
-    pillar: (row.pillar as CaseStudyCard["pillar"]) || "Content",
+    pillar: pillars[0] ?? "Content",
+    pillars,
     clientType: (row.clientType as CaseStudyCard["clientType"]) || "Direct client",
     industry: row.industry || "",
     size: row.size || "",
@@ -481,12 +637,15 @@ export function caseStudyToCard(row: CaseStudyRow): CaseStudyCard {
 }
 
 export function caseStudyCardToRow(card: CaseStudyCard) {
+  const pillars = normalizeCaseStudyPillars(card);
   const {
+    id: _id,
     slug,
     title,
     summary,
     client,
-    pillar,
+    pillar: _pillar,
+    pillars: _pillars,
     clientType,
     industry,
     size,
@@ -496,19 +655,28 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
     ...rest
   } = card;
 
+  const meta = [
+    { label: "Client", value: client },
+    { label: "Pillars used", value: pillars.join(" · ") },
+  ];
+
   return {
     slug,
     title,
     summary,
     client,
-    pillar,
+    pillar: pillars[0] ?? "Content",
     clientType,
     industry,
     size,
     period,
     coverImage,
     featured: Boolean(featured),
-    data: rest,
+    data: {
+      ...rest,
+      pillars,
+      meta: Array.isArray(rest.meta) && rest.meta.length > 0 ? rest.meta : meta,
+    },
     relatedExperts: rest.ctaCreator?.slug ? [rest.ctaCreator.slug] : [],
   };
 }

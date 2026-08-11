@@ -1,13 +1,21 @@
-import Link from "next/link";
 import { ArrowUpRight } from "@phosphor-icons/react/ssr";
 
+import { ContactVisualEditor } from "@/components/contact-visual-editor";
 import {
   SendBriefForm,
   type BriefAudience,
   type BriefCreator,
 } from "@/components/send-brief-form";
+import {
+  getContactPageSections,
+  saveContactPage,
+} from "@/lib/actions/admin-cms";
+import { auth } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = createMetadata({
   title: "Send brief",
@@ -15,30 +23,6 @@ export const metadata = createMetadata({
     "Brief B2B expert creators your buyers already trust. Same-day acknowledgement, shortlist within 48 hours.",
   path: "/contact",
 });
-
-const TRUST_LOGOS = [
-  { name: "Stripe", src: "/brand/clients/stripe-wordmark-white.svg" },
-  { name: "Notion", src: "/brand/clients/notion-wordmark-white.svg" },
-  { name: "Figma", src: "/brand/clients/figma-wordmark-white.svg" },
-  { name: "Linear", src: "/brand/clients/linear-wordmark-white.svg" },
-  { name: "Ramp", src: "/brand/clients/ramp-wordmark-white.svg" },
-  { name: "Intercom", src: "/brand/clients/intercom-wordmark-white.svg" },
-] as const;
-
-const STEPS = [
-  {
-    title: "Same-day acknowledgement",
-    body: "A real person confirms your brief and flags anything missing.",
-  },
-  {
-    title: "Shortlist within 48 hours",
-    body: "Named creators with reach data, past work and format-level pricing.",
-  },
-  {
-    title: "Scoped proposal",
-    body: "Deliverables, dates and commercials in one document you can forward.",
-  },
-] as const;
 
 const EYEBROW =
   "text-[0.7rem] font-medium tracking-[0.16em] text-charcoal/45 uppercase";
@@ -90,6 +74,13 @@ export default async function ContactPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
+  const [content, session] = await Promise.all([
+    getContactPageSections(),
+    auth(),
+  ]);
+  const canEdit = Boolean(
+    session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
+  );
 
   // Accepts ?experts=a,b from the shortlist basket and ?expert=a from profiles.
   const requested = [
@@ -139,73 +130,11 @@ export default async function ContactPage({
             initialAudience={parseAudience(params.type)}
           />
 
-          <aside className="flex flex-col gap-5 lg:sticky lg:top-32">
-            <div className="rounded-sm bg-charcoal p-6 md:p-7">
-              <p className="text-[0.7rem] font-medium tracking-[0.16em] text-cream/55 uppercase">
-                Briefed by teams at
-              </p>
-              <ul className="mt-5 grid grid-cols-3 items-center gap-x-6 gap-y-5">
-                {TRUST_LOGOS.map((logo) => (
-                  <li key={logo.name}>
-                    <img
-                      src={logo.src}
-                      alt={logo.name}
-                      className="h-5 w-auto max-w-full object-contain object-left brightness-0 invert md:h-5.5"
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-6 md:p-7">
-              <p className="text-[0.7rem] font-medium tracking-[0.16em] text-charcoal/45 uppercase">
-                What happens next
-              </p>
-              <ol className="mt-6">
-                {STEPS.map((step, index) => (
-                  <li
-                    key={step.title}
-                    className="relative flex gap-4 pb-6 last:pb-0"
-                  >
-                    {index < STEPS.length - 1 ? (
-                      <span
-                        aria-hidden
-                        className="absolute top-7 bottom-0 left-2.75 w-px bg-charcoal/12"
-                      />
-                    ) : null}
-                    <span className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-forest/25 bg-forest/8 font-display text-[0.6875rem] leading-none text-forest">
-                      {index + 1}
-                    </span>
-                    <div className="-mt-1">
-                      <p className="font-display text-[1.0625rem] leading-snug tracking-tight text-charcoal">
-                        {step.title}
-                      </p>
-                      <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/60">
-                        {step.body}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-
-              <p className="mt-2 border-t border-charcoal/8 pt-5 text-[0.8125rem] leading-relaxed text-charcoal/60">
-                Rather browse first?{" "}
-                <Link
-                  href="/roster"
-                  className="font-medium text-forest transition-colors hover:text-forest-dark"
-                >
-                  See all 24 creators
-                </Link>
-                {" · "}
-                <a
-                  href="mailto:hello@crediblecreators.com"
-                  className="font-medium text-forest transition-colors hover:text-forest-dark"
-                >
-                  email us
-                </a>
-              </p>
-            </div>
-          </aside>
+          <ContactVisualEditor
+            initial={content}
+            canEdit={canEdit}
+            saveAction={saveContactPage}
+          />
         </div>
 
         <section className="mt-16 border-t border-charcoal/10 pt-12 md:mt-20 md:pt-14">

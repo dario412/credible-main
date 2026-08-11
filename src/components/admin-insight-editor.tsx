@@ -19,6 +19,14 @@ function newBlock(type: BlockType): InsightBlock {
       return { type: "quote", text: "", attribution: "" };
     case "ul":
       return { type: "ul", items: [""] };
+    case "ol":
+      return { type: "ol", items: [""] };
+    case "image":
+      return { type: "image", src: "", alt: "", caption: "" };
+    case "callout":
+      return { type: "callout", text: "", label: "" };
+    case "hr":
+      return { type: "hr" };
     case "p":
     default:
       return { type: "p", text: "" };
@@ -31,7 +39,15 @@ const ADD_OPTIONS: { type: BlockType; label: string }[] = [
   { type: "h3", label: "Heading 3" },
   { type: "quote", label: "Quote" },
   { type: "ul", label: "Bullet list" },
+  { type: "ol", label: "Numbered list" },
+  { type: "image", label: "Image" },
+  { type: "callout", label: "Callout" },
+  { type: "hr", label: "Divider" },
 ];
+
+function blockLabel(type: BlockType) {
+  return ADD_OPTIONS.find((o) => o.type === type)?.label ?? type;
+}
 
 export function InsightBlockEditor({
   value,
@@ -100,15 +116,7 @@ export function InsightBlockEditor({
           >
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <span className="text-[0.65rem] font-medium tracking-[0.12em] text-charcoal/45 uppercase">
-                {block.type === "p"
-                  ? "Paragraph"
-                  : block.type === "h2"
-                    ? "Heading 2"
-                    : block.type === "h3"
-                      ? "Heading 3"
-                      : block.type === "quote"
-                        ? "Quote"
-                        : "Bullet list"}
+                {blockLabel(block.type)}
               </span>
               <div className="flex items-center gap-1">
                 <button
@@ -173,7 +181,7 @@ export function InsightBlockEditor({
               </div>
             ) : null}
 
-            {block.type === "ul" ? (
+            {block.type === "ul" || block.type === "ol" ? (
               <TextArea
                 value={block.items.join("\n")}
                 rows={4}
@@ -183,8 +191,63 @@ export function InsightBlockEditor({
                     items: e.target.value.split("\n"),
                   })
                 }
-                placeholder={"One bullet per line\nSecond item"}
+                placeholder={
+                  block.type === "ol"
+                    ? "One item per line\nSecond item"
+                    : "One bullet per line\nSecond item"
+                }
               />
+            ) : null}
+
+            {block.type === "image" ? (
+              <div className="space-y-3">
+                <MediaField
+                  label="Image"
+                  value={block.src}
+                  onChange={(src) => updateAt(index, { ...block, src })}
+                  hint="Pick from the media library or paste a URL."
+                />
+                <TextInput
+                  value={block.alt ?? ""}
+                  onChange={(e) =>
+                    updateAt(index, { ...block, alt: e.target.value })
+                  }
+                  placeholder="Alt text"
+                />
+                <TextInput
+                  value={block.caption ?? ""}
+                  onChange={(e) =>
+                    updateAt(index, { ...block, caption: e.target.value })
+                  }
+                  placeholder="Caption (optional)"
+                />
+              </div>
+            ) : null}
+
+            {block.type === "callout" ? (
+              <div className="space-y-3">
+                <TextInput
+                  value={block.label ?? ""}
+                  onChange={(e) =>
+                    updateAt(index, { ...block, label: e.target.value })
+                  }
+                  placeholder="Label (optional) — e.g. Key takeaway"
+                />
+                <TextArea
+                  value={block.text}
+                  rows={3}
+                  onChange={(e) =>
+                    updateAt(index, { ...block, text: e.target.value })
+                  }
+                  placeholder="Callout text…"
+                />
+              </div>
+            ) : null}
+
+            {block.type === "hr" ? (
+              <p className="text-sm text-muted">
+                Horizontal divider — no extra fields.
+              </p>
             ) : null}
           </li>
         ))}

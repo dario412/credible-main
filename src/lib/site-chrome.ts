@@ -16,6 +16,91 @@ export type FooterColumn = {
   links: NavLink[];
 };
 
+export type ProfileRailNavLabels = {
+  overview: string;
+  channels: string;
+  topics: string;
+  formats: string;
+  work: string;
+};
+
+export type ProfileRailSections = {
+  availabilityLabel: string;
+  signedBadgeLabel: string;
+  openBadgeLabel: string;
+  focusLabel: string;
+  workWithTitle: string;
+  workWithDescription: string;
+  primaryCtaLabel: string;
+  shortlistLabel: string;
+  shortlistedLabel: string;
+  footnote: string;
+  nav: ProfileRailNavLabels;
+};
+
+export type ProfileCtaSections = {
+  headline: string;
+  description: string;
+  primaryCtaLabel: string;
+  primaryCtaHref: string;
+  secondaryCtaLabel: string;
+  secondaryCtaHref: string;
+  similarHeadline: string;
+  similarLinkLabel: string;
+  similarLinkHref: string;
+};
+
+export type ProfileFormatKind =
+  | "brandPartnerships"
+  | "speaking"
+  | "liveEvents"
+  | "ambassador";
+
+export type ProfileFormatCopy = {
+  title: string;
+  description: string;
+};
+
+export type ProfileFormatsSections = Record<
+  ProfileFormatKind,
+  ProfileFormatCopy
+>;
+
+export type InsightsPromoSections = {
+  newsletter: {
+    eyebrow: string;
+    headline: string;
+    description: string;
+    emailPlaceholder: string;
+    buttonLabel: string;
+  };
+  roster: {
+    eyebrow: string;
+    headline: string;
+    description: string;
+    ctaLabel: string;
+    ctaHref: string;
+  };
+};
+
+/** Compact roster CTA in insight / case study article sidebars. */
+export type ArticleSidebarCtaSections = {
+  headline: string;
+  description: string;
+  ctaLabel: string;
+  ctaHref: string;
+};
+
+export const PROFILE_FORMAT_KINDS: Array<{
+  key: ProfileFormatKind;
+  hint: string;
+}> = [
+  { key: "brandPartnerships", hint: "Brand partnerships" },
+  { key: "speaking", hint: "Speaking" },
+  { key: "liveEvents", hint: "Live events" },
+  { key: "ambassador", hint: "Ambassador program" },
+];
+
 export type SiteChromeSections = {
   header: {
     links: NavLink[];
@@ -31,6 +116,11 @@ export type SiteChromeSections = {
     columns: FooterColumn[];
     legalLinks: NavLink[];
   };
+  profileRail: ProfileRailSections;
+  profileCta: ProfileCtaSections;
+  profileFormats: ProfileFormatsSections;
+  insightsPromo: InsightsPromoSections;
+  articleSidebarCta: ArticleSidebarCtaSections;
 };
 
 export const SOCIAL_NETWORKS: Array<{
@@ -118,6 +208,84 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
       { href: "/terms", label: "Terms of Service" },
     ],
   },
+  profileRail: {
+    availabilityLabel: "Available to book",
+    signedBadgeLabel: "Signed",
+    openBadgeLabel: "Open",
+    focusLabel: "Focus",
+    workWithTitle: "Work with {first}",
+    workWithDescription: "Briefs go to {first}'s manager at Credible.",
+    primaryCtaLabel: "Get Rates",
+    shortlistLabel: "Shortlist",
+    shortlistedLabel: "Shortlisted",
+    footnote: "Exclusive · Reply in 48h · Selective briefs",
+    nav: {
+      overview: "Overview",
+      channels: "Channels",
+      topics: "Topics & audience",
+      formats: "Formats",
+      work: "Recent work",
+    },
+  },
+  profileCta: {
+    headline: "Interested in working with {first}?",
+    description:
+      "Every enquiry gets a same-day acknowledgement from {first}'s manager at Credible. Brief availability is limited to two commercial partners per quarter.",
+    primaryCtaLabel: "Send brief",
+    primaryCtaHref: "/contact?expert={slug}",
+    secondaryCtaLabel: "Browse roster",
+    secondaryCtaHref: "/roster",
+    similarHeadline: "Similar creators.",
+    similarLinkLabel: "View roster",
+    similarLinkHref: "/roster",
+  },
+  profileFormats: {
+    brandPartnerships: {
+      title: "Brand partnerships",
+      description:
+        "Hosted or co-produced series with brand integration — long-form and considered, built for operators who already trust {first}'s voice.",
+    },
+    speaking: {
+      title: "Speaking",
+      description:
+        "Keynotes and firesides on building media businesses, founder storytelling and creator-led growth. 45–60 minute delivery.",
+    },
+    liveEvents: {
+      title: "Live events",
+      description:
+        "Founder summits, product launches and closed-door exec sessions — {first} hosts the room, then carries it to {first}'s own audience.",
+    },
+    ambassador: {
+      title: "Ambassador program",
+      description:
+        "12–18 month terms only. Selective — {first} takes on a small number of brand partners per year.",
+    },
+  },
+  insightsPromo: {
+    newsletter: {
+      eyebrow: "Newsletter",
+      headline: "Get the monthly briefing.",
+      description:
+        "Field notes on B2B creators, buyer research, and the formats that actually move pipeline.",
+      emailPlaceholder: "Work email",
+      buttonLabel: "Subscribe",
+    },
+    roster: {
+      eyebrow: "Roster",
+      headline: "Browse creators ready to brief.",
+      description:
+        "Expert operators filtered by topic, format, and archetype.",
+      ctaLabel: "Explore the roster",
+      ctaHref: "/roster",
+    },
+  },
+  articleSidebarCta: {
+    headline: "Ready to brief an expert?",
+    description:
+      "Browse operators by topic, format, and archetype — then send a brief.",
+    ctaLabel: "Browse the roster",
+    ctaHref: "/roster",
+  },
 };
 
 function asString(value: unknown, fallback: string) {
@@ -179,10 +347,205 @@ function mergeFooterColumn(
   return { title, links };
 }
 
+function mergeProfileRailNav(
+  raw: unknown,
+  defaults: ProfileRailNavLabels,
+): ProfileRailNavLabels {
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    ProfileRailNavLabels
+  >;
+  return {
+    overview: asString(data.overview, defaults.overview),
+    channels: asString(data.channels, defaults.channels),
+    topics: asString(data.topics, defaults.topics),
+    formats: asString(data.formats, defaults.formats),
+    work: asString(data.work, defaults.work),
+  };
+}
+
+function mergeProfileRail(raw: unknown): ProfileRailSections {
+  const defaults = DEFAULT_SITE_CHROME.profileRail;
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    ProfileRailSections
+  >;
+  return {
+    availabilityLabel: asString(
+      data.availabilityLabel,
+      defaults.availabilityLabel,
+    ),
+    signedBadgeLabel: asString(data.signedBadgeLabel, defaults.signedBadgeLabel),
+    openBadgeLabel: asString(data.openBadgeLabel, defaults.openBadgeLabel),
+    focusLabel: asString(data.focusLabel, defaults.focusLabel),
+    workWithTitle: asString(data.workWithTitle, defaults.workWithTitle),
+    workWithDescription: asString(
+      data.workWithDescription,
+      defaults.workWithDescription,
+    ),
+    primaryCtaLabel: asString(data.primaryCtaLabel, defaults.primaryCtaLabel),
+    shortlistLabel: asString(data.shortlistLabel, defaults.shortlistLabel),
+    shortlistedLabel: asString(
+      data.shortlistedLabel,
+      defaults.shortlistedLabel,
+    ),
+    footnote: asString(data.footnote, defaults.footnote),
+    nav: mergeProfileRailNav(data.nav, defaults.nav),
+  };
+}
+
+function mergeProfileCta(raw: unknown): ProfileCtaSections {
+  const defaults = DEFAULT_SITE_CHROME.profileCta;
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    ProfileCtaSections
+  >;
+  return {
+    headline: asString(data.headline, defaults.headline),
+    description: asString(data.description, defaults.description),
+    primaryCtaLabel: asString(data.primaryCtaLabel, defaults.primaryCtaLabel),
+    primaryCtaHref: asString(data.primaryCtaHref, defaults.primaryCtaHref),
+    secondaryCtaLabel: asString(
+      data.secondaryCtaLabel,
+      defaults.secondaryCtaLabel,
+    ),
+    secondaryCtaHref: asString(
+      data.secondaryCtaHref,
+      defaults.secondaryCtaHref,
+    ),
+    similarHeadline: asString(data.similarHeadline, defaults.similarHeadline),
+    similarLinkLabel: asString(
+      data.similarLinkLabel,
+      defaults.similarLinkLabel,
+    ),
+    similarLinkHref: asString(data.similarLinkHref, defaults.similarLinkHref),
+  };
+}
+
+function mergeFormatCopy(
+  raw: unknown,
+  fallback: ProfileFormatCopy,
+): ProfileFormatCopy {
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    ProfileFormatCopy
+  >;
+  return {
+    title: asString(data.title, fallback.title),
+    description: asString(data.description, fallback.description),
+  };
+}
+
+function mergeProfileFormats(raw: unknown): ProfileFormatsSections {
+  const defaults = DEFAULT_SITE_CHROME.profileFormats;
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    Record<ProfileFormatKind, unknown>
+  >;
+  return {
+    brandPartnerships: mergeFormatCopy(
+      data.brandPartnerships,
+      defaults.brandPartnerships,
+    ),
+    speaking: mergeFormatCopy(data.speaking, defaults.speaking),
+    liveEvents: mergeFormatCopy(data.liveEvents, defaults.liveEvents),
+    ambassador: mergeFormatCopy(data.ambassador, defaults.ambassador),
+  };
+}
+
+function mergeInsightsPromo(raw: unknown): InsightsPromoSections {
+  const defaults = DEFAULT_SITE_CHROME.insightsPromo;
+  const data = (raw && typeof raw === "object" ? raw : {}) as {
+    newsletter?: Partial<InsightsPromoSections["newsletter"]>;
+    roster?: Partial<InsightsPromoSections["roster"]>;
+  };
+  const newsletter = data.newsletter ?? {};
+  const roster = data.roster ?? {};
+  return {
+    newsletter: {
+      eyebrow: asString(newsletter.eyebrow, defaults.newsletter.eyebrow),
+      headline: asString(newsletter.headline, defaults.newsletter.headline),
+      description: asString(
+        newsletter.description,
+        defaults.newsletter.description,
+      ),
+      emailPlaceholder: asString(
+        newsletter.emailPlaceholder,
+        defaults.newsletter.emailPlaceholder,
+      ),
+      buttonLabel: asString(
+        newsletter.buttonLabel,
+        defaults.newsletter.buttonLabel,
+      ),
+    },
+    roster: {
+      eyebrow: asString(roster.eyebrow, defaults.roster.eyebrow),
+      headline: asString(roster.headline, defaults.roster.headline),
+      description: asString(roster.description, defaults.roster.description),
+      ctaLabel: asString(roster.ctaLabel, defaults.roster.ctaLabel),
+      ctaHref: asString(roster.ctaHref, defaults.roster.ctaHref),
+    },
+  };
+}
+
+function mergeArticleSidebarCta(raw: unknown): ArticleSidebarCtaSections {
+  const defaults = DEFAULT_SITE_CHROME.articleSidebarCta;
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    ArticleSidebarCtaSections
+  >;
+  return {
+    headline: asString(data.headline, defaults.headline),
+    description: asString(data.description, defaults.description),
+    ctaLabel: asString(data.ctaLabel, defaults.ctaLabel),
+    ctaHref: asString(data.ctaHref, defaults.ctaHref),
+  };
+}
+
+export type ProfileTemplateVars = {
+  first: string;
+  name: string;
+  slug?: string;
+};
+
+export function applyProfileRailTemplate(
+  template: string,
+  vars: ProfileTemplateVars,
+) {
+  return template
+    .replace(/\{first\}/g, vars.first)
+    .replace(/\{name\}/g, vars.name)
+    .replace(/\{slug\}/g, vars.slug ?? "");
+}
+
+export function buildProfileNav(
+  labels: ProfileRailNavLabels,
+  sections: {
+    hasChannels: boolean;
+    hasTopics: boolean;
+    hasFormats: boolean;
+    hasWork: boolean;
+  },
+): NavLink[] {
+  const items: NavLink[] = [{ href: "#overview", label: labels.overview }];
+  if (sections.hasChannels) {
+    items.push({ href: "#channels", label: labels.channels });
+  }
+  if (sections.hasTopics) {
+    items.push({ href: "#topics", label: labels.topics });
+  }
+  if (sections.hasFormats) {
+    items.push({ href: "#formats", label: labels.formats });
+  }
+  if (sections.hasWork) {
+    items.push({ href: "#work", label: labels.work });
+  }
+  return items;
+}
+
 export function mergeSiteChrome(raw: unknown): SiteChromeSections {
   const data = (raw && typeof raw === "object" ? raw : {}) as {
     header?: Partial<SiteChromeSections["header"]>;
     footer?: Partial<SiteChromeSections["footer"]> & Record<string, unknown>;
+    profileRail?: unknown;
+    profileCta?: unknown;
+    profileFormats?: unknown;
+    insightsPromo?: unknown;
+    articleSidebarCta?: unknown;
   };
   const header = data.header ?? {};
   const footer = data.footer ?? {};
@@ -229,6 +592,11 @@ export function mergeSiteChrome(raw: unknown): SiteChromeSections {
             })),
       legalLinks: mergeNavLinks(footer.legalLinks, defaults.footer.legalLinks),
     },
+    profileRail: mergeProfileRail(data.profileRail),
+    profileCta: mergeProfileCta(data.profileCta),
+    profileFormats: mergeProfileFormats(data.profileFormats),
+    insightsPromo: mergeInsightsPromo(data.insightsPromo),
+    articleSidebarCta: mergeArticleSidebarCta(data.articleSidebarCta),
   };
 }
 

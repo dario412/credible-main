@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight } from "@phosphor-icons/react/ssr";
@@ -6,6 +5,7 @@ import { ArrowRight } from "@phosphor-icons/react/ssr";
 import { InsightArticleCta } from "@/components/insight-article-cta";
 import { InsightShare } from "@/components/insight-share";
 import { RelatedInsightsGrid } from "@/components/related-insights-grid";
+import { SiteImage } from "@/components/site-image";
 import { ViewMoreLink } from "@/components/view-more-link";
 import {
   DEFAULT_INSIGHT_AUTHOR_SLUG,
@@ -101,6 +101,12 @@ export default async function InsightPage({ params }: Props) {
               {insight.title}
             </h1>
 
+            {insight.excerpt ? (
+              <p className="mt-4 max-w-xl text-[0.98rem] leading-relaxed text-charcoal/65 md:mt-5 md:text-[1.02rem]">
+                {insight.excerpt}
+              </p>
+            ) : null}
+
             <Link
               href={`/insights/authors/${author.slug}`}
               className="mt-6 flex w-fit items-center gap-3 md:mt-7"
@@ -123,7 +129,7 @@ export default async function InsightPage({ params }: Props) {
           <div className="lg:flex lg:items-center">
             <div className="relative aspect-16/10 w-full overflow-hidden rounded-sm bg-forest/10 lg:aspect-auto lg:min-h-112">
               {cover ? (
-                <Image
+                <SiteImage
                   src={cover}
                   alt=""
                   fill
@@ -210,10 +216,6 @@ export default async function InsightPage({ params }: Props) {
             </aside>
 
             <div className="min-w-0 w-full">
-              <p className="mb-7 w-full text-[0.98rem] leading-relaxed text-charcoal/65 md:mb-8 md:text-[1.02rem]">
-                {insight.excerpt}
-              </p>
-
               <div className="prose-credible w-full ![max-width:none]">
                 {blocks.map((block, index) => (
                   <InsightBlockView
@@ -318,12 +320,58 @@ function InsightBlockView({ block }: { block: InsightBlock }) {
     case "ul":
       return (
         <ul className="my-4 list-disc space-y-2 pl-5 text-[0.95rem] leading-[1.65] text-charcoal">
-          {block.items.map((item) => (
-            <li key={item}>{item}</li>
+          {block.items.map((item, i) => (
+            <li key={`${i}-${item}`}>{item}</li>
           ))}
         </ul>
       );
-    default:
+    case "ol":
+      return (
+        <ol className="my-4 list-decimal space-y-2 pl-5 text-[0.95rem] leading-[1.65] text-charcoal">
+          {block.items.map((item, i) => (
+            <li key={`${i}-${item}`}>{item}</li>
+          ))}
+        </ol>
+      );
+    case "image":
+      return (
+        <figure className="my-8 md:my-10">
+          <div className="relative aspect-16/10 w-full overflow-hidden rounded-sm bg-forest/10">
+            <SiteImage
+              src={block.src}
+              alt={block.alt ?? ""}
+              fill
+              sizes="(min-width: 1024px) 60vw, 100vw"
+              className="object-cover"
+            />
+          </div>
+          {block.caption ? (
+            <figcaption className="mt-3 text-[0.8125rem] leading-relaxed text-charcoal/55">
+              {block.caption}
+            </figcaption>
+          ) : null}
+        </figure>
+      );
+    case "callout":
+      return (
+        <aside className="my-7 rounded-sm border border-charcoal/8 bg-[#FBF8F5] px-5 py-5 md:px-6 md:py-6">
+          {block.label ? (
+            <p className="text-[0.65rem] font-medium tracking-[0.14em] text-charcoal/45 uppercase">
+              {block.label}
+            </p>
+          ) : null}
+          <p
+            className={`text-[0.95rem] leading-[1.65] text-charcoal md:text-[0.98rem] ${
+              block.label ? "mt-2" : ""
+            }`}
+          >
+            {block.text}
+          </p>
+        </aside>
+      );
+    case "hr":
+      return <hr className="my-10 border-0 border-t border-charcoal/12" />;
+    case "p":
       return (
         <p className="mb-[1em] text-[0.95rem] leading-[1.65] text-charcoal md:text-[0.98rem]">
           {block.text}

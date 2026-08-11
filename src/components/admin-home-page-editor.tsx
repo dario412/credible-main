@@ -8,7 +8,10 @@ import {
   TextStyleControls,
 } from "@/components/home-style-controls";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
+import { MediaField } from "@/components/media-library";
 import type { HomePageSections } from "@/lib/cms";
+import { DEFAULT_HOME_SECTIONS } from "@/lib/cms";
+import { TRUSTED_BY_LOGO_HINT } from "@/lib/trusted-by";
 import { cn } from "@/lib/utils";
 
 export function HomePageEditorForm({
@@ -317,70 +320,136 @@ export function HomePageEditorForm({
             }
           />
         </Field>
-        <div className="grid gap-4 md:grid-cols-3">
-          <Field label="Pillar" id="ks-pillar">
-            <TextInput
-              id="ks-pillar"
-              value={sections.keyStudy.pillar}
-              onChange={(e) =>
-                patch("keyStudy", {
-                  ...sections.keyStudy,
-                  pillar: e.target.value,
-                })
-              }
-            />
-          </Field>
-          <Field label="Lead" id="ks-lead">
-            <TextInput
-              id="ks-lead"
-              value={sections.keyStudy.lead}
-              onChange={(e) =>
-                patch("keyStudy", {
-                  ...sections.keyStudy,
-                  lead: e.target.value,
-                })
-              }
-            />
-          </Field>
-          <Field label="Term" id="ks-term">
-            <TextInput
-              id="ks-term"
-              value={sections.keyStudy.term}
-              onChange={(e) =>
-                patch("keyStudy", {
-                  ...sections.keyStudy,
-                  term: e.target.value,
-                })
-              }
-            />
-          </Field>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm font-medium">Meta line</p>
+            <p className="mt-1 text-sm text-muted">
+              Label and value pairs shown under the summary (e.g. Pillar, Lead, Term).
+            </p>
+          </div>
+          {sections.keyStudy.meta.map((item, index) => (
+            <div
+              key={`ks-meta-${index}`}
+              className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-medium">Item {index + 1}</p>
+                <button
+                  type="button"
+                  onClick={() =>
+                    patch("keyStudy", {
+                      ...sections.keyStudy,
+                      meta: sections.keyStudy.meta.filter((_, i) => i !== index),
+                    })
+                  }
+                  className="text-xs font-medium text-danger hover:underline"
+                >
+                  Remove
+                </button>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="Title" id={`ks-meta-label-${index}`}>
+                  <TextInput
+                    id={`ks-meta-label-${index}`}
+                    value={item.label}
+                    onChange={(e) => {
+                      const meta = sections.keyStudy.meta.map((row, i) =>
+                        i === index ? { ...row, label: e.target.value } : row,
+                      );
+                      patch("keyStudy", { ...sections.keyStudy, meta });
+                    }}
+                  />
+                </Field>
+                <Field label="Value" id={`ks-meta-value-${index}`}>
+                  <TextInput
+                    id={`ks-meta-value-${index}`}
+                    value={item.value}
+                    onChange={(e) => {
+                      const meta = sections.keyStudy.meta.map((row, i) =>
+                        i === index ? { ...row, value: e.target.value } : row,
+                      );
+                      patch("keyStudy", { ...sections.keyStudy, meta });
+                    }}
+                  />
+                </Field>
+              </div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              patch("keyStudy", {
+                ...sections.keyStudy,
+                meta: [...sections.keyStudy.meta, { label: "", value: "" }],
+              })
+            }
+            className="text-sm font-medium text-forest hover:text-forest-dark"
+          >
+            + Add meta item
+          </button>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <Field label="CTA label" id="ks-cta">
-            <TextInput
-              id="ks-cta"
-              value={sections.keyStudy.ctaLabel}
-              onChange={(e) =>
+        {sections.keyStudy.showCta ? (
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label="CTA label" id="ks-cta">
+                <TextInput
+                  id="ks-cta"
+                  value={sections.keyStudy.ctaLabel}
+                  onChange={(e) =>
+                    patch("keyStudy", {
+                      ...sections.keyStudy,
+                      ctaLabel: e.target.value,
+                    })
+                  }
+                />
+              </Field>
+              <Field label="CTA link" id="ks-href">
+                <TextInput
+                  id="ks-href"
+                  value={sections.keyStudy.ctaHref}
+                  onChange={(e) =>
+                    patch("keyStudy", {
+                      ...sections.keyStudy,
+                      ctaHref: e.target.value,
+                    })
+                  }
+                />
+              </Field>
+            </div>
+            <button
+              type="button"
+              onClick={() =>
                 patch("keyStudy", {
                   ...sections.keyStudy,
-                  ctaLabel: e.target.value,
+                  showCta: false,
                 })
               }
-            />
-          </Field>
-          <Field label="CTA link" id="ks-href">
-            <TextInput
-              id="ks-href"
-              value={sections.keyStudy.ctaHref}
-              onChange={(e) =>
-                patch("keyStudy", {
-                  ...sections.keyStudy,
-                  ctaHref: e.target.value,
-                })
-              }
-            />
-          </Field>
-        </div>
+              className="text-sm font-medium text-danger hover:underline"
+            >
+              Remove button
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              const defaults = DEFAULT_HOME_SECTIONS.keyStudy;
+              patch("keyStudy", {
+                ...sections.keyStudy,
+                showCta: true,
+                ctaLabel: sections.keyStudy.ctaLabel.trim()
+                  ? sections.keyStudy.ctaLabel
+                  : defaults.ctaLabel,
+                ctaHref: sections.keyStudy.ctaHref.trim()
+                  ? sections.keyStudy.ctaHref
+                  : defaults.ctaHref,
+              });
+            }}
+            className="text-sm font-medium text-forest hover:text-forest-dark"
+          >
+            + Add case study button
+          </button>
+        )}
         {sections.keyStudy.metrics.map((metric, index) => (
           <div
             key={index}
@@ -518,6 +587,39 @@ export function HomePageEditorForm({
             />
           </Field>
         </div>
+        <MediaField
+          label="Person photo"
+          value={sections.brandBrief.quotePhoto}
+          onChange={(quotePhoto) =>
+            patch("brandBrief", {
+              ...sections.brandBrief,
+              quotePhoto,
+            })
+          }
+        />
+        <MediaField
+          label="Company logo"
+          hint={TRUSTED_BY_LOGO_HINT}
+          value={sections.brandBrief.quoteLogo}
+          onChange={(quoteLogo) =>
+            patch("brandBrief", {
+              ...sections.brandBrief,
+              quoteLogo,
+            })
+          }
+        />
+        <Field label="Logo name (alt text)" id="bb-quote-logo-name">
+          <TextInput
+            id="bb-quote-logo-name"
+            value={sections.brandBrief.quoteLogoName}
+            onChange={(e) =>
+              patch("brandBrief", {
+                ...sections.brandBrief,
+                quoteLogoName: e.target.value,
+              })
+            }
+          />
+        </Field>
         <Field label="Form title" id="bb-form">
           <TextInput
             id="bb-form"
@@ -530,6 +632,241 @@ export function HomePageEditorForm({
             }
           />
         </Field>
+        <Field label="Form footnote" id="bb-footnote">
+          <TextInput
+            id="bb-footnote"
+            value={sections.brandBrief.formFootnote}
+            onChange={(e) =>
+              patch("brandBrief", {
+                ...sections.brandBrief,
+                formFootnote: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm font-medium">Briefed-by strip</p>
+            <p className="mt-1 text-sm text-muted">
+              Label and client logos shown below the form.
+            </p>
+          </div>
+          <Field label="Label" id="bb-briefed-label">
+            <TextInput
+              id="bb-briefed-label"
+              value={sections.brandBrief.briefedByLabel}
+              onChange={(e) =>
+                patch("brandBrief", {
+                  ...sections.brandBrief,
+                  briefedByLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          {sections.brandBrief.briefedByLogos.map((logo, index) => (
+            <div
+              key={`bb-logo-${index}`}
+              className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-medium">Logo {index + 1}</p>
+                <button
+                  type="button"
+                  onClick={() =>
+                    patch("brandBrief", {
+                      ...sections.brandBrief,
+                      briefedByLogos: sections.brandBrief.briefedByLogos.filter(
+                        (_, i) => i !== index,
+                      ),
+                    })
+                  }
+                  className="text-xs font-medium text-danger hover:underline"
+                >
+                  Remove
+                </button>
+              </div>
+              <Field label="Name" id={`bb-logo-name-${index}`}>
+                <TextInput
+                  id={`bb-logo-name-${index}`}
+                  value={logo.name}
+                  onChange={(e) => {
+                    const briefedByLogos = sections.brandBrief.briefedByLogos.map(
+                      (row, i) =>
+                        i === index ? { ...row, name: e.target.value } : row,
+                    );
+                    patch("brandBrief", {
+                      ...sections.brandBrief,
+                      briefedByLogos,
+                    });
+                  }}
+                />
+              </Field>
+              <MediaField
+                label="Logo image"
+                hint={TRUSTED_BY_LOGO_HINT}
+                value={logo.src}
+                onChange={(src) => {
+                  const briefedByLogos = sections.brandBrief.briefedByLogos.map(
+                    (row, i) => (i === index ? { ...row, src } : row),
+                  );
+                  patch("brandBrief", {
+                    ...sections.brandBrief,
+                    briefedByLogos,
+                  });
+                }}
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              patch("brandBrief", {
+                ...sections.brandBrief,
+                briefedByLogos: [
+                  ...sections.brandBrief.briefedByLogos,
+                  { name: "", src: "" },
+                ],
+              })
+            }
+            className="text-sm font-medium text-forest hover:text-forest-dark"
+          >
+            + Add logo
+          </button>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="font-display text-xl">Creators CTA</h2>
+        <Field label="Eyebrow" id="cc-eyebrow">
+          <TextInput
+            id="cc-eyebrow"
+            value={sections.creatorCta.eyebrow}
+            onChange={(e) =>
+              patch("creatorCta", {
+                ...sections.creatorCta,
+                eyebrow: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Headline" id="cc-headline">
+          <TextArea
+            id="cc-headline"
+            rows={2}
+            value={sections.creatorCta.headline}
+            onChange={(e) =>
+              patch("creatorCta", {
+                ...sections.creatorCta,
+                headline: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Supporting line" id="cc-subhead">
+          <TextArea
+            id="cc-subhead"
+            rows={3}
+            value={sections.creatorCta.subhead}
+            onChange={(e) =>
+              patch("creatorCta", {
+                ...sections.creatorCta,
+                subhead: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <label className="flex items-center gap-2 text-sm text-charcoal">
+          <input
+            type="checkbox"
+            checked={sections.creatorCta.showFacesMarquee}
+            onChange={(e) =>
+              patch("creatorCta", {
+                ...sections.creatorCta,
+                showFacesMarquee: e.target.checked,
+              })
+            }
+            className="rounded-sm border-charcoal/20"
+          />
+          Show creator faces marquee
+        </label>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Stat 1" id="cc-stat1">
+            <TextInput
+              id="cc-stat1"
+              value={sections.creatorCta.stat1}
+              onChange={(e) =>
+                patch("creatorCta", {
+                  ...sections.creatorCta,
+                  stat1: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Stat 2" id="cc-stat2">
+            <TextInput
+              id="cc-stat2"
+              value={sections.creatorCta.stat2}
+              onChange={(e) =>
+                patch("creatorCta", {
+                  ...sections.creatorCta,
+                  stat2: e.target.value,
+                })
+              }
+            />
+          </Field>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Primary button label" id="cc-primary-label">
+            <TextInput
+              id="cc-primary-label"
+              value={sections.creatorCta.primaryCtaLabel}
+              onChange={(e) =>
+                patch("creatorCta", {
+                  ...sections.creatorCta,
+                  primaryCtaLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Primary button link" id="cc-primary-href">
+            <TextInput
+              id="cc-primary-href"
+              value={sections.creatorCta.primaryCtaHref}
+              onChange={(e) =>
+                patch("creatorCta", {
+                  ...sections.creatorCta,
+                  primaryCtaHref: e.target.value,
+                })
+              }
+            />
+          </Field>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Secondary button label" id="cc-secondary-label">
+            <TextInput
+              id="cc-secondary-label"
+              value={sections.creatorCta.secondaryCtaLabel}
+              onChange={(e) =>
+                patch("creatorCta", {
+                  ...sections.creatorCta,
+                  secondaryCtaLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Secondary button link" id="cc-secondary-href">
+            <TextInput
+              id="cc-secondary-href"
+              value={sections.creatorCta.secondaryCtaHref}
+              onChange={(e) =>
+                patch("creatorCta", {
+                  ...sections.creatorCta,
+                  secondaryCtaHref: e.target.value,
+                })
+              }
+            />
+          </Field>
+        </div>
       </section>
 
       <section className="rounded-sm border border-charcoal/10 bg-cream/50 px-4 py-4 text-sm text-muted">

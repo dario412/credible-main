@@ -8,7 +8,7 @@ import { createMetadata } from "@/lib/seo";
 import { hasTrustedByStory } from "@/lib/trusted-by";
 
 export const metadata = createMetadata({
-  title: "Trusted by CMS",
+  title: "Homepage logos",
   path: "/admin/trusted-by",
   noIndex: true,
 });
@@ -24,10 +24,9 @@ export default async function AdminTrustedByPage() {
     <div className="mx-auto max-w-5xl space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl">Trusted by</h1>
+          <h1 className="font-display text-3xl">Homepage logos</h1>
           <p className="mt-2 text-sm text-muted">
-            Shared client logos and optional customer stories — reuse on home and
-            other pages.
+            Client logos and optional stories for the homepage Trusted by grid.
           </p>
         </div>
         <Link

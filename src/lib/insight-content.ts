@@ -42,7 +42,11 @@ export type InsightBlock =
   | { type: "h2"; text: string; id: string }
   | { type: "h3"; text: string; id: string }
   | { type: "quote"; text: string; attribution?: string }
-  | { type: "ul"; items: string[] };
+  | { type: "ul"; items: string[] }
+  | { type: "ol"; items: string[] }
+  | { type: "image"; src: string; alt?: string; caption?: string }
+  | { type: "callout"; text: string; label?: string }
+  | { type: "hr" };
 
 export type InsightTocItem = { id: string; text: string };
 
@@ -58,11 +62,18 @@ export function blocksToPlainText(blocks: InsightBlock[]): string {
     .map((block) => {
       switch (block.type) {
         case "ul":
+        case "ol":
           return block.items.join(" ");
         case "quote":
           return `${block.text} ${block.attribution ?? ""}`;
+        case "image":
+          return [block.alt, block.caption].filter(Boolean).join(" ");
+        case "callout":
+          return `${block.label ?? ""} ${block.text}`;
+        case "hr":
+          return "";
         default:
-          return block.text;
+          return "text" in block ? block.text : "";
       }
     })
     .join(" ");
@@ -82,9 +93,23 @@ export function blocksToMarkdown(blocks: InsightBlock[]): string {
             : `> ${block.text}`;
         case "ul":
           return block.items.map((item) => `- ${item}`).join("\n");
+        case "ol":
+          return block.items
+            .map((item, i) => `${i + 1}. ${item}`)
+            .join("\n");
+        case "image":
+          return `![${block.alt ?? ""}](${block.src})${
+            block.caption ? `\n*${block.caption}*` : ""
+          }`;
+        case "callout":
+          return block.label
+            ? `> **${block.label}**\n> ${block.text}`
+            : `> ${block.text}`;
+        case "hr":
+          return "---";
         case "p":
         default:
-          return block.text;
+          return "text" in block ? block.text : "";
       }
     })
     .join("\n\n");
@@ -143,6 +168,26 @@ export function parseInsightBlocks(raw: unknown): InsightBlock[] | null {
         type: "ul",
         items: block.items.filter((i): i is string => typeof i === "string"),
       });
+    } else if (type === "ol" && Array.isArray(block.items)) {
+      blocks.push({
+        type: "ol",
+        items: block.items.filter((i): i is string => typeof i === "string"),
+      });
+    } else if (type === "image" && typeof block.src === "string" && block.src.trim()) {
+      blocks.push({
+        type: "image",
+        src: block.src,
+        alt: typeof block.alt === "string" ? block.alt : undefined,
+        caption: typeof block.caption === "string" ? block.caption : undefined,
+      });
+    } else if (type === "callout" && typeof block.text === "string") {
+      blocks.push({
+        type: "callout",
+        text: block.text,
+        label: typeof block.label === "string" ? block.label : undefined,
+      });
+    } else if (type === "hr") {
+      blocks.push({ type: "hr" });
     }
   }
   return blocks.length > 0 ? ensureBlockIds(blocks) : null;
@@ -160,7 +205,7 @@ export function resolveInsightContent(insight: {
   return parseInsightBody(insight.body);
 }
 
-/** Lightweight markdown: ## / ### / > / - lists / paragraphs */
+/** Lightweight markdown: ## / ### / > / lists / images / --- / paragraphs */
 export function parseInsightBody(body: string): {
   blocks: InsightBlock[];
   toc: InsightTocItem[];
@@ -171,6 +216,7 @@ export function parseInsightBody(body: string): {
   const usedIds = new Map<string, number>();
   let paragraph: string[] = [];
   let listItems: string[] = [];
+  let listKind: "ul" | "ol" | null = null;
 
   function uniqueId(text: string) {
     const base = slugify(text) || "section";
@@ -188,9 +234,14 @@ export function parseInsightBody(body: string): {
   }
 
   function flushList() {
-    if (listItems.length === 0) return;
-    blocks.push({ type: "ul", items: [...listItems] });
+    if (listItems.length === 0 || !listKind) {
+      listItems = [];
+      listKind = null;
+      return;
+    }
+    blocks.push({ type: listKind, items: [...listItems] });
     listItems = [];
+    listKind = null;
   }
 
   for (const raw of lines) {
@@ -200,6 +251,13 @@ export function parseInsightBody(body: string): {
     if (!trimmed) {
       flushParagraph();
       flushList();
+      continue;
+    }
+
+    if (trimmed === "---") {
+      flushParagraph();
+      flushList();
+      blocks.push({ type: "hr" });
       continue;
     }
 
@@ -222,6 +280,18 @@ export function parseInsightBody(body: string): {
       continue;
     }
 
+    const imageMatch = trimmed.match(/^!\[([^\]]*)\]\(([^)]+)\)\s*$/);
+    if (imageMatch) {
+      flushParagraph();
+      flushList();
+      blocks.push({
+        type: "image",
+        src: imageMatch[2]!.trim(),
+        alt: imageMatch[1]?.trim() || undefined,
+      });
+      continue;
+    }
+
     if (trimmed.startsWith("> ")) {
       flushParagraph();
       flushList();
@@ -230,8 +300,8 @@ export function parseInsightBody(body: string): {
       if (attrMatch) {
         blocks.push({
           type: "quote",
-          text: attrMatch[1].replace(/^["“]|["”]$/g, "").trim(),
-          attribution: attrMatch[2].trim(),
+          text: attrMatch[1]!.replace(/^["“]|["”]$/g, "").trim(),
+          attribution: attrMatch[2]!.trim(),
         });
       } else {
         blocks.push({
@@ -244,7 +314,18 @@ export function parseInsightBody(body: string): {
 
     if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
       flushParagraph();
+      if (listKind && listKind !== "ul") flushList();
+      listKind = "ul";
       listItems.push(trimmed.slice(2).trim());
+      continue;
+    }
+
+    const olMatch = trimmed.match(/^\d+\.\s+(.+)$/);
+    if (olMatch) {
+      flushParagraph();
+      if (listKind && listKind !== "ol") flushList();
+      listKind = "ol";
+      listItems.push(olMatch[1]!.trim());
       continue;
     }
 

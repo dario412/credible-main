@@ -105,36 +105,36 @@ function FullKeyStudy({
   );
   const metaNode = (
     <dl className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.8125rem] md:gap-x-6">
-      <div className="flex items-baseline gap-2">
-        <dt className="font-medium text-charcoal/50">Pillar</dt>
-        <dd className="font-medium text-charcoal">{content.pillar}</dd>
-      </div>
-      <span
-        aria-hidden
-        className="hidden h-3.5 w-px bg-charcoal/20 sm:block"
-      />
-      <div className="flex items-baseline gap-2">
-        <dt className="font-medium text-charcoal/50">Lead</dt>
-        <dd className="font-medium text-charcoal">{content.lead}</dd>
-      </div>
-      <span
-        aria-hidden
-        className="hidden h-3.5 w-px bg-charcoal/20 sm:block"
-      />
-      <div className="flex items-baseline gap-2">
-        <dt className="font-medium text-charcoal/50">Term</dt>
-        <dd className="font-medium text-charcoal">{content.term}</dd>
-      </div>
+      {content.meta
+        .filter((item) => item.label.trim() || item.value.trim())
+        .map((item, index) => (
+        <div key={`${item.label}-${index}`} className="contents">
+          {index > 0 ? (
+            <span
+              aria-hidden
+              className="hidden h-3.5 w-px bg-charcoal/20 sm:block"
+            />
+          ) : null}
+          <div className="flex items-baseline gap-2">
+            <dt className="font-medium text-charcoal/50">{item.label}</dt>
+            <dd className="font-medium text-charcoal">{item.value}</dd>
+          </div>
+        </div>
+      ))}
     </dl>
   );
-  const ctaNode = (
+  const ctaNode = content.showCta ? (
     <CaseStudyCta
       tone="charcoal"
       className="mt-8"
       label={content.ctaLabel}
       href={content.ctaHref}
     />
-  );
+  ) : editSlots?.cta ? (
+    <p className="mt-8 rounded-sm border border-dashed border-charcoal/20 px-4 py-3 text-[0.8125rem] text-charcoal/45">
+      Case study button hidden
+    </p>
+  ) : null;
 
   return (
     <section className="bg-cream-dark px-6 py-12 md:px-10 md:py-14 lg:px-12 lg:py-16">
@@ -150,7 +150,11 @@ function FullKeyStudy({
             {editSlots?.headline ? editSlots.headline(headlineNode) : headlineNode}
             {editSlots?.summary ? editSlots.summary(summaryNode) : summaryNode}
             {editSlots?.meta ? editSlots.meta(metaNode) : metaNode}
-            {editSlots?.cta ? editSlots.cta(ctaNode) : ctaNode}
+            {editSlots?.cta && ctaNode
+              ? editSlots.cta(ctaNode)
+              : content.showCta
+                ? ctaNode
+                : null}
           </div>
 
           <ul className="min-w-0">

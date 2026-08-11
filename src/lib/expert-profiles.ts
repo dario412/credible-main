@@ -36,6 +36,12 @@ export type ExpertFormatChannel = {
 };
 
 export type ExpertFormatOffering = {
+  /** Stable slot for shared CMS copy + Airtable panels */
+  kind?:
+    | "brandPartnerships"
+    | "speaking"
+    | "liveEvents"
+    | "ambassador";
   /** Display index, e.g. "01" */
   category: string;
   title: string;
@@ -137,12 +143,12 @@ const LIVE_EVENT_FORMATS = [
 
 const AMBASSADOR_FORMATS = ["Brand Ambassador", "Category Ambassador"];
 
-/** Shared format offerings — descriptions stay per-expert. */
-function expertFormats(copy: {
-  brandPartnerships: string;
-  speaking: string;
-  liveEvents: string;
-  ambassador: string;
+/** Shared format offerings — left-side copy lives in site chrome CMS. */
+function expertFormats(copy?: {
+  brandPartnerships?: string;
+  speaking?: string;
+  liveEvents?: string;
+  ambassador?: string;
   pricing?: {
     brandPartnerships?: string;
     speaking?: string;
@@ -150,37 +156,149 @@ function expertFormats(copy: {
     ambassador?: string;
   };
 }): ExpertFormatOffering[] {
-  const p = copy.pricing ?? {};
+  const p = copy?.pricing ?? {};
   return [
     {
+      kind: "brandPartnerships",
       category: "01",
       title: "Brand partnerships",
-      description: copy.brandPartnerships,
+      description: copy?.brandPartnerships ?? "",
       pricing: p.brandPartnerships,
       channels: BRAND_PARTNERSHIP_CHANNELS,
     },
     {
+      kind: "speaking",
       category: "02",
       title: "Speaking",
-      description: copy.speaking,
+      description: copy?.speaking ?? "",
       pricing: p.speaking,
       formats: SPEAKING_FORMATS,
     },
     {
+      kind: "liveEvents",
       category: "03",
       title: "Live events",
-      description: copy.liveEvents,
+      description: copy?.liveEvents ?? "",
       pricing: p.liveEvents,
       formats: LIVE_EVENT_FORMATS,
     },
     {
+      kind: "ambassador",
       category: "04",
       title: "Ambassador program",
-      description: copy.ambassador,
+      description: copy?.ambassador ?? "",
       pricing: p.ambassador,
       formats: AMBASSADOR_FORMATS,
     },
   ];
+}
+
+export const DEMO_FORMATS = expertFormats();
+
+export type FormatKind = NonNullable<ExpertFormatOffering["kind"]>;
+
+const FORMAT_KIND_ORDER: FormatKind[] = [
+  "brandPartnerships",
+  "speaking",
+  "liveEvents",
+  "ambassador",
+];
+
+export function resolveFormatKind(
+  format: ExpertFormatOffering,
+): FormatKind | null {
+  if (format.kind) return format.kind;
+  const key = format.title.toLowerCase();
+  if (key.includes("ambassador")) return "ambassador";
+  if (key.includes("brand") || key.includes("partnership")) {
+    return "brandPartnerships";
+  }
+  if (key.includes("live") || key.includes("event")) return "liveEvents";
+  if (key.includes("speak")) return "speaking";
+  return null;
+}
+
+/** Keep Airtable channel/format panels; fill missing slots from enrichment / demo. */
+export function mergeFormats(
+  primary: ExpertFormatOffering[] | null | undefined,
+  fallback: ExpertFormatOffering[] | null | undefined,
+): ExpertFormatOffering[] {
+  const demoByKind = new Map(
+    DEMO_FORMATS.map((item) => [item.kind!, item] as const),
+  );
+  const fallbackByKind = new Map<FormatKind, ExpertFormatOffering>();
+  for (const item of fallback ?? []) {
+    const kind = resolveFormatKind(item);
+    if (kind) fallbackByKind.set(kind, item);
+  }
+  const primaryByKind = new Map<FormatKind, ExpertFormatOffering>();
+  for (const item of primary ?? []) {
+    const kind = resolveFormatKind(item);
+    if (kind) primaryByKind.set(kind, item);
+  }
+
+  return FORMAT_KIND_ORDER.map((kind, index) => {
+    const live = primaryByKind.get(kind);
+    const enriched = fallbackByKind.get(kind);
+    const demo = demoByKind.get(kind)!;
+    const source = live ?? enriched ?? demo;
+    return {
+      ...demo,
+      ...source,
+      kind,
+      category: String(index + 1).padStart(2, "0"),
+      channels: source.channels?.length
+        ? source.channels
+        : demo.channels,
+      formats: source.channels?.length
+        ? undefined
+        : source.formats?.length
+          ? source.formats
+          : demo.formats,
+      description: "",
+    };
+  });
+}
+
+/**
+ * Placeholder audience slices for profiles that only have Airtable seniority
+ * (or no audience data yet). Lets clients see the full Topics grid; replace
+ * via Airtable when real industry / geography lists land.
+ */
+export const DEMO_AUDIENCE: ExpertAudience = {
+  seniority: [
+    { label: "Founder / C-Suite", percent: 41 },
+    { label: "VP / Director", percent: 26 },
+    { label: "Manager / IC", percent: 22 },
+    { label: "Investor", percent: 11 },
+  ],
+  industry: [
+    { label: "SaaS / Tech", percent: 38 },
+    { label: "Media / Marketing", percent: 28 },
+    { label: "Financial services", percent: 12 },
+    { label: "Other", percent: 22 },
+  ],
+  geography: [
+    { label: "US", percent: 72 },
+    { label: "UK", percent: 9 },
+    { label: "Canada", percent: 6 },
+  ],
+};
+
+/** Prefer live slices; fill empty lists from enrichment / demo placeholders. */
+export function mergeAudience(
+  primary: ExpertAudience | null | undefined,
+  fallback: ExpertAudience | null | undefined,
+): ExpertAudience | undefined {
+  const base = fallback ?? DEMO_AUDIENCE;
+  if (!primary) return fallback ?? DEMO_AUDIENCE;
+  return {
+    seniority:
+      primary.seniority.length > 0 ? primary.seniority : base.seniority,
+    industry: primary.industry.length > 0 ? primary.industry : base.industry,
+    geography:
+      primary.geography.length > 0 ? primary.geography : base.geography,
+  };
 }
 
 /** Profile fields not yet in the Expert model — keyed by slug. */

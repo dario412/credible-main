@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Media library uploads allow up to 4 MB; default Server Action limit is 1 MB.
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
+  },
   images: {
     remotePatterns: [
       {
@@ -23,6 +29,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.r2.dev",
       },
+    ],
+    localPatterns: [
+      { pathname: "/api/media/**", search: "" },
+      { pathname: "/images/**", search: "" },
+      { pathname: "/brand/**", search: "" },
     ],
   },
   async redirects() {

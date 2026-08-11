@@ -9,7 +9,7 @@ import { createMetadata } from "@/lib/seo";
 import { emptyTrustedByClient } from "@/lib/trusted-by";
 
 export const metadata = createMetadata({
-  title: "New trusted by client",
+  title: "New homepage logo",
   path: "/admin/trusted-by/new",
   noIndex: true,
 });
@@ -26,7 +26,7 @@ export default async function AdminTrustedByNewPage() {
           href="/admin/trusted-by"
           className="text-sm text-charcoal/55 hover:text-charcoal"
         >
-          ← Trusted by
+          ← Homepage logos
         </Link>
         <h1 className="mt-3 font-display text-3xl">New client</h1>
       </div>

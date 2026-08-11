@@ -297,7 +297,10 @@ export function Home2Hero({
     "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.04) 12%, rgba(0,0,0,0.14) 28%, rgba(0,0,0,0.38) 48%, rgba(0,0,0,0.55) 62%, rgba(0,0,0,0.42) 76%, rgba(0,0,0,0.18) 88%, transparent 100%)";
 
   return (
-    <section className="relative overflow-hidden bg-cream" data-site-hero>
+    <section
+      className="relative -mt-[7.25rem] overflow-hidden bg-cream md:-mt-[5.5rem]"
+      data-site-hero
+    >
       {/* Wave stage — forest-tinted, soft mid-band presence */}
       <div
         className="pointer-events-none absolute inset-0 z-0"
@@ -326,7 +329,7 @@ export function Home2Hero({
         }}
       />
 
-      <div className="relative z-10 mx-auto max-w-3xl px-6 pb-8 pt-16 text-center md:px-10 md:pb-10 md:pt-20 lg:pt-24">
+      <div className="relative z-10 mx-auto max-w-3xl px-6 pb-8 pt-28 text-center md:px-10 md:pb-10 md:pt-32 lg:pt-36">
         {editSlots?.headline ? editSlots.headline(headlineNode) : headlineNode}
         {editSlots?.subhead ? editSlots.subhead(subheadNode) : subheadNode}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

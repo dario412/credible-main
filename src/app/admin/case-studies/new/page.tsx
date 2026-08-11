@@ -20,13 +20,14 @@ const blank: CaseStudyCard = {
   title: "",
   summary: "",
   pillar: "Content",
+  pillars: ["Content"],
   clientType: "Direct client",
   industry: "",
   size: "",
   period: "",
   coverImage: "/images/case-studies/notion.jpg",
   featured: false,
-  story: { challenge: [], approach: [], outcomes: [], deliverables: [] },
+  blocks: [],
 };
 
 export default async function AdminNewCaseStudyPage() {

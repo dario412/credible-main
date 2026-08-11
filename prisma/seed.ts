@@ -23,7 +23,7 @@ async function main() {
 
   await prisma.user.upsert({
     where: { email },
-    update: { passwordHash, role: "OWNER", active: true },
+    update: { role: "OWNER", active: true },
     create: {
       email,
       name: "Dario Stojanov",
@@ -33,17 +33,14 @@ async function main() {
     },
   });
 
-  // Client owner account — password set explicitly for Lloyd's access.
+  // Client owner account — create if missing; do not reset an existing password on deploy.
   const lloydPasswordHash = await bcrypt.hash("Lloyd123", 12);
   await prisma.user.upsert({
     where: { email: "lloyd@crediblecreators.com" },
     update: {
       name: "Lloyd",
-      passwordHash: lloydPasswordHash,
       role: "OWNER",
       active: true,
-      totpEnabled: false,
-      totpSecret: null,
     },
     create: {
       email: "lloyd@crediblecreators.com",
@@ -64,11 +61,12 @@ async function main() {
     console.log(`Removed ${removed.count} legacy seed expert(s).`);
   }
 
+  // Seed defaults only — never overwrite CMS edits already on this database.
   for (const card of CASE_STUDIES) {
     const row = caseStudyCardToRow(card);
     await prisma.caseStudy.upsert({
       where: { slug: row.slug },
-      update: row,
+      update: {},
       create: row,
     });
   }
@@ -324,14 +322,14 @@ This data note helps buyers build a roster that expands reach instead of echoing
     const record = { ...insight, body, blocks };
     await prisma.insight.upsert({
       where: { slug: insight.slug },
-      update: record,
+      update: {},
       create: record,
     });
   }
 
   await prisma.pageContent.upsert({
     where: { slug: "home" },
-    update: { title: "Home", sections: DEFAULT_HOME_SECTIONS },
+    update: {},
     create: {
       slug: "home",
       title: "Home",

@@ -2,11 +2,26 @@
 
 import { useState } from "react";
 
+import { CaseStudyBlockEditor } from "@/components/case-study-block-editor";
 import { MediaField } from "@/components/media-library";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
-import type { CaseStudyCard } from "@/lib/case-studies";
-import { CASE_STUDY_PILLARS, CASE_STUDY_CLIENT_TYPES } from "@/lib/case-studies";
+import {
+  CASE_STUDY_PILLARS,
+  type CaseStudyCard,
+} from "@/lib/case-studies";
+import {
+  ensureBlockIds,
+  legacyStoryToBlocks,
+  type CaseStudyBlock,
+} from "@/lib/case-study-content";
 import { cn } from "@/lib/utils";
+
+function initialBlocks(card: CaseStudyCard): CaseStudyBlock[] {
+  if (card.blocks && card.blocks.length > 0) {
+    return ensureBlockIds(card.blocks);
+  }
+  return legacyStoryToBlocks(card);
+}
 
 export function CaseStudyEditorForm({
   initial,
@@ -16,42 +31,31 @@ export function CaseStudyEditorForm({
   saveAction: typeof import("@/lib/actions/admin-cms").saveCaseStudy;
 }) {
   const [card, setCard] = useState<CaseStudyCard>(initial);
-  const [challenge, setChallenge] = useState(
-    (initial.story?.challenge ?? []).join("\n\n"),
+  const [blocks, setBlocks] = useState<CaseStudyBlock[]>(() =>
+    initialBlocks(initial),
   );
-  const [approach, setApproach] = useState(
-    (initial.story?.approach ?? []).join("\n\n"),
-  );
-  const [outcomes, setOutcomes] = useState(
-    (initial.story?.outcomes ?? []).join("\n\n"),
-  );
+  const [previousSlug] = useState(initial.slug);
   const [message, setMessage] = useState("");
   const [ok, setOk] = useState(false);
   const [pending, setPending] = useState(false);
 
-  function splitParas(text: string) {
-    return text
-      .split(/\n\s*\n/)
-      .map((p) => p.trim())
-      .filter(Boolean);
-  }
-
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (pending) return;
     setPending(true);
     const next: CaseStudyCard = {
       ...card,
-      story: {
-        challenge: splitParas(challenge),
-        approach: splitParas(approach),
-        outcomes: splitParas(outcomes),
-        outcomesHeadline: card.story?.outcomesHeadline,
-        deliverablesHeadline: card.story?.deliverablesHeadline,
-        deliverablesIntro: card.story?.deliverablesIntro,
-        deliverables: card.story?.deliverables ?? [],
-      },
+      id: card.id ?? initial.id,
+      pillars:
+        card.pillars && card.pillars.length > 0
+          ? card.pillars
+          : [card.pillar || "Content"],
+      pillar: (card.pillars && card.pillars[0]) || card.pillar || "Content",
+      blocks: ensureBlockIds(blocks),
     };
-    const result = await saveAction(next);
+    const result = await saveAction(next, {
+      previousSlug: previousSlug || undefined,
+    });
     setOk(result.ok);
     setMessage(result.message);
     setPending(false);
@@ -87,6 +91,12 @@ export function CaseStudyEditorForm({
             required
           />
         </Field>
+        <MediaField
+          label="Client logo"
+          hint="Shown on the case study hero and catalogue cards. Prefer a simple mark on transparent or dark-ready artwork."
+          value={card.logo ?? ""}
+          onChange={(logo) => setCard({ ...card, logo: logo || undefined })}
+        />
         <Field label="Period" id="period">
           <TextInput
             id="period"
@@ -94,57 +104,43 @@ export function CaseStudyEditorForm({
             onChange={(e) => setCard({ ...card, period: e.target.value })}
           />
         </Field>
-        <Field label="Pillar" id="pillar">
-          <select
-            id="pillar"
-            className="w-full border border-charcoal/30 bg-white px-4 py-3 text-sm"
-            value={card.pillar}
-            onChange={(e) =>
-              setCard({
-                ...card,
-                pillar: e.target.value as CaseStudyCard["pillar"],
-              })
-            }
+        <Field label="Pillars" id="pillars">
+          <div
+            id="pillars"
+            className="flex flex-wrap gap-x-4 gap-y-2 border border-charcoal/30 bg-white px-4 py-3"
           >
-            {CASE_STUDY_PILLARS.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label="Client type" id="clientType">
-          <select
-            id="clientType"
-            className="w-full border border-charcoal/30 bg-white px-4 py-3 text-sm"
-            value={card.clientType}
-            onChange={(e) =>
-              setCard({
-                ...card,
-                clientType: e.target.value as CaseStudyCard["clientType"],
-              })
-            }
-          >
-            {CASE_STUDY_CLIENT_TYPES.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-        </Field>
-        <Field label="Industry" id="industry">
-          <TextInput
-            id="industry"
-            value={card.industry}
-            onChange={(e) => setCard({ ...card, industry: e.target.value })}
-          />
-        </Field>
-        <Field label="Company size" id="size">
-          <TextInput
-            id="size"
-            value={card.size}
-            onChange={(e) => setCard({ ...card, size: e.target.value })}
-          />
+            {CASE_STUDY_PILLARS.map((p) => {
+              const selected = (card.pillars ?? [card.pillar]).includes(p);
+              return (
+                <label
+                  key={p}
+                  className="flex cursor-pointer items-center gap-2 text-sm text-charcoal"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => {
+                      const current = card.pillars?.length
+                        ? [...card.pillars]
+                        : [card.pillar];
+                      const next = selected
+                        ? current.filter((item) => item !== p)
+                        : [...current, p];
+                      const ordered = CASE_STUDY_PILLARS.filter((item) =>
+                        next.includes(item),
+                      );
+                      setCard({
+                        ...card,
+                        pillars: ordered,
+                        pillar: ordered[0] ?? "Content",
+                      });
+                    }}
+                  />
+                  {p}
+                </label>
+              );
+            })}
+          </div>
         </Field>
         <div className="md:col-span-2">
           <Field label="Summary" id="summary">
@@ -199,34 +195,8 @@ export function CaseStudyEditorForm({
       </div>
 
       <div className="space-y-4">
-        <h2 className="font-display text-xl">Story</h2>
-        <p className="text-sm text-muted">
-          Separate paragraphs with a blank line.
-        </p>
-        <Field label="Challenge" id="challenge">
-          <TextArea
-            id="challenge"
-            rows={5}
-            value={challenge}
-            onChange={(e) => setChallenge(e.target.value)}
-          />
-        </Field>
-        <Field label="Approach" id="approach">
-          <TextArea
-            id="approach"
-            rows={5}
-            value={approach}
-            onChange={(e) => setApproach(e.target.value)}
-          />
-        </Field>
-        <Field label="Outcomes" id="outcomes">
-          <TextArea
-            id="outcomes"
-            rows={5}
-            value={outcomes}
-            onChange={(e) => setOutcomes(e.target.value)}
-          />
-        </Field>
+        <h2 className="font-display text-xl">Story content</h2>
+        <CaseStudyBlockEditor value={blocks} onChange={setBlocks} />
       </div>
 
       <div

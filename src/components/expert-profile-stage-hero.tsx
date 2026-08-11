@@ -46,8 +46,9 @@ export function ExpertProfileStageHero({
     <section
       className={cn(
         "relative isolate w-full overflow-hidden",
+        "-mt-[7.25rem] md:-mt-[5.5rem]",
         showTrustedBy
-          ? "min-h-[min(88vh,48rem)] -mt-[7.25rem] md:min-h-[min(90vh,52rem)] md:-mt-[5.5rem]"
+          ? "min-h-[min(88vh,48rem)] md:min-h-[min(90vh,52rem)]"
           : "min-h-[min(72vh,40rem)] md:min-h-[min(76vh,44rem)]",
       )}
       aria-label={
@@ -75,13 +76,23 @@ export function ExpertProfileStageHero({
         aria-hidden
         className="absolute inset-0 bg-linear-to-r from-charcoal/85 via-charcoal/45 to-transparent"
       />
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-[55%] backdrop-blur-[8px]"
+        style={{
+          maskImage:
+            "linear-gradient(to bottom, black 0%, black 35%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, black 0%, black 35%, transparent 100%)",
+        }}
+      />
 
       <div
         className={cn(
           "relative flex flex-col px-6 pb-12 md:px-10 md:pb-14 lg:px-12 lg:pb-16",
           showTrustedBy
             ? "min-h-[min(88vh,48rem)] pt-48 md:min-h-[min(90vh,52rem)] md:pt-56"
-            : "min-h-[min(72vh,40rem)] pt-16 md:min-h-[min(76vh,44rem)] md:pt-20",
+            : "min-h-[min(72vh,40rem)] pt-28 md:min-h-[min(76vh,44rem)] md:pt-32",
         )}
       >
         <div

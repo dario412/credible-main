@@ -14,6 +14,10 @@ import {
 } from "@/lib/cms";
 import type { CaseStudyCard } from "@/lib/case-studies";
 import {
+  mergeContactSections,
+  type ContactPageSections,
+} from "@/lib/contact-page";
+import {
   ensureBlockIds,
   parseInsightBlocks,
   type InsightBlock,
@@ -138,7 +142,10 @@ export async function ensureInsightBlocks(id: string) {
   return ensureBlockIds([{ type: "p", text: "" }]);
 }
 
-export async function saveCaseStudy(card: CaseStudyCard) {
+export async function saveCaseStudy(
+  card: CaseStudyCard,
+  options?: { previousSlug?: string },
+) {
   const session = await requireContentEditor();
   if (!session) return { ok: false as const, message: "Unauthorized" };
 
@@ -146,25 +153,82 @@ export async function saveCaseStudy(card: CaseStudyCard) {
     return { ok: false as const, message: "Title and slug are required." };
   }
 
+  const slug = slugify(card.slug);
+  if (!slug) {
+    return { ok: false as const, message: "Slug must include letters or numbers." };
+  }
+
   const row = caseStudyCardToRow({
     ...card,
-    slug: slugify(card.slug),
+    slug,
   });
+  const previousSlug = options?.previousSlug
+    ? slugify(options.previousSlug)
+    : "";
 
   try {
-    await prisma.caseStudy.upsert({
-      where: { slug: row.slug },
-      create: row,
-      update: row,
-    });
+    if (card.id) {
+      const conflict = await prisma.caseStudy.findFirst({
+        where: { slug, NOT: { id: card.id } },
+        select: { id: true },
+      });
+      if (conflict) {
+        return {
+          ok: false as const,
+          message: "That slug is already used by another case study.",
+        };
+      }
+      await prisma.caseStudy.update({
+        where: { id: card.id },
+        data: row,
+      });
+    } else if (previousSlug && previousSlug !== slug) {
+      const existing = await prisma.caseStudy.findUnique({
+        where: { slug: previousSlug },
+        select: { id: true },
+      });
+      if (existing) {
+        const conflict = await prisma.caseStudy.findFirst({
+          where: { slug, NOT: { id: existing.id } },
+          select: { id: true },
+        });
+        if (conflict) {
+          return {
+            ok: false as const,
+            message: "That slug is already used by another case study.",
+          };
+        }
+        await prisma.caseStudy.update({
+          where: { id: existing.id },
+          data: row,
+        });
+      } else {
+        await prisma.caseStudy.upsert({
+          where: { slug },
+          create: row,
+          update: row,
+        });
+      }
+    } else {
+      await prisma.caseStudy.upsert({
+        where: { slug },
+        create: row,
+        update: row,
+      });
+    }
   } catch {
     return { ok: false as const, message: "Could not save case study." };
   }
 
+  if (previousSlug && previousSlug !== slug) {
+    revalidatePath(`/case-studies/${previousSlug}`);
+    revalidatePath(`/admin/case-studies/${previousSlug}`);
+  }
   revalidatePath("/case-studies");
-  revalidatePath(`/case-studies/${row.slug}`);
+  revalidatePath(`/case-studies/${slug}`);
   revalidatePath("/admin/case-studies");
-  return { ok: true as const, message: "Case study saved.", slug: row.slug };
+  revalidatePath(`/admin/case-studies/${slug}`);
+  return { ok: true as const, message: "Case study saved.", slug };
 }
 
 export async function deleteCaseStudy(slug: string) {
@@ -268,7 +332,40 @@ export async function saveSiteChrome(sections: SiteChromeSections) {
   });
 
   revalidatePath("/", "layout");
+  revalidatePath("/insights");
   revalidatePath("/admin/pages");
   revalidatePath("/admin/pages/site");
   return { ok: true as const, message: "Header & footer saved." };
+}
+
+export async function getContactPageSections(): Promise<ContactPageSections> {
+  const page = await prisma.pageContent.findUnique({
+    where: { slug: "contact" },
+  });
+  return mergeContactSections(page?.sections);
+}
+
+export async function saveContactPage(sections: ContactPageSections) {
+  const session = await requireContentEditor();
+  if (!session) return { ok: false as const, message: "Unauthorized" };
+
+  const merged = mergeContactSections(sections);
+
+  await prisma.pageContent.upsert({
+    where: { slug: "contact" },
+    create: {
+      slug: "contact",
+      title: "Contact",
+      sections: merged,
+    },
+    update: {
+      title: "Contact",
+      sections: merged,
+    },
+  });
+
+  revalidatePath("/contact");
+  revalidatePath("/admin/pages");
+  revalidatePath("/admin/pages/contact");
+  return { ok: true as const, message: "Contact page saved." };
 }

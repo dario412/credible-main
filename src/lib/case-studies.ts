@@ -1,3 +1,5 @@
+import type { CaseStudyBlock } from "@/lib/case-study-content";
+
 export type CaseStudyMeta = {
   label: string;
   value: string;
@@ -67,8 +69,15 @@ export type CaseStudyCard = {
   results?: CaseStudyResult[];
   quote?: CaseStudyQuote;
   story?: CaseStudyStory;
+  /** Ordered body content — preferred over legacy quote/story/results. */
+  blocks?: CaseStudyBlock[];
   ctaCreator?: CaseStudyCtaCreator;
-  pillar: "Content" | "Brand" | "Speaking" | "Live";
+  /** DB id when loaded from CMS — used to update in place on save. */
+  id?: string;
+  /** Primary pillar (DB column). Prefer `pillars` for display. */
+  pillar: CaseStudyPillar;
+  /** Engagement pillars shown on cards and the detail hero. */
+  pillars?: CaseStudyPillar[];
   clientType: "Direct client" | "Agency client";
   industry: string;
   size: string;
@@ -93,6 +102,48 @@ export const CASE_STUDY_PILLARS = [
   "Live",
 ] as const;
 
+export type CaseStudyPillar = (typeof CASE_STUDY_PILLARS)[number];
+
+const PILLAR_SET = new Set<string>(CASE_STUDY_PILLARS);
+
+export function isCaseStudyPillar(value: string): value is CaseStudyPillar {
+  return PILLAR_SET.has(value);
+}
+
+export function splitCaseStudyPillars(value: string): string[] {
+  return value
+    .split(/[·•|,/]/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+export function normalizeCaseStudyPillars(
+  study: Pick<CaseStudyCard, "pillar" | "pillars" | "meta">,
+): CaseStudyPillar[] {
+  if (Array.isArray(study.pillars) && study.pillars.length > 0) {
+    const fromArray = study.pillars.filter(isCaseStudyPillar);
+    if (fromArray.length > 0) return fromArray;
+  }
+
+  const pillarsFromMeta = study.meta?.find((item) =>
+    /pillar/i.test(item.label),
+  )?.value;
+  if (pillarsFromMeta?.trim()) {
+    const fromMeta = splitCaseStudyPillars(pillarsFromMeta).filter(
+      isCaseStudyPillar,
+    );
+    if (fromMeta.length > 0) return fromMeta;
+  }
+
+  return isCaseStudyPillar(study.pillar) ? [study.pillar] : ["Content"];
+}
+
+export function formatCaseStudyPillars(
+  study: Pick<CaseStudyCard, "pillar" | "pillars" | "meta">,
+) {
+  return normalizeCaseStudyPillars(study).join(" · ");
+}
+
 export const CASE_STUDIES: CaseStudyCard[] = [
   {
     slug: "notion-founders-journal",
@@ -106,10 +157,100 @@ export const CASE_STUDIES: CaseStudyCard[] = [
     heroSummary:
       "How Credible built out Alex Lieberman's post-Morning Brew business across content, brand, and stage — in 18 months, without a single one-off influencer post.",
     meta: [
-      { label: "Client roster", value: "Notion, Ramp, SaaStr, others" },
-      { label: "Duration", value: "18 months (ongoing)" },
+      { label: "Client", value: "Notion" },
       { label: "Pillars used", value: "Content · Brand · Speaking" },
-      { label: "Gross revenue", value: "$4.2M" },
+    ],
+    pillars: ["Content", "Brand", "Speaking"],
+    blocks: [
+      {
+        type: "quoteFull",
+        text: "I'd been managing myself for two years and hitting a ceiling. Credible built the business I couldn't build alone — and did it without ever making me feel like a product on a shelf.",
+        name: "Alex Lieberman",
+        role: "Co-founder, Morning Brew",
+      },
+      { type: "h2", text: "The challenge", id: "challenge" },
+      {
+        type: "p",
+        text: "After Morning Brew, Alex had the audience every B2B brand wanted — and a calendar full of one-off asks that never compounded. Brands wanted a post. Agencies wanted a rate. Nobody wanted to build a real business around the trust he'd earned.",
+      },
+      {
+        type: "p",
+        text: "Self-managing for two years meant leaving pipeline on the table, saying yes to the wrong work, and watching category peers industrialize while he stayed stuck in inbox mode.",
+      },
+      { type: "h2", text: "Our approach", id: "approach" },
+      {
+        type: "p",
+        text: "We treated Alex like a company, not a channel. Credible built the operating system: positioning, offer architecture, pricing, and a roster of brand partners who bought programs — not posts.",
+      },
+      {
+        type: "p",
+        text: "Content, brand, and speaking ran as one system. Each flagship series, keynote, and ambassador seat fed the next. No freelancers stitching briefs. One team owning the commercial relationship end-to-end.",
+      },
+      {
+        type: "h2",
+        text: "Eighteen months, four revenue lines.",
+        id: "outcomes",
+      },
+      {
+        type: "p",
+        text: "In eighteen months the business moved from scattered inbound to four compounding revenue lines — content partnerships, keynotes, audience growth, and program retainers — without a single one-off influencer post.",
+      },
+      {
+        type: "stats",
+        items: [
+          {
+            label: "Content partnerships",
+            value: "6",
+            caption: "Ongoing series, 12–18 month terms",
+          },
+          {
+            label: "Keynotes delivered",
+            value: "19",
+            caption: "Avg fee 3.4× baseline",
+          },
+          {
+            label: "Reach growth",
+            value: "+58%",
+            caption: "Combined, 18 months",
+          },
+          {
+            label: "Gross revenue",
+            value: "$4.2M",
+            caption: "Across all pillars",
+          },
+        ],
+      },
+      {
+        type: "h2",
+        text: "What actually shipped.",
+        id: "deliverables",
+      },
+      {
+        type: "deliverables",
+        intro: [
+          "Flagship programs with Notion, Ramp, and SaaStr — each structured as an ongoing partnership, not a one-off post.",
+        ],
+        items: [
+          {
+            label: "Notion",
+            title: "The Founder's Journal — sponsored series",
+            meta: "12 episodes · 4.1M downloads · 22-month term",
+            logo: "/brand/clients/notion-wordmark.png",
+          },
+          {
+            label: "Ramp",
+            title: "Year of Founders ambassadorship",
+            meta: "18 months · content + events + podcast",
+            logo: "/brand/clients/ramp.svg",
+          },
+          {
+            label: "SaaStr",
+            title: "SaaStr Annual closing keynote",
+            meta: "12,000 attendees · highest-rated session 2025",
+            logo: "/brand/clients/saastr.svg",
+          },
+        ],
+      },
     ],
     results: [
       {
@@ -329,18 +470,21 @@ export function featuredCaseStudy() {
 }
 
 export function caseStudyHero(study: CaseStudyCard) {
+  const pillars = normalizeCaseStudyPillars(study);
+
   return {
     title: study.heroTitle ?? study.title,
     titleEmphasis: study.heroTitleEmphasis,
     summary: study.heroSummary ?? study.summary,
-    meta:
-      study.meta ??
-      ([
-        { label: "Client", value: study.client },
-        { label: "Duration", value: study.period },
-        { label: "Pillar", value: study.pillar },
-        { label: "Client type", value: study.clientType },
-      ] satisfies CaseStudyMeta[]),
+    client: study.client,
+    pillars,
+    meta: [
+      { label: "Client", value: study.client },
+      {
+        label: "Pillars used",
+        value: pillars.join(" · "),
+      },
+    ] satisfies CaseStudyMeta[],
     results: study.results ?? [],
   };
 }
@@ -351,8 +495,14 @@ export function similarCaseStudies(slug: string, limit = 3) {
 
   if (!current) return others.slice(0, limit);
 
-  const samePillar = others.filter((study) => study.pillar === current.pillar);
-  const rest = others.filter((study) => study.pillar !== current.pillar);
+  const currentPillars = new Set(normalizeCaseStudyPillars(current));
+  const samePillar = others.filter((study) =>
+    normalizeCaseStudyPillars(study).some((p) => currentPillars.has(p)),
+  );
+  const rest = others.filter(
+    (study) =>
+      !normalizeCaseStudyPillars(study).some((p) => currentPillars.has(p)),
+  );
 
   return [...samePillar, ...rest].slice(0, limit);
 }
@@ -380,13 +530,15 @@ export function filterCaseStudies(
     }
     if (
       filters.pillar &&
-      study.pillar.toLowerCase() !== filters.pillar.toLowerCase()
+      !normalizeCaseStudyPillars(study).some(
+        (p) => p.toLowerCase() === filters.pillar!.toLowerCase(),
+      )
     ) {
       return false;
     }
     if (q) {
       const hay =
-        `${study.title} ${study.client} ${study.summary} ${study.industry} ${study.pillar}`.toLowerCase();
+        `${study.title} ${study.client} ${study.summary} ${study.industry} ${formatCaseStudyPillars(study)}`.toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;

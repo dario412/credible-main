@@ -78,32 +78,42 @@ export async function uploadMediaAsset(formData: FormData) {
     typeof formData.get("alt") === "string"
       ? String(formData.get("alt")).trim()
       : "";
-  const buffer = Buffer.from(await file.arrayBuffer());
 
-  const row = await prisma.mediaAsset.create({
-    data: {
-      fileName: file.name.slice(0, 180) || "upload",
-      mimeType,
-      alt,
-      byteSize: buffer.byteLength,
-      data: buffer,
-    },
-    select: {
-      id: true,
-      fileName: true,
-      mimeType: true,
-      alt: true,
-      byteSize: true,
-      createdAt: true,
-    },
-  });
+  try {
+    const buffer = Buffer.from(await file.arrayBuffer());
 
-  revalidatePath("/admin/media");
-  return {
-    ok: true as const,
-    message: "Uploaded.",
-    asset: toCard(row),
-  };
+    const row = await prisma.mediaAsset.create({
+      data: {
+        fileName: file.name.slice(0, 180) || "upload",
+        mimeType,
+        alt,
+        byteSize: buffer.byteLength,
+        data: buffer,
+      },
+      select: {
+        id: true,
+        fileName: true,
+        mimeType: true,
+        alt: true,
+        byteSize: true,
+        createdAt: true,
+      },
+    });
+
+    revalidatePath("/admin/media");
+    return {
+      ok: true as const,
+      message: "Uploaded.",
+      asset: toCard(row),
+    };
+  } catch (error) {
+    console.error("uploadMediaAsset failed", error);
+    return {
+      ok: false as const,
+      message:
+        "Upload failed. Try a smaller JPG/PNG (under 4 MB) and save again.",
+    };
+  }
 }
 
 export async function deleteMediaAsset(id: string) {
