@@ -51,9 +51,11 @@ export function SiteHeader() {
     /^\/insights\/[^/]+\/?$/.test(pathname) ||
     /^\/insights\/authors\//.test(pathname);
   const isHome = pathname === "/";
+  const isForestHeroPage = pathname === "/apply-for-representation";
   // Full-bleed heroes — nav sits inside the frame with inverted colors.
   const overlay =
     isHome ||
+    isForestHeroPage ||
     /^\/roster\/[^/]+\/?$/.test(pathname) ||
     /^\/case-studies\/[^/]+\/?$/.test(pathname);
   const [scrolled, setScrolled] = useState(false);
@@ -62,7 +64,15 @@ export function SiteHeader() {
     const onScroll = () => {
       const y = window.scrollY;
 
-      if (overlay && !isHome) {
+      if (isForestHeroPage) {
+        const hero = document.querySelector("[data-site-hero-overlay]");
+        if (hero) {
+          setScrolled(hero.getBoundingClientRect().bottom < 96);
+          return;
+        }
+      }
+
+      if (overlay && !isHome && !isForestHeroPage) {
         setScrolled(y > window.innerHeight * 0.6);
         return;
       }
@@ -77,10 +87,10 @@ export function SiteHeader() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [overlay, isHome]);
+  }, [overlay, isHome, isForestHeroPage]);
 
   const pageSurface = insightArticle ? "bg-cream-dark" : "bg-cream";
-  // Dark full-bleed heroes invert the pill to cream; home keeps the charcoal bar.
+  // Hero overlay pages: cream pill + dark type until scroll, then charcoal bar.
   const onDarkHero = overlay && !scrolled && !isHome;
 
   return (

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { AdminDeleteButton } from "@/components/admin-delete-button";
 import { auth } from "@/lib/auth";
 import { listCaseStudyCards } from "@/lib/actions/admin-cms";
 import { formatCaseStudyPillars } from "@/lib/case-studies";
@@ -66,12 +67,19 @@ export default async function AdminCaseStudiesPage() {
                   {formatCaseStudyPillars(study)}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link
-                    href={`/admin/case-studies/${study.slug}`}
-                    className="font-medium text-forest hover:text-forest-dark"
-                  >
-                    Edit
-                  </Link>
+                  <div className="inline-flex items-center gap-4">
+                    <Link
+                      href={`/admin/case-studies/${study.slug}`}
+                      className="font-medium text-forest hover:text-forest-dark"
+                    >
+                      Edit
+                    </Link>
+                    <AdminDeleteButton
+                      kind="caseStudy"
+                      value={study.slug}
+                      label={study.title}
+                    />
+                  </div>
                 </td>
               </tr>
             ))}

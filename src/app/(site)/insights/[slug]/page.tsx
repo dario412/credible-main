@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight } from "@phosphor-icons/react/ssr";
 
+import { ArticleSidebarCtaEditorProvider } from "@/components/article-sidebar-cta-editor";
 import { InsightArticleCta } from "@/components/insight-article-cta";
 import { InsightShare } from "@/components/insight-share";
 import { RelatedInsightsGrid } from "@/components/related-insights-grid";
@@ -17,7 +18,10 @@ import {
   resolveInsightContent,
   type InsightBlock,
 } from "@/lib/insight-content";
+import { saveSiteChrome } from "@/lib/actions/admin-cms";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { hasPermission } from "@/lib/permissions";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -46,14 +50,20 @@ export default async function InsightPage({ params }: Props) {
   const shareUrl = absoluteUrl(`/insights/${insight.slug}`);
   const author = getInsightAuthor(DEFAULT_INSIGHT_AUTHOR_SLUG);
 
-  const related = await prisma.insight.findMany({
-    where: {
-      category: insight.category,
-      NOT: { id: insight.id },
-    },
-    orderBy: { publishedAt: "desc" },
-    take: 3,
-  });
+  const [related, session] = await Promise.all([
+    prisma.insight.findMany({
+      where: {
+        category: insight.category,
+        NOT: { id: insight.id },
+      },
+      orderBy: { publishedAt: "desc" },
+      take: 3,
+    }),
+    auth(),
+  ]);
+  const canEdit = Boolean(
+    session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
+  );
 
   return (
     <>
@@ -150,6 +160,10 @@ export default async function InsightPage({ params }: Props) {
         </div>
       </section>
 
+      <ArticleSidebarCtaEditorProvider
+        canEdit={canEdit}
+        saveAction={saveSiteChrome}
+      >
       <div className="px-6 py-10 md:px-10 md:py-12 lg:px-12 lg:py-14">
         <div className="mx-auto max-w-352">
           <InsightShare
@@ -280,6 +294,7 @@ export default async function InsightPage({ params }: Props) {
           ) : null}
         </div>
       </div>
+      </ArticleSidebarCtaEditorProvider>
     </>
   );
 }

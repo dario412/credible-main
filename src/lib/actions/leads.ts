@@ -234,3 +234,79 @@ export async function submitContact(
 
   return { ok: true, message: "Thanks — we received your message." };
 }
+
+const representationSchema = z.object({
+  name: z.string().min(1).max(120),
+  email: z.string().email(),
+  location: z.string().max(120).optional(),
+  platform: z.string().min(1).max(60),
+  profileUrl: z.string().min(1).max(500),
+  audience: z.string().max(120).optional(),
+  topics: z.string().min(1).max(2000),
+  formats: z.string().min(1).max(400),
+  pitch: z.string().min(1).max(5000),
+  workLinks: z.string().max(2000).optional(),
+});
+
+export async function submitRepresentationApplication(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const formats = formData.getAll("formats").join(", ");
+  const parsed = representationSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    location: formData.get("location") || undefined,
+    platform: formData.get("platform"),
+    profileUrl: formData.get("profileUrl"),
+    audience: formData.get("audience") || undefined,
+    topics: formData.get("topics"),
+    formats,
+    pitch: formData.get("pitch"),
+    workLinks: formData.get("workLinks") || undefined,
+  });
+
+  if (!parsed.success) {
+    return {
+      ok: false,
+      message: "Please check the highlighted fields and try again.",
+    };
+  }
+
+  const data = parsed.data;
+  const message = [
+    "Representation application",
+    "",
+    `Platform: ${data.platform}`,
+    data.audience ? `Audience: ${data.audience}` : null,
+    data.location ? `Location: ${data.location}` : null,
+    `Profile: ${data.profileUrl}`,
+    `Formats: ${data.formats}`,
+    "",
+    "Topics & expertise:",
+    data.topics,
+    "",
+    "Why apply:",
+    data.pitch,
+    data.workLinks
+      ? `\nRecent work:\n${data.workLinks}`
+      : null,
+  ]
+    .filter((line): line is string => line !== null)
+    .join("\n");
+
+  await prisma.lead.create({
+    data: {
+      email: data.email,
+      name: data.name,
+      message,
+      source: "CONTACT",
+    },
+  });
+
+  return {
+    ok: true,
+    message:
+      "Application received. We review submissions fortnightly and reply to every qualified application.",
+  };
+}

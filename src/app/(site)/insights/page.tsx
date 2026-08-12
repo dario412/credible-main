@@ -5,7 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 import { INSIGHT_TOPICS } from "@/lib/insight-topics";
 import { ViewMoreLink } from "@/components/view-more-link";
-import { InsightsPromo } from "@/components/insights-promo";
+import { InsightsVisualEditor } from "@/components/insights-visual-editor";
+import { saveSiteChrome } from "@/lib/actions/admin-cms";
+import { auth } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
@@ -76,6 +79,10 @@ export default async function InsightsPage({
   const category = params.category?.trim();
   const q = params.q?.trim();
   const isFiltered = Boolean(category || q);
+  const session = await auth();
+  const canEdit = Boolean(
+    session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
+  );
 
   const all = await prisma.insight.findMany({
     orderBy: { publishedAt: "desc" },
@@ -175,7 +182,7 @@ export default async function InsightsPage({
           </Link>
         ) : null}
 
-        <InsightsPromo />
+        <InsightsVisualEditor canEdit={canEdit} saveAction={saveSiteChrome} />
 
         <div className="mt-14 md:mt-16">
           {sections ? (

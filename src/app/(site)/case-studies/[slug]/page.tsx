@@ -1,9 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { CaseStudyContentStream } from "@/components/case-study-content-stream";
-import { CaseStudyCreatorCta } from "@/components/case-study-creator-cta";
-import { InsightArticleCta } from "@/components/insight-article-cta";
-import { InsightShare } from "@/components/insight-share";
+import { CaseStudyArticleWithSidebarCta } from "@/components/case-study-article-with-sidebar-cta";
 import { SimilarCaseStudiesGrid } from "@/components/similar-case-studies-grid";
 import { SiteImage } from "@/components/site-image";
 import { ViewMoreLink } from "@/components/view-more-link";
@@ -17,6 +14,9 @@ import {
   loadCaseStudy,
   loadSimilarCaseStudies,
 } from "@/lib/case-studies-server";
+import { saveSiteChrome } from "@/lib/actions/admin-cms";
+import { auth } from "@/lib/auth";
+import { hasPermission } from "@/lib/permissions";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -49,7 +49,13 @@ export default async function CaseStudyPage({ params }: Props) {
   const logo = study.logo ?? CASE_STUDY_LOGO;
   const { blocks, toc } = resolveCaseStudyBlocks(study);
   const shareUrl = absoluteUrl(`/case-studies/${study.slug}`);
-  const similar = await loadSimilarCaseStudies(study.slug, 3);
+  const [similar, session] = await Promise.all([
+    loadSimilarCaseStudies(study.slug, 3),
+    auth(),
+  ]);
+  const canEdit = Boolean(
+    session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
+  );
   const hasBody = blocks.length > 0;
 
   return (
@@ -153,28 +159,14 @@ export default async function CaseStudyPage({ params }: Props) {
       </section>
 
       {hasBody ? (
-        <CaseStudyContentStream
+        <CaseStudyArticleWithSidebarCta
+          canEdit={canEdit}
+          saveAction={saveSiteChrome}
           blocks={blocks}
           toc={toc}
-          share={<InsightShare url={shareUrl} title={study.title} />}
-          sidebarExtra={<InsightArticleCta />}
-          afterColumn={
-            <>
-              {study.ctaCreator ? (
-                <CaseStudyCreatorCta
-                  className="mt-10 md:mt-12"
-                  creatorName={study.ctaCreator.name}
-                  expert={{
-                    slug: study.ctaCreator.slug,
-                    name: study.ctaCreator.name,
-                  }}
-                />
-              ) : null}
-              <div className="pt-2 lg:hidden">
-                <InsightArticleCta />
-              </div>
-            </>
-          }
+          shareUrl={shareUrl}
+          title={study.title}
+          ctaCreator={study.ctaCreator ?? null}
         />
       ) : null}
 

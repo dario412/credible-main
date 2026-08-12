@@ -174,6 +174,12 @@ export function SiteChromeEditorForm({
     setSections({ ...sections, articleSidebarCta });
   }
 
+  function setCaseStudyCreatorCta(
+    caseStudyCreatorCta: SiteChromeSections["caseStudyCreatorCta"],
+  ) {
+    setSections({ ...sections, caseStudyCreatorCta });
+  }
+
   function setFooter(footer: SiteChromeSections["footer"]) {
     setSections({ ...sections, footer });
   }
@@ -593,8 +599,14 @@ export function SiteChromeEditorForm({
         <div>
           <h2 className="font-display text-xl">Insights page promos</h2>
           <p className="mt-1 text-sm text-muted">
-            Newsletter and roster cards at the bottom of /insights. Clear both
-            sides to hide the strip.
+            Newsletter and roster cards on /insights. Or edit live with{" "}
+            <a
+              href="/insights"
+              className="font-medium text-forest hover:text-forest-dark"
+            >
+              Edit page
+            </a>
+            . Clear both sides to hide the strip.
           </p>
         </div>
         <div className="space-y-3 rounded-sm border border-charcoal/10 p-4">
@@ -765,7 +777,9 @@ export function SiteChromeEditorForm({
         <div>
           <h2 className="font-display text-xl">Article sidebar CTA</h2>
           <p className="mt-1 text-sm text-muted">
-            Forest card in the sidebar on insight and case study articles. Clear
+            Forest card in the sidebar on insight and case study articles. Or
+            edit live on any article with{" "}
+            <span className="font-medium text-charcoal">Edit page</span>. Clear
             headline, description, and CTA label to hide it.
           </p>
         </div>
@@ -815,6 +829,146 @@ export function SiteChromeEditorForm({
                 setArticleSidebarCta({
                   ...sections.articleSidebarCta,
                   ctaHref: e.target.value,
+                })
+              }
+            />
+          </Field>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Case study creator CTA</h2>
+          <p className="mt-1 text-sm text-muted">
+            Rust closing block on case studies with a featured creator. Or edit
+            live on any case study with{" "}
+            <span className="font-medium text-charcoal">Edit page</span>. Use{" "}
+            {"{first}"}, {"{name}"}, {"{slug}"}, or {"{possessive}"} in copy and
+            links.
+          </p>
+        </div>
+        <Field label="Eyebrow" id="cscc-eyebrow">
+          <TextInput
+            id="cscc-eyebrow"
+            value={sections.caseStudyCreatorCta.eyebrow}
+            onChange={(e) =>
+              setCaseStudyCreatorCta({
+                ...sections.caseStudyCreatorCta,
+                eyebrow: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Headline" id="cscc-headline">
+          <TextInput
+            id="cscc-headline"
+            value={sections.caseStudyCreatorCta.headline}
+            onChange={(e) =>
+              setCaseStudyCreatorCta({
+                ...sections.caseStudyCreatorCta,
+                headline: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Description" id="cscc-description">
+          <TextArea
+            id="cscc-description"
+            rows={3}
+            value={sections.caseStudyCreatorCta.description}
+            onChange={(e) =>
+              setCaseStudyCreatorCta({
+                ...sections.caseStudyCreatorCta,
+                description: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <label className="flex items-center gap-2 text-sm text-charcoal">
+          <input
+            type="checkbox"
+            checked={sections.caseStudyCreatorCta.showFacesMarquee}
+            onChange={(e) =>
+              setCaseStudyCreatorCta({
+                ...sections.caseStudyCreatorCta,
+                showFacesMarquee: e.target.checked,
+              })
+            }
+            className="size-4 rounded-sm border-charcoal/20"
+          />
+          Show creator faces marquee
+        </label>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Stat 1" id="cscc-stat1">
+            <TextInput
+              id="cscc-stat1"
+              value={sections.caseStudyCreatorCta.stat1}
+              onChange={(e) =>
+                setCaseStudyCreatorCta({
+                  ...sections.caseStudyCreatorCta,
+                  stat1: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Stat 2" id="cscc-stat2">
+            <TextInput
+              id="cscc-stat2"
+              value={sections.caseStudyCreatorCta.stat2}
+              onChange={(e) =>
+                setCaseStudyCreatorCta({
+                  ...sections.caseStudyCreatorCta,
+                  stat2: e.target.value,
+                })
+              }
+            />
+          </Field>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Primary button label" id="cscc-primary-label">
+            <TextInput
+              id="cscc-primary-label"
+              value={sections.caseStudyCreatorCta.primaryCtaLabel}
+              onChange={(e) =>
+                setCaseStudyCreatorCta({
+                  ...sections.caseStudyCreatorCta,
+                  primaryCtaLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Primary button URL" id="cscc-primary-href">
+            <TextInput
+              id="cscc-primary-href"
+              value={sections.caseStudyCreatorCta.primaryCtaHref}
+              onChange={(e) =>
+                setCaseStudyCreatorCta({
+                  ...sections.caseStudyCreatorCta,
+                  primaryCtaHref: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Secondary button label" id="cscc-secondary-label">
+            <TextInput
+              id="cscc-secondary-label"
+              value={sections.caseStudyCreatorCta.secondaryCtaLabel}
+              onChange={(e) =>
+                setCaseStudyCreatorCta({
+                  ...sections.caseStudyCreatorCta,
+                  secondaryCtaLabel: e.target.value,
+                })
+              }
+            />
+          </Field>
+          <Field label="Secondary button URL" id="cscc-secondary-href">
+            <TextInput
+              id="cscc-secondary-href"
+              value={sections.caseStudyCreatorCta.secondaryCtaHref}
+              onChange={(e) =>
+                setCaseStudyCreatorCta({
+                  ...sections.caseStudyCreatorCta,
+                  secondaryCtaHref: e.target.value,
                 })
               }
             />

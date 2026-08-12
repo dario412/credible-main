@@ -13,7 +13,7 @@ import {
 } from "@/lib/shortlist";
 import { cn } from "@/lib/utils";
 
-export function ShortlistMenu() {
+export function ShortlistMenu({ inverted = false }: { inverted?: boolean }) {
   const entries = useShortlist();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -52,7 +52,9 @@ export function ShortlistMenu() {
           "inline-flex cursor-pointer items-center justify-center rounded-sm border px-4 transition-colors",
           open
             ? "border-charcoal bg-charcoal text-cream"
-            : "border-charcoal/20 bg-cream text-charcoal hover:border-charcoal/45",
+            : inverted
+              ? "border-cream/35 bg-forest text-cream hover:border-cream/55"
+              : "border-charcoal/20 bg-cream text-charcoal hover:border-charcoal/45",
         )}
       >
         <span className="relative">

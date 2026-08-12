@@ -117,7 +117,7 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
     subhead:
       "Founders, operators, investors, and specialists — briefed for stage, content, and advisory that moves B2B brands.",
     primaryCta: "Apply for Representation",
-    primaryHref: "/contact",
+    primaryHref: "/apply-for-representation",
     secondaryCta: "Explore roster",
     secondaryHref: "/roster",
     headlineStyle: { color: "charcoal", size: "xl" },
@@ -240,7 +240,7 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
     stat1: "24 creators represented",
     stat2: "Applications reviewed fortnightly",
     primaryCtaLabel: "Apply for representation",
-    primaryCtaHref: "/contact?type=creator",
+    primaryCtaHref: "/apply-for-representation",
     secondaryCtaLabel: "What we offer creators",
     secondaryCtaHref: "/what-we-do",
   },

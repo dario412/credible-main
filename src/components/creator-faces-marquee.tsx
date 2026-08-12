@@ -19,10 +19,10 @@ const EXPERT_IMAGES: Record<string, string> = {
 const EXPERT_IMAGE_FALLBACKS = Object.values(EXPERT_IMAGES);
 
 const FACE_TILTS = [
+  { rotate: -4, y: 2 },
+  { rotate: 5, y: -1 },
   { rotate: -5, y: 3 },
-  { rotate: 7, y: -2 },
-  { rotate: -6, y: 4 },
-  { rotate: 5, y: 0 },
+  { rotate: 4, y: 0 },
 ] as const;
 
 const CREATOR_FACES = HOME_2_SPEAKERS.map((speaker, index) => ({
@@ -34,11 +34,22 @@ const CREATOR_FACES = HOME_2_SPEAKERS.map((speaker, index) => ({
   tilt: FACE_TILTS[index % FACE_TILTS.length],
 }));
 
-export function CreatorFacesMarquee() {
+export function CreatorFacesMarquee({
+  variant = "compact",
+  tone = "rust",
+  limit,
+}: {
+  variant?: "compact" | "wide";
+  tone?: "rust" | "cream";
+  /** Cap faces in the loop — keeps the strip readable on hero rows. */
+  limit?: number;
+}) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [label, setLabel] = useState<{ name: string; x: number } | null>(null);
   const [open, setOpen] = useState(false);
-  const loop = [...CREATOR_FACES, ...CREATOR_FACES];
+  const isWide = variant === "wide";
+  const faces = limit ? CREATOR_FACES.slice(0, limit) : CREATOR_FACES;
+  const loop = [...faces, ...faces];
 
   function showLabel(name: string, event: React.MouseEvent<HTMLLIElement>) {
     const wrap = wrapRef.current;
@@ -50,17 +61,30 @@ export function CreatorFacesMarquee() {
     setOpen(true);
   }
 
+  const tileClass =
+    tone === "cream"
+      ? "border-cream/35 bg-forest-dark/80 shadow-[0_14px_36px_rgba(28,26,23,0.28)]"
+      : "border-rust bg-rust-dark shadow-[0_10px_28px_rgba(28,26,23,0.2)]";
+
+  const tileSizeClass = isWide
+    ? "h-[6.75rem] w-[4.85rem] sm:h-[7.5rem] sm:w-[5.35rem] md:h-[8.25rem] md:w-[5.85rem] lg:h-[9.25rem] lg:w-[6.5rem]"
+    : "h-12 w-9 md:h-14 md:w-10";
+
+  const imageSizes = isWide
+    ? "(max-width: 640px) 78px, (max-width: 1024px) 94px, 104px"
+    : "36px";
+
   return (
     <div
       ref={wrapRef}
-      className="relative shrink-0"
+      className={cn("relative", isWide ? "w-full" : "shrink-0")}
       onMouseLeave={() => setOpen(false)}
     >
       <div
         aria-hidden
         style={{ left: label?.x ?? 0 }}
         className={cn(
-          "pointer-events-none absolute bottom-[calc(100%-0.4rem)] z-20 -translate-x-1/2 transition-opacity duration-200",
+          "pointer-events-none absolute bottom-[calc(100%-0.25rem)] z-20 -translate-x-1/2 transition-opacity duration-200",
           open ? "opacity-100" : "opacity-0",
         )}
       >
@@ -71,25 +95,44 @@ export function CreatorFacesMarquee() {
       </div>
 
       <div
-        className="creator-marquee-window w-33 overflow-hidden py-2 mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] md:w-37"
+        className={cn(
+          "creator-marquee-window overflow-hidden",
+          isWide
+            ? "w-full py-4 mask-[linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] md:py-5 lg:py-6"
+            : "w-33 py-2 mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] md:w-37",
+        )}
         aria-label="Creators we represent"
       >
-        <ul className="animate-creator-marquee flex w-max items-center pl-1">
+        <ul
+          className={cn(
+            "flex w-max items-end",
+            isWide ? "animate-creator-marquee-wide" : "animate-creator-marquee",
+          )}
+        >
           {loop.map((face, index) => (
             <li
               key={`${face.slug}-${index}`}
-              className="relative -ml-1 origin-bottom"
+              className={cn(
+                "relative shrink-0 origin-bottom",
+                isWide ? "pr-5 md:pr-6 lg:pr-7" : "pr-2.5 md:pr-3",
+              )}
               style={{
                 transform: `rotate(${face.tilt.rotate}deg) translateY(${face.tilt.y}px)`,
               }}
               onMouseEnter={(event) => showLabel(face.name, event)}
             >
-              <span className="relative block h-12 w-9 overflow-hidden rounded-sm border-2 border-rust bg-rust-dark transition-transform duration-300 hover:scale-105 md:h-14 md:w-10">
+              <span
+                className={cn(
+                  "relative block overflow-hidden rounded-sm border-2 transition-transform duration-300 ease-out hover:scale-[1.04] hover:-translate-y-0.5",
+                  tileClass,
+                  tileSizeClass,
+                )}
+              >
                 <Image
                   src={face.src}
                   alt=""
                   fill
-                  sizes="36px"
+                  sizes={imageSizes}
                   className="object-cover object-top"
                 />
               </span>

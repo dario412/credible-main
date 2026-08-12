@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { AdminDeleteButton } from "@/components/admin-delete-button";
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
@@ -74,12 +75,19 @@ export default async function AdminInsightsPage() {
                   })}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link
-                    href={`/admin/insights/${insight.slug}`}
-                    className="font-medium text-forest hover:text-forest-dark"
-                  >
-                    Edit
-                  </Link>
+                  <div className="inline-flex items-center gap-4">
+                    <Link
+                      href={`/admin/insights/${insight.slug}`}
+                      className="font-medium text-forest hover:text-forest-dark"
+                    >
+                      Edit
+                    </Link>
+                    <AdminDeleteButton
+                      kind="insight"
+                      value={insight.id}
+                      label={insight.title}
+                    />
+                  </div>
                 </td>
               </tr>
             ))}

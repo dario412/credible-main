@@ -91,6 +91,20 @@ export type ArticleSidebarCtaSections = {
   ctaHref: string;
 };
 
+/** Rust creator CTA at the bottom of case study articles. */
+export type CaseStudyCreatorCtaSections = {
+  eyebrow: string;
+  headline: string;
+  description: string;
+  showFacesMarquee: boolean;
+  stat1: string;
+  stat2: string;
+  primaryCtaLabel: string;
+  primaryCtaHref: string;
+  secondaryCtaLabel: string;
+  secondaryCtaHref: string;
+};
+
 export const PROFILE_FORMAT_KINDS: Array<{
   key: ProfileFormatKind;
   hint: string;
@@ -121,6 +135,7 @@ export type SiteChromeSections = {
   profileFormats: ProfileFormatsSections;
   insightsPromo: InsightsPromoSections;
   articleSidebarCta: ArticleSidebarCtaSections;
+  caseStudyCreatorCta: CaseStudyCreatorCtaSections;
 };
 
 export const SOCIAL_NETWORKS: Array<{
@@ -190,7 +205,7 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
         links: [
           { href: "/what-we-do", label: "What we do" },
           { href: "/contact", label: "For Brands" },
-          { href: "/contact?type=creator", label: "For Creators" },
+          { href: "/apply-for-representation", label: "For Creators" },
         ],
       },
       {
@@ -285,6 +300,19 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
       "Browse operators by topic, format, and archetype — then send a brief.",
     ctaLabel: "Browse the roster",
     ctaHref: "/roster",
+  },
+  caseStudyCreatorCta: {
+    eyebrow: "Work with {first}",
+    headline: "Interested in working with {first} or a similar creator?",
+    description:
+      "Tell us the brief — audience, format, and goal. We'll come back with {first} or a shortlist of operators who fit the same profile.",
+    showFacesMarquee: true,
+    stat1: "60+ brands briefed",
+    stat2: "Reply in 2 business days",
+    primaryCtaLabel: "Send a brief",
+    primaryCtaHref: "/contact",
+    secondaryCtaLabel: "View {possessive} profile",
+    secondaryCtaHref: "/roster/{slug}",
   },
 };
 
@@ -496,20 +524,55 @@ function mergeArticleSidebarCta(raw: unknown): ArticleSidebarCtaSections {
   };
 }
 
+function mergeCaseStudyCreatorCta(raw: unknown): CaseStudyCreatorCtaSections {
+  const defaults = DEFAULT_SITE_CHROME.caseStudyCreatorCta;
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    CaseStudyCreatorCtaSections & { showFacesMarquee?: unknown }
+  >;
+  return {
+    eyebrow: asString(data.eyebrow, defaults.eyebrow),
+    headline: asString(data.headline, defaults.headline),
+    description: asString(data.description, defaults.description),
+    showFacesMarquee:
+      typeof data.showFacesMarquee === "boolean"
+        ? data.showFacesMarquee
+        : defaults.showFacesMarquee,
+    stat1: asString(data.stat1, defaults.stat1),
+    stat2: asString(data.stat2, defaults.stat2),
+    primaryCtaLabel: asString(data.primaryCtaLabel, defaults.primaryCtaLabel),
+    primaryCtaHref: asString(data.primaryCtaHref, defaults.primaryCtaHref),
+    secondaryCtaLabel: asString(
+      data.secondaryCtaLabel,
+      defaults.secondaryCtaLabel,
+    ),
+    secondaryCtaHref: asString(
+      data.secondaryCtaHref,
+      defaults.secondaryCtaHref,
+    ),
+  };
+}
+
 export type ProfileTemplateVars = {
   first: string;
   name: string;
   slug?: string;
+  possessive?: string;
 };
+
+export function possessiveFirst(first: string) {
+  return first.endsWith("s") ? `${first}'` : `${first}'s`;
+}
 
 export function applyProfileRailTemplate(
   template: string,
   vars: ProfileTemplateVars,
 ) {
+  const possessive = vars.possessive ?? possessiveFirst(vars.first);
   return template
     .replace(/\{first\}/g, vars.first)
     .replace(/\{name\}/g, vars.name)
-    .replace(/\{slug\}/g, vars.slug ?? "");
+    .replace(/\{slug\}/g, vars.slug ?? "")
+    .replace(/\{possessive\}/g, possessive);
 }
 
 export function buildProfileNav(
@@ -546,6 +609,7 @@ export function mergeSiteChrome(raw: unknown): SiteChromeSections {
     profileFormats?: unknown;
     insightsPromo?: unknown;
     articleSidebarCta?: unknown;
+    caseStudyCreatorCta?: unknown;
   };
   const header = data.header ?? {};
   const footer = data.footer ?? {};
@@ -597,6 +661,7 @@ export function mergeSiteChrome(raw: unknown): SiteChromeSections {
     profileFormats: mergeProfileFormats(data.profileFormats),
     insightsPromo: mergeInsightsPromo(data.insightsPromo),
     articleSidebarCta: mergeArticleSidebarCta(data.articleSidebarCta),
+    caseStudyCreatorCta: mergeCaseStudyCreatorCta(data.caseStudyCreatorCta),
   };
 }
 

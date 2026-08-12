@@ -169,8 +169,8 @@ h6.font-display {
 }
 
 @keyframes creator-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
 }
 
 .animate-fade-up {
@@ -184,14 +184,23 @@ h6.font-display {
 .animate-creator-marquee {
   animation: creator-marquee 72s linear infinite;
   will-change: transform;
+  backface-visibility: hidden;
 }
 
-.creator-marquee-window:hover .animate-creator-marquee {
+.animate-creator-marquee-wide {
+  animation: creator-marquee 88s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.creator-marquee-window:hover .animate-creator-marquee,
+.creator-marquee-window:hover .animate-creator-marquee-wide {
   animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-creator-marquee {
+  .animate-creator-marquee,
+  .animate-creator-marquee-wide {
     animation: none;
   }
 }
