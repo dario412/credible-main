@@ -1,3 +1,4 @@
+import { PeptalkTrackingCapture } from "@/components/peptalk-tracking";
 import { SiteChromeProvider } from "@/components/site-chrome-context";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { getSiteChrome } from "@/lib/actions/admin-cms";
@@ -11,6 +12,7 @@ export default async function SiteLayout({
 
   return (
     <SiteChromeProvider initialChrome={chrome}>
+      <PeptalkTrackingCapture />
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter />

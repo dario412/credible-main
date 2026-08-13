@@ -74,7 +74,7 @@ model CaseStudy {
   title          String
   summary        String
   client         String   @default("")
-  pillar         String   @default("Content")
+  pillar         String   @default("Brand Partnership")
   clientType     String   @default("Direct client")
   industry       String   @default("")
   size           String   @default("")

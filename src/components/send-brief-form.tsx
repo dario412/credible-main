@@ -10,9 +10,13 @@ import {
   Plus,
   X,
 } from "@phosphor-icons/react";
-import { useActionState, useEffect, useId, useMemo, useState } from "react";
+import { useActionState, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { submitSendBrief, type FormState } from "@/lib/actions/leads";
+import {
+  getPeptalkContext,
+  getPeptalkTracking,
+} from "@/components/peptalk-tracking";
 import { clearShortlist, useShortlist } from "@/lib/shortlist";
 import { cn } from "@/lib/utils";
 
@@ -90,8 +94,17 @@ export function SendBriefForm({
   const [selected, setSelected] = useState<BriefCreator[]>(preselected);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerQuery, setPickerQuery] = useState("");
+  const trackingRef = useRef<HTMLInputElement>(null);
+  const contextRef = useRef<HTMLInputElement>(null);
 
-  // Landing here without creators in the URL still picks up the basket.
+  function stampPeptalkFields() {
+    if (trackingRef.current) {
+      trackingRef.current.value = JSON.stringify(getPeptalkTracking());
+    }
+    if (contextRef.current) {
+      contextRef.current.value = JSON.stringify(getPeptalkContext());
+    }
+  }
   useEffect(() => {
     if (preselected.length > 0 || shortlist.length === 0) return;
     setSelected((current) => {
@@ -171,9 +184,22 @@ export function SendBriefForm({
   return (
     <form
       action={action}
+      onSubmit={stampPeptalkFields}
       className="rounded-sm border border-charcoal/8 bg-[#FBF8F5] p-5 shadow-[0_10px_28px_rgba(28,26,23,0.06)] sm:p-6 md:p-8"
     >
       <input type="hidden" name="audience" value={audience} />
+      <input
+        ref={trackingRef}
+        type="hidden"
+        name="peptalkTracking"
+        defaultValue=""
+      />
+      <input
+        ref={contextRef}
+        type="hidden"
+        name="peptalkContext"
+        defaultValue=""
+      />
       <input
         type="hidden"
         name="creators"

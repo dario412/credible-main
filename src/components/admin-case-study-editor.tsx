@@ -7,6 +7,7 @@ import { MediaField } from "@/components/media-library";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
   CASE_STUDY_PILLARS,
+  DEFAULT_CASE_STUDY_PILLAR,
   type CaseStudyCard,
 } from "@/lib/case-studies";
 import {
@@ -49,8 +50,11 @@ export function CaseStudyEditorForm({
       pillars:
         card.pillars && card.pillars.length > 0
           ? card.pillars
-          : [card.pillar || "Content"],
-      pillar: (card.pillars && card.pillars[0]) || card.pillar || "Content",
+          : [card.pillar || DEFAULT_CASE_STUDY_PILLAR],
+      pillar:
+        (card.pillars && card.pillars[0]) ||
+        card.pillar ||
+        DEFAULT_CASE_STUDY_PILLAR,
       blocks: ensureBlockIds(blocks),
     };
     const result = await saveAction(next, {
@@ -132,7 +136,7 @@ export function CaseStudyEditorForm({
                       setCard({
                         ...card,
                         pillars: ordered,
-                        pillar: ordered[0] ?? "Content",
+                        pillar: ordered[0] ?? DEFAULT_CASE_STUDY_PILLAR,
                       });
                     }}
                   />

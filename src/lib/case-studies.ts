@@ -96,15 +96,29 @@ export const CASE_STUDY_CLIENT_TYPES = [
 ] as const;
 
 export const CASE_STUDY_PILLARS = [
-  "Content",
-  "Brand",
+  "Brand Partnership",
+  "Ambassador",
   "Speaking",
-  "Live",
+  "Live Event",
 ] as const;
 
 export type CaseStudyPillar = (typeof CASE_STUDY_PILLARS)[number];
 
+export const DEFAULT_CASE_STUDY_PILLAR: CaseStudyPillar = CASE_STUDY_PILLARS[0];
+
 const PILLAR_SET = new Set<string>(CASE_STUDY_PILLARS);
+
+/** Legacy admin labels — mapped on read so existing DB rows keep working. */
+const LEGACY_CASE_STUDY_PILLARS: Record<string, CaseStudyPillar> = {
+  Content: "Brand Partnership",
+  Brand: "Ambassador",
+  Live: "Live Event",
+};
+
+export function migrateCaseStudyPillar(value: string): CaseStudyPillar | null {
+  if (isCaseStudyPillar(value)) return value;
+  return LEGACY_CASE_STUDY_PILLARS[value] ?? null;
+}
 
 export function isCaseStudyPillar(value: string): value is CaseStudyPillar {
   return PILLAR_SET.has(value);
@@ -117,11 +131,25 @@ export function splitCaseStudyPillars(value: string): string[] {
     .filter(Boolean);
 }
 
+function uniquePillars(values: string[]): CaseStudyPillar[] {
+  const seen = new Set<CaseStudyPillar>();
+  const ordered: CaseStudyPillar[] = [];
+
+  for (const value of values) {
+    const pillar = migrateCaseStudyPillar(value);
+    if (!pillar || seen.has(pillar)) continue;
+    seen.add(pillar);
+    ordered.push(pillar);
+  }
+
+  return CASE_STUDY_PILLARS.filter((pillar) => seen.has(pillar));
+}
+
 export function normalizeCaseStudyPillars(
   study: Pick<CaseStudyCard, "pillar" | "pillars" | "meta">,
 ): CaseStudyPillar[] {
   if (Array.isArray(study.pillars) && study.pillars.length > 0) {
-    const fromArray = study.pillars.filter(isCaseStudyPillar);
+    const fromArray = uniquePillars(study.pillars);
     if (fromArray.length > 0) return fromArray;
   }
 
@@ -129,13 +157,12 @@ export function normalizeCaseStudyPillars(
     /pillar/i.test(item.label),
   )?.value;
   if (pillarsFromMeta?.trim()) {
-    const fromMeta = splitCaseStudyPillars(pillarsFromMeta).filter(
-      isCaseStudyPillar,
-    );
+    const fromMeta = uniquePillars(splitCaseStudyPillars(pillarsFromMeta));
     if (fromMeta.length > 0) return fromMeta;
   }
 
-  return isCaseStudyPillar(study.pillar) ? [study.pillar] : ["Content"];
+  const migrated = migrateCaseStudyPillar(study.pillar);
+  return migrated ? [migrated] : [DEFAULT_CASE_STUDY_PILLAR];
 }
 
 export function formatCaseStudyPillars(
@@ -158,9 +185,12 @@ export const CASE_STUDIES: CaseStudyCard[] = [
       "How Credible built out Alex Lieberman's post-Morning Brew business across content, brand, and stage — in 18 months, without a single one-off influencer post.",
     meta: [
       { label: "Client", value: "Notion" },
-      { label: "Pillars used", value: "Content · Brand · Speaking" },
+      {
+        label: "Pillars used",
+        value: "Brand Partnership · Ambassador · Speaking",
+      },
     ],
-    pillars: ["Content", "Brand", "Speaking"],
+    pillars: ["Brand Partnership", "Ambassador", "Speaking"],
     blocks: [
       {
         type: "quoteFull",
@@ -320,7 +350,7 @@ export const CASE_STUDIES: CaseStudyCard[] = [
         },
       ],
     },
-    pillar: "Content",
+    pillar: "Brand Partnership",
     clientType: "Direct client",
     industry: "Software & technology",
     size: "Mid-size",
@@ -353,7 +383,7 @@ export const CASE_STUDIES: CaseStudyCard[] = [
     title: "HubSpot's fintech report — with a category investor",
     summary:
       "A quarterly research release fronted by a category-defining investor. 41k downloads in eight weeks.",
-    pillar: "Content",
+    pillar: "Brand Partnership",
     clientType: "Direct client",
     industry: "Marketing & SaaS",
     size: "Enterprise",
@@ -367,7 +397,7 @@ export const CASE_STUDIES: CaseStudyCard[] = [
     title: "Vanta's category ambassador program",
     summary:
       "Twelve months of content and events that put a practitioner voice at the centre of Vanta's category leadership.",
-    pillar: "Brand",
+    pillar: "Ambassador",
     clientType: "Direct client",
     industry: "Security & compliance",
     size: "Growth",
@@ -395,7 +425,7 @@ export const CASE_STUDIES: CaseStudyCard[] = [
     title: "Stripe's founder salons — a closed network in four cities",
     summary:
       "Four cities, sixteen dinners, 340 founders in the room. A closed network Stripe couldn't have built alone.",
-    pillar: "Live",
+    pillar: "Live Event",
     clientType: "Direct client",
     industry: "Payments & infrastructure",
     size: "Enterprise",
@@ -409,7 +439,7 @@ export const CASE_STUDIES: CaseStudyCard[] = [
     title: "Linear's operator series — shipping in public with practitioners",
     summary:
       "A six-part series that put product operators in the frame and turned roadmap craft into category narrative.",
-    pillar: "Content",
+    pillar: "Brand Partnership",
     clientType: "Agency client",
     industry: "Software & technology",
     size: "Growth",
@@ -423,7 +453,7 @@ export const CASE_STUDIES: CaseStudyCard[] = [
     title: "Figma's brand film — designers who build the tools",
     summary:
       "A brand film fronted by design leaders. Launched at Config to an audience that already spoke the language.",
-    pillar: "Brand",
+    pillar: "Ambassador",
     clientType: "Agency client",
     industry: "Design & creative",
     size: "Enterprise",
@@ -451,7 +481,7 @@ export const CASE_STUDIES: CaseStudyCard[] = [
     title: "Clerk's builder dinners — auth conversations off the record",
     summary:
       "Eight cities, intimate rooms, the buyers who actually ship auth. A live network that compounds.",
-    pillar: "Live",
+    pillar: "Live Event",
     clientType: "Agency client",
     industry: "Developer tools",
     size: "Growth",
@@ -528,13 +558,16 @@ export function filterCaseStudies(
     ) {
       return false;
     }
-    if (
-      filters.pillar &&
-      !normalizeCaseStudyPillars(study).some(
-        (p) => p.toLowerCase() === filters.pillar!.toLowerCase(),
-      )
-    ) {
-      return false;
+    if (filters.pillar) {
+      const filterPillar =
+        migrateCaseStudyPillar(filters.pillar) ?? filters.pillar;
+      if (
+        !normalizeCaseStudyPillars(study).some(
+          (p) => p.toLowerCase() === filterPillar.toLowerCase(),
+        )
+      ) {
+        return false;
+      }
     }
     if (q) {
       const hay =

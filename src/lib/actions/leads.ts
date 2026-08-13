@@ -3,6 +3,13 @@
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+import {
+  buildSendBriefPeptalkPayload,
+  parsePeptalkContext,
+  parsePeptalkTracking,
+  submitPeptalkPayload,
+} from "@/lib/peptalk";
+
 const waitlistSchema = z.object({
   email: z.string().email(),
 });
@@ -165,6 +172,35 @@ export async function submitSendBrief(
 
   const { brief, campaign, targetAudience, successMetrics, ...details } =
     parsed.data;
+
+  let trackingRaw: unknown = {};
+  let contextRaw: unknown = {};
+  try {
+    trackingRaw = JSON.parse(String(formData.get("peptalkTracking") || "{}"));
+  } catch {
+    trackingRaw = {};
+  }
+  try {
+    contextRaw = JSON.parse(String(formData.get("peptalkContext") || "{}"));
+  } catch {
+    contextRaw = {};
+  }
+
+  try {
+    await submitPeptalkPayload(
+      buildSendBriefPeptalkPayload(
+        parsed.data,
+        parsePeptalkTracking(trackingRaw),
+        parsePeptalkContext(contextRaw),
+      ),
+    );
+  } catch {
+    return {
+      ok: false,
+      message: "We couldn’t send your brief just now. Please try again.",
+    };
+  }
+
   const summary = [
     ["Briefing as", details.audience],
     ["Role", details.jobRole],
@@ -192,15 +228,19 @@ export async function submitSendBrief(
   const message = summary
     ? `${summary}\n\n${narrative}`
     : narrative;
-  await prisma.lead.create({
-    data: {
-      email: details.email,
-      name: details.name,
-      company: details.company,
-      message,
-      source: "CONTACT",
-    },
-  });
+  try {
+    await prisma.lead.create({
+      data: {
+        email: details.email,
+        name: details.name,
+        company: details.company,
+        message,
+        source: "CONTACT",
+      },
+    });
+  } catch {
+    // Peptalk already received the brief — don't fail the visitor.
+  }
 
   return {
     ok: true,

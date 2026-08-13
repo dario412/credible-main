@@ -5,7 +5,11 @@ import {
   type InsightBlock,
 } from "@/lib/insight-content";
 import type { CaseStudyCard } from "@/lib/case-studies";
-import { CASE_STUDY_LOGO, normalizeCaseStudyPillars } from "@/lib/case-studies";
+import {
+  CASE_STUDY_LOGO,
+  DEFAULT_CASE_STUDY_PILLAR,
+  normalizeCaseStudyPillars,
+} from "@/lib/case-studies";
 
 export const BRAND_COLORS = [
   "charcoal",
@@ -182,7 +186,7 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
     summary:
       "One operator voice. Twelve episodes. End-to-end casting, format, and distribution — so Notion owned the category without standing up an in-house media team.",
     meta: [
-      { label: "Pillar", value: "Content" },
+      { label: "Pillar", value: "Brand Partnership" },
       { label: "Lead", value: "Alex Lieberman" },
       { label: "Term", value: "22 months" },
     ],
@@ -604,7 +608,7 @@ export function caseStudyToCard(row: CaseStudyRow): CaseStudyCard {
       : {};
 
   const pillars = normalizeCaseStudyPillars({
-    pillar: (row.pillar as CaseStudyCard["pillar"]) || "Content",
+    pillar: (row.pillar as CaseStudyCard["pillar"]) || DEFAULT_CASE_STUDY_PILLAR,
     pillars: Array.isArray(data.pillars) ? data.pillars : undefined,
     meta: data.meta,
   });
@@ -624,7 +628,7 @@ export function caseStudyToCard(row: CaseStudyRow): CaseStudyCard {
     story: data.story,
     blocks: Array.isArray(data.blocks) ? data.blocks : undefined,
     ctaCreator: data.ctaCreator,
-    pillar: pillars[0] ?? "Content",
+    pillar: pillars[0] ?? DEFAULT_CASE_STUDY_PILLAR,
     pillars,
     clientType: (row.clientType as CaseStudyCard["clientType"]) || "Direct client",
     industry: row.industry || "",
@@ -665,7 +669,7 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
     title,
     summary,
     client,
-    pillar: pillars[0] ?? "Content",
+    pillar: pillars[0] ?? DEFAULT_CASE_STUDY_PILLAR,
     clientType,
     industry,
     size,

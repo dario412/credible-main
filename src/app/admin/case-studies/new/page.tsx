@@ -5,6 +5,7 @@ import { CaseStudyEditorForm } from "@/components/admin-case-study-editor";
 import { saveCaseStudy } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import type { CaseStudyCard } from "@/lib/case-studies";
+import { DEFAULT_CASE_STUDY_PILLAR } from "@/lib/case-studies";
 import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
 
@@ -19,8 +20,8 @@ const blank: CaseStudyCard = {
   client: "",
   title: "",
   summary: "",
-  pillar: "Content",
-  pillars: ["Content"],
+  pillar: DEFAULT_CASE_STUDY_PILLAR,
+  pillars: [DEFAULT_CASE_STUDY_PILLAR],
   clientType: "Direct client",
   industry: "",
   size: "",
