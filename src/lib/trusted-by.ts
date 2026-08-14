@@ -41,6 +41,15 @@ export function hasTrustedByStory(client: TrustedByClient) {
   return Boolean(client.testimonial?.quote?.trim());
 }
 
+export function visiblePortrait(
+  src?: string | null,
+  fallback = "/images/experts/amara-chen.jpg",
+) {
+  const value = src?.trim() ?? "";
+  if (!value || value.includes("creator-placeholder")) return fallback;
+  return value;
+}
+
 export const DEFAULT_TRUSTED_CLIENTS: TrustedByClient[] = [
   {
     name: "LinkedIn",
@@ -57,7 +66,7 @@ export const DEFAULT_TRUSTED_CLIENTS: TrustedByClient[] = [
         "Credible turned a single keynote into a year-long advisory partnership — exactly the kind of credibility our buyers trust.",
       name: "Maya Chen",
       title: "Head of Brand Partnerships, Airtable",
-      imageSrc: "/images/creator-placeholder.png",
+      imageSrc: "/images/experts/amara-chen.jpg",
     },
   },
   {
@@ -75,7 +84,7 @@ export const DEFAULT_TRUSTED_CLIENTS: TrustedByClient[] = [
         "They assembled operators and trusted voices into one coherent launch narrative — stage, media, and everything in between.",
       name: "Jordan Hale",
       title: "Director of Marketing, Webflow",
-      imageSrc: "/images/creator-placeholder.png",
+      imageSrc: "/images/experts/sofia-martinez.jpg",
     },
   },
   {
@@ -105,7 +114,7 @@ export const DEFAULT_TRUSTED_CLIENTS: TrustedByClient[] = [
         "The creators we booked felt like peers to our audience — not sponsors. That authenticity moved the deal cycle.",
       name: "Sam Okonkwo",
       title: "VP Marketing, HubSpot",
-      imageSrc: "/images/creator-placeholder.png",
+      imageSrc: "/images/experts/james-okafor.jpg",
     },
   },
   {
@@ -181,8 +190,7 @@ export function trustedClientToCard(row: TrustedClientRow): TrustedByClient {
             quote,
             name,
             title: row.testimonialTitle ?? "",
-            imageSrc:
-              row.testimonialImage || "/images/creator-placeholder.png",
+            imageSrc: visiblePortrait(row.testimonialImage),
           }
         : null,
   };

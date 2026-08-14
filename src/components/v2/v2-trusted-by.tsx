@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { hasTrustedByStory, type TrustedByClient } from "@/lib/trusted-by";
+import { hasTrustedByStory, visiblePortrait, type TrustedByClient } from "@/lib/trusted-by";
 
 function ArrowIcon({ className }: { className?: string }) {
   return (
@@ -78,10 +78,7 @@ export function V2TrustedBy({ clients }: { clients: TrustedByClient[] }) {
                       <div className="mt-3.5 border-t border-[var(--v2-timberline)]/15 pt-3">
                         <div className="flex items-center gap-2.5">
                           <Image
-                            src={
-                              testimonial.imageSrc ||
-                              "/images/creator-placeholder.png"
-                            }
+                            src={visiblePortrait(testimonial.imageSrc)}
                             alt=""
                             width={32}
                             height={32}

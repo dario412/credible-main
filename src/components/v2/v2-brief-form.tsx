@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useId } from "react";
-import { CaretDown, ShieldCheck } from "@phosphor-icons/react";
+import { ShieldCheck } from "@phosphor-icons/react";
 
 import { ArrowRightIcon } from "@/components/v2/v2-icons";
 import { submitBrief, type FormState } from "@/lib/actions/leads";
@@ -10,16 +10,35 @@ import { cn } from "@/lib/utils";
 
 const initial: FormState = { ok: false, message: "" };
 
-const formats = [
-  "Brand partnership",
-  "Ambassador program",
-  "Speaking engagement",
-  "Live event",
-  "Not sure yet",
-] as const;
-
 const fieldClass =
-  "h-11 w-full rounded-[8px] border border-[var(--v2-border)] bg-[var(--v2-snow)] px-4 text-[15px] leading-[18px] text-[var(--v2-timberline)] outline-none placeholder:text-[var(--v2-lichen)]";
+  "h-9 w-full rounded-[8px] border border-[var(--v2-border)] bg-[var(--v2-snow)] px-3.5 text-[14px] leading-[18px] text-[var(--v2-timberline)] outline-none placeholder:text-[var(--v2-lichen)]";
+
+const areaClass =
+  "min-h-[56px] w-full resize-none rounded-[8px] border border-[var(--v2-border)] bg-[var(--v2-snow)] px-3.5 py-2.5 text-[14px] leading-[18px] text-[var(--v2-timberline)] outline-none placeholder:text-[var(--v2-lichen)]";
+
+function FieldLabel({
+  htmlFor,
+  children,
+  optional = false,
+}: {
+  htmlFor: string;
+  children: string;
+  optional?: boolean;
+}) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className="text-[13px] leading-4 font-medium text-[var(--v2-timberline)]"
+    >
+      {children}
+      {optional ? (
+        <span className="ml-1.5 font-normal text-[var(--v2-lichen)]">
+          Optional
+        </span>
+      ) : null}
+    </label>
+  );
+}
 
 export function V2ShortlistHint() {
   const entries = useShortlist();
@@ -40,15 +59,10 @@ export function V2BriefForm({ footnote }: { footnote: string }) {
   const shortlist = useShortlist();
 
   return (
-    <form action={action} className="flex flex-col gap-4">
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor={`${id}-name`}
-            className="text-[13px] leading-4 font-medium text-[var(--v2-timberline)]"
-          >
-            Your name
-          </label>
+    <form action={action} className="flex flex-col gap-2.5">
+      <div className="grid gap-x-3 gap-y-2.5 sm:grid-cols-2">
+        <div className="flex flex-col gap-1">
+          <FieldLabel htmlFor={`${id}-name`}>Name</FieldLabel>
           <input
             id={`${id}-name`}
             name="name"
@@ -58,13 +72,8 @@ export function V2BriefForm({ footnote }: { footnote: string }) {
             className={fieldClass}
           />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor={`${id}-email`}
-            className="text-[13px] leading-4 font-medium text-[var(--v2-timberline)]"
-          >
-            Work email
-          </label>
+        <div className="flex flex-col gap-1">
+          <FieldLabel htmlFor={`${id}-email`}>Work email</FieldLabel>
           <input
             id={`${id}-email`}
             name="email"
@@ -75,78 +84,73 @@ export function V2BriefForm({ footnote }: { footnote: string }) {
             className={fieldClass}
           />
         </div>
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor={`${id}-company`}
-          className="text-[13px] leading-4 font-medium text-[var(--v2-timberline)]"
-        >
-          Company
-        </label>
-        <input
-          id={`${id}-company`}
-          name="company"
-          autoComplete="organization"
-          placeholder="Where you're briefing from"
-          className={fieldClass}
-        />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor={`${id}-format`}
-          className="text-[13px] leading-4 font-medium text-[var(--v2-timberline)]"
-        >
-          What are you building?
-        </label>
-        <div className="relative">
-          <select
-            id={`${id}-format`}
-            name="format"
+        <div className="flex flex-col gap-1">
+          <FieldLabel htmlFor={`${id}-phone`}>Phone</FieldLabel>
+          <input
+            id={`${id}-phone`}
+            name="phone"
+            type="tel"
             required
-            defaultValue=""
-            className={cn(fieldClass, "appearance-none pr-10 invalid:text-[var(--v2-lichen)]")}
-          >
-            <option value="" disabled>
-              Choose a format
-            </option>
-            {formats.map((format) => (
-              <option key={format} value={format}>
-                {format}
-              </option>
-            ))}
-          </select>
-          <CaretDown
-            weight="bold"
-            aria-hidden
-            className="pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2 text-[var(--v2-lichen)]"
+            autoComplete="tel"
+            placeholder="+1 555 000 0000"
+            className={fieldClass}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <FieldLabel htmlFor={`${id}-company`}>Company</FieldLabel>
+          <input
+            id={`${id}-company`}
+            name="company"
+            required
+            autoComplete="organization"
+            placeholder="Where you're briefing from"
+            className={fieldClass}
           />
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label
-          htmlFor={`${id}-brief`}
-          className="text-[13px] leading-4 font-medium text-[var(--v2-timberline)]"
-        >
-          The brief (short version)
-        </label>
+      <div className="flex flex-col gap-1">
+        <FieldLabel htmlFor={`${id}-role`} optional>
+          Role
+        </FieldLabel>
+        <input
+          id={`${id}-role`}
+          name="role"
+          autoComplete="organization-title"
+          placeholder="Head of brand, partnerships, etc."
+          className={fieldClass}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <FieldLabel htmlFor={`${id}-brief`}>Brief</FieldLabel>
         <textarea
           id={`${id}-brief`}
           name="brief"
           required
-          rows={3}
+          rows={2}
           placeholder="Audience, ambition, deadline, budget shape."
-          className="min-h-[84px] w-full resize-none rounded-[8px] border border-[var(--v2-border)] bg-[var(--v2-snow)] px-4 py-3.5 text-[15px] leading-[18px] text-[var(--v2-timberline)] outline-none placeholder:text-[var(--v2-lichen)]"
+          className={areaClass}
         />
       </div>
 
-      <div className="flex flex-col gap-2.5 pt-0.5">
+      <div className="flex flex-col gap-1">
+        <FieldLabel htmlFor={`${id}-deliverables`} optional>
+          Deliverables
+        </FieldLabel>
+        <input
+          id={`${id}-deliverables`}
+          name="deliverables"
+          placeholder="Keynote, series, ambassador, dinner, etc."
+          className={fieldClass}
+        />
+      </div>
+
+      <div className="flex flex-col gap-2 pt-0.5">
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex h-12 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-[var(--v2-evergreen)] text-[16px] leading-5 font-medium text-[var(--v2-snow)] transition-transform active:scale-[0.98] disabled:opacity-60"
+          className="inline-flex h-11 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-[var(--v2-evergreen)] text-[15px] leading-5 font-medium text-[var(--v2-snow)] transition-transform active:scale-[0.98] disabled:opacity-60"
         >
           {pending ? "Sending…" : "Send brief"}
           <ArrowRightIcon className="size-[17px]" />

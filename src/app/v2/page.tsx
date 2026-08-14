@@ -14,7 +14,7 @@ import { isLinkedInTopVoice } from "@/lib/expert-profiles";
 import { parseExpertChannels } from "@/lib/expert-channels";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
-import { hasTrustedByStory } from "@/lib/trusted-by";
+import { hasTrustedByStory, visiblePortrait } from "@/lib/trusted-by";
 import { loadTrustedClients } from "@/lib/trusted-by-server";
 import type { RosterCardExpert } from "@/components/roster-card";
 
@@ -88,7 +88,7 @@ export default async function HomeV2Page() {
         quote: storyClient.testimonial.quote,
         name: storyClient.testimonial.name,
         title: storyClient.testimonial.title,
-        imageSrc: storyClient.testimonial.imageSrc,
+        imageSrc: visiblePortrait(storyClient.testimonial.imageSrc),
         metric: home.keyStudy.metrics[0]
           ? {
               value: home.keyStudy.metrics[0].value,
@@ -101,7 +101,7 @@ export default async function HomeV2Page() {
           quote: home.brandBrief.quote,
           name: home.brandBrief.quoteName,
           title: home.brandBrief.quoteRole,
-          imageSrc: home.brandBrief.quotePhoto,
+          imageSrc: visiblePortrait(home.brandBrief.quotePhoto),
           metric: home.keyStudy.metrics[0]
             ? {
                 value: home.keyStudy.metrics[0].value,

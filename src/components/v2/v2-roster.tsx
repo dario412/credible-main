@@ -111,7 +111,7 @@ function V2RosterCard({ expert }: { expert: RosterCardExpert }) {
             "group/shortlist inline-flex shrink-0 cursor-pointer items-center justify-center gap-1 rounded-full border px-[18px] py-3 text-[14px] leading-[18px] font-medium transition-colors duration-300",
             shortlisted
               ? "border-[var(--v2-timberline)] bg-[var(--v2-timberline)] text-[var(--v2-snow)] hover:border-[var(--v2-timberline)]/80 hover:bg-[var(--v2-timberline)]/85"
-              : "border-[#C1CCC5] bg-transparent text-[var(--v2-timberline)] hover:border-[var(--v2-timberline)] hover:bg-[var(--v2-timberline)] hover:text-[var(--v2-snow)]",
+              : "border-[#C1CCC5] bg-[var(--v2-snow)] text-[var(--v2-timberline)] hover:border-[var(--v2-timberline)] hover:bg-[var(--v2-timberline)] hover:text-[var(--v2-snow)]",
           )}
         >
           <span className="relative inline-grid grid-cols-1 grid-rows-1 items-center justify-items-center">

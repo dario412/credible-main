@@ -2,13 +2,42 @@
 
 import Link from "next/link";
 import { List, X } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ArrowRightIcon, ChevronRightIcon } from "@/components/v2/v2-icons";
 import { V2Shortlist } from "@/components/v2/v2-shortlist";
 import { V2Wordmark } from "@/components/v2/v2-wordmark";
 import type { NavLink } from "@/lib/site-chrome";
 import { cn } from "@/lib/utils";
+
+function NavItem({
+  href,
+  label,
+  className,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  className?: string;
+  onClick?: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={cn(
+        "group relative isolate overflow-hidden rounded-full px-[18px] py-2.5 text-[15px] leading-[18px] font-medium text-[var(--v2-timberline)] transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-[var(--v2-snow)] focus-visible:text-[var(--v2-snow)]",
+        className,
+      )}
+    >
+      <span
+        aria-hidden
+        className="absolute inset-0 z-0 origin-center scale-y-0 rounded-full bg-[var(--v2-timberline)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100 group-focus-visible:scale-y-100"
+      />
+      <span className="relative z-10">{label}</span>
+    </Link>
+  );
+}
 
 function SlideCta({
   href,
@@ -55,35 +84,51 @@ export function V2Nav({
   creatorCount: number;
 }) {
   const [open, setOpen] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("v2-banner-dismissed") === "1") {
+      setBannerDismissed(true);
+    }
+  }, []);
 
   return (
     <>
-      <Link
-        href="/roster"
-        className="flex items-center justify-center gap-2 bg-[var(--v2-ember)] py-1.5 pr-2 pl-3"
-      >
-        <span className="size-1.5 shrink-0 rounded-full bg-[var(--v2-on-ember)]" />
-        <span className="text-[13px] leading-4 font-medium text-[var(--v2-on-ember)]">
-          New: {creatorCount}+ creators with Q3 availability
-        </span>
-        <span className="flex size-5 items-center justify-center rounded-full bg-[var(--v2-snow)] text-[var(--v2-ember)]">
-          <ChevronRightIcon className="size-3" />
-        </span>
-      </Link>
-      <header className="sticky top-0 z-50 bg-[var(--v2-snow)]">
+      {bannerDismissed ? null : (
+        <div className="relative flex items-center justify-center bg-[var(--v2-ember)]">
+          <Link
+            href="/roster"
+            className="flex items-center justify-center gap-2 py-1.5 pr-10 pl-3"
+          >
+            <span className="size-1.5 shrink-0 rounded-full bg-[var(--v2-on-ember)]" />
+            <span className="text-[13px] leading-4 font-medium text-[var(--v2-on-ember)]">
+              New: {creatorCount}+ creators with Q3 availability
+            </span>
+            <span className="flex size-5 items-center justify-center rounded-full bg-[var(--v2-snow)] text-[var(--v2-ember)]">
+              <ChevronRightIcon className="size-3" />
+            </span>
+          </Link>
+          <button
+            type="button"
+            aria-label="Dismiss announcement"
+            className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-[var(--v2-on-ember)] transition-colors hover:bg-[var(--v2-snow)]/15"
+            onClick={() => {
+              sessionStorage.setItem("v2-banner-dismissed", "1");
+              setBannerDismissed(true);
+            }}
+          >
+            <X className="size-3.5" weight="bold" />
+          </button>
+        </div>
+      )}
+      <header className="sticky top-0 z-50 pointer-events-none">
       <div className="v2-container pt-4 pb-2">
-      <div className="v2-nav-pill flex w-full items-center justify-between gap-3 rounded-full border border-[#E1E7E3] bg-[#FFFFFFEB] py-[11px] pr-[11px] pl-7 shadow-[0_8px_28px_rgba(14,26,20,0.07)] backdrop-blur-md">
+      <div className="v2-nav-pill pointer-events-auto flex w-full items-center justify-between gap-3 rounded-full border border-[var(--v2-border)] bg-[var(--v2-snow)] py-[11px] pr-[11px] pl-7 shadow-[0_1px_2px_rgba(14,26,20,0.08),0_8px_28px_rgba(14,26,20,0.12)]">
         <V2Wordmark className="text-[25px] leading-none" />
 
         <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Primary">
           {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-full px-[18px] py-2.5 text-[15px] leading-[18px] font-medium text-[var(--v2-timberline)] transition-colors hover:bg-[var(--v2-glacier)]"
-            >
-              {link.label}
-            </Link>
+            <NavItem key={link.href} href={link.href} label={link.label} />
           ))}
         </nav>
 
@@ -103,17 +148,16 @@ export function V2Nav({
       </div>
 
       {open ? (
-        <div className="mt-2 rounded-[20px] border border-[var(--v2-rule-glacier)] bg-[var(--v2-snow)] p-4 shadow-[0_12px_32px_rgba(14,26,20,0.1)] lg:hidden">
+        <div className="pointer-events-auto mt-2 rounded-[20px] border border-[var(--v2-rule-glacier)] bg-[var(--v2-snow)] p-4 shadow-[0_12px_32px_rgba(14,26,20,0.1)] lg:hidden">
           <nav className="flex flex-col gap-1" aria-label="Mobile">
             {links.map((link) => (
-              <Link
+              <NavItem
                 key={link.href}
                 href={link.href}
+                label={link.label}
                 onClick={() => setOpen(false)}
-                className="rounded-full px-4 py-3 text-[15px] font-medium text-[var(--v2-timberline)] hover:bg-[var(--v2-glacier)]"
-              >
-                {link.label}
-              </Link>
+                className="px-4 py-3"
+              />
             ))}
             <SlideCta
               href="#brief"

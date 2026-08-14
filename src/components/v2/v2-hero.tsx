@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Handshake } from "@phosphor-icons/react/ssr";
 
 import { ArrowRightIcon } from "@/components/v2/v2-icons";
 import type { HomePageSections } from "@/lib/cms";
+import { visiblePortrait } from "@/lib/trusted-by";
 import { cn } from "@/lib/utils";
 
 export type V2CastMember = {
@@ -81,16 +83,22 @@ export function V2Hero({
   proof: V2ProofStory | null;
   creatorCount: number;
 }) {
+  const ctaImage = visiblePortrait(proof?.imageSrc, visiblePortrait(bookerImage));
+  const storyImage = visiblePortrait(
+    bookerImage,
+    visiblePortrait(proof?.imageSrc),
+  );
+
   return (
     <>
       <section className="bg-[var(--v2-snow)] pt-16 md:pt-[72px]">
-        <div className="v2-container flex flex-col gap-11">
+        <div className="v2-container flex flex-col gap-6">
         <TwoToneDisplay
           text={hero.headline}
           className="text-[clamp(2.6rem,7vw,5rem)] leading-[1.1]"
         />
 
-        <div className="flex w-full flex-col gap-10 pt-9 pb-16 lg:flex-row lg:items-stretch lg:justify-between lg:gap-[108px]">
+        <div className="flex w-full flex-col gap-10 pb-16 lg:flex-row lg:items-stretch lg:justify-between lg:gap-[108px]">
           <div className="flex max-w-[620px] flex-1 flex-col justify-between gap-8">
             {hero.subhead.trim() ? (
               <p className="text-[20px] leading-8 text-[var(--v2-timberline)]">
@@ -98,7 +106,7 @@ export function V2Hero({
               </p>
             ) : null}
 
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
               {hero.primaryCta.trim() ? (
                 <Link
@@ -115,9 +123,9 @@ export function V2Hero({
                 >
                   <span className="relative size-[38px] shrink-0">
                     <span className="relative block size-[38px] overflow-hidden rounded-full bg-[var(--v2-glacier)]">
-                      {bookerImage ? (
+                      {ctaImage ? (
                         <Image
-                          src={bookerImage}
+                          src={ctaImage}
                           alt=""
                           fill
                           sizes="38px"
@@ -140,8 +148,12 @@ export function V2Hero({
 
           {proof ? (
             <aside className="flex w-full max-w-[520px] flex-col justify-between gap-7 self-stretch rounded-[16px] bg-[var(--v2-glacier)] p-9">
-              <div className="flex items-center gap-2.5">
-                <span className="size-[7px] rounded-full bg-[var(--v2-ember)]" />
+              <div className="flex items-center gap-2">
+                <Handshake
+                  weight="fill"
+                  className="size-3.5 text-[var(--v2-ember)]"
+                  aria-hidden
+                />
                 <p className="text-[12px] leading-4 font-medium tracking-[0.08em] text-[var(--v2-evergreen)] uppercase">
                   Client story
                 </p>
@@ -152,9 +164,9 @@ export function V2Hero({
               <div className="flex items-center justify-between gap-4 border-t border-[var(--v2-rule-glacier)] pt-6">
                 <div className="flex min-w-0 items-center gap-3.5">
                   <div className="relative size-11 shrink-0 overflow-hidden rounded-full bg-[var(--v2-snow)]">
-                    {proof.imageSrc ? (
+                    {storyImage ? (
                       <Image
-                        src={proof.imageSrc}
+                        src={storyImage}
                         alt=""
                         fill
                         sizes="44px"

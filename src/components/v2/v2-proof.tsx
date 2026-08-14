@@ -95,7 +95,7 @@ function CaseStudyBlock({
               <span className="inline-flex items-center gap-2 rounded-full bg-[var(--v2-surface)] px-3.5 py-1.5">
                 <Handshake
                   weight="fill"
-                  className="size-3.5 text-[var(--v2-ember)]"
+                  className="size-3.5 text-[var(--v2-snow)]"
                   aria-hidden
                 />
                 <span className="text-[12px] leading-4 font-medium tracking-[0.06em] text-[var(--v2-on-dark)] uppercase">
@@ -254,7 +254,7 @@ export function V2Proof({
             ) : null}
           </div>
 
-          <div className="flex w-full shrink-0 flex-col gap-4 rounded-[16px] bg-[var(--v2-snow)] p-7 lg:w-[568px]">
+          <div className="flex w-full shrink-0 flex-col gap-3 rounded-[16px] bg-[var(--v2-snow)] p-5 lg:w-[568px]">
             <div className="flex items-center justify-between gap-3">
               <p className="v2-display text-[24px] leading-[30px] tracking-[-0.01em] text-[var(--v2-timberline)]">
                 {brandBrief.formTitle}
@@ -263,7 +263,7 @@ export function V2Proof({
             </div>
             <V2BriefForm footnote={brandBrief.formFootnote} />
             {brandBrief.briefedByLogos.length > 0 ? (
-              <div className="mt-1 flex items-center justify-between gap-4 rounded-[12px] bg-[var(--v2-timberline)] px-4 py-3">
+              <div className="mt-0.5 flex items-center justify-between gap-4 rounded-[12px] bg-[var(--v2-timberline)] px-4 py-2.5">
                 <p className="shrink-0 text-[10px] leading-3 font-semibold tracking-[0.08em] text-[var(--v2-on-dark-muted)] uppercase">
                   {brandBrief.briefedByLabel}
                 </p>
@@ -286,16 +286,16 @@ export function V2Proof({
         </div>
       </div>
 
-      <div className="flex flex-col gap-11 rounded-[20px] bg-[var(--v2-ember)] p-8 md:p-14">
+      <div className="flex flex-col gap-11 rounded-[20px] bg-[var(--v2-on-ember)] p-8 md:p-14">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
           <div className="flex max-w-[640px] flex-col gap-7">
-            <p className="text-[13px] leading-4 font-medium tracking-[0.08em] text-[var(--v2-on-ember-muted)] uppercase">
+            <p className="text-[13px] leading-4 font-medium tracking-[0.08em] text-[var(--v2-ember)] uppercase">
               {creatorCta.eyebrow}
             </p>
-            <h2 className="v2-display text-[clamp(2rem,4vw,3.5rem)] leading-[1.07] text-[var(--v2-snow)]">
+            <h2 className="v2-display text-[clamp(2rem,4vw,3.5rem)] leading-[1.07] text-[var(--v2-timberline)]">
               {creatorCta.headline}
             </h2>
-            <p className="text-[17px] leading-7 text-[var(--v2-on-ember)]">
+            <p className="text-[17px] leading-7 text-[var(--v2-lichen)]">
               {creatorCta.subhead}
             </p>
           </div>
@@ -303,7 +303,7 @@ export function V2Proof({
             {creatorCta.primaryCtaLabel.trim() ? (
               <Link
                 href={creatorCta.primaryCtaHref}
-                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[var(--v2-snow)] py-[19px] text-[16px] leading-5 font-medium text-[var(--v2-ember)] transition-transform active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[var(--v2-ember)] py-[19px] text-[16px] leading-5 font-medium text-[var(--v2-snow)] transition-transform active:scale-[0.98]"
               >
                 {creatorCta.primaryCtaLabel}
                 <ArrowRightIcon className="size-[17px]" />
@@ -312,13 +312,13 @@ export function V2Proof({
             {creatorCta.secondaryCtaLabel.trim() ? (
               <Link
                 href={creatorCta.secondaryCtaHref}
-                className="inline-flex items-center justify-center rounded-full border border-[#E0A98C] py-[19px] text-[16px] leading-5 font-medium text-[var(--v2-snow)]"
+                className="inline-flex items-center justify-center rounded-full border border-[var(--v2-ember)] py-[19px] text-[16px] leading-5 font-medium text-[var(--v2-ember)]"
               >
                 {creatorCta.secondaryCtaLabel}
               </Link>
             ) : null}
             {creatorCta.stat2.trim() ? (
-              <p className="pt-1.5 text-center text-[13px] leading-4 text-[var(--v2-on-ember-muted)]">
+              <p className="pt-1.5 text-center text-[13px] leading-4 text-[var(--v2-lichen)]">
                 {creatorCta.stat2}
               </p>
             ) : null}
@@ -326,28 +326,28 @@ export function V2Proof({
         </div>
         <div className="grid gap-8 md:grid-cols-3">
           <div className="flex flex-col gap-2.5">
-            <p className="v2-display text-[20px] leading-[26px] text-[var(--v2-snow)]">
+            <p className="v2-display text-[20px] leading-[26px] text-[var(--v2-timberline)]">
               You keep the voice
             </p>
-            <p className="text-[15px] leading-6 text-[var(--v2-on-ember)]">
+            <p className="text-[15px] leading-6 text-[var(--v2-lichen)]">
               No scripts, no approvals queue. We never post as you or dilute what
               your audience follows you for.
             </p>
           </div>
           <div className="flex flex-col gap-2.5">
-            <p className="v2-display text-[20px] leading-[26px] text-[var(--v2-snow)]">
+            <p className="v2-display text-[20px] leading-[26px] text-[var(--v2-timberline)]">
               We handle the commercials
             </p>
-            <p className="text-[15px] leading-6 text-[var(--v2-on-ember)]">
+            <p className="text-[15px] leading-6 text-[var(--v2-lichen)]">
               Inbound triage, rate card, negotiation, contracts and chasing
               invoices. You stop being your own agent.
             </p>
           </div>
           <div className="flex flex-col gap-2.5">
-            <p className="v2-display text-[20px] leading-[26px] text-[var(--v2-snow)]">
+            <p className="v2-display text-[20px] leading-[26px] text-[var(--v2-timberline)]">
               Briefs worth taking
             </p>
-            <p className="text-[15px] leading-6 text-[var(--v2-on-ember)]">
+            <p className="text-[15px] leading-6 text-[var(--v2-lichen)]">
               We turn down more than we bring you. Every brief that lands has
               budget, a real timeline and a fit.
             </p>

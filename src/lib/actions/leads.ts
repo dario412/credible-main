@@ -51,8 +51,11 @@ const briefSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1).max(120),
   company: z.string().max(120).optional(),
-  format: z.string().min(1).max(60),
+  phone: z.string().max(40).optional(),
+  role: z.string().max(120).optional(),
+  format: z.string().max(60).optional(),
   brief: z.string().min(1).max(5000),
+  deliverables: z.string().max(5000).optional(),
 });
 
 export async function submitBrief(
@@ -63,8 +66,11 @@ export async function submitBrief(
     email: formData.get("email"),
     name: formData.get("name"),
     company: formData.get("company") || undefined,
-    format: formData.get("format"),
+    phone: formData.get("phone") || undefined,
+    role: formData.get("role") || undefined,
+    format: formData.get("format") || undefined,
     brief: formData.get("brief"),
+    deliverables: formData.get("deliverables") || undefined,
   });
   if (!parsed.success) {
     return {
@@ -73,12 +79,24 @@ export async function submitBrief(
     };
   }
 
+  const message = [
+    parsed.data.phone ? `Phone: ${parsed.data.phone}` : null,
+    parsed.data.role ? `Role: ${parsed.data.role}` : null,
+    parsed.data.format ? `Format: ${parsed.data.format}` : null,
+    parsed.data.brief,
+    parsed.data.deliverables
+      ? `Deliverables:\n${parsed.data.deliverables}`
+      : null,
+  ]
+    .filter((line): line is string => Boolean(line))
+    .join("\n\n");
+
   await prisma.lead.create({
     data: {
       email: parsed.data.email,
       name: parsed.data.name,
       company: parsed.data.company,
-      message: `Format: ${parsed.data.format}\n\n${parsed.data.brief}`,
+      message,
       source: "CONTACT",
     },
   });
