@@ -26,15 +26,11 @@ function NavItem({
       href={href}
       onClick={onClick}
       className={cn(
-        "group relative isolate overflow-hidden rounded-full px-[18px] py-2.5 text-[15px] leading-[18px] font-medium text-[var(--v2-timberline)] transition-colors duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-[var(--v2-snow)] focus-visible:text-[var(--v2-snow)]",
+        "rounded-full px-[18px] py-2.5 text-[15px] leading-[18px] font-medium text-[var(--v2-timberline)] transition-opacity duration-200 ease-out hover:opacity-50 focus-visible:opacity-50",
         className,
       )}
     >
-      <span
-        aria-hidden
-        className="absolute inset-0 z-0 origin-center scale-y-0 rounded-full bg-[var(--v2-timberline)] transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100 group-focus-visible:scale-y-100"
-      />
-      <span className="relative z-10">{label}</span>
+      {label}
     </Link>
   );
 }

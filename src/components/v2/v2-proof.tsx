@@ -303,16 +303,29 @@ export function V2Proof({
             {creatorCta.primaryCtaLabel.trim() ? (
               <Link
                 href={creatorCta.primaryCtaHref}
-                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-[var(--v2-ember)] py-[19px] text-[16px] leading-5 font-medium text-[var(--v2-snow)] transition-transform active:scale-[0.98]"
+                className="group inline-flex w-full items-center justify-center overflow-hidden rounded-full bg-[var(--v2-ember)] py-[19px] text-[16px] leading-5 font-medium text-[var(--v2-snow)] transition-[transform,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#9e4a28] active:scale-[0.98]"
               >
-                {creatorCta.primaryCtaLabel}
-                <ArrowRightIcon className="size-[17px]" />
+                <span className="relative inline-flex items-center overflow-hidden">
+                  <span className="invisible inline-flex items-center gap-2.5">
+                    <span className="whitespace-nowrap">
+                      {creatorCta.primaryCtaLabel}
+                    </span>
+                    <ArrowRightIcon className="size-[17px] shrink-0" />
+                  </span>
+                  <span className="absolute inset-y-0 left-0 inline-flex items-center gap-2.5 transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] -translate-x-[calc(17px+0.625rem)] group-hover:translate-x-0 group-focus-visible:translate-x-0">
+                    <ArrowRightIcon className="size-[17px] shrink-0" />
+                    <span className="whitespace-nowrap">
+                      {creatorCta.primaryCtaLabel}
+                    </span>
+                    <ArrowRightIcon className="size-[17px] shrink-0" />
+                  </span>
+                </span>
               </Link>
             ) : null}
             {creatorCta.secondaryCtaLabel.trim() ? (
               <Link
                 href={creatorCta.secondaryCtaHref}
-                className="inline-flex items-center justify-center rounded-full border border-[var(--v2-ember)] py-[19px] text-[16px] leading-5 font-medium text-[var(--v2-ember)]"
+                className="inline-flex w-full items-center justify-center rounded-full border border-[var(--v2-ember)] bg-transparent py-[19px] text-[16px] leading-5 font-medium text-[var(--v2-ember)] transition-colors duration-300 ease-out hover:bg-[var(--v2-ember)] hover:text-[var(--v2-snow)] focus-visible:bg-[var(--v2-ember)] focus-visible:text-[var(--v2-snow)]"
               >
                 {creatorCta.secondaryCtaLabel}
               </Link>
