@@ -156,6 +156,13 @@ export default async function AdminDashboardPage() {
                   </Link>
                 </li>
               ) : null}
+              {hasPermission(session.user.role, "MANAGE_CONTENT") ? (
+                <li>
+                  <Link href="/admin/sync" className="hover:text-forest">
+                    Sync roster from Airtable
+                  </Link>
+                </li>
+              ) : null}
             </ul>
           </div>
         </div>

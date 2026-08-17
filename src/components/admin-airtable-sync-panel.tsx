@@ -24,11 +24,11 @@ export function AdminAirtableSyncPanel({
   return (
     <div className="space-y-6 rounded-sm border border-charcoal/10 bg-white p-6 shadow-[0_10px_28px_rgba(28,26,23,0.04)]">
       <div>
-        <h2 className="font-display text-xl tracking-tight">Sync from Airtable</h2>
+        <h2 className="font-display text-xl tracking-tight">Creator roster</h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-          Pulls speakers via the Airtable REST API (Personal Access Token) and
-          upserts them into the site database. Public pages keep reading
-          Postgres — this only refreshes the roster data.
+          Matches the website roster to Airtable: adds new creators, updates
+          existing ones, and removes anyone missing from Airtable or marked
+          archived.
         </p>
       </div>
 
@@ -64,9 +64,20 @@ export function AdminAirtableSyncPanel({
         >
           <p className="font-medium">{result.message}</p>
           <p className="mt-1 text-charcoal/65">
-            Total records: {result.total} · New: {result.created} · Updated:{" "}
-            {result.updated} · Skipped: {result.skipped}
+            Airtable records: {result.total} · Added: {result.created} ·
+            Updated: {result.updated} · Removed: {result.removed} · Skipped:{" "}
+            {result.skipped}
           </p>
+          {result.createdNames.length > 0 ? (
+            <p className="mt-2 text-sm text-charcoal/75">
+              Added: {result.createdNames.join(", ")}
+            </p>
+          ) : null}
+          {result.removedNames.length > 0 ? (
+            <p className="mt-1 text-sm text-charcoal/75">
+              Removed: {result.removedNames.join(", ")}
+            </p>
+          ) : null}
           {result.errors.length > 0 ? (
             <ul className="mt-3 list-disc space-y-1 pl-5 text-xs">
               {result.errors.map((error) => (

@@ -33,18 +33,22 @@ export async function runAirtableExpertSync() {
       message: "Unauthorized",
       created: 0,
       updated: 0,
+      removed: 0,
       skipped: 0,
       total: 0,
       errors: [] as string[],
+      createdNames: [] as string[],
+      removedNames: [] as string[],
     };
   }
 
   const result = await syncExpertsFromAirtable();
 
-  if (result.created + result.updated > 0) {
+  if (result.created + result.updated + result.removed > 0) {
     revalidatePath("/roster");
     revalidatePath("/");
     revalidatePath("/admin/roster");
+    revalidatePath("/admin/sync");
   }
 
   return result;

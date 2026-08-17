@@ -50,6 +50,22 @@ const icons: Record<string, React.ReactNode> = {
       <path d="M2.5 13c.5-2 1.8-3 3-3s2.5 1 3 3M7.5 13c.5-2 1.8-3 3-3s2.5 1 3 3" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
     </svg>
   ),
+  "/admin/sync": (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path
+        d="M12.25 5.25A5 5 0 0 0 4.1 6.4M3.75 10.75A5 5 0 0 0 11.9 9.6"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+      />
+      <path
+        d="M12.25 2.75v2.5H9.75M3.75 13.25v-2.5H6.25"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="square"
+      />
+    </svg>
+  ),
   "/admin/pages": (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
       <path d="M4 2.5h5.5L12 5v8.5H4z" stroke="currentColor" strokeWidth="1.25" />

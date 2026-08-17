@@ -16,10 +16,32 @@ export type SyncExpertsResult = {
   message: string;
   created: number;
   updated: number;
+  removed: number;
   skipped: number;
   total: number;
   errors: string[];
+  createdNames: string[];
+  removedNames: string[];
 };
+
+function emptySyncResult(
+  message: string,
+  extra?: Partial<SyncExpertsResult>,
+): SyncExpertsResult {
+  return {
+    ok: false,
+    message,
+    created: 0,
+    updated: 0,
+    removed: 0,
+    skipped: 0,
+    total: 0,
+    errors: [],
+    createdNames: [],
+    removedNames: [],
+    ...extra,
+  };
+}
 
 function chunk<T>(items: T[], size: number): T[][] {
   const out: T[][] = [];
@@ -81,21 +103,16 @@ async function loadTrustedByByExpertId(
 }
 
 /**
- * Pull all Airtable speaker records and upsert into Expert.
+ * Pull all Airtable speaker records and reconcile Expert.
+ * Adds new creators, updates existing ones, and removes anyone missing
+ * from Airtable (deleted, archived, or no longer mappable).
  * Match order: airtableId → slug (links existing seed rows) → create.
  */
 export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
   if (!isAirtableConfigured()) {
-    return {
-      ok: false,
-      message:
-        "Airtable is not configured. Set AIRTABLE_PAT, AIRTABLE_BASE_ID, and AIRTABLE_TABLE.",
-      created: 0,
-      updated: 0,
-      skipped: 0,
-      total: 0,
-      errors: [],
-    };
+    return emptySyncResult(
+      "Airtable is not configured. Set AIRTABLE_PAT, AIRTABLE_BASE_ID, and AIRTABLE_TABLE.",
+    );
   }
 
   let records;
@@ -104,15 +121,7 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Airtable fetch failed.";
-    return {
-      ok: false,
-      message,
-      created: 0,
-      updated: 0,
-      skipped: 0,
-      total: 0,
-      errors: [message],
-    };
+    return emptySyncResult(message, { errors: [message] });
   }
 
   const mappedRows = records
@@ -121,6 +130,19 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
       (row): row is { record: AirtableRecord; mapped: NonNullable<typeof row.mapped> } =>
         Boolean(row.mapped),
     );
+
+  if (records.length > 0 && mappedRows.length === 0) {
+    return emptySyncResult(
+      "Airtable returned records but none could be mapped. Left the existing roster in place.",
+      {
+        total: records.length,
+        skipped: records.length,
+        errors: [
+          "Check that creator names are present and Archive is not set on every row.",
+        ],
+      },
+    );
+  }
 
   const expertIds = mappedRows.flatMap((row) => row.mapped.expertsRecordIds);
   let trustedByMap = new Map<string, TrustedBrand[]>();
@@ -134,7 +156,9 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
   let updated = 0;
   let skipped = records.length - mappedRows.length;
   const errors: string[] = [];
+  const createdNames: string[] = [];
   const usedSlugs = new Set<string>();
+  const keepIds = mappedRows.map((row) => row.mapped.airtableId);
 
   for (const { mapped } of mappedRows) {
     let slug = mapped.slug;
@@ -219,6 +243,7 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
 
       await prisma.expert.create({ data });
       created += 1;
+      createdNames.push(mapped.name);
     } catch (error) {
       const message =
         error instanceof Error
@@ -229,16 +254,37 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
     }
   }
 
+  const stale =
+    keepIds.length === 0
+      ? await prisma.expert.findMany({ select: { id: true, name: true } })
+      : await prisma.expert.findMany({
+          where: {
+            OR: [{ airtableId: null }, { airtableId: { notIn: keepIds } }],
+          },
+          select: { id: true, name: true },
+        });
+
+  if (stale.length > 0) {
+    await prisma.expert.deleteMany({
+      where: { id: { in: stale.map((expert) => expert.id) } },
+    });
+  }
+
+  const removedNames = stale.map((expert) => expert.name);
+  const removed = removedNames.length;
   const ok = errors.length === 0;
   return {
     ok,
     message: ok
-      ? `Synced ${created + updated} experts (${created} new, ${updated} updated, ${skipped} skipped).`
-      : `Synced with ${errors.length} error(s). ${created} new, ${updated} updated, ${skipped} skipped.`,
+      ? `Synced ${created + updated} creators (${created} added, ${updated} updated, ${removed} removed).`
+      : `Synced with ${errors.length} error(s). ${created} added, ${updated} updated, ${removed} removed, ${skipped} skipped.`,
     created,
     updated,
+    removed,
     skipped,
     total: records.length,
     errors: errors.slice(0, 20),
+    createdNames: createdNames.slice(0, 20),
+    removedNames: removedNames.slice(0, 20),
   };
 }
