@@ -11,7 +11,8 @@ export function FadeUp({
   delay = 0,
   duration = 1100,
   y = 28,
-  threshold = 0.25,
+  threshold = 0.2,
+  rootMargin = "0px 0px -10% 0px",
 }: {
   children: ReactNode;
   className?: string;
@@ -19,6 +20,7 @@ export function FadeUp({
   duration?: number;
   y?: number;
   threshold?: number;
+  rootMargin?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -38,11 +40,11 @@ export function FadeUp({
         setVisible(true);
         observer.disconnect();
       },
-      { threshold },
+      { threshold, rootMargin },
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [threshold]);
+  }, [threshold, rootMargin]);
 
   return (
     <div

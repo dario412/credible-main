@@ -234,8 +234,15 @@ h6.font-display {
 }
 
 .cast-marquee-window:hover .cast-marquee-track,
-.cast-marquee-window:focus-within .cast-marquee-track {
+.cast-marquee-window:focus-within .cast-marquee-track,
+.cast-marquee-window:hover .about-roster-track,
+.cast-marquee-window:focus-within .about-roster-track {
   animation-play-state: paused;
+}
+
+.about-roster-track {
+  animation: cast-marquee 70s linear infinite;
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -243,7 +250,8 @@ h6.font-display {
     animation: none;
   }
 
-  .cast-marquee-track {
+  .cast-marquee-track,
+  .about-roster-track {
     animation: none;
   }
 }

@@ -52,6 +52,26 @@ const nextConfig: NextConfig = {
         destination: "/",
         permanent: true,
       },
+      {
+        source: "/v2",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/v2-about",
+        destination: "/about",
+        permanent: true,
+      },
+      {
+        source: "/v2-what-we-do",
+        destination: "/what-we-do",
+        permanent: true,
+      },
+      {
+        source: "/v2-apply-for-representation",
+        destination: "/apply-for-representation",
+        permanent: true,
+      },
     ];
   },
 };

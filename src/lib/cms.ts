@@ -319,6 +319,20 @@ function asString(value: unknown, fallback: string) {
   return typeof value === "string" ? value : fallback;
 }
 
+const APPLY_PAGE = "/apply-for-representation";
+
+function pagePath(href: string) {
+  return href.split("#")[0]?.split("?")[0] ?? href;
+}
+
+/** Saved homepage CTAs still point at /contact or retired /v2-* routes. */
+function resolveApplyHref(href: string, label: string) {
+  const path = pagePath(href);
+  if (path === "/v2-apply-for-representation") return APPLY_PAGE;
+  if (/apply/i.test(label) && path === "/contact") return APPLY_PAGE;
+  return href;
+}
+
 function mergeWaysIn(raw: unknown): HomePageSections["waysIn"] {
   const defaults = DEFAULT_HOME_SECTIONS.waysIn;
   const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
@@ -505,7 +519,10 @@ function mergeCreatorCta(raw: unknown): HomePageSections["creatorCta"] {
     stat1: asString(data.stat1, defaults.stat1),
     stat2: asString(data.stat2, defaults.stat2),
     primaryCtaLabel: asString(data.primaryCtaLabel, defaults.primaryCtaLabel),
-    primaryCtaHref: asString(data.primaryCtaHref, defaults.primaryCtaHref),
+    primaryCtaHref: resolveApplyHref(
+      asString(data.primaryCtaHref, defaults.primaryCtaHref),
+      asString(data.primaryCtaLabel, defaults.primaryCtaLabel),
+    ),
     secondaryCtaLabel: asString(
       data.secondaryCtaLabel,
       defaults.secondaryCtaLabel,
@@ -543,13 +560,17 @@ export function mergeHomeSections(raw: unknown): HomePageSections {
   };
   const hero = data.hero ?? {};
   const defaults = DEFAULT_HOME_SECTIONS.hero;
+  const primaryCta = asString(hero.primaryCta, defaults.primaryCta);
 
   return {
     hero: {
       headline: asString(hero.headline, defaults.headline),
       subhead: asString(hero.subhead, defaults.subhead),
-      primaryCta: asString(hero.primaryCta, defaults.primaryCta),
-      primaryHref: asString(hero.primaryHref, defaults.primaryHref),
+      primaryCta,
+      primaryHref: resolveApplyHref(
+        asString(hero.primaryHref, defaults.primaryHref),
+        primaryCta,
+      ),
       secondaryCta: asString(hero.secondaryCta, defaults.secondaryCta),
       secondaryHref: asString(hero.secondaryHref, defaults.secondaryHref),
       headlineStyle: mergeHeadlineStyle(hero.headlineStyle),

@@ -1,8 +1,9 @@
 "use client";
 
-import { CaretDown } from "@phosphor-icons/react";
+import { Minus, Plus } from "@phosphor-icons/react";
 import { useId, useState } from "react";
 
+import { FadeUp } from "@/components/fade-up";
 import { cn } from "@/lib/utils";
 
 export function RepresentationFaq({
@@ -14,14 +15,15 @@ export function RepresentationFaq({
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <dl className="divide-y divide-charcoal/10 rounded-sm border border-charcoal/10 bg-white">
+    <dl className="flex flex-col gap-3">
       {items.map((item, index) => {
         const open = openIndex === index;
         const panelId = `${baseId}-panel-${index}`;
         const buttonId = `${baseId}-button-${index}`;
 
         return (
-          <div key={item.q}>
+          <FadeUp key={item.q} delay={index * 70} y={16} threshold={0.12}>
+            <div className="rounded-sm bg-cream-dark px-6 py-7 md:px-10 md:py-8">
             <dt>
               <button
                 id={buttonId}
@@ -29,19 +31,18 @@ export function RepresentationFaq({
                 aria-expanded={open}
                 aria-controls={panelId}
                 onClick={() => setOpenIndex(open ? null : index)}
-                className="flex w-full items-start justify-between gap-4 px-5 py-5 text-left transition-colors hover:bg-cream/40 md:px-6 md:py-6"
+                className="flex w-full items-center justify-between gap-6 text-left"
               >
-                <span className="font-display text-[1.05rem] leading-snug tracking-tight text-charcoal md:text-[1.1rem]">
+                <span className="min-w-0 flex-1 font-display text-[1.25rem] leading-[1.3] tracking-tight text-charcoal md:text-[1.5rem]">
                   {item.q}
                 </span>
-                <CaretDown
-                  weight="bold"
-                  aria-hidden
-                  className={cn(
-                    "mt-1 size-4 shrink-0 text-charcoal/40 transition-transform duration-200",
-                    open && "rotate-180",
+                <span className="flex size-10 shrink-0 items-center justify-center text-charcoal">
+                  {open ? (
+                    <Minus weight="bold" className="size-4.5" aria-hidden />
+                  ) : (
+                    <Plus weight="bold" className="size-4.5" aria-hidden />
                   )}
-                />
+                </span>
               </button>
             </dt>
             <dd
@@ -54,12 +55,13 @@ export function RepresentationFaq({
               )}
             >
               <div className="overflow-hidden">
-                <p className="px-5 pb-5 text-[0.875rem] leading-relaxed text-charcoal/65 md:px-6 md:pb-6">
+                <p className="max-w-[37.5rem] pt-4 text-[1.0625rem] leading-[1.68] text-charcoal/70">
                   {item.a}
                 </p>
               </div>
             </dd>
-          </div>
+            </div>
+          </FadeUp>
         );
       })}
     </dl>

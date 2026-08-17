@@ -51,11 +51,11 @@ export function SiteHeader() {
     /^\/insights\/[^/]+\/?$/.test(pathname) ||
     /^\/insights\/authors\//.test(pathname);
   const isHome = pathname === "/";
-  const isForestHeroPage = pathname === "/apply-for-representation";
+  const isHeroOverlayPage = pathname === "/about";
   // Full-bleed heroes — nav sits inside the frame with inverted colors.
   const overlay =
     isHome ||
-    isForestHeroPage ||
+    isHeroOverlayPage ||
     /^\/roster\/[^/]+\/?$/.test(pathname) ||
     /^\/case-studies\/[^/]+\/?$/.test(pathname);
   const [scrolled, setScrolled] = useState(false);
@@ -64,7 +64,7 @@ export function SiteHeader() {
     const onScroll = () => {
       const y = window.scrollY;
 
-      if (isForestHeroPage) {
+      if (isHeroOverlayPage) {
         const hero = document.querySelector("[data-site-hero-overlay]");
         if (hero) {
           setScrolled(hero.getBoundingClientRect().bottom < 96);
@@ -72,7 +72,7 @@ export function SiteHeader() {
         }
       }
 
-      if (overlay && !isHome && !isForestHeroPage) {
+      if (overlay && !isHome && !isHeroOverlayPage) {
         setScrolled(y > window.innerHeight * 0.6);
         return;
       }
@@ -87,7 +87,7 @@ export function SiteHeader() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [overlay, isHome, isForestHeroPage]);
+  }, [overlay, isHome, isHeroOverlayPage]);
 
   const pageSurface = insightArticle ? "bg-cream-dark" : "bg-cream";
   // Hero overlay pages: cream pill + dark type until scroll, then charcoal bar.
