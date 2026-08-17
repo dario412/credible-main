@@ -7,18 +7,14 @@ import {
 import { caseStudyToCard } from "@/lib/cms";
 import { prisma } from "@/lib/prisma";
 
-/** Prefer CMS DB rows; keep unique static fallbacks that aren't in the DB yet. */
+/** CMS database is the source of truth. Static catalog is first-run / outage fallback only. */
 export async function loadCaseStudies(): Promise<CaseStudyCard[]> {
   try {
     const rows = await prisma.caseStudy.findMany({
       orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
     });
     if (rows.length === 0) return CASE_STUDIES;
-
-    const fromDb = rows.map(caseStudyToCard);
-    const dbSlugs = new Set(fromDb.map((study) => study.slug));
-    const staticOnly = CASE_STUDIES.filter((study) => !dbSlugs.has(study.slug));
-    return [...fromDb, ...staticOnly];
+    return rows.map(caseStudyToCard);
   } catch {
     return CASE_STUDIES;
   }

@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
+import { readingTime } from "@/lib/insight-content";
 import { INSIGHT_TOPICS } from "@/lib/insight-topics";
 import { ViewMoreLink } from "@/components/view-more-link";
 import { InsightsVisualEditor } from "@/components/insights-visual-editor";
@@ -57,11 +58,6 @@ type InsightCardData = {
 
 function coverFor(insight: { slug: string; coverImage: string | null }) {
   return insight.coverImage ?? COVER_BY_SLUG[insight.slug] ?? null;
-}
-
-function readingTime(body: string) {
-  const words = body.trim().split(/\s+/).length;
-  return Math.max(1, Math.round(words / 200));
 }
 
 function matchesQuery(insight: InsightCardData, q: string) {

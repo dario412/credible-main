@@ -1,13 +1,12 @@
-import { V2Footer } from "@/components/v2/v2-footer";
+import { V2Chrome } from "@/components/v2/v2-chrome";
 import { V2Hero, type V2CastMember, type V2ProofStory } from "@/components/v2/v2-hero";
 import { V2Impact } from "@/components/v2/v2-impact";
 import { V2Insights } from "@/components/v2/v2-insights";
-import { V2Nav } from "@/components/v2/v2-nav";
 import { V2Proof } from "@/components/v2/v2-proof";
 import { V2Roster } from "@/components/v2/v2-roster";
 import { V2TrustedBy } from "@/components/v2/v2-trusted-by";
 import { V2WaysIn } from "@/components/v2/v2-ways-in";
-import { getHomePageSections, getSiteChrome } from "@/lib/actions/admin-cms";
+import { getHomePageSections } from "@/lib/actions/admin-cms";
 import { loadFeaturedCaseStudy } from "@/lib/case-studies-server";
 import { insightCover, readingTime } from "@/lib/insight-content";
 import { isLinkedInTopVoice } from "@/lib/expert-profiles";
@@ -16,6 +15,7 @@ import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 import { hasTrustedByStory, visiblePortrait } from "@/lib/trusted-by";
 import { loadTrustedClients } from "@/lib/trusted-by-server";
+import { toV2Href } from "@/lib/v2-links";
 import type { RosterCardExpert } from "@/components/roster-card";
 
 export const dynamic = "force-dynamic";
@@ -29,10 +29,9 @@ export const metadata = createMetadata({
 });
 
 export default async function HomeV2Page() {
-  const [home, chrome, trustedClients, featured, insights, experts, expertCount] =
+  const [home, trustedClients, featured, insights, experts, expertCount] =
     await Promise.all([
       getHomePageSections(),
-      getSiteChrome(),
       loadTrustedClients(),
       loadFeaturedCaseStudy(),
       prisma.insight.findMany({
@@ -122,15 +121,13 @@ export default async function HomeV2Page() {
   }));
 
   return (
-    <>
-      <V2Nav
-        links={chrome.header.links}
-        ctaLabel={chrome.header.ctaLabel || "Send a brief"}
-        creatorCount={expertCount || 20}
-      />
-      <main className="flex-1">
+    <V2Chrome>
         <V2Hero
-          hero={home.hero}
+          hero={{
+            ...home.hero,
+            primaryHref: toV2Href(home.hero.primaryHref),
+            secondaryHref: toV2Href(home.hero.secondaryHref),
+          }}
           cast={cast}
           bookerImage={cast[0]?.image ?? null}
           proof={proof}
@@ -144,11 +141,13 @@ export default async function HomeV2Page() {
           keyStudy={home.keyStudy}
           featured={featured}
           brandBrief={home.brandBrief}
-          creatorCta={home.creatorCta}
+          creatorCta={{
+            ...home.creatorCta,
+            primaryCtaHref: toV2Href(home.creatorCta.primaryCtaHref),
+            secondaryCtaHref: toV2Href(home.creatorCta.secondaryCtaHref),
+          }}
         />
         <V2Insights insights={insightCards} />
-      </main>
-      <V2Footer footer={chrome.footer} />
-    </>
+    </V2Chrome>
   );
 }

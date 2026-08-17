@@ -8,6 +8,7 @@ import { ArrowRightIcon, ChevronRightIcon } from "@/components/v2/v2-icons";
 import { V2Shortlist } from "@/components/v2/v2-shortlist";
 import { V2Wordmark } from "@/components/v2/v2-wordmark";
 import type { NavLink } from "@/lib/site-chrome";
+import { toV2Href, V2_BRIEF, V2_HOME } from "@/lib/v2-links";
 import { cn } from "@/lib/utils";
 
 function NavItem({
@@ -81,6 +82,10 @@ export function V2Nav({
 }) {
   const [open, setOpen] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const navLinks = links.map((link) => ({
+    ...link,
+    href: toV2Href(link.href),
+  }));
 
   useEffect(() => {
     if (sessionStorage.getItem("v2-banner-dismissed") === "1") {
@@ -120,16 +125,16 @@ export function V2Nav({
       <header className="sticky top-0 z-50 pointer-events-none">
       <div className="v2-container pt-4 pb-2">
       <div className="v2-nav-pill pointer-events-auto flex w-full items-center justify-between gap-3 rounded-full border border-[var(--v2-border)] bg-[var(--v2-snow)] py-[11px] pr-[11px] pl-7 shadow-[0_1px_2px_rgba(14,26,20,0.08),0_8px_28px_rgba(14,26,20,0.12)]">
-        <V2Wordmark className="text-[25px] leading-none" />
+        <V2Wordmark href={V2_HOME} className="text-[25px] leading-none" />
 
         <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Primary">
-          {links.map((link) => (
+          {navLinks.map((link) => (
             <NavItem key={link.href} href={link.href} label={link.label} />
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
-          <SlideCta href="#brief" label={ctaLabel} className="hidden sm:inline-flex" />
+          <SlideCta href={V2_BRIEF} label={ctaLabel} className="hidden sm:inline-flex" />
           <V2Shortlist />
           <button
             type="button"
@@ -146,7 +151,7 @@ export function V2Nav({
       {open ? (
         <div className="pointer-events-auto mt-2 rounded-[20px] border border-[var(--v2-rule-glacier)] bg-[var(--v2-snow)] p-4 shadow-[0_12px_32px_rgba(14,26,20,0.1)] lg:hidden">
           <nav className="flex flex-col gap-1" aria-label="Mobile">
-            {links.map((link) => (
+            {navLinks.map((link) => (
               <NavItem
                 key={link.href}
                 href={link.href}
@@ -156,7 +161,7 @@ export function V2Nav({
               />
             ))}
             <SlideCta
-              href="#brief"
+              href={V2_BRIEF}
               label={ctaLabel}
               onClick={() => setOpen(false)}
               className="mt-2 justify-center px-5 py-3.5"

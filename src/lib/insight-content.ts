@@ -30,7 +30,7 @@ export function insightCover(insight: {
 
 export function readingTime(body: string) {
   const words = body.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.round(words / 200));
+  return Math.max(1, Math.round(words / 170));
 }
 
 export function readingTimeFromBlocks(blocks: InsightBlock[]) {

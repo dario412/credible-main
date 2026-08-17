@@ -1,11 +1,12 @@
 .v2 {
   --v2-snow: #ffffff;
+  --v2-cream: #f9f3ef;
   --v2-glacier: #e8ede9;
   --v2-lichen: #6b7671;
   --v2-timberline: #0e1a14;
   --v2-evergreen: #2c5341;
   --v2-evergreen-deep: #1e3b2e;
-  --v2-ember: #b4552e;
+  --v2-ember: #355b47;
   --v2-surface: #1b2b23;
   --v2-on-dark: #b8c6be;
   --v2-on-dark-muted: #8fa398;
@@ -15,9 +16,9 @@
   --v2-rule-light: #dde4df;
   --v2-rule-glacier: #cfd9d2;
   --v2-border: #c7d0ca;
-  --v2-on-ember: #f7e3d8;
-  --v2-on-ember-muted: #f2d5c6;
-  --v2-rule-ember: #c97b55;
+  --v2-on-ember: #e8ede9;
+  --v2-on-ember-muted: #d5ddd6;
+  --v2-rule-ember: #4a6b58;
   --v2-live: #3fa76a;
   --v2-gutter: clamp(1.25rem, 6.6vw, 6rem);
   --v2-page: 90rem;

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { TwoToneDisplay } from "@/components/v2/v2-hero";
 import { ArrowUpRightIcon } from "@/components/v2/v2-icons";
 import type { HomePageSections } from "@/lib/cms";
+import { V2_WHAT_WE_DO } from "@/lib/v2-links";
 
 export function V2WaysIn({ content }: { content: HomePageSections["waysIn"] }) {
   return (
@@ -25,7 +26,7 @@ export function V2WaysIn({ content }: { content: HomePageSections["waysIn"] }) {
         {content.items.map((item, index) => (
           <li key={`${item.title}-${index}`}>
             <Link
-              href="/what-we-do"
+              href={V2_WHAT_WE_DO}
               className="group flex items-start gap-8 py-[34px]"
             >
               <span className="w-11 shrink-0 pt-2 text-[13px] leading-4 font-medium tracking-[0.08em] text-[var(--v2-ember)]">

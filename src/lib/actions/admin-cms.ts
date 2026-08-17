@@ -235,7 +235,13 @@ export async function deleteCaseStudy(slug: string) {
   const session = await requireContentEditor();
   if (!session) return { ok: false as const, message: "Unauthorized" };
 
-  await prisma.caseStudy.delete({ where: { slug } }).catch(() => null);
+  try {
+    await prisma.caseStudy.delete({ where: { slug } });
+  } catch {
+    return { ok: false as const, message: "Could not delete case study." };
+  }
+
+  revalidatePath("/");
   revalidatePath("/case-studies");
   revalidatePath(`/case-studies/${slug}`);
   revalidatePath("/admin/case-studies");

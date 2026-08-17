@@ -120,7 +120,7 @@ function CaseStudyBlock({
                     className={cn(
                       "v2-display text-[44px] leading-[48px] tracking-[-0.03em]",
                       index === 1
-                        ? "text-[var(--v2-ember)]"
+                        ? "text-[var(--v2-glacier)]"
                         : "text-[var(--v2-snow)]",
                     )}
                   >
@@ -177,7 +177,7 @@ export function V2Proof({
       className="pt-28 pb-[60px]"
       style={{
         backgroundImage:
-          "linear-gradient(180deg, #F4E2D7 0%, #F8EDE6 22%, #FFFFFF 44%)",
+          "linear-gradient(180deg, #E8EDE9 0%, #F4F7F5 22%, #FFFFFF 44%)",
       }}
     >
       <div className="v2-container flex flex-col gap-8">
@@ -287,23 +287,27 @@ export function V2Proof({
       </div>
 
       <div className="flex flex-col gap-11 rounded-[20px] bg-[var(--v2-on-ember)] p-8 md:p-14">
+        <div className="flex flex-col gap-7">
+          <p className="text-[13px] leading-4 font-medium tracking-[0.08em] text-[var(--v2-ember)] uppercase">
+            {creatorCta.eyebrow}
+          </p>
+          <h2 className="v2-display text-[clamp(2rem,4vw,3.5rem)] leading-[1.07] text-[var(--v2-timberline)]">
+            {creatorCta.headline.split(/(?<=\.)\s+/).map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
+          </h2>
+        </div>
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
-          <div className="flex max-w-[640px] flex-col gap-7">
-            <p className="text-[13px] leading-4 font-medium tracking-[0.08em] text-[var(--v2-ember)] uppercase">
-              {creatorCta.eyebrow}
-            </p>
-            <h2 className="v2-display text-[clamp(2rem,4vw,3.5rem)] leading-[1.07] text-[var(--v2-timberline)]">
-              {creatorCta.headline}
-            </h2>
-            <p className="text-[17px] leading-7 text-[var(--v2-lichen)]">
-              {creatorCta.subhead}
-            </p>
-          </div>
-          <div className="flex w-full max-w-[400px] shrink-0 flex-col gap-3 lg:pt-11">
+          <p className="max-w-[640px] text-[17px] leading-7 text-[var(--v2-lichen)]">
+            {creatorCta.subhead}
+          </p>
+          <div className="flex w-full max-w-[400px] shrink-0 flex-col gap-3">
             {creatorCta.primaryCtaLabel.trim() ? (
               <Link
                 href={creatorCta.primaryCtaHref}
-                className="group inline-flex w-full items-center justify-center overflow-hidden rounded-full bg-[var(--v2-ember)] py-[19px] text-[16px] leading-5 font-medium text-[var(--v2-snow)] transition-[transform,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#9e4a28] active:scale-[0.98]"
+                className="group inline-flex w-full items-center justify-center overflow-hidden rounded-full bg-[var(--v2-ember)] py-[19px] text-[16px] leading-5 font-medium text-[var(--v2-snow)] transition-[transform,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--v2-evergreen-deep)] active:scale-[0.98]"
               >
                 <span className="relative inline-flex items-center overflow-hidden">
                   <span className="invisible inline-flex items-center gap-2.5">

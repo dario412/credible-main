@@ -61,14 +61,13 @@ async function main() {
     console.log(`Removed ${removed.count} legacy seed expert(s).`);
   }
 
-  // Seed defaults only — never overwrite CMS edits already on this database.
-  for (const card of CASE_STUDIES) {
-    const row = caseStudyCardToRow(card);
-    await prisma.caseStudy.upsert({
-      where: { slug: row.slug },
-      update: {},
-      create: row,
-    });
+  // Seed defaults only when the table is empty. Every production build runs this
+  // script — upserting by slug would resurrect case studies deleted in the CMS.
+  const caseStudyCount = await prisma.caseStudy.count();
+  if (caseStudyCount === 0) {
+    for (const card of CASE_STUDIES) {
+      await prisma.caseStudy.create({ data: caseStudyCardToRow(card) });
+    }
   }
 
   const insights = [

@@ -3,6 +3,7 @@ import { LinkedinLogo, YoutubeLogo, XLogo, InstagramLogo } from "@phosphor-icons
 
 import { V2Wordmark } from "@/components/v2/v2-wordmark";
 import type { SiteChromeSections, SocialNetwork } from "@/lib/site-chrome";
+import { toV2Href, V2_HOME } from "@/lib/v2-links";
 
 function SocialGlyph({ network }: { network: SocialNetwork }) {
   const className = "size-[17px]";
@@ -21,7 +22,7 @@ export function V2Footer({ footer }: { footer: SiteChromeSections["footer"] }) {
       <div className="overflow-hidden rounded-[20px] bg-[var(--v2-timberline)]">
         <div className="flex flex-col gap-16 px-8 pt-16 md:px-16 lg:flex-row lg:justify-between lg:gap-16">
           <div className="flex max-w-[26rem] flex-col gap-6">
-            <V2Wordmark invert className="text-[44px] leading-none" />
+            <V2Wordmark href={V2_HOME} invert className="text-[44px] leading-none" />
             <div className="flex flex-col gap-1">
               {footer.tagline.trim() ? (
                 <p className="text-[17px] leading-7 text-[#D6E0DA]">{footer.tagline}</p>
@@ -64,7 +65,7 @@ export function V2Footer({ footer }: { footer: SiteChromeSections["footer"] }) {
                 {column.links.map((link) => (
                   <Link
                     key={`${column.title}-${link.href}-${link.label}`}
-                    href={link.href}
+                    href={toV2Href(link.href)}
                     className="text-[16px] leading-[22px] text-[#D6E0DA] transition-colors hover:text-[var(--v2-snow)]"
                   >
                     {link.label}
