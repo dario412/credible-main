@@ -11,7 +11,12 @@ export const metadata = createMetadata({
   noIndex: true,
 });
 
-const pages = [
+const pages: {
+  slug: string;
+  title: string;
+  description: string;
+  disabled?: boolean;
+}[] = [
   {
     slug: "home",
     title: "Home",
@@ -33,14 +38,20 @@ const pages = [
   {
     slug: "about",
     title: "About",
-    description: "Coming online when the About page leaves placeholder.",
-    disabled: true,
+    description:
+      "Hero, thesis, why we exist, operating model, how we work, roster rail, and two ways in.",
   },
   {
     slug: "what-we-do",
     title: "What we do",
-    description: "Coming online when the What we do page leaves placeholder.",
-    disabled: true,
+    description:
+      "Hero, service system, business moments, service cards, process, how to choose, and closing CTA.",
+  },
+  {
+    slug: "apply-for-representation",
+    title: "Apply for representation",
+    description:
+      "Intro, authority stats, self-qualify, path, benefits, FAQ, and start-application CTA.",
   },
 ];
 

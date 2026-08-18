@@ -18,6 +18,18 @@ import {
   type ContactPageSections,
 } from "@/lib/contact-page";
 import {
+  mergeWhatWeDoSections,
+  type WhatWeDoPageSections,
+} from "@/lib/what-we-do";
+import {
+  mergeAboutSections,
+  type AboutPageSections,
+} from "@/lib/about-page";
+import {
+  mergeApplySections,
+  type ApplyPageSections,
+} from "@/lib/apply-page";
+import {
   ensureBlockIds,
   parseInsightBlocks,
   type InsightBlock,
@@ -374,4 +386,100 @@ export async function saveContactPage(sections: ContactPageSections) {
   revalidatePath("/admin/pages");
   revalidatePath("/admin/pages/contact");
   return { ok: true as const, message: "Contact page saved." };
+}
+
+export async function getWhatWeDoSections(): Promise<WhatWeDoPageSections> {
+  const page = await prisma.pageContent.findUnique({
+    where: { slug: "what-we-do" },
+  });
+  return mergeWhatWeDoSections(page?.sections);
+}
+
+export async function saveWhatWeDoPage(sections: WhatWeDoPageSections) {
+  const session = await requireContentEditor();
+  if (!session) return { ok: false as const, message: "Unauthorized" };
+
+  const merged = mergeWhatWeDoSections(sections);
+
+  await prisma.pageContent.upsert({
+    where: { slug: "what-we-do" },
+    create: {
+      slug: "what-we-do",
+      title: "What we do",
+      sections: merged,
+    },
+    update: {
+      title: "What we do",
+      sections: merged,
+    },
+  });
+
+  revalidatePath("/what-we-do");
+  revalidatePath("/admin/pages");
+  revalidatePath("/admin/pages/what-we-do");
+  return { ok: true as const, message: "What we do page saved." };
+}
+
+export async function getAboutPageSections(): Promise<AboutPageSections> {
+  const page = await prisma.pageContent.findUnique({
+    where: { slug: "about" },
+  });
+  return mergeAboutSections(page?.sections);
+}
+
+export async function saveAboutPage(sections: AboutPageSections) {
+  const session = await requireContentEditor();
+  if (!session) return { ok: false as const, message: "Unauthorized" };
+
+  const merged = mergeAboutSections(sections);
+
+  await prisma.pageContent.upsert({
+    where: { slug: "about" },
+    create: {
+      slug: "about",
+      title: "About",
+      sections: merged,
+    },
+    update: {
+      title: "About",
+      sections: merged,
+    },
+  });
+
+  revalidatePath("/about");
+  revalidatePath("/admin/pages");
+  revalidatePath("/admin/pages/about");
+  return { ok: true as const, message: "About page saved." };
+}
+
+export async function getApplyPageSections(): Promise<ApplyPageSections> {
+  const page = await prisma.pageContent.findUnique({
+    where: { slug: "apply-for-representation" },
+  });
+  return mergeApplySections(page?.sections);
+}
+
+export async function saveApplyPage(sections: ApplyPageSections) {
+  const session = await requireContentEditor();
+  if (!session) return { ok: false as const, message: "Unauthorized" };
+
+  const merged = mergeApplySections(sections);
+
+  await prisma.pageContent.upsert({
+    where: { slug: "apply-for-representation" },
+    create: {
+      slug: "apply-for-representation",
+      title: "Apply for representation",
+      sections: merged,
+    },
+    update: {
+      title: "Apply for representation",
+      sections: merged,
+    },
+  });
+
+  revalidatePath("/apply-for-representation");
+  revalidatePath("/admin/pages");
+  revalidatePath("/admin/pages/apply-for-representation");
+  return { ok: true as const, message: "Apply page saved." };
 }
