@@ -151,18 +151,18 @@ export default function ApplyForRepresentationPage() {
     <>
       <section
         id="apply"
-        className="scroll-mt-24 bg-cream-dark px-6 pt-10 pb-16 md:px-10 md:pt-14 md:pb-20 lg:px-12 lg:pt-16 lg:pb-24"
+        className="scroll-mt-24 bg-cream-dark px-6 pt-8 pb-12 md:px-10 md:pt-10 md:pb-16 lg:px-12 lg:pt-12 lg:pb-20"
       >
-        <div className={`${PAGE_SHELL} grid items-start gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-14`}>
+        <div className={`${PAGE_SHELL} grid items-start gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-10`}>
           <FadeUp y={18} duration={1000} threshold={0.05} rootMargin="0px">
             <p className="inline-flex items-center gap-2 rounded-full border border-charcoal/20 px-3.5 py-1.5 text-[0.75rem] font-medium text-charcoal">
               <span className="size-1.5 rounded-full bg-forest" aria-hidden />
               Applications reviewed every two weeks
             </p>
-            <h1 className="mt-6 max-w-[14ch] font-display text-[2.5rem] leading-[1.05] tracking-tight text-charcoal sm:text-[3.15rem] md:text-[3.6rem]">
+            <h1 className="mt-5 max-w-[14ch] font-display text-[2.25rem] leading-[1.05] tracking-tight text-charcoal sm:text-[2.85rem] md:text-[3.15rem]">
               Turn your expert audience into managed commercial work.
             </h1>
-            <p className="mt-5 max-w-[34rem] text-[1.05rem] leading-relaxed text-charcoal/65">
+            <p className="mt-4 max-w-[34rem] text-[1rem] leading-relaxed text-charcoal/65">
               Credible represents founders, operators, investors, and specialist
               voices with B2B audiences. You keep the voice. We qualify inbound,
               price opportunities, negotiate scope, and manage delivery.
@@ -174,9 +174,9 @@ export default function ApplyForRepresentationPage() {
               <span className="hidden h-3 w-px bg-charcoal/20 sm:block" aria-hidden />
               <span>Selective roster</span>
             </p>
-            <div className="mt-10 border-t border-charcoal/15 pt-7">
+            <div className="mt-8 border-t border-charcoal/15 pt-5">
               <p className={EYEBROW_MUTED}>What happens next</p>
-              <ol className="mt-5 space-y-3">
+              <ol className="mt-4 space-y-2.5">
                 {NEXT.map((item, i) => (
                   <li key={item} className="flex items-start gap-4">
                     <span className="w-6 shrink-0 text-[0.75rem] font-medium tracking-[0.1em] text-forest">
