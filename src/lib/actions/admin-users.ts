@@ -81,6 +81,26 @@ export async function updateUserRole(userId: string, role: Role) {
   return { ok: true };
 }
 
+const passwordSchema = z.string().min(6).max(100);
+
+export async function setUserPassword(userId: string, password: string) {
+  const session = await requireOwner();
+  if (!session) return { ok: false, message: "Unauthorized" };
+
+  const parsed = passwordSchema.safeParse(password);
+  if (!parsed.success) {
+    return { ok: false, message: "Password must be at least 6 characters." };
+  }
+
+  const target = await prisma.user.findUnique({ where: { id: userId } });
+  if (!target) return { ok: false, message: "User not found." };
+
+  const passwordHash = await bcrypt.hash(parsed.data, 12);
+  await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
+  revalidatePath("/admin/users");
+  return { ok: true, message: "Password updated." };
+}
+
 export async function setUserActive(userId: string, active: boolean) {
   const session = await requireOwner();
   if (!session) return { ok: false, message: "Unauthorized" };

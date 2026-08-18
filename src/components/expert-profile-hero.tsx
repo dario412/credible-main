@@ -65,6 +65,16 @@ export function ExpertProfileShell({
   const initials = expertInitials(name);
   const first = firstName(name);
   const topicLine = topics.slice(0, 3).map(formatTopicLabel);
+  const statsGridClass =
+    stats.length === 1
+      ? "grid-cols-1"
+      : stats.length === 2
+        ? "grid-cols-2"
+        : stats.length === 3
+          ? "grid-cols-3"
+          : stats.length === 4
+            ? "grid-cols-2"
+            : "grid-cols-2";
   const templateVars = { first, name };
   const workWithTitle = applyProfileRailTemplate(
     rail.workWithTitle,
@@ -154,9 +164,17 @@ export function ExpertProfileShell({
 
             {/* Proof */}
             {stats.length > 0 ? (
-              <dl className="grid grid-cols-2 gap-px border-b border-charcoal/8 bg-charcoal/8">
-                {stats.map((stat) => (
-                  <div key={stat.label} className="bg-[#FBF8F5] px-4 py-3">
+              <dl
+                className={cn(
+                  "grid gap-px border-b border-charcoal/8 bg-charcoal/8",
+                  statsGridClass,
+                )}
+              >
+                {stats.map((stat, index) => (
+                  <div
+                    key={`${stat.label}-${index}`}
+                    className="bg-[#FBF8F5] px-4 py-3"
+                  >
                     <dd
                       className={cn(
                         "text-[1.125rem] font-medium leading-none tracking-tight tabular-nums",

@@ -272,8 +272,10 @@ export default function WhatWeDoPage() {
           <FadeUp>
             <div className="rounded-sm bg-charcoal px-8 py-10 text-cream md:px-12 md:py-14">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-end">
-              <h2 className="max-w-[16ch] font-display text-[2rem] leading-[1.12] tracking-tight md:text-[2.5rem]">
-                Choose by business moment, not by content format.
+              <h2 className="max-w-[28ch] font-display text-[2rem] leading-[1.12] tracking-tight md:text-[2.5rem]">
+                Choose by business moment,
+                <br />
+                not by content format.
               </h2>
               <p className="text-[0.9375rem] leading-relaxed text-cream/65">
                 The page should help a buyer recognize their goal first, then
@@ -354,19 +356,13 @@ export default function WhatWeDoPage() {
                     ))}
                   </div>
                 </div>
-                <div className="flex items-start gap-4 bg-forest-dark px-7 py-6 text-cream md:px-10">
-                  <span
-                    aria-hidden
-                    className="mt-1 size-5 shrink-0 rounded-full border border-cream/70"
-                  />
-                  <div>
-                    <p className="text-[0.68rem] font-medium tracking-[0.16em] text-cream/60 uppercase">
-                      Best for
-                    </p>
-                    <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-cream">
-                      {service.bestFor}
-                    </p>
-                  </div>
+                <div className="flex min-h-[8.25rem] flex-col justify-center bg-forest-dark px-7 py-6 text-cream md:min-h-[7.5rem] md:px-10">
+                  <p className="text-[0.68rem] font-medium tracking-[0.16em] text-cream/60 uppercase">
+                    Best for
+                  </p>
+                  <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-cream">
+                    {service.bestFor}
+                  </p>
                 </div>
                   </div>
                 </FadeUp>

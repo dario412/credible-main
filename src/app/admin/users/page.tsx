@@ -25,8 +25,9 @@ export default async function AdminUsersPage() {
     <div>
       <h1 className="font-display text-3xl">User management</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted">
-        Owners can add users with Owner, Editor, or Viewer permissions. New users
-        must complete two-factor authentication on first login.
+        Owners can add users with Owner, Editor, or Viewer permissions, and set
+        a new password for any account. New users must complete two-factor
+        authentication on first login.
       </p>
 
       <div className="mt-10 max-w-lg">

@@ -87,9 +87,15 @@ export function StickyRosterFilters(
           aria-hidden
           className={cn(
             // Reach up through the header→filter gap so that strip is frosted too.
-            "pointer-events-none absolute inset-x-0 -top-8 -bottom-3 -z-10 bg-cream/88 backdrop-blur-md transition-opacity duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:-top-6 md:-bottom-4",
+            "pointer-events-none absolute inset-x-0 -top-8 -bottom-4 -z-10 transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:-top-6 md:-bottom-5",
             stuck ? "opacity-100" : "opacity-0",
           )}
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(249,243,239,0.94) 0%, rgba(249,243,239,0.9) 55%, rgba(249,243,239,0.55) 100%)",
+            backdropFilter: "blur(22px)",
+            WebkitBackdropFilter: "blur(22px)",
+          }}
         />
         <div
           className={cn(
@@ -97,7 +103,7 @@ export function StickyRosterFilters(
             stuck ? "max-w-352" : "max-w-4xl",
           )}
         >
-          <RosterFilters {...props} />
+          <RosterFilters {...props} elevated={stuck} />
         </div>
       </div>
     </>
@@ -109,11 +115,13 @@ export function RosterFilters({
   currentTopic,
   currentChannels = [],
   currentQuery,
+  elevated = false,
 }: {
   currentArchetype?: string;
   currentTopic?: string;
   currentChannels?: string[];
   currentQuery?: string;
+  elevated?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -208,7 +216,10 @@ export function RosterFilters({
       <div
         ref={barRef}
         className={cn(
-          "rounded-sm border border-charcoal/8 bg-[#FBF8F5] shadow-[0_10px_28px_rgba(28,26,23,0.06)] transition-opacity",
+          "rounded-sm border transition-[border-color,box-shadow,background-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          elevated
+            ? "border-charcoal/18 bg-white shadow-[0_16px_40px_rgba(28,26,23,0.14)]"
+            : "border-charcoal/8 bg-[#FBF8F5] shadow-[0_10px_28px_rgba(28,26,23,0.06)]",
           // The menus are absolutely positioned below the bar, so they need to escape it.
           open ? "overflow-visible" : "overflow-hidden",
           pending && "opacity-70",
