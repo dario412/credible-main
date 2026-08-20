@@ -304,9 +304,9 @@ export default async function ExpertPage({ params }: Props) {
     extras.websiteSubtitle?.trim() ||
     (expert.shortBio && expert.shortBio.trim().length <= 180
       ? expert.shortBio.trim()
-      : null) ||
+      : undefined) ||
     enrichment.heroProof ||
-    null;
+    undefined;
 
   return (
     <>
