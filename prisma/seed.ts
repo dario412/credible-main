@@ -62,13 +62,35 @@ async function main() {
   }
 
   // Seed defaults only when the table is empty. Every production build runs this
-  // script — upserting by slug would resurrect case studies deleted in the CMS.
+  // script — upserting by slug would resurrect CMS rows deleted in admin.
   const caseStudyCount = await prisma.caseStudy.count();
   if (caseStudyCount === 0) {
     for (const card of CASE_STUDIES) {
       await prisma.caseStudy.create({ data: caseStudyCardToRow(card) });
     }
   }
+
+  const SAMPLE_INSIGHT_SLUGS = [
+    "why-creator-label-doesnt-fit-b2b",
+    "rise-of-the-creator-marketing-manager",
+    "four-tier-revenue-pyramid",
+    "superstar-revenue-mix-2025",
+    "conversation-with-alex-lieberman",
+    "pr-agencies-best-buyers",
+    "how-to-brief-a-b2b-creator",
+    "when-to-use-expert-creators-vs-executives",
+    "category-narrative-before-the-campaign",
+    "what-b2b-buyers-actually-trust",
+    "inside-the-creator-briefing-room",
+    "pricing-ambassador-retainers",
+    "conversation-with-lenny-rachitsky",
+    "conversation-with-emily-kramer",
+    "format-roi-benchmarks-2025",
+    "audience-overlap-across-expert-tiers",
+    "what-is-the-expert-economy",
+    "booking-beyond-the-keynote",
+    "rise-of-the-operator-creator",
+  ];
 
   const insights = [
     {
@@ -315,15 +337,26 @@ This data note helps buyers build a roster that expands reach instead of echoing
     },
   ];
 
-  for (const insight of insights) {
-    const body = INSIGHT_BODIES[insight.slug] ?? insight.body;
-    const blocks = parseInsightBody(body).blocks;
-    const record = { ...insight, body, blocks };
-    await prisma.insight.upsert({
-      where: { slug: insight.slug },
-      update: {},
-      create: record,
+  // Remove sample insights whenever real CMS rows exist, and never upsert
+  // them on deploy — that is what kept bringing the placeholders back.
+  const realInsightCount = await prisma.insight.count({
+    where: { slug: { notIn: SAMPLE_INSIGHT_SLUGS } },
+  });
+  if (realInsightCount > 0) {
+    await prisma.insight.deleteMany({
+      where: { slug: { in: SAMPLE_INSIGHT_SLUGS } },
     });
+  } else {
+    const insightCount = await prisma.insight.count();
+    if (insightCount === 0) {
+      for (const insight of insights) {
+        const body = INSIGHT_BODIES[insight.slug] ?? insight.body;
+        const blocks = parseInsightBody(body).blocks;
+        await prisma.insight.create({
+          data: { ...insight, body, blocks },
+        });
+      }
+    }
   }
 
   await prisma.pageContent.upsert({
@@ -344,19 +377,6 @@ This data note helps buyers build a roster that expands reach instead of echoing
       ),
     });
   }
-
-  // Remove older sample insights that no longer match the client taxonomy
-  await prisma.insight.deleteMany({
-    where: {
-      slug: {
-        in: [
-          "what-is-the-expert-economy",
-          "booking-beyond-the-keynote",
-          "rise-of-the-operator-creator",
-        ],
-      },
-    },
-  });
 
   console.log("Seed complete:", email);
 }

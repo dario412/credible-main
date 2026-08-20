@@ -22,8 +22,6 @@ export const metadata = createMetadata({
 
 type SearchParams = Promise<{ category?: string; q?: string }>;
 
-const FEATURED_SLUG = "why-creator-label-doesnt-fit-b2b";
-
 const COVER_BY_SLUG: Record<string, string> = {
   "why-creator-label-doesnt-fit-b2b": "/images/insights/operator-creator.jpg",
   "rise-of-the-creator-marketing-manager":
@@ -84,9 +82,7 @@ export default async function InsightsPage({
     orderBy: { publishedAt: "desc" },
   });
 
-  const featured = !isFiltered
-    ? (all.find((insight) => insight.slug === FEATURED_SLUG) ?? all[0] ?? null)
-    : null;
+  const featured = !isFiltered ? (all[0] ?? null) : null;
 
   const pool = all.filter((insight) => {
     if (featured && insight.id === featured.id) return false;
