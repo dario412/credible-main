@@ -9,17 +9,17 @@ import { FadeUp } from "@/components/fade-up";
 import {
   EYEBROW,
   EYEBROW_MUTED,
-  EYEBROW_ON_DARK,
   PAGE_SHELL,
   PageGhostLink,
   PagePrimaryLink,
 } from "@/components/inner-page";
+import { MediaField } from "@/components/media-library";
 import { PatternField } from "@/components/pattern-field";
 import { ProcessTimeline } from "@/components/process-timeline";
+import { SiteImage } from "@/components/site-image";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import { WhatWeDoServices } from "@/components/what-we-do-services";
 import {
-  emptyWhatWeDoLane,
   emptyWhatWeDoMatrixRow,
   emptyWhatWeDoMoment,
   emptyWhatWeDoProof,
@@ -163,18 +163,6 @@ function EditorPopover({
       <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
         {target === "hero" ? (
           <>
-            <Field label="Eyebrow" id="ve-wwd-hero-eyebrow">
-              <TextInput
-                id="ve-wwd-hero-eyebrow"
-                value={sections.hero.eyebrow}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    hero: { ...sections.hero, eyebrow: e.target.value },
-                  })
-                }
-              />
-            </Field>
             <Field
               label="Headline"
               id="ve-wwd-hero-headline"
@@ -323,175 +311,19 @@ function EditorPopover({
 
         {target === "system" ? (
           <>
-            <Field label="Eyebrow" id="ve-wwd-system-eyebrow">
-              <TextInput
-                id="ve-wwd-system-eyebrow"
-                value={sections.hero.system.eyebrow}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    hero: {
-                      ...sections.hero,
-                      system: { ...sections.hero.system, eyebrow: e.target.value },
-                    },
-                  })
-                }
-              />
-            </Field>
-            <Field
-              label="Headline"
-              id="ve-wwd-system-headline"
-              hint="Line breaks become new lines on the page."
-            >
-              <TextArea
-                id="ve-wwd-system-headline"
-                rows={3}
-                value={sections.hero.system.headline}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    hero: {
-                      ...sections.hero,
-                      system: { ...sections.hero.system, headline: e.target.value },
-                    },
-                  })
-                }
-              />
-            </Field>
-            <Field label="Badge" id="ve-wwd-system-badge">
-              <TextInput
-                id="ve-wwd-system-badge"
-                value={sections.hero.system.badge}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    hero: {
-                      ...sections.hero,
-                      system: { ...sections.hero.system, badge: e.target.value },
-                    },
-                  })
-                }
-              />
-            </Field>
-            {sections.hero.system.lanes.map((lane, index) => (
-              <div
-                key={`ve-wwd-lane-${index}`}
-                className="space-y-3 rounded-sm border border-charcoal/10 p-3"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium">Lane {index + 1}</p>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onChange({
-                        ...sections,
-                        hero: {
-                          ...sections.hero,
-                          system: {
-                            ...sections.hero.system,
-                            lanes: sections.hero.system.lanes.filter(
-                              (_, i) => i !== index,
-                            ),
-                          },
-                        },
-                      })
-                    }
-                    className="text-xs font-medium text-danger hover:underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-                <Field label="Number" id={`ve-wwd-lane-n-${index}`}>
-                  <TextInput
-                    id={`ve-wwd-lane-n-${index}`}
-                    value={lane.n}
-                    onChange={(e) => {
-                      const lanes = sections.hero.system.lanes.map((row, i) =>
-                        i === index ? { ...row, n: e.target.value } : row,
-                      );
-                      onChange({
-                        ...sections,
-                        hero: {
-                          ...sections.hero,
-                          system: { ...sections.hero.system, lanes },
-                        },
-                      });
-                    }}
-                  />
-                </Field>
-                <Field label="Title" id={`ve-wwd-lane-title-${index}`}>
-                  <TextInput
-                    id={`ve-wwd-lane-title-${index}`}
-                    value={lane.title}
-                    onChange={(e) => {
-                      const lanes = sections.hero.system.lanes.map((row, i) =>
-                        i === index ? { ...row, title: e.target.value } : row,
-                      );
-                      onChange({
-                        ...sections,
-                        hero: {
-                          ...sections.hero,
-                          system: { ...sections.hero.system, lanes },
-                        },
-                      });
-                    }}
-                  />
-                </Field>
-                <Field label="Body" id={`ve-wwd-lane-body-${index}`}>
-                  <TextArea
-                    id={`ve-wwd-lane-body-${index}`}
-                    rows={2}
-                    value={lane.body}
-                    onChange={(e) => {
-                      const lanes = sections.hero.system.lanes.map((row, i) =>
-                        i === index ? { ...row, body: e.target.value } : row,
-                      );
-                      onChange({
-                        ...sections,
-                        hero: {
-                          ...sections.hero,
-                          system: { ...sections.hero.system, lanes },
-                        },
-                      });
-                    }}
-                  />
-                </Field>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
+            <MediaField
+              label="Panel image"
+              value={sections.hero.system.image}
+              onChange={(image) =>
                 onChange({
                   ...sections,
                   hero: {
                     ...sections.hero,
-                    system: {
-                      ...sections.hero.system,
-                      lanes: [...sections.hero.system.lanes, emptyWhatWeDoLane()],
-                    },
+                    system: { ...sections.hero.system, image },
                   },
                 })
               }
-              className="text-sm font-medium text-forest hover:text-forest-dark"
-            >
-              + Add lane
-            </button>
-            <Field label="Footnote" id="ve-wwd-system-footnote">
-              <TextArea
-                id="ve-wwd-system-footnote"
-                rows={3}
-                value={sections.hero.system.footnote}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    hero: {
-                      ...sections.hero,
-                      system: { ...sections.hero.system, footnote: e.target.value },
-                    },
-                  })
-                }
-              />
-            </Field>
+            />
           </>
         ) : null}
 
@@ -785,18 +617,6 @@ function EditorPopover({
 
         {target === "process" ? (
           <>
-            <Field label="Eyebrow" id="ve-wwd-process-eyebrow">
-              <TextInput
-                id="ve-wwd-process-eyebrow"
-                value={sections.process.eyebrow}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    process: { ...sections.process, eyebrow: e.target.value },
-                  })
-                }
-              />
-            </Field>
             <Field label="Headline" id="ve-wwd-process-headline">
               <TextArea
                 id="ve-wwd-process-headline"
@@ -1143,18 +963,6 @@ function EditorPopover({
 
         {target === "cta" ? (
           <>
-            <Field label="Eyebrow" id="ve-wwd-cta-eyebrow">
-              <TextInput
-                id="ve-wwd-cta-eyebrow"
-                value={sections.cta.eyebrow}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    cta: { ...sections.cta, eyebrow: e.target.value },
-                  })
-                }
-              />
-            </Field>
             <Field
               label="Headline"
               id="ve-wwd-cta-headline"
@@ -1251,6 +1059,7 @@ function WhatWeDoView({
   selected: EditTarget | null;
   onSelect: (target: EditTarget) => void;
 }) {
+  const showHowToChoose = false;
   const laneCount = Math.max(sections.choose.laneLabels.length, 1);
   const matrixTemplate = `14rem minmax(0,1fr) repeat(${laneCount}, 5.5rem)`;
 
@@ -1274,11 +1083,10 @@ function WhatWeDoView({
               onSelect,
               "hero",
               <div>
-                <p className={EYEBROW}>{sections.hero.eyebrow}</p>
                 <MultilineText
                   as="h1"
                   text={sections.hero.headline}
-                  className="mt-4 max-w-[14ch] font-display text-[2.6rem] leading-[1.06] tracking-tight text-charcoal sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4rem]"
+                  className="max-w-[14ch] font-display text-[2.6rem] leading-[1.06] tracking-tight text-charcoal sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4rem]"
                 />
                 <p className="mt-5 max-w-[34rem] text-[1.05rem] leading-relaxed text-charcoal/65">
                   {sections.hero.subhead}
@@ -1322,45 +1130,16 @@ function WhatWeDoView({
               selected,
               onSelect,
               "service system",
-              <div className="flex h-full flex-col justify-between rounded-sm bg-forest-dark p-8 text-cream md:p-10">
-                <div className="flex items-start justify-between gap-6">
-                  <div>
-                    <p className={EYEBROW_ON_DARK}>{sections.hero.system.eyebrow}</p>
-                    <MultilineText
-                      as="p"
-                      text={sections.hero.system.headline}
-                      className="mt-3 font-display text-[1.85rem] leading-[1.12] tracking-tight"
-                    />
-                  </div>
-                  {sections.hero.system.badge.trim() ? (
-                    <span className="flex size-14 shrink-0 items-center justify-center rounded-full border border-cream/20 font-display text-[1.35rem]">
-                      {sections.hero.system.badge}
-                    </span>
-                  ) : null}
-                </div>
-                <ol className="mt-8 border-t border-cream/15">
-                  {sections.hero.system.lanes.map((lane, index) => (
-                    <li
-                      key={`${lane.n}-${index}`}
-                      className="flex items-start gap-5 border-b border-cream/15 py-4"
-                    >
-                      <span className="w-7 shrink-0 text-[0.75rem] font-medium tracking-[0.1em] text-cream/50">
-                        {lane.n}
-                      </span>
-                      <div>
-                        <p className="text-[1rem] font-medium leading-snug text-cream">
-                          {lane.title}
-                        </p>
-                        <p className="mt-1 text-[0.8125rem] leading-relaxed text-cream/65">
-                          {lane.body}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-                <p className="mt-6 text-[0.8125rem] leading-relaxed text-cream/55">
-                  {sections.hero.system.footnote}
-                </p>
+              <div className="relative h-full min-h-[28rem] overflow-hidden rounded-sm bg-forest-dark md:min-h-[32rem]">
+                {sections.hero.system.image.trim() ? (
+                  <SiteImage
+                    src={sections.hero.system.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 42vw, 100vw"
+                    className="object-cover object-[center_35%]"
+                  />
+                ) : null}
               </div>,
               { block: true, ringOffset: "ring-offset-forest-dark" },
             )}
@@ -1388,11 +1167,11 @@ function WhatWeDoView({
                     {sections.moments.subhead}
                   </p>
                 </div>
-                <ul className="mt-10 grid gap-8 md:grid-cols-3 md:gap-6">
+                <ul className="mt-10 grid items-stretch gap-4 md:grid-cols-3">
                   {sections.moments.items.map((moment, index) => (
                     <li
                       key={`${moment.title}-${index}`}
-                      className="border-t border-cream/15 pt-5"
+                      className="flex h-full flex-col rounded-sm border border-cream/14 bg-cream/[0.07] p-6 md:p-7"
                     >
                       <p className="text-[0.68rem] font-medium tracking-[0.16em] text-cream/50 uppercase">
                         {moment.eyebrow}
@@ -1429,7 +1208,7 @@ function WhatWeDoView({
           </FadeUp>
         )}
         wrapItem={(index, node) => (
-          <FadeUp delay={index * 70} y={18} threshold={0.12}>
+          <FadeUp delay={index * 60} y={16} threshold={0.12}>
             {hit(
               editing,
               `service.${index}`,
@@ -1455,8 +1234,7 @@ function WhatWeDoView({
               onSelect,
               "process",
               <div>
-                <p className={EYEBROW}>{sections.process.eyebrow}</p>
-                <h2 className="mt-3 max-w-[12ch] font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.5rem]">
+                <h2 className="max-w-[18ch] font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.5rem]">
                   {sections.process.headline}
                 </h2>
                 <p className="mt-4 max-w-md text-[0.9375rem] leading-relaxed text-charcoal/62">
@@ -1493,6 +1271,7 @@ function WhatWeDoView({
         </div>
       </section>
 
+      {showHowToChoose ? (
       <section className="bg-cream px-6 py-20 md:px-10 md:py-24 lg:px-12 lg:py-28">
         <div className={PAGE_SHELL}>
           <FadeUp>
@@ -1613,8 +1392,9 @@ function WhatWeDoView({
           </ul>
         </div>
       </section>
+      ) : null}
 
-      <section className="px-6 pb-6 md:px-10 md:pb-8 lg:px-12 lg:pb-8">
+      <section className="px-6 pt-16 pb-0 md:px-10 md:pt-20 lg:px-12 lg:pt-24">
         <div className={PAGE_SHELL}>
           <FadeUp>
             {hit(
@@ -1633,11 +1413,10 @@ function WhatWeDoView({
                 </div>
                 <div className="relative z-2 grid items-end gap-10 px-8 py-10 md:grid-cols-[minmax(0,1.4fr)_minmax(0,16rem)] md:px-12 md:py-14">
                   <div>
-                    <p className={EYEBROW_ON_DARK}>{sections.cta.eyebrow}</p>
                     <MultilineText
                       as="h2"
                       text={sections.cta.headline}
-                      className="mt-3 font-display text-[2rem] leading-[1.12] tracking-tight md:text-[2.5rem]"
+                      className="font-display text-[2rem] leading-[1.12] tracking-tight md:text-[2.5rem]"
                     />
                     <p className="mt-4 max-w-[34rem] text-[0.9375rem] leading-relaxed text-cream/70">
                       {sections.cta.body}

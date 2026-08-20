@@ -13,6 +13,7 @@ import {
   withResolvedLogos,
   type TrustedBrand,
 } from "@/lib/brand-logos";
+import { parseHighlightStat } from "@/lib/airtable/map-expert";
 import type { AirtableProfileSections } from "@/lib/airtable/map-profile-sections";
 import { parseExpertChannels } from "@/lib/expert-channels";
 import {
@@ -20,6 +21,7 @@ import {
   isLinkedInTopVoice,
   mergeAudience,
   mergeFormats,
+  resolveFormatKind,
   type ExpertAudience,
   type ExpertChannelPresence,
   type ExpertFormatOffering,
@@ -40,13 +42,17 @@ type Props = { params: Promise<{ slug: string }> };
 type ProfileExtras = {
   nameFirst?: string | null;
   bannerImage?: string | null;
+  highlight1?: string | null;
   highlight2?: string | null;
   highlight3?: string | null;
+  highlight4?: string | null;
+  websiteSubtitle?: string | null;
   exclusive?: boolean;
   quote?: string | null;
   quoteSource?: string | null;
   brandPartnershipsCopy?: string | null;
   trustedBy?: TrustedBrand[];
+  similarProfileIds?: string[];
   profileSections?: AirtableProfileSections;
 };
 
@@ -55,7 +61,24 @@ function parseProfileExtras(value: unknown): ProfileExtras {
   return value as ProfileExtras;
 }
 
-/** Prefer Airtable section data when present; fall back to hardcoded enrichment. */
+function applyAirtableFormatDescriptions(
+  formats: ExpertFormatOffering[],
+  extras: ProfileExtras,
+): ExpertFormatOffering[] {
+  const byKind = new Map<string, string>();
+  for (const item of extras.profileSections?.formats ?? []) {
+    const kind = resolveFormatKind(item);
+    const text = item.description?.trim();
+    if (kind && text) byKind.set(kind, text);
+  }
+  if (byKind.size === 0) return formats;
+  return formats.map((format) => {
+    const kind = resolveFormatKind(format);
+    const text = kind ? byKind.get(kind) : undefined;
+    return text ? { ...format, description: text } : format;
+  });
+}
+
 function mergeProfileContent(
   extras: ProfileExtras,
   enrichment: ExpertProfileEnrichment,
@@ -76,14 +99,17 @@ function mergeProfileContent(
       ? sections.topicShares
       : enrichment.topicShares;
   const audience = mergeAudience(sections?.audience, enrichment.audience);
-  const formats = mergeFormats(sections?.formats, enrichment.formats);
+  const formats = applyAirtableFormatDescriptions(
+    mergeFormats(sections?.formats, enrichment.formats),
+    extras,
+  );
   const quote =
-    sections?.quote ?? extras.quote ?? enrichment.quote ?? undefined;
-  const quoteAttribution =
-    sections?.quoteAttribution ??
-    extras.quoteSource ??
-    enrichment.quoteAttribution ??
-    undefined;
+    sections?.quote?.trim() || extras.quote?.trim() || undefined;
+  const quoteAttribution = quote
+    ? sections?.quoteAttribution?.trim() ||
+      extras.quoteSource?.trim() ||
+      undefined
+    : undefined;
 
   return {
     quote: quote ?? undefined,
@@ -121,27 +147,26 @@ function buildStats(
   extras: ProfileExtras,
   enrichmentStats?: ExpertProfileStat[],
 ): ExpertProfileStat[] {
+  const fromAirtable = [
+    extras.highlight1,
+    extras.highlight2,
+    extras.highlight3,
+    extras.highlight4,
+  ]
+    .map(parseHighlightStat)
+    .filter((stat): stat is { value: string; label: string } => Boolean(stat))
+    .map((stat) => ({
+      value: stat.value,
+      label: stat.label,
+      accent: /growth/i.test(stat.label) ? ("forest" as const) : undefined,
+    }));
+
+  if (fromAirtable.length > 0) return fromAirtable.slice(0, 4);
   if (enrichmentStats?.length) return enrichmentStats;
 
   const stats: ExpertProfileStat[] = [];
   if (expert.combinedReach) {
     stats.push({ label: "Combined reach", value: expert.combinedReach });
-  }
-  if (extras.highlight2) {
-    const value = extras.highlight2.replace(/\s+/g, " ").trim();
-    const metric = value.match(/^([+-]?[\d.,]+\s*[KkMmBb%+]*)/);
-    stats.push({
-      label: value.replace(metric?.[1] ?? "", "").trim() || "Highlight",
-      value: (metric?.[1] ?? value).replace(/\s+/g, ""),
-    });
-  }
-  if (extras.highlight3) {
-    const value = extras.highlight3.replace(/\s+/g, " ").trim();
-    const metric = value.match(/^([+-]?[\d.,]+\s*[KkMmBb%+]*)/);
-    stats.push({
-      label: value.replace(metric?.[1] ?? "", "").trim() || "Highlight",
-      value: (metric?.[1] ?? value).replace(/\s+/g, ""),
-    });
   }
   if (expert.growth90d) {
     stats.push({
@@ -196,31 +221,41 @@ function toRosterCard(expert: {
   };
 }
 
-export default async function ExpertPage({ params }: Props) {
-  const { slug } = await params;
-  const expert = await prisma.expert.findUnique({ where: { slug } });
-  if (!expert) notFound();
-
-  const [siteChrome, session] = await Promise.all([
-    getSiteChrome(),
-    auth(),
-  ]);
-  const canEdit = Boolean(
-    session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
+async function loadSimilarCreators(
+  expert: { slug: string; categories: string[] },
+  extras: ProfileExtras,
+): Promise<RosterCardExpert[]> {
+  const linkedIds = (extras.similarProfileIds ?? []).filter(
+    (id): id is string => typeof id === "string" && id.startsWith("rec"),
   );
-  const enrichment = getExpertProfileEnrichment(expert.slug);
-  const extras = parseProfileExtras(expert.profileExtras);
-  const content = mergeProfileContent(extras, enrichment);
-  const primaryCategory = expert.categories[0];
-  const trustedBy = resolveTrustedBy(extras, enrichment.trustedBy);
 
+  if (linkedIds.length > 0) {
+    const linked = await prisma.expert.findMany({
+      where: {
+        airtableId: { in: linkedIds },
+        slug: { not: expert.slug },
+      },
+    });
+    const byAirtableId = new Map(
+      linked
+        .filter((item) => item.airtableId)
+        .map((item) => [item.airtableId as string, item] as const),
+    );
+    return linkedIds
+      .map((id) => byAirtableId.get(id))
+      .filter((item): item is NonNullable<typeof item> => Boolean(item))
+      .slice(0, 6)
+      .map(toRosterCard);
+  }
+
+  const primaryCategory = expert.categories[0];
   const similarPool = await prisma.expert.findMany({
     where: { slug: { not: expert.slug } },
     orderBy: { name: "asc" },
     take: 12,
   });
 
-  const similarSorted = [
+  return [
     ...similarPool.filter((item) =>
       primaryCategory
         ? item.categories.some(
@@ -244,12 +279,34 @@ export default async function ExpertPage({ params }: Props) {
     )
     .slice(0, 3)
     .map(toRosterCard);
+}
+
+export default async function ExpertPage({ params }: Props) {
+  const { slug } = await params;
+  const expert = await prisma.expert.findUnique({ where: { slug } });
+  if (!expert) notFound();
+
+  const [siteChrome, session] = await Promise.all([
+    getSiteChrome(),
+    auth(),
+  ]);
+  const canEdit = Boolean(
+    session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
+  );
+  const enrichment = getExpertProfileEnrichment(expert.slug);
+  const extras = parseProfileExtras(expert.profileExtras);
+  const content = mergeProfileContent(extras, enrichment);
+  const trustedBy = resolveTrustedBy(extras, enrichment.trustedBy);
+  const similarSorted = await loadSimilarCreators(expert, extras);
 
   const heroStats = buildStats(expert, extras, enrichment.stats);
   const heroProof =
-    enrichment.heroProof ??
-    ([expert.shortBio, expert.categories[0]].filter(Boolean).join(" · ") ||
-      expert.title);
+    extras.websiteSubtitle?.trim() ||
+    (expert.shortBio && expert.shortBio.trim().length <= 180
+      ? expert.shortBio.trim()
+      : null) ||
+    enrichment.heroProof ||
+    null;
 
   return (
     <>
@@ -260,9 +317,11 @@ export default async function ExpertPage({ params }: Props) {
         archetype={expert.categories[0] ?? null}
         based={enrichment.based}
         stageImage={
-          enrichment.stageImage ?? extras.bannerImage ?? undefined
+          extras.bannerImage ?? enrichment.stageImage ?? undefined
         }
-        stageImagePosition={enrichment.stageImagePosition}
+        stageImagePosition={
+          extras.bannerImage ? undefined : enrichment.stageImagePosition
+        }
         portraitImage={expert.image}
         heroProof={heroProof}
         trustedBy={trustedBy}

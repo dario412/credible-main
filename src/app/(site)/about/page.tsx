@@ -2,6 +2,7 @@ import { AboutVisualEditor } from "@/components/about-visual-editor";
 import { getAboutPageSections, saveAboutPage } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
+import { loadHeroCast } from "@/lib/roster-preview-server";
 import { createMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -14,9 +15,10 @@ export const metadata = createMetadata({
 });
 
 export default async function AboutPage() {
-  const [sections, session] = await Promise.all([
+  const [sections, session, members] = await Promise.all([
     getAboutPageSections(),
     auth(),
+    loadHeroCast(8),
   ]);
   const canEdit = Boolean(
     session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
@@ -25,6 +27,7 @@ export default async function AboutPage() {
   return (
     <AboutVisualEditor
       initial={sections}
+      members={members}
       canEdit={canEdit}
       saveAction={saveAboutPage}
     />

@@ -30,6 +30,9 @@ function asString(value: unknown): string | null {
       if (s) return s;
     }
   }
+  if (value && typeof value === "object" && "value" in value) {
+    return asString((value as { value: unknown }).value);
+  }
   return null;
 }
 
@@ -296,7 +299,7 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
       kind: "brandPartnerships",
       category: "01",
       title: "Brand partnerships",
-      description: "",
+      description: brandCopy ?? "",
       channels: brandChannels.length ? brandChannels : undefined,
       formats: brandChannels.length ? undefined : ["Sponsored content"],
     });
@@ -311,7 +314,7 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
       kind: "speaking",
       category: String(formats.length + 1).padStart(2, "0"),
       title: "Speaking",
-      description: "",
+      description: speakingCopy ?? "",
       formats: [
         "In-Person Keynote",
         "Virtual Keynote / Webinar",
@@ -329,7 +332,7 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
       kind: "liveEvents",
       category: String(formats.length + 1).padStart(2, "0"),
       title: "Live events",
-      description: "",
+      description: liveCopy ?? "",
       formats: ["Panel", "Retreat / Summit", "Roundtable"],
     });
   }
@@ -346,7 +349,7 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
       kind: "ambassador",
       category: String(formats.length + 1).padStart(2, "0"),
       title: "Ambassador program",
-      description: "",
+      description: ambassadorCopy ?? "",
       formats: ["Brand Ambassador", "Category Ambassador"],
     });
   }

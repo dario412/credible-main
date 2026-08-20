@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 
+import { MediaField } from "@/components/media-library";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
-  emptyWhatWeDoLane,
   emptyWhatWeDoMatrixRow,
   emptyWhatWeDoMoment,
   emptyWhatWeDoProof,
@@ -45,18 +45,6 @@ export function WhatWeDoPageEditorForm({
             Opening copy, CTAs, and the two proof lines.
           </p>
         </div>
-        <Field label="Eyebrow" id="wwd-hero-eyebrow">
-          <TextInput
-            id="wwd-hero-eyebrow"
-            value={sections.hero.eyebrow}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                hero: { ...sections.hero, eyebrow: e.target.value },
-              })
-            }
-          />
-        </Field>
         <Field
           label="Headline"
           id="wwd-hero-headline"
@@ -212,182 +200,24 @@ export function WhatWeDoPageEditorForm({
 
       <section className="space-y-4">
         <div>
-          <h2 className="font-display text-xl">Service system panel</h2>
+          <h2 className="font-display text-xl">Hero image panel</h2>
           <p className="mt-1 text-sm text-muted">
-            Forest card on the right of the hero.
+            Photograph on the right of the hero.
           </p>
         </div>
-        <Field label="Eyebrow" id="wwd-system-eyebrow">
-          <TextInput
-            id="wwd-system-eyebrow"
-            value={sections.hero.system.eyebrow}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                hero: {
-                  ...sections.hero,
-                  system: { ...sections.hero.system, eyebrow: e.target.value },
-                },
-              })
-            }
-          />
-        </Field>
-        <Field
-          label="Headline"
-          id="wwd-system-headline"
-          hint="Line breaks become new lines on the page."
-        >
-          <TextArea
-            id="wwd-system-headline"
-            rows={3}
-            value={sections.hero.system.headline}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                hero: {
-                  ...sections.hero,
-                  system: { ...sections.hero.system, headline: e.target.value },
-                },
-              })
-            }
-          />
-        </Field>
-        <Field label="Badge" id="wwd-system-badge">
-          <TextInput
-            id="wwd-system-badge"
-            value={sections.hero.system.badge}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                hero: {
-                  ...sections.hero,
-                  system: { ...sections.hero.system, badge: e.target.value },
-                },
-              })
-            }
-          />
-        </Field>
-        {sections.hero.system.lanes.map((lane, index) => (
-          <div
-            key={`wwd-lane-${index}`}
-            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium">Lane {index + 1}</p>
-              <button
-                type="button"
-                onClick={() =>
-                  setSections({
-                    ...sections,
-                    hero: {
-                      ...sections.hero,
-                      system: {
-                        ...sections.hero.system,
-                        lanes: sections.hero.system.lanes.filter(
-                          (_, i) => i !== index,
-                        ),
-                      },
-                    },
-                  })
-                }
-                className="text-xs font-medium text-danger hover:underline"
-              >
-                Remove
-              </button>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Number" id={`wwd-lane-n-${index}`}>
-                <TextInput
-                  id={`wwd-lane-n-${index}`}
-                  value={lane.n}
-                  onChange={(e) => {
-                    const lanes = sections.hero.system.lanes.map((row, i) =>
-                      i === index ? { ...row, n: e.target.value } : row,
-                    );
-                    setSections({
-                      ...sections,
-                      hero: {
-                        ...sections.hero,
-                        system: { ...sections.hero.system, lanes },
-                      },
-                    });
-                  }}
-                />
-              </Field>
-              <Field label="Title" id={`wwd-lane-title-${index}`}>
-                <TextInput
-                  id={`wwd-lane-title-${index}`}
-                  value={lane.title}
-                  onChange={(e) => {
-                    const lanes = sections.hero.system.lanes.map((row, i) =>
-                      i === index ? { ...row, title: e.target.value } : row,
-                    );
-                    setSections({
-                      ...sections,
-                      hero: {
-                        ...sections.hero,
-                        system: { ...sections.hero.system, lanes },
-                      },
-                    });
-                  }}
-                />
-              </Field>
-            </div>
-            <Field label="Body" id={`wwd-lane-body-${index}`}>
-              <TextArea
-                id={`wwd-lane-body-${index}`}
-                rows={2}
-                value={lane.body}
-                onChange={(e) => {
-                  const lanes = sections.hero.system.lanes.map((row, i) =>
-                    i === index ? { ...row, body: e.target.value } : row,
-                  );
-                  setSections({
-                    ...sections,
-                    hero: {
-                      ...sections.hero,
-                      system: { ...sections.hero.system, lanes },
-                    },
-                  });
-                }}
-              />
-            </Field>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() =>
+        <MediaField
+          label="Panel image"
+          value={sections.hero.system.image}
+          onChange={(image) =>
             setSections({
               ...sections,
               hero: {
                 ...sections.hero,
-                system: {
-                  ...sections.hero.system,
-                  lanes: [...sections.hero.system.lanes, emptyWhatWeDoLane()],
-                },
+                system: { ...sections.hero.system, image },
               },
             })
           }
-          className="text-sm font-medium text-forest hover:text-forest-dark"
-        >
-          + Add lane
-        </button>
-        <Field label="Footnote" id="wwd-system-footnote">
-          <TextArea
-            id="wwd-system-footnote"
-            rows={3}
-            value={sections.hero.system.footnote}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                hero: {
-                  ...sections.hero,
-                  system: { ...sections.hero.system, footnote: e.target.value },
-                },
-              })
-            }
-          />
-        </Field>
+        />
       </section>
 
       <section className="space-y-4">
@@ -708,18 +538,6 @@ export function WhatWeDoPageEditorForm({
             Left-column copy and the timeline steps.
           </p>
         </div>
-        <Field label="Eyebrow" id="wwd-process-eyebrow">
-          <TextInput
-            id="wwd-process-eyebrow"
-            value={sections.process.eyebrow}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                process: { ...sections.process, eyebrow: e.target.value },
-              })
-            }
-          />
-        </Field>
         <Field label="Headline" id="wwd-process-headline">
           <TextArea
             id="wwd-process-headline"
@@ -1109,18 +927,6 @@ export function WhatWeDoPageEditorForm({
         <div>
           <h2 className="font-display text-xl">Closing CTA</h2>
         </div>
-        <Field label="Eyebrow" id="wwd-cta-eyebrow">
-          <TextInput
-            id="wwd-cta-eyebrow"
-            value={sections.cta.eyebrow}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                cta: { ...sections.cta, eyebrow: e.target.value },
-              })
-            }
-          />
-        </Field>
         <Field
           label="Headline"
           id="wwd-cta-headline"

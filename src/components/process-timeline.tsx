@@ -114,21 +114,23 @@ export function ProcessTimeline({ steps }: { steps: readonly Step[] }) {
               threshold={0.12}
               className={index === steps.length - 1 ? "mb-0 min-w-0 flex-1" : "mb-5 min-w-0 flex-1"}
             >
-              <div className="rounded-sm border border-charcoal/8 bg-white px-6 py-8 md:px-10 md:py-11">
-              <p
-                className={cn(
-                  "font-display text-[3.5rem] leading-none tracking-tight transition-colors duration-300 md:text-[4.5rem]",
-                  on ? "text-forest/28" : "text-charcoal/18",
-                )}
-              >
-                {step.n}
-              </p>
-              <h3 className="mt-8 font-display text-[1.45rem] leading-snug tracking-tight text-charcoal md:text-[1.75rem]">
-                {step.title}
-              </h3>
-              <p className="mt-3 max-w-md text-[0.9375rem] leading-relaxed text-charcoal/60">
-                {step.body}
-              </p>
+              <div className="relative rounded-sm border border-charcoal/8 bg-white px-6 py-8 md:px-10 md:py-11">
+                <p
+                  aria-hidden
+                  className={cn(
+                    "pointer-events-none absolute top-5 right-5 font-display text-[4rem] leading-none tracking-tight transition-colors duration-300 md:top-6 md:right-7 md:text-[5.5rem]",
+                    on ? "text-forest" : "text-charcoal/18",
+                  )}
+                >
+                  {step.n}
+                </p>
+                <h3 className="relative max-w-[12ch] font-display text-[1.75rem] leading-[1.12] tracking-tight text-charcoal md:max-w-[13ch] md:text-[2.15rem]">
+                  <span className="sr-only">{step.n}. </span>
+                  {step.title}
+                </h3>
+                <p className="relative mt-3 max-w-md text-[0.9375rem] leading-relaxed text-charcoal/60">
+                  {step.body}
+                </p>
               </div>
             </FadeUp>
           </li>

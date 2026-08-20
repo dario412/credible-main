@@ -48,6 +48,7 @@ export type WhatWeDoPageSections = {
     secondaryHref: string;
     proofs: WhatWeDoProof[];
     system: {
+      image: string;
       eyebrow: string;
       headline: string;
       badge: string;
@@ -116,6 +117,7 @@ export const DEFAULT_WHAT_WE_DO_SECTIONS: WhatWeDoPageSections = {
       },
     ],
     system: {
+      image: "/images/what-we-do/hero-system.jpg",
       eyebrow: "Service system",
       headline: "Four service lanes.\nOne managed system.",
       badge: "4",
@@ -549,6 +551,7 @@ export function mergeWhatWeDoSections(raw: unknown): WhatWeDoPageSections {
       secondaryHref: asString(hero.secondaryHref, defaults.hero.secondaryHref),
       proofs: mergeProofs(hero.proofs, defaults.hero.proofs),
       system: {
+        image: asString(system?.image, defaults.hero.system.image),
         eyebrow: asString(system?.eyebrow, defaults.hero.system.eyebrow),
         headline: asString(system?.headline, defaults.hero.system.headline),
         badge: asString(system?.badge, defaults.hero.system.badge),

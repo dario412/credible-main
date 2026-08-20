@@ -255,7 +255,9 @@ export function mergeFormats(
         : source.formats?.length
           ? source.formats
           : demo.formats,
-      description: "",
+      description:
+        live?.description?.trim() ||
+        "",
     };
   });
 }

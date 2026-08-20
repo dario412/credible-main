@@ -90,9 +90,9 @@ export type AboutPageSections = {
 
 export const DEFAULT_ABOUT_SECTIONS: AboutPageSections = {
   hero: {
-    image: "/images/experts/alex-lieberman-stage.png",
+    image: "/images/about/hero-stage.jpg",
     eyebrow: "A PepTalk company",
-    headline: "We represent the people buyers already trust.",
+    headline: "We represent the people\nbuyers already trust.",
     subhead:
       "Credible Creators is a management agency for the expert economy: founders, operators, investors, and specialists whose voices shape how professional audiences think, buy, and build.",
     stats: [
@@ -132,7 +132,7 @@ export const DEFAULT_ABOUT_SECTIONS: AboutPageSections = {
     asideHref: "/roster",
   },
   ledger: {
-    headline: "Credible gives expert voices commercial leverage.",
+    headline: "Credible gives expert voices\ncommercial leverage.",
     subhead:
       "A smaller roster creates better fit, better pricing, and more credible work for both sides of the market.",
     items: [
@@ -159,7 +159,7 @@ export const DEFAULT_ABOUT_SECTIONS: AboutPageSections = {
     ],
   },
   model: {
-    headline: "Selective by design, commercial by default.",
+    headline: "Selective by design,\ncommercial by default.",
     subhead:
       "The business case is simple: a smaller roster creates better fit, better pricing, and better delivery.",
     items: [
@@ -187,7 +187,7 @@ export const DEFAULT_ABOUT_SECTIONS: AboutPageSections = {
   },
   roster: {
     eyebrow: "How credibility compounds",
-    headline: "A roster with range, managed with restraint.",
+    headline: "A roster with range,\nmanaged with restraint.",
     subhead:
       "The agency only works if the roster stays credible. Every partnership, stage, and content program has to protect the expert's point of view while making the commercial opportunity easier to execute.",
     lanes: [
@@ -239,6 +239,15 @@ export const DEFAULT_ABOUT_SECTIONS: AboutPageSections = {
 
 function asString(value: unknown, fallback: string) {
   return typeof value === "string" ? value : fallback;
+}
+
+const LEGACY_ABOUT_HERO_IMAGES = new Set([
+  "/images/experts/alex-lieberman-stage.png",
+]);
+
+function aboutHeroImage(value: unknown, fallback: string) {
+  const image = asString(value, fallback).trim() || fallback;
+  return LEGACY_ABOUT_HERO_IMAGES.has(image) ? fallback : image;
 }
 
 function padN(index: number, fallback: string) {
@@ -393,7 +402,7 @@ export function mergeAboutSections(raw: unknown): AboutPageSections {
 
   return {
     hero: {
-      image: asString(hero.image, defaults.hero.image),
+      image: aboutHeroImage(hero.image, defaults.hero.image),
       eyebrow: asString(hero.eyebrow, defaults.hero.eyebrow),
       headline: asString(hero.headline, defaults.hero.headline),
       subhead: asString(hero.subhead, defaults.hero.subhead),

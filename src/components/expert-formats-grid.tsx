@@ -99,12 +99,18 @@ export function ExpertFormatsGrid({
     <ul className="mt-8 flex flex-col gap-4 md:gap-5">
       {formats.map((format, index) => {
         const kind = resolveFormatKind(format);
-        const copy =
+        const chromeCopy =
           kind != null
             ? chrome.profileFormats[kind]
             : { title: format.title, description: format.description };
-        const title = applyProfileRailTemplate(copy.title, vars);
-        const description = applyProfileRailTemplate(copy.description, vars);
+        const title = applyProfileRailTemplate(
+          format.title.trim() || chromeCopy.title,
+          vars,
+        );
+        const description = applyProfileRailTemplate(
+          format.description.trim() || chromeCopy.description,
+          vars,
+        );
 
         return (
           <li key={kind ?? `${format.category}-${format.title}`}>

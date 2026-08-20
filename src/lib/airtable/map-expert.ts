@@ -13,14 +13,17 @@ export type MappedExpert = {
   title: string;
   bio: string;
   shortBio: string | null;
+  websiteSubtitle: string | null;
   image: string | null;
   bannerImage: string | null;
   categories: string[];
   topics: string[];
   formats: string[];
   combinedReach: string | null;
+  highlight1: string | null;
   highlight2: string | null;
   highlight3: string | null;
+  highlight4: string | null;
   growth90d: string | null;
   audienceWho: string | null;
   audienceWhere: string | null;
@@ -34,6 +37,8 @@ export type MappedExpert = {
   seoDescription: string | null;
   expertsRecordIds: string[];
   recentPartnerships: string[];
+  companyLogoIds: string[];
+  similarProfileIds: string[];
   profileSections: AirtableProfileSections;
 };
 
@@ -79,6 +84,10 @@ function asString(value: unknown): string | null {
       if (s) return s;
     }
   }
+  // Airtable aiText fields arrive as { state, value, isStale }
+  if (value && typeof value === "object" && "value" in value) {
+    return asString((value as { value: unknown }).value);
+  }
   return null;
 }
 
@@ -96,6 +105,13 @@ function asBoolean(value: unknown): boolean {
     );
   }
   return false;
+}
+
+function recordIds(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (id): id is string => typeof id === "string" && id.startsWith("rec"),
+  );
 }
 
 function asStringList(value: unknown): string[] {
@@ -121,6 +137,46 @@ function splitThemeLine(value: string): string[] {
     .split(/[\n\r]+|•|\u2022|,|;/)
     .map((part) => part.replace(/\s+/g, " ").trim())
     .filter(Boolean);
+}
+
+/** "214K Combined reach" / "$75M Successful Exit as Co-Founder" / "3 Platforms". */
+export function parseHighlightStat(
+  raw: string | null | undefined,
+): { value: string; label: string } | null {
+  if (!raw) return null;
+  const text = raw.replace(/\s+/g, " ").trim();
+  if (!text) return null;
+  const match = text.match(
+    /^([+\-]?\$?\d[\d.,]*(?:\s*[KkMmBb])?\+?%?)\s+(.*)$/,
+  );
+  if (!match) return { value: text, label: "" };
+  const value = (match[1] ?? "").replace(/\s+/g, "");
+  const label = (match[2] ?? "").trim();
+  return { value: value || text, label };
+}
+
+function highlightField(
+  fields: Record<string, unknown>,
+  n: 1 | 2 | 3 | 4,
+): string | null {
+  const direct = asString(
+    field(
+      fields,
+      `Creator | Website | Highlight ${n}`,
+      `Creator | Wesbite | Highlight ${n}`,
+      `Website | Highlight ${n}`,
+      `Highlight ${n}`,
+    ),
+  );
+  if (direct) return direct;
+
+  const re = new RegExp(`highlight\\s*${n}\\b`);
+  for (const [key, value] of Object.entries(fields)) {
+    if (!re.test(normalizeKey(key))) continue;
+    const parsed = asString(value);
+    if (parsed) return parsed;
+  }
+  return null;
 }
 
 /** "3.2M Combined reach" / "20k+" → "3.2M" / "20k+" for roster cards. */
@@ -225,21 +281,19 @@ export function mapAirtableRecordToExpert(
   );
   if (!slug) return null;
 
-  const subtitle = asString(
-    field(
-      fields,
-      "Creator | Website | Subtitle",
-      "Creator | Profile | Title",
-      "Subtitle",
-      "Title",
-    ),
+  const websiteSubtitle = asString(
+    field(fields, "Creator | Website | Subtitle", "Website | Subtitle") ??
+      fieldMatching(fields, "website", "subtitle"),
   );
 
-  const shortBio = asString(
+  const profileTitle = asString(
+    field(fields, "Creator | Profile | Title", "Job Title", "Role"),
+  );
+
+  const profileShortBio = asString(
     field(
       fields,
       "Creator | Profile | Short bio",
-      "Creator | Website | Subtitle",
       "Short Bio",
       "Short bio",
     ),
@@ -255,8 +309,7 @@ export function mapAirtableRecordToExpert(
     ),
   );
 
-  const title = subtitle ?? name;
-  const bio = longBio ?? shortBio ?? subtitle ?? title;
+  const shortBio = websiteSubtitle ?? profileShortBio;
 
   const image =
     firstUrl(field(fields, "Creator | Expert image", "Expert image")) ??
@@ -277,6 +330,14 @@ export function mapAirtableRecordToExpert(
     field(fields, "Creator | Website | Archetype", "Archetype"),
   );
 
+  const title =
+    (profileTitle && profileTitle !== websiteSubtitle
+      ? profileTitle
+      : null) ??
+    categories[0] ??
+    name;
+  const bio = longBio ?? shortBio ?? title;
+
   const topics = asStringList(
     field(
       fields,
@@ -287,24 +348,10 @@ export function mapAirtableRecordToExpert(
     ),
   ).slice(0, 6);
 
-  // Airtable typo is intentional: "Wesbite" on Highlight 1
-  const highlight1Raw = field(
-    fields,
-    "Creator | Wesbite | Highlight 1",
-    "Creator | Website | Highlight 1",
-    "Highlight 1",
-  );
-  const highlight2 = asString(
-    field(fields, "Creator | Website | Highlight 2", "Highlight 2"),
-  );
-  const highlight3 = asString(
-    field(fields, "Creator | Website | Highlight 3", "Highlight 3"),
-  );
-  const highlight4Raw = field(
-    fields,
-    "Creator | Website | Highlight 4",
-    "Highlight 4",
-  );
+  const highlight1 = highlightField(fields, 1);
+  const highlight2 = highlightField(fields, 2);
+  const highlight3 = highlightField(fields, 3);
+  const highlight4 = highlightField(fields, 4);
 
   const followersHeadline = asString(
     field(
@@ -314,10 +361,18 @@ export function mapAirtableRecordToExpert(
     ),
   );
 
-  // Prefer website highlight; fall back to followers headline for roster cards
+  const parsedHighlights = [highlight1, highlight2, highlight3, highlight4]
+    .map(parseHighlightStat)
+    .filter((stat): stat is { value: string; label: string } => Boolean(stat));
+
+  const reachStat =
+    parsedHighlights.find((stat) => /reach/i.test(stat.label)) ??
+    parsedHighlights[0];
+  const growthStat = parsedHighlights.find((stat) => /growth/i.test(stat.label));
+
   const combinedReach =
-    asReachMetric(highlight1Raw) ?? asReachMetric(followersHeadline);
-  const growth90d = asReachMetric(highlight4Raw);
+    reachStat?.value ?? asReachMetric(followersHeadline);
+  const growth90d = growthStat?.value ?? null;
 
   const exclusiveRaw = field(
     fields,
@@ -361,15 +416,18 @@ export function mapAirtableRecordToExpert(
     nameFirst: firstNameFrom(name, nameFirst),
     title,
     bio,
-    shortBio: shortBio ?? subtitle,
+    shortBio,
+    websiteSubtitle,
     image: image ?? bannerImage,
     bannerImage,
     categories,
     topics,
     formats: [],
     combinedReach,
+    highlight1,
     highlight2,
     highlight3,
+    highlight4,
     growth90d,
     audienceWho: asString(
       field(fields, "Creator | Profile | Audience", "Audience"),
@@ -385,19 +443,24 @@ export function mapAirtableRecordToExpert(
     seoDescription: asString(
       field(fields, "Website | Meta Description", "SEO Description"),
     ),
-    expertsRecordIds: (() => {
-      const raw = field(fields, "Experts | Name", "Experts");
-      if (!Array.isArray(raw)) return [];
-      return raw.filter(
-        (id): id is string => typeof id === "string" && id.startsWith("rec"),
-      );
-    })(),
+    expertsRecordIds: recordIds(field(fields, "Experts | Name", "Experts")),
     recentPartnerships: asStringList(
       field(
         fields,
         "Creator | Profile | Recent partnerships",
         "Recent partnerships",
       ),
+    ),
+    companyLogoIds: recordIds(
+      field(
+        fields,
+        "Creator | Website | Company logos",
+        "Website | Company logos",
+        "Company logos",
+      ),
+    ),
+    similarProfileIds: recordIds(
+      field(fields, "Similar profiles", "Similar Profiles"),
     ),
     profileSections,
   };

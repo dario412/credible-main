@@ -34,6 +34,9 @@ const LOCAL_BRAND_LOGOS: Record<string, string> = {
   saastr: "/brand/clients/saastr-wordmark-white.svg",
   "wispr flow": "/brand/clients/wispr-flow-wordmark-white.svg",
   wisprflow: "/brand/clients/wispr-flow-wordmark-white.svg",
+  "wispr flow ai": "/brand/clients/wispr-flow-wordmark-white.svg",
+  zoom: "/brand/clients/zoom-wordmark-white.svg",
+  "poly ai": "/brand/clients/polyai-wordmark-white.svg",
 };
 
 export type TrustedBrand = {
@@ -45,6 +48,13 @@ function normalizeBrandKey(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
+function brandLookupKeys(name: string): string[] {
+  const key = normalizeBrandKey(name);
+  const compact = key.replace(/[^a-z0-9]+/g, "");
+  const withoutAi = key.replace(/\s+ai$/, "");
+  return [...new Set([key, compact, withoutAi, withoutAi.replace(/[^a-z0-9]+/g, "")])];
+}
+
 export function resolveBrandLogo(
   name: string,
   airtableLogoUrl?: string | null,
@@ -52,8 +62,11 @@ export function resolveBrandLogo(
   if (airtableLogoUrl && /^https?:\/\//i.test(airtableLogoUrl.trim())) {
     return airtableLogoUrl.trim();
   }
-  const key = normalizeBrandKey(name);
-  return LOCAL_BRAND_LOGOS[key];
+  for (const key of brandLookupKeys(name)) {
+    const hit = LOCAL_BRAND_LOGOS[key];
+    if (hit) return hit;
+  }
+  return undefined;
 }
 
 export function withResolvedLogos(
@@ -64,7 +77,7 @@ export function withResolvedLogos(
   for (const brand of brands) {
     const name = brand.name?.trim();
     if (!name) continue;
-    const key = normalizeBrandKey(name);
+    const key = brandLookupKeys(name)[1] ?? brandLookupKeys(name)[0]!;
     if (seen.has(key)) continue;
     // Skip agency labels that aren't client logos
     if (

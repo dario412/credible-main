@@ -185,9 +185,11 @@ export function ExpertProfileShell({
                     >
                       <StatCounter value={stat.value} />
                     </dd>
-                    <dt className="mt-1 text-[0.5625rem] tracking-[0.1em] text-charcoal/55 uppercase">
-                      {stat.label}
-                    </dt>
+                    {stat.label ? (
+                      <dt className="mt-1 text-[0.5625rem] tracking-[0.1em] text-charcoal/55 uppercase">
+                        {stat.label}
+                      </dt>
+                    ) : null}
                   </div>
                 ))}
               </dl>

@@ -5,13 +5,14 @@ import { ArrowRight } from "@phosphor-icons/react";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
+import { AboutModelStack } from "@/components/about-model-stack";
 import { AboutRosterRail } from "@/components/about-roster-rail";
+import type { HeroCastMember } from "@/components/home-2/hero-cast";
 import { EditableHit, MultilineText } from "@/components/editable-hit";
 import { FadeUp } from "@/components/fade-up";
 import {
   EYEBROW,
   EYEBROW_MUTED,
-  EYEBROW_ON_DARK,
   PAGE_SHELL,
   PageGhostLink,
   PagePrimaryLink,
@@ -26,7 +27,6 @@ import {
   emptyAboutJumpLink,
   emptyAboutLedgerItem,
   emptyAboutModelItem,
-  emptyAboutRosterLane,
   paragraphsToText,
   textToParagraphs,
   type AboutPageSections,
@@ -42,7 +42,6 @@ type EditTarget =
   | "model"
   | `model.${number}`
   | "roster"
-  | "rosterLanes"
   | "cta";
 
 function targetTitle(target: EditTarget): string {
@@ -60,7 +59,6 @@ function targetTitle(target: EditTarget): string {
     ledger: "Operating model intro",
     model: "How we work intro",
     roster: "Roster intro",
-    rosterLanes: "Roster rail",
     cta: "Two ways in",
   };
   return map[target] ?? "Edit";
@@ -164,18 +162,6 @@ function EditorPopover({
                 })
               }
             />
-            <Field label="Eyebrow" id="ve-about-hero-eyebrow">
-              <TextInput
-                id="ve-about-hero-eyebrow"
-                value={sections.hero.eyebrow}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    hero: { ...sections.hero, eyebrow: e.target.value },
-                  })
-                }
-              />
-            </Field>
             <Field
               label="Headline"
               id="ve-about-hero-headline"
@@ -329,18 +315,6 @@ function EditorPopover({
 
         {target === "thesis" ? (
           <>
-            <Field label="Eyebrow" id="ve-about-thesis-eyebrow">
-              <TextInput
-                id="ve-about-thesis-eyebrow"
-                value={sections.thesis.eyebrow}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    thesis: { ...sections.thesis, eyebrow: e.target.value },
-                  })
-                }
-              />
-            </Field>
             <Field label="Headline" id="ve-about-thesis-headline">
               <TextArea
                 id="ve-about-thesis-headline"
@@ -372,18 +346,6 @@ function EditorPopover({
 
         {target === "why" ? (
           <>
-            <Field label="Eyebrow" id="ve-about-why-eyebrow">
-              <TextInput
-                id="ve-about-why-eyebrow"
-                value={sections.why.eyebrow}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    why: { ...sections.why, eyebrow: e.target.value },
-                  })
-                }
-              />
-            </Field>
             <Field label="Headline" id="ve-about-why-headline">
               <TextArea
                 id="ve-about-why-headline"
@@ -797,97 +759,6 @@ function EditorPopover({
           </>
         ) : null}
 
-        {target === "rosterLanes" ? (
-          <>
-            {sections.roster.lanes.map((lane, index) => (
-              <div
-                key={`ve-about-lane-${index}`}
-                className="space-y-3 rounded-sm border border-charcoal/10 p-3"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium">Lane {index + 1}</p>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onChange({
-                        ...sections,
-                        roster: {
-                          ...sections.roster,
-                          lanes: sections.roster.lanes.filter(
-                            (_, i) => i !== index,
-                          ),
-                        },
-                      })
-                    }
-                    className="text-xs font-medium text-danger hover:underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-                <Field label="Title" id={`ve-about-lane-title-${index}`}>
-                  <TextInput
-                    id={`ve-about-lane-title-${index}`}
-                    value={lane.title}
-                    onChange={(e) => {
-                      const lanes = sections.roster.lanes.map((row, i) =>
-                        i === index ? { ...row, title: e.target.value } : row,
-                      );
-                      onChange({
-                        ...sections,
-                        roster: { ...sections.roster, lanes },
-                      });
-                    }}
-                  />
-                </Field>
-                <Field label="Body" id={`ve-about-lane-body-${index}`}>
-                  <TextArea
-                    id={`ve-about-lane-body-${index}`}
-                    rows={2}
-                    value={lane.body}
-                    onChange={(e) => {
-                      const lanes = sections.roster.lanes.map((row, i) =>
-                        i === index ? { ...row, body: e.target.value } : row,
-                      );
-                      onChange({
-                        ...sections,
-                        roster: { ...sections.roster, lanes },
-                      });
-                    }}
-                  />
-                </Field>
-                <MediaField
-                  label="Image"
-                  value={lane.image}
-                  onChange={(image) => {
-                    const lanes = sections.roster.lanes.map((row, i) =>
-                      i === index ? { ...row, image } : row,
-                    );
-                    onChange({
-                      ...sections,
-                      roster: { ...sections.roster, lanes },
-                    });
-                  }}
-                />
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
-                onChange({
-                  ...sections,
-                  roster: {
-                    ...sections.roster,
-                    lanes: [...sections.roster.lanes, emptyAboutRosterLane()],
-                  },
-                })
-              }
-              className="text-sm font-medium text-forest hover:text-forest-dark"
-            >
-              + Add lane
-            </button>
-          </>
-        ) : null}
-
         {target === "cta" ? (
           <>
             <Field label="Eyebrow" id="ve-about-cta-eyebrow">
@@ -1066,11 +937,13 @@ function EditorPopover({
 
 function AboutView({
   sections,
+  members,
   editing,
   selected,
   onSelect,
 }: {
   sections: AboutPageSections;
+  members: HeroCastMember[];
   editing: boolean;
   selected: EditTarget | null;
   onSelect: (target: EditTarget) => void;
@@ -1091,7 +964,7 @@ function AboutView({
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[68%_18%]"
+            className="object-cover object-[center_42%]"
           />
         ) : null}
         <div
@@ -1114,11 +987,17 @@ function AboutView({
             "hero",
             <div>
               <FadeUp y={18} duration={1000} threshold={0.05} rootMargin="0px">
-                <p className={EYEBROW_ON_DARK}>{sections.hero.eyebrow}</p>
                 <MultilineText
                   as="h1"
-                  text={sections.hero.headline}
-                  className="mt-4 max-w-[16ch] font-display text-[2.6rem] leading-[1.05] tracking-tight text-cream sm:text-[3.25rem] md:text-[4rem] lg:text-[4.4rem]"
+                  text={
+                    sections.hero.headline.includes("\n")
+                      ? sections.hero.headline
+                      : sections.hero.headline.replace(
+                          " the people ",
+                          " the people\n",
+                        )
+                  }
+                  className="max-w-[28ch] font-display text-[2.6rem] leading-[1.05] tracking-tight text-cream sm:text-[3.25rem] md:text-[4rem] lg:text-[4.4rem]"
                 />
                 <p className="mt-5 max-w-[38rem] text-[1rem] leading-relaxed text-cream/72 md:text-[1.0625rem]">
                   {sections.hero.subhead}
@@ -1179,8 +1058,7 @@ function AboutView({
             onSelect,
             "thesis",
             <div>
-              <p className={EYEBROW}>{sections.thesis.eyebrow}</p>
-              <h2 className="mt-4 font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.75rem] lg:text-[3.2rem]">
+              <h2 className="font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.75rem] lg:text-[3.2rem]">
                 {sections.thesis.headline}
               </h2>
               <p className="mx-auto mt-5 max-w-[45rem] text-[1.05rem] leading-relaxed text-charcoal/65">
@@ -1207,8 +1085,7 @@ function AboutView({
               onSelect,
               "why we exist",
               <article>
-                <p className={EYEBROW}>{sections.why.eyebrow}</p>
-                <h2 className="mt-4 max-w-[18ch] font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.65rem]">
+                <h2 className="max-w-[18ch] font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.65rem]">
                   {sections.why.headline}
                 </h2>
                 <div className="mt-8 max-w-[45rem] space-y-5 text-[1rem] leading-relaxed text-charcoal/68">
@@ -1293,11 +1170,20 @@ function AboutView({
               selected,
               onSelect,
               "operating model intro",
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-end">
-                <h2 className="max-w-[16ch] font-display text-[2rem] leading-[1.12] tracking-tight md:text-[2.65rem]">
-                  {sections.ledger.headline}
-                </h2>
-                <p className="text-[0.9375rem] leading-relaxed text-cream/65">
+              <div className="mx-auto max-w-2xl text-center">
+                <MultilineText
+                  as="h2"
+                  text={
+                    sections.ledger.headline.includes("\n")
+                      ? sections.ledger.headline
+                      : sections.ledger.headline.replace(
+                          " expert voices ",
+                          " expert voices\n",
+                        )
+                  }
+                  className="font-display text-[2rem] leading-[1.12] tracking-tight md:text-[2.65rem]"
+                />
+                <p className="mx-auto mt-5 max-w-md text-[0.9375rem] leading-relaxed text-cream/65">
                   {sections.ledger.subhead}
                 </p>
               </div>,
@@ -1315,7 +1201,7 @@ function AboutView({
                     selected,
                     onSelect,
                     row.label || `ledger ${index + 1}`,
-                    <div className="grid gap-3 border-t border-cream/12 py-8 md:grid-cols-[8rem_minmax(0,16rem)_minmax(0,1fr)] md:items-baseline md:gap-10">
+                    <div className="grid gap-3 border-t border-cream/12 py-8 md:grid-cols-[8rem_minmax(0,1fr)_26rem] md:items-baseline md:gap-10">
                       <p className="font-display text-[2.75rem] leading-none tracking-tight text-cream md:text-[3.25rem]">
                         {row.value}
                       </p>
@@ -1335,62 +1221,35 @@ function AboutView({
         </div>
       </section>
 
-      <section
-        id="model"
-        className="scroll-mt-28 bg-cream-dark px-6 py-20 md:px-10 md:py-24 lg:px-12 lg:py-28"
-      >
-        <div className={PAGE_SHELL}>
-          <FadeUp>
-            {hit(
-              editing,
-              "model",
-              selected,
-              onSelect,
-              "how we work intro",
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-end">
-                <h2 className="max-w-[14ch] font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.65rem]">
-                  {sections.model.headline}
-                </h2>
-                <p className="text-[0.9375rem] leading-relaxed text-charcoal/60">
-                  {sections.model.subhead}
-                </p>
-              </div>,
-              { block: true, ringOffset: "ring-offset-cream-dark" },
-            )}
-          </FadeUp>
-          <ul className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-            {sections.model.items.map((item, index) => (
-              <li key={`${item.n}-${index}`}>
-                <FadeUp delay={index * 90} y={20} threshold={0.15}>
-                  {hit(
-                    editing,
-                    `model.${index}`,
-                    selected,
-                    onSelect,
-                    item.title || `model ${index + 1}`,
-                    <div className="border-t border-charcoal/12 pt-5">
-                      <p className="text-[0.68rem] font-medium tracking-[0.16em] text-forest uppercase">
-                        {item.n}
-                      </p>
-                      <h3 className="mt-3 font-display text-[1.25rem] leading-snug tracking-tight text-charcoal">
-                        {item.title}
-                      </h3>
-                      <p className="mt-3 text-[0.875rem] leading-relaxed text-charcoal/60">
-                        {item.body}
-                      </p>
-                    </div>,
-                    { block: true, ringOffset: "ring-offset-cream-dark" },
-                  )}
-                </FadeUp>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      <AboutModelStack
+        content={sections.model}
+        wrapHeader={(node) =>
+          hit(
+            editing,
+            "model",
+            selected,
+            onSelect,
+            "how we work intro",
+            node,
+            { block: true, ringOffset: "ring-offset-cream-dark" },
+          )
+        }
+        wrapItem={(index, node) =>
+          hit(
+            editing,
+            `model.${index}`,
+            selected,
+            onSelect,
+            sections.model.items[index]?.title || `model ${index + 1}`,
+            node,
+            { block: true, ringOffset: "ring-offset-cream-dark" },
+          )
+        }
+      />
 
       <section
         id="roster"
-        className="scroll-mt-28 overflow-hidden bg-cream py-20 md:py-24 lg:py-28"
+        className="scroll-mt-28 overflow-hidden bg-cream pt-20 pb-0 md:pt-24 lg:pt-28"
       >
         <div className={`${PAGE_SHELL} px-6 md:px-10 lg:px-12`}>
           <FadeUp>
@@ -1403,9 +1262,15 @@ function AboutView({
               <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end">
                 <div>
                   <p className={EYEBROW}>{sections.roster.eyebrow}</p>
-                  <h2 className="mt-3 max-w-[16ch] font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.65rem]">
-                    {sections.roster.headline}
-                  </h2>
+                  <MultilineText
+                    as="h2"
+                    text={
+                      sections.roster.headline.includes("\n")
+                        ? sections.roster.headline
+                        : sections.roster.headline.replace(", ", ",\n")
+                    }
+                    className="mt-3 max-w-[28ch] font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.65rem]"
+                  />
                 </div>
                 <p className="text-[0.9375rem] leading-relaxed text-charcoal/60">
                   {sections.roster.subhead}
@@ -1416,18 +1281,10 @@ function AboutView({
           </FadeUp>
         </div>
 
-        {hit(
-          editing,
-          "rosterLanes",
-          selected,
-          onSelect,
-          "roster rail",
-          <AboutRosterRail lanes={sections.roster.lanes} />,
-          { block: true },
-        )}
+        <AboutRosterRail members={members} />
       </section>
 
-      <section className="px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
+      <section className="px-6 pt-16 pb-0 md:px-10 md:pt-20 lg:px-12 lg:pt-24">
         <div className={PAGE_SHELL}>
           <FadeUp>
             {hit(
@@ -1518,10 +1375,12 @@ function AboutView({
 
 export function AboutVisualEditor({
   initial,
+  members,
   canEdit,
   saveAction,
 }: {
   initial: AboutPageSections;
+  members: HeroCastMember[];
   canEdit: boolean;
   saveAction: typeof import("@/lib/actions/admin-cms").saveAboutPage;
 }) {
@@ -1563,6 +1422,7 @@ export function AboutVisualEditor({
     <>
       <AboutView
         sections={sections}
+        members={members}
         editing={editing && canEdit}
         selected={target}
         onSelect={setTarget}

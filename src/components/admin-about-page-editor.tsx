@@ -10,7 +10,6 @@ import {
   emptyAboutJumpLink,
   emptyAboutLedgerItem,
   emptyAboutModelItem,
-  emptyAboutRosterLane,
   paragraphsToText,
   textToParagraphs,
   type AboutPageSections,
@@ -56,18 +55,6 @@ export function AboutPageEditorForm({
             })
           }
         />
-        <Field label="Eyebrow" id="about-hero-eyebrow">
-          <TextInput
-            id="about-hero-eyebrow"
-            value={sections.hero.eyebrow}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                hero: { ...sections.hero, eyebrow: e.target.value },
-              })
-            }
-          />
-        </Field>
         <Field
           label="Headline"
           id="about-hero-headline"
@@ -226,18 +213,6 @@ export function AboutPageEditorForm({
         <div>
           <h2 className="font-display text-xl">Thesis</h2>
         </div>
-        <Field label="Eyebrow" id="about-thesis-eyebrow">
-          <TextInput
-            id="about-thesis-eyebrow"
-            value={sections.thesis.eyebrow}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                thesis: { ...sections.thesis, eyebrow: e.target.value },
-              })
-            }
-          />
-        </Field>
         <Field label="Headline" id="about-thesis-headline">
           <TextArea
             id="about-thesis-headline"
@@ -273,18 +248,6 @@ export function AboutPageEditorForm({
             Main story, on-this-page links, and the brief card.
           </p>
         </div>
-        <Field label="Eyebrow" id="about-why-eyebrow">
-          <TextInput
-            id="about-why-eyebrow"
-            value={sections.why.eyebrow}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                why: { ...sections.why, eyebrow: e.target.value },
-              })
-            }
-          />
-        </Field>
         <Field label="Headline" id="about-why-headline">
           <TextArea
             id="about-why-headline"
@@ -740,90 +703,10 @@ export function AboutPageEditorForm({
             }
           />
         </Field>
-        {sections.roster.lanes.map((lane, index) => (
-          <div
-            key={`about-lane-${index}`}
-            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium">Lane {index + 1}</p>
-              <button
-                type="button"
-                onClick={() =>
-                  setSections({
-                    ...sections,
-                    roster: {
-                      ...sections.roster,
-                      lanes: sections.roster.lanes.filter((_, i) => i !== index),
-                    },
-                  })
-                }
-                className="text-xs font-medium text-danger hover:underline"
-              >
-                Remove
-              </button>
-            </div>
-            <Field label="Title" id={`about-lane-title-${index}`}>
-              <TextInput
-                id={`about-lane-title-${index}`}
-                value={lane.title}
-                onChange={(e) => {
-                  const lanes = sections.roster.lanes.map((row, i) =>
-                    i === index ? { ...row, title: e.target.value } : row,
-                  );
-                  setSections({
-                    ...sections,
-                    roster: { ...sections.roster, lanes },
-                  });
-                }}
-              />
-            </Field>
-            <Field label="Body" id={`about-lane-body-${index}`}>
-              <TextArea
-                id={`about-lane-body-${index}`}
-                rows={2}
-                value={lane.body}
-                onChange={(e) => {
-                  const lanes = sections.roster.lanes.map((row, i) =>
-                    i === index ? { ...row, body: e.target.value } : row,
-                  );
-                  setSections({
-                    ...sections,
-                    roster: { ...sections.roster, lanes },
-                  });
-                }}
-              />
-            </Field>
-            <MediaField
-              label="Image"
-              value={lane.image}
-              onChange={(image) => {
-                const lanes = sections.roster.lanes.map((row, i) =>
-                  i === index ? { ...row, image } : row,
-                );
-                setSections({
-                  ...sections,
-                  roster: { ...sections.roster, lanes },
-                });
-              }}
-            />
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() =>
-            setSections({
-              ...sections,
-              roster: {
-                ...sections.roster,
-                lanes: [...sections.roster.lanes, emptyAboutRosterLane()],
-              },
-            })
-          }
-          className="text-sm font-medium text-forest hover:text-forest-dark"
-        >
-          + Add lane
-        </button>
+        <p className="text-sm text-muted">
+          The portrait rail is pulled from signed roster profiles. Edit people
+          in the roster, not here.
+        </p>
       </section>
 
       <section className="space-y-4">

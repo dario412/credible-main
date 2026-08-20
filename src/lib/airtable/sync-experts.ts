@@ -10,6 +10,7 @@ import {
   type AirtableRecord,
 } from "./client";
 import { mapAirtableRecordToExpert } from "./map-expert";
+import { loadOrganisationBrandsByIds } from "./organisations";
 
 export type SyncExpertsResult = {
   ok: boolean;
@@ -145,11 +146,18 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
   }
 
   const expertIds = mappedRows.flatMap((row) => row.mapped.expertsRecordIds);
+  const companyLogoIds = mappedRows.flatMap((row) => row.mapped.companyLogoIds);
   let trustedByMap = new Map<string, TrustedBrand[]>();
+  let organisationBrands = new Map<string, TrustedBrand>();
   try {
     trustedByMap = await loadTrustedByByExpertId(expertIds);
   } catch {
     trustedByMap = new Map();
+  }
+  try {
+    organisationBrands = await loadOrganisationBrandsByIds(companyLogoIds);
+  } catch {
+    organisationBrands = new Map();
   }
 
   let created = 0;
@@ -167,16 +175,22 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
     }
     usedSlugs.add(slug);
 
+    const fromCompanyLogos = mapped.companyLogoIds
+      .map((id) => organisationBrands.get(id))
+      .filter((brand): brand is TrustedBrand => Boolean(brand));
     const fromOrgs = mapped.expertsRecordIds.flatMap(
       (id) => trustedByMap.get(id) ?? [],
     );
     const fromPartnerships = withResolvedLogos(
       mapped.recentPartnerships.map((name) => ({ name })),
     );
-    const trustedBy = withResolvedLogos([...fromOrgs, ...fromPartnerships]).slice(
-      0,
-      12,
-    );
+    const trustedBy = withResolvedLogos(
+      fromCompanyLogos.length > 0
+        ? fromCompanyLogos
+        : [...fromOrgs, ...fromPartnerships],
+    )
+      .filter((brand) => Boolean(brand.logo))
+      .slice(0, 12);
 
     const data = {
       airtableId: mapped.airtableId,
@@ -200,13 +214,17 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
       profileExtras: {
         nameFirst: mapped.nameFirst,
         bannerImage: mapped.bannerImage,
+        highlight1: mapped.highlight1,
         highlight2: mapped.highlight2,
         highlight3: mapped.highlight3,
+        highlight4: mapped.highlight4,
+        websiteSubtitle: mapped.websiteSubtitle,
         exclusive: mapped.exclusive,
         quote: mapped.quote,
         quoteSource: mapped.quoteSource,
         brandPartnershipsCopy: mapped.brandPartnershipsCopy,
         trustedBy,
+        similarProfileIds: mapped.similarProfileIds,
         profileSections: mapped.profileSections,
       },
     };
