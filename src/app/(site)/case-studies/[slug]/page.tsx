@@ -94,9 +94,9 @@ export default async function CaseStudyPage({ params }: Props) {
               <SiteImage
                 src={logo}
                 alt={study.client}
-                width={48}
-                height={48}
-                className="size-10 object-contain brightness-0 invert md:size-11"
+                width={96}
+                height={96}
+                className="size-16 object-contain brightness-0 invert md:size-20"
                 priority
               />
 
