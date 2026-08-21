@@ -3,12 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useId, type ReactNode } from "react";
-import { ArrowRight, CaretDown } from "@phosphor-icons/react/ssr";
+import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { CreatorFacesMarquee } from "@/components/creator-faces-marquee";
 import { Home2WaveField } from "@/components/home-2/home-2-wave-field";
 import { PatternField } from "@/components/pattern-field";
-import { inputClassName } from "@/components/ui";
 import { submitBrief, type FormState } from "@/lib/actions/leads";
 import {
   DEFAULT_HOME_SECTIONS,
@@ -26,14 +25,6 @@ function SectionEyebrow({ children }: { children: ReactNode }) {
     </p>
   );
 }
-
-const formats = [
-  "Brand partnership",
-  "Ambassador program",
-  "Speaking engagement",
-  "Live event",
-  "Not sure yet",
-] as const;
 
 function ArrowIcon({ className }: { className?: string }) {
   return <ArrowRight weight="bold" aria-hidden className={className} />;
@@ -185,20 +176,25 @@ function BriefForm({
   const light = surface === "light";
   const id = useId();
 
-  const inputClass = light
-    ? cn(inputClassName, "rounded-sm bg-[#FBF8F5]")
-    : "w-full rounded-sm border border-cream/25 bg-cream/5 px-4 py-3 text-sm text-cream outline-none transition-colors placeholder:text-cream/35 focus:border-cream focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-cream";
+  const fieldShell = light
+    ? "w-full rounded-sm border border-forest/40 bg-[#FBF8F5] px-2.5 text-[0.8125rem] text-charcoal outline-none transition-colors placeholder:text-charcoal/45 focus:border-forest focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-forest"
+    : "w-full rounded-sm border border-cream/25 bg-cream/5 px-2.5 text-[0.8125rem] text-cream outline-none transition-colors placeholder:text-cream/35 focus:border-cream focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-cream";
+  const inputClass = cn(fieldShell, "h-8 leading-none");
+  const textareaClass = cn(fieldShell, "min-h-0 resize-none py-1.5 leading-snug");
 
   const labelClass = light
-    ? "block text-[0.8125rem] font-medium text-charcoal"
-    : "block text-[0.8125rem] font-medium text-cream/75";
+    ? "block text-[0.7rem] font-medium leading-none text-charcoal"
+    : "block text-[0.7rem] font-medium leading-none text-cream/75";
+
+  const optionalClass = light ? "text-charcoal/40" : "text-cream/45";
+  const fieldClass = "space-y-1";
 
   return (
-    <form action={action} className="space-y-5">
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div className="space-y-1.5">
+    <form action={action} className="space-y-2.5">
+      <div className="grid gap-2.5 sm:grid-cols-2">
+        <div className={fieldClass}>
           <label htmlFor={`${id}-name`} className={labelClass}>
-            Your name
+            Name
           </label>
           <input
             id={`${id}-name`}
@@ -209,9 +205,9 @@ function BriefForm({
             className={inputClass}
           />
         </div>
-        <div className="space-y-1.5">
+        <div className={fieldClass}>
           <label htmlFor={`${id}-email`} className={labelClass}>
-            Work email
+            Work Email
           </label>
           <input
             id={`${id}-email`}
@@ -223,77 +219,80 @@ function BriefForm({
             className={inputClass}
           />
         </div>
-      </div>
-
-      <div className="space-y-1.5">
-        <label htmlFor={`${id}-company`} className={labelClass}>
-          Company
-        </label>
-        <input
-          id={`${id}-company`}
-          name="company"
-          autoComplete="organization"
-          placeholder="Where you're briefing from"
-          className={inputClass}
-        />
-      </div>
-
-      <div className="space-y-1.5">
-        <label htmlFor={`${id}-format`} className={labelClass}>
-          What are you building?
-        </label>
-        <div className="relative">
-          <select
-            id={`${id}-format`}
-            name="format"
+        <div className={fieldClass}>
+          <label htmlFor={`${id}-phone`} className={labelClass}>
+            Phone
+          </label>
+          <input
+            id={`${id}-phone`}
+            name="phone"
+            type="tel"
             required
-            defaultValue=""
-            className={cn(
-              inputClass,
-              "appearance-none pr-10",
-              light ? "invalid:text-charcoal/45" : "invalid:text-cream/35",
-            )}
-          >
-            <option value="" disabled>
-              Choose a format
-            </option>
-            {formats.map((format) => (
-              <option key={format} value={format} className="text-charcoal">
-                {format}
-              </option>
-            ))}
-          </select>
-          <CaretDown
-            weight="bold"
-            aria-hidden
-            className={cn(
-              "pointer-events-none absolute top-1/2 right-3.5 size-3.5 -translate-y-1/2",
-              light ? "text-charcoal/45" : "text-cream/50",
-            )}
+            autoComplete="tel"
+            placeholder="+1 555 000 0000"
+            className={inputClass}
+          />
+        </div>
+        <div className={fieldClass}>
+          <label htmlFor={`${id}-company`} className={labelClass}>
+            Company
+          </label>
+          <input
+            id={`${id}-company`}
+            name="company"
+            required
+            autoComplete="organization"
+            placeholder="Where you're briefing from"
+            className={inputClass}
+          />
+        </div>
+        <div className={cn(fieldClass, "sm:col-span-2")}>
+          <label htmlFor={`${id}-role`} className={labelClass}>
+            Role{" "}
+            <span className={cn("font-normal", optionalClass)}>(Optional)</span>
+          </label>
+          <input
+            id={`${id}-role`}
+            name="role"
+            autoComplete="organization-title"
+            placeholder="Head of Brand"
+            className={inputClass}
+          />
+        </div>
+        <div className={cn(fieldClass, "sm:col-span-2")}>
+          <label htmlFor={`${id}-message`} className={labelClass}>
+            Brief
+          </label>
+          <textarea
+            id={`${id}-message`}
+            name="brief"
+            required
+            rows={2}
+            placeholder="Audience, ambition, deadline, budget shape."
+            className={textareaClass}
+          />
+        </div>
+        <div className={cn(fieldClass, "sm:col-span-2")}>
+          <label htmlFor={`${id}-deliverables`} className={labelClass}>
+            Deliverables{" "}
+            <span className={cn("font-normal", optionalClass)}>(Optional)</span>
+          </label>
+          <textarea
+            id={`${id}-deliverables`}
+            name="deliverables"
+            rows={2}
+            placeholder="What you need delivered, and by when."
+            className={textareaClass}
           />
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor={`${id}-message`} className={labelClass}>
-          The brief (short version)
-        </label>
-        <textarea
-          id={`${id}-message`}
-          name="brief"
-          required
-          rows={3}
-          placeholder="Audience, ambition, deadline, budget shape."
-          className={cn(inputClass, "min-h-22 resize-none")}
-        />
-      </div>
-
-      <div className={cn(light && "pt-1")}>
+      <div>
         <button
           type="submit"
           disabled={pending}
           className={cn(
-            "inline-flex w-full items-center justify-center gap-2 rounded-sm border px-7 py-3.5 text-[0.875rem] font-medium transition-colors disabled:opacity-60",
+            "inline-flex w-full items-center justify-center gap-2 rounded-sm border px-6 py-2.5 text-[0.8125rem] font-medium transition-colors disabled:opacity-60",
             light
               ? "border-forest bg-forest text-cream hover:border-forest-dark hover:bg-forest-dark"
               : "border-cream bg-cream text-charcoal hover:bg-cream-dark",
@@ -446,7 +445,7 @@ function BoxedBrief({
     </figure>
   );
   const formTitleNode = (
-    <p className="mb-5 font-display text-[1.15rem] leading-tight tracking-tight text-charcoal md:text-[1.25rem]">
+    <p className="mb-3 font-display text-[1.05rem] leading-tight tracking-tight text-charcoal md:text-[1.15rem]">
       {content.formTitle}
     </p>
   );
@@ -529,7 +528,7 @@ function BoxedBrief({
               {editSlots?.quote ? editSlots.quote(quoteNode) : quoteNode}
             </div>
 
-            <div className="rounded-sm bg-cream px-5 py-6 shadow-[0_20px_50px_rgba(28,26,23,0.22)] sm:px-6 sm:py-7 md:px-7 md:py-8">
+            <div className="rounded-sm bg-cream px-5 py-5 shadow-[0_20px_50px_rgba(28,26,23,0.22)] sm:px-6 sm:py-6">
               {editSlots?.formTitle
                 ? editSlots.formTitle(formTitleNode)
                 : formTitleNode}

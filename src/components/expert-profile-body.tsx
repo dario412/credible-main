@@ -1,7 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowSquareOut } from "@phosphor-icons/react/ssr";
 import type { ReactNode } from "react";
+import {
+  ArrowSquareOut,
+  EnvelopeSimple,
+  FacebookLogo,
+  InstagramLogo,
+  LinkedinLogo,
+  Microphone,
+  TiktokLogo,
+  XLogo,
+  YoutubeLogo,
+} from "@phosphor-icons/react/ssr";
 
 import {
   AudienceShareList,
@@ -17,7 +27,6 @@ import type { RosterCardExpert } from "@/components/roster-card";
 import { SimilarCreatorsGrid } from "@/components/similar-creators-grid";
 import { StatCounter } from "@/components/stat-counter";
 import {
-  channelPresenceUrl,
   firstName,
   type ExpertAudience,
   type ExpertChannelPresence,
@@ -47,68 +56,101 @@ function SectionHeading({
   );
 }
 
-function ChannelGlyph({
-  icon,
-}: {
-  icon: ExpertChannelPresence["icon"];
-}) {
+function channelMark(
+  channel: ExpertChannelPresence,
+): ExpertChannelPresence["icon"] {
+  const platform = channel.platform.toLowerCase();
+  const url = (channel.url ?? "").toLowerCase();
+
+  if (platform.includes("linkedin") || url.includes("linkedin.com")) {
+    return "linkedin";
+  }
+  if (
+    platform.includes("youtube") ||
+    url.includes("youtube.com") ||
+    url.includes("youtu.be")
+  ) {
+    return "youtube";
+  }
+  if (platform.includes("instagram") || url.includes("instagram.com")) {
+    return "instagram";
+  }
+  if (
+    platform.includes("facebook") ||
+    url.includes("facebook.com") ||
+    url.includes("fb.com")
+  ) {
+    return "facebook";
+  }
+  if (platform.includes("newsletter") || url.includes("substack.com")) {
+    return "newsletter";
+  }
+  if (
+    platform.includes("twitter") ||
+    platform === "x" ||
+    platform.startsWith("x /") ||
+    url.includes("x.com") ||
+    url.includes("twitter.com")
+  ) {
+    return "x";
+  }
+  return channel.icon;
+}
+
+function ChannelGlyph({ channel }: { channel: ExpertChannelPresence }) {
+  const mark = channelMark(channel);
   const className = "size-5";
 
-  let mark: ReactNode = null;
-  let tint = "bg-charcoal text-cream";
+  const styles: Record<
+    ExpertChannelPresence["icon"],
+    { tint: string; icon: ReactNode }
+  > = {
+    linkedin: {
+      tint: "bg-[#0A66C2] text-white",
+      icon: <LinkedinLogo weight="fill" className={className} aria-hidden />,
+    },
+    youtube: {
+      tint: "bg-[#FF0000] text-white",
+      icon: <YoutubeLogo weight="fill" className={className} aria-hidden />,
+    },
+    x: {
+      tint: "bg-charcoal text-cream",
+      icon: <XLogo weight="fill" className={className} aria-hidden />,
+    },
+    instagram: {
+      tint: "bg-[#E1306C] text-white",
+      icon: <InstagramLogo weight="fill" className={className} aria-hidden />,
+    },
+    facebook: {
+      tint: "bg-[#1877F2] text-white",
+      icon: <FacebookLogo weight="fill" className={className} aria-hidden />,
+    },
+    newsletter: {
+      tint: "bg-forest text-cream",
+      icon: <EnvelopeSimple weight="fill" className={className} aria-hidden />,
+    },
+    podcast: {
+      tint: "bg-[#935B3B] text-cream",
+      icon: <Microphone weight="fill" className={className} aria-hidden />,
+    },
+    tiktok: {
+      tint: "bg-charcoal text-cream",
+      icon: <TiktokLogo weight="fill" className={className} aria-hidden />,
+    },
+  };
 
-  switch (icon) {
-    case "linkedin":
-      tint = "bg-[#0A66C2] text-white";
-      mark = (
-        <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
-          <path d="M6.94 6.5A1.94 1.94 0 1 1 5 4.56 1.94 1.94 0 0 1 6.94 6.5ZM7 8.75H4V20h3V8.75Zm4.75 0H8.8V20h2.94v-5.7c0-1.5.28-2.95 2.14-2.95 1.84 0 1.86 1.72 1.86 3.05V20H18.7v-6.26c0-3.07-.66-5.43-4.24-5.43-1.72 0-2.87.94-3.34 1.83h-.05V8.75Z" />
-        </svg>
-      );
-      break;
-    case "youtube":
-      tint = "bg-[#FF0000] text-white";
-      mark = (
-        <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
-          <path d="M21.6 7.2a2.7 2.7 0 0 0-1.9-1.9C18 5 12 5 12 5s-6 0-7.7.3A2.7 2.7 0 0 0 2.4 7.2 28.2 28.2 0 0 0 2 12a28.2 28.2 0 0 0 .4 4.8 2.7 2.7 0 0 0 1.9 1.9C6 19 12 19 12 19s6 0 7.7-.3a2.7 2.7 0 0 0 1.9-1.9A28.2 28.2 0 0 0 22 12a28.2 28.2 0 0 0-.4-4.8ZM10 15.2V8.8L15.5 12 10 15.2Z" />
-        </svg>
-      );
-      break;
-    case "podcast":
-      tint = "bg-[#935B3B] text-cream";
-      mark = (
-        <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
-          <path d="M12 3a4 4 0 0 0-4 4v4a4 4 0 0 0 8 0V7a4 4 0 0 0-4-4Zm0 14a6.5 6.5 0 0 1-6.5-6.5h-1.8A8.3 8.3 0 0 0 11 18.6V21h2v-2.4a8.3 8.3 0 0 0 7.3-8.1h-1.8A6.5 6.5 0 0 1 12 17Z" />
-        </svg>
-      );
-      break;
-    case "newsletter":
-      tint = "bg-forest text-cream";
-      mark = (
-        <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
-          <path d="M3.5 5.75A1.75 1.75 0 0 1 5.25 4h13.5A1.75 1.75 0 0 1 20.5 5.75v12.5A1.75 1.75 0 0 1 18.75 20H5.25A1.75 1.75 0 0 1 3.5 18.25V5.75Zm1.75-.25a.25.25 0 0 0-.25.25v.4l7 4.55 7-4.55v-.4a.25.25 0 0 0-.25-.25H5.25Zm13.5 3.05-6.52 4.23a.75.75 0 0 1-.82 0L5 8.55v9.7c0 .14.11.25.25.25h13.5a.25.25 0 0 0 .25-.25V8.55Z" />
-        </svg>
-      );
-      break;
-    case "x":
-      tint = "bg-charcoal text-cream";
-      mark = (
-        <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
-          <path d="M17.5 3h3l-6.6 7.5L22 21h-5.7l-4.5-5.9L7 21H4l7.1-8.1L2.5 3H8.3l4 5.3L17.5 3Zm-1 16.2h1.7L7.6 4.7H5.8l10.7 14.5Z" />
-        </svg>
-      );
-      break;
-  }
+  const visual = styles[mark] ?? styles.newsletter;
 
   return (
     <span
       className={cn(
         "inline-flex size-10 shrink-0 items-center justify-center rounded-sm shadow-[inset_0_0_0_1px_rgba(28,26,23,0.06)]",
-        tint,
+        visual.tint,
       )}
       aria-hidden
+      title={channel.platform}
     >
-      {mark}
+      {visual.icon}
     </span>
   );
 }
@@ -225,7 +267,7 @@ function ChannelsSection({
             </thead>
             <tbody>
               {channels.map((channel) => {
-                const href = channelPresenceUrl(channel);
+                const href = channel.url;
 
                 return (
                   <tr
@@ -233,26 +275,28 @@ function ChannelsSection({
                     className="border-b border-charcoal/8 last:border-b-0"
                   >
                     <td className="px-3 py-4 first:pl-4 md:px-4 md:py-4.5">
-                      <ChannelGlyph icon={channel.icon} />
+                      <ChannelGlyph channel={channel} />
                     </td>
                     <td className="px-3 py-4 md:px-4 md:py-4.5">
                       <div className="flex items-center gap-2">
                         <p className="text-[0.9375rem] font-medium text-charcoal">
                           {channel.platform}
                         </p>
-                        <a
-                          href={href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Open ${channel.platform} profile`}
-                          className="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-charcoal/40 transition-colors hover:bg-charcoal/5 hover:text-forest"
-                        >
-                          <ArrowSquareOut
-                            weight="bold"
-                            className="size-3.5"
-                            aria-hidden
-                          />
-                        </a>
+                        {href ? (
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Open ${channel.platform} profile`}
+                            className="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-charcoal/40 transition-colors hover:bg-charcoal/5 hover:text-forest"
+                          >
+                            <ArrowSquareOut
+                              weight="bold"
+                              className="size-3.5"
+                              aria-hidden
+                            />
+                          </a>
+                        ) : null}
                       </div>
                       <p className="mt-1 text-[0.8125rem] font-medium tracking-tight text-charcoal/70">
                         {channel.handle}

@@ -93,7 +93,20 @@ function mergeProfileContent(
 } {
   const sections = extras.profileSections;
   const channels =
-    sections?.channels?.length ? sections.channels : enrichment.channels;
+    sections?.channels?.filter((channel) => {
+      if (
+        channel.platform === "TikTok" ||
+        channel.platform === "Podcast" ||
+        channel.icon === "tiktok" ||
+        channel.icon === "podcast"
+      ) {
+        return false;
+      }
+      return (
+        Boolean(channel.url) ||
+        (Boolean(channel.followers?.trim()) && channel.followers !== "—")
+      );
+    }) ?? [];
   const topicShares =
     sections?.topicShares?.length
       ? sections.topicShares

@@ -106,7 +106,7 @@ export default async function RosterPage({
             <span className="text-forest">ready to brief.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-lg text-[0.9rem] leading-relaxed text-charcoal/65 md:text-[0.95rem]">
-            Filter by archetype, topic or channel. Each profile carries reach
+            Filter by role, topic or channel. Each profile carries reach
             data, past collaborations and format-level pricing so you can
             shortlist before you brief.
           </p>

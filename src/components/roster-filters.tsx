@@ -260,9 +260,9 @@ export function RosterFilters({
           </label>
 
           <FilterSegment
-            label="Archetype"
+            label="Roles"
             value={currentArchetype}
-            placeholder="All archetypes"
+            placeholder="All roles"
             options={ARCHETYPE_OPTIONS}
             open={open === "archetype"}
             onToggle={() =>

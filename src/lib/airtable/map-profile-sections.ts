@@ -16,7 +16,9 @@ function field(fields: Record<string, unknown>, ...aliases: string[]): unknown {
   );
   for (const alias of aliases) {
     const hit = byNorm.get(alias.replace(/\uFEFF/g, "").trim().toLowerCase());
-    if (hit !== undefined && hit !== null && hit !== "") return hit;
+    if (hit === undefined || hit === null || hit === "") continue;
+    if (Array.isArray(hit) && hit.length === 0) continue;
+    return hit;
   }
   return undefined;
 }
@@ -39,15 +41,49 @@ function asString(value: unknown): string | null {
 function asNumber(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string" && value.trim()) {
-    const n = Number(value.replace(/,/g, ""));
+    const raw = value.trim().replace(/,/g, "");
+    const compact = raw.match(/^([\d.]+)\s*([kmb])$/i);
+    if (compact) {
+      const n = Number(compact[1]);
+      if (!Number.isFinite(n)) return null;
+      const unit = compact[2]!.toLowerCase();
+      return n * (unit === "k" ? 1_000 : unit === "m" ? 1_000_000 : 1_000_000_000);
+    }
+    const n = Number(raw);
     return Number.isFinite(n) ? n : null;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const n = asNumber(item);
+      if (n != null) return n;
+    }
+  }
+  if (value && typeof value === "object" && "value" in value) {
+    return asNumber((value as { value: unknown }).value);
   }
   return null;
 }
 
 function firstUrl(value: unknown): string | null {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const url = firstUrl(item);
+      if (url) return url;
+    }
+    return null;
+  }
   const s = asString(value);
-  if (s && /^https?:\/\//i.test(s)) return s;
+  if (!s) return null;
+  if (/^https?:\/\//i.test(s)) return s;
+  if (/^(www\.)?[a-z0-9.-]+\.[a-z]{2,}\b/i.test(s)) return `https://${s}`;
+  return null;
+}
+
+function followerDisplay(value: unknown): string | null {
+  const formatted = formatFollowers(asNumber(value));
+  if (formatted) return formatted;
+  const s = asString(value);
+  if (s && /\d/.test(s) && !/^rec[a-z0-9]+$/i.test(s)) return s;
   return null;
 }
 
@@ -64,16 +100,66 @@ function formatFollowers(count: number | null): string | null {
   return String(count);
 }
 
+function urlMatchesPlatform(url: string, platform: string): boolean {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+    switch (platform) {
+      case "LinkedIn":
+        return host === "linkedin.com" || host.endsWith(".linkedin.com");
+      case "YouTube":
+        return (
+          host === "youtube.com" ||
+          host.endsWith(".youtube.com") ||
+          host === "youtu.be"
+        );
+      case "X / Twitter":
+        return host === "x.com" || host === "twitter.com";
+      case "Instagram":
+        return host === "instagram.com" || host.endsWith(".instagram.com");
+      case "Facebook":
+        return (
+          host === "facebook.com" ||
+          host.endsWith(".facebook.com") ||
+          host === "fb.com"
+        );
+      case "TikTok":
+        return host === "tiktok.com" || host.endsWith(".tiktok.com");
+      default:
+        return true;
+    }
+  } catch {
+    return false;
+  }
+}
+
 function handleFromUrl(url: string, platform: string): string {
   try {
     const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, "");
     const parts = u.pathname.split("/").filter(Boolean);
-    const last = parts[parts.length - 1] ?? "";
-    if (!last) return platform;
+    const last = decodeURIComponent(parts[parts.length - 1] ?? "").replace(
+      /\/+$/,
+      "",
+    );
+    if (platform === "Newsletter") {
+      if (last && last !== "subscribe") {
+        return last.startsWith("@") ? last : last.replace(/[-_]/g, " ");
+      }
+      return host;
+    }
+    if (!last) return host || platform;
     if (last.startsWith("@")) return last;
-    if (platform === "LinkedIn" && parts[0] === "in") return `@${last}`;
-    if (platform === "YouTube" && last.startsWith("@")) return last;
-    if (["X / Twitter", "Instagram", "TikTok"].includes(platform)) {
+    if (platform === "LinkedIn" && (parts[0] === "in" || parts[0] === "company")) {
+      return `@${last}`;
+    }
+    if (platform === "Facebook" && parts[0] === "profile.php") {
+      return host;
+    }
+    if (
+      ["X / Twitter", "Instagram", "TikTok", "Facebook", "YouTube"].includes(
+        platform,
+      )
+    ) {
       return last.startsWith("@") ? last : `@${last}`;
     }
     return last.replace(/[-_]/g, " ");
@@ -127,19 +213,28 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
       icon: "linkedin",
       platform: "LinkedIn",
       urlAliases: ["Channel | LinkedIn | URL", "LinkedIn"],
-      followerAliases: ["Channel | LinkedIn | Followers"],
+      followerAliases: [
+        "Channel | LinkedIn | Followers",
+        "Channel | LinkedIn | Follower count",
+      ],
     },
     {
       icon: "youtube",
       platform: "YouTube",
       urlAliases: ["Channel | YouTube | URL", "YouTube"],
-      followerAliases: ["Channel | YouTube | Followers"],
+      followerAliases: [
+        "Channel | YouTube | Followers",
+        "Channel | YouTube | Follower count",
+      ],
     },
     {
       icon: "x",
       platform: "X / Twitter",
       urlAliases: ["Channel | x.com | URL", "X", "Twitter"],
-      followerAliases: ["Channel | x.com | Followers"],
+      followerAliases: [
+        "Channel | x.com | Followers",
+        "Channel | X | Followers",
+      ],
     },
     {
       icon: "newsletter",
@@ -148,36 +243,25 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
       followerAliases: ["Channel | Newsletter | Followers"],
     },
     {
-      icon: "podcast",
-      platform: "Podcast",
-      urlAliases: ["Channel | Podcast | URL", "Podcast"],
-      followerAliases: ["Channel | Podcast | Followers"],
-    },
-  ];
-
-  // Instagram / TikTok use same icon set loosely via x or youtube — map as x for IG? 
-  // ExpertChannelPresence icons are limited — skip IG/TikTok or map to youtube/x
-  const extra: typeof defs = [
-    {
-      icon: "youtube",
-      platform: "TikTok",
-      urlAliases: ["Channel | TikTok | URL", "TikTok"],
-      followerAliases: ["Channel | TikTok | Followers"],
-    },
-    {
-      icon: "x",
+      icon: "instagram",
       platform: "Instagram",
       urlAliases: ["Channel | Instagram | URL", "Instagram"],
       followerAliases: ["Channel | Instagram | Followers"],
     },
+    {
+      icon: "facebook",
+      platform: "Facebook",
+      urlAliases: ["Channel | Facebook | URL", "Facebook"],
+      followerAliases: ["Channel | Facebook | Followers"],
+    },
   ];
 
   const channels: ExpertChannelPresence[] = [];
-  for (const def of [...defs, ...extra]) {
-    const url = firstUrl(field(fields, ...def.urlAliases));
-    const followers = formatFollowers(
-      asNumber(field(fields, ...def.followerAliases)),
-    );
+  for (const def of defs) {
+    const rawUrl = firstUrl(field(fields, ...def.urlAliases));
+    const url =
+      rawUrl && urlMatchesPlatform(rawUrl, def.platform) ? rawUrl : null;
+    const followers = followerDisplay(field(fields, ...def.followerAliases));
     if (!url && !followers) continue;
     channels.push({
       icon: def.icon,

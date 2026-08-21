@@ -1,5 +1,13 @@
 export type ExpertChannel = {
-  type: "linkedin" | "youtube" | "podcast" | "x" | "tiktok";
+  type:
+    | "linkedin"
+    | "youtube"
+    | "podcast"
+    | "x"
+    | "tiktok"
+    | "instagram"
+    | "facebook"
+    | "newsletter";
   url: string;
 };
 
@@ -9,6 +17,9 @@ const EXPERT_CHANNEL_TYPES: ExpertChannel["type"][] = [
   "podcast",
   "x",
   "tiktok",
+  "instagram",
+  "facebook",
+  "newsletter",
 ];
 
 export function parseExpertChannels(value: unknown): ExpertChannel[] {

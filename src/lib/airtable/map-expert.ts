@@ -399,6 +399,9 @@ export function mapAirtableRecordToExpert(
     ["youtube", field(fields, "Channel | YouTube | URL", "YouTube")],
     ["x", field(fields, "Channel | x.com | URL", "X", "Twitter")],
     ["tiktok", field(fields, "Channel | TikTok | URL", "TikTok")],
+    ["instagram", field(fields, "Channel | Instagram | URL", "Instagram")],
+    ["facebook", field(fields, "Channel | Facebook | URL", "Facebook")],
+    ["newsletter", field(fields, "Channel | Newsletter | URL")],
     ["podcast", field(fields, "Channel | Podcast | URL", "Podcast")],
   ] as const) {
     const channel = channelFromUrl(type, value);

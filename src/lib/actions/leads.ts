@@ -50,10 +50,9 @@ export async function submitWaitlist(
 const briefSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1).max(120),
-  company: z.string().max(120).optional(),
-  phone: z.string().max(40).optional(),
+  company: z.string().min(1).max(120),
+  phone: z.string().min(1).max(40),
   role: z.string().max(120).optional(),
-  format: z.string().max(60).optional(),
   brief: z.string().min(1).max(5000),
   deliverables: z.string().max(5000).optional(),
 });
@@ -65,10 +64,9 @@ export async function submitBrief(
   const parsed = briefSchema.safeParse({
     email: formData.get("email"),
     name: formData.get("name"),
-    company: formData.get("company") || undefined,
-    phone: formData.get("phone") || undefined,
+    company: formData.get("company"),
+    phone: formData.get("phone"),
     role: formData.get("role") || undefined,
-    format: formData.get("format") || undefined,
     brief: formData.get("brief"),
     deliverables: formData.get("deliverables") || undefined,
   });
@@ -82,7 +80,6 @@ export async function submitBrief(
   const message = [
     parsed.data.phone ? `Phone: ${parsed.data.phone}` : null,
     parsed.data.role ? `Role: ${parsed.data.role}` : null,
-    parsed.data.format ? `Format: ${parsed.data.format}` : null,
     parsed.data.brief,
     parsed.data.deliverables
       ? `Deliverables:\n${parsed.data.deliverables}`

@@ -10,7 +10,15 @@ export type ExpertChannelPresence = {
   followers: string;
   growth90d: string;
   engagement: string;
-  icon: "linkedin" | "youtube" | "podcast" | "newsletter" | "x";
+  icon:
+    | "linkedin"
+    | "youtube"
+    | "podcast"
+    | "newsletter"
+    | "x"
+    | "instagram"
+    | "facebook"
+    | "tiktok";
   url?: string;
 };
 
@@ -1321,19 +1329,5 @@ export function isPositiveGrowth(value: string) {
 
 export function channelPresenceUrl(channel: ExpertChannelPresence) {
   if (channel.url) return channel.url;
-
-  const handle = channel.handle.replace(/^@/, "").split(/\s|\//)[0] ?? "";
-
-  switch (channel.icon) {
-    case "linkedin":
-      return `https://www.linkedin.com/in/${handle || "company"}`;
-    case "youtube":
-      return `https://www.youtube.com/@${handle.replace(/\s+/g, "") || "channel"}`;
-    case "podcast":
-      return "https://open.spotify.com/";
-    case "newsletter":
-      return "https://substack.com/";
-    case "x":
-      return `https://x.com/${handle || "home"}`;
-  }
+  return undefined;
 }
