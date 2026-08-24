@@ -4,8 +4,14 @@ import type { HeroCastMember } from "@/components/home-2/hero-cast";
 import { SiteImage } from "@/components/site-image";
 import { cn } from "@/lib/utils";
 
-/** Skyline rhythm: size follows the person, so the marquee loop stays seamless. */
-const CARD_SIZES = [
+type CardSize = {
+  frame: string;
+  height: string;
+  name: string;
+};
+
+/** About page — clearer skyline range. */
+const CARD_SIZES_SKYLINE: readonly CardSize[] = [
   {
     frame: "w-[13.5rem] md:w-[15.75rem]",
     height: "h-[17.5rem] md:h-[22.5rem]",
@@ -31,7 +37,36 @@ const CARD_SIZES = [
     height: "h-[18.25rem] md:h-[24rem]",
     name: "text-[1.125rem]",
   },
-] as const;
+];
+
+/** Homepage hero — same language, softer height swings. */
+const CARD_SIZES_SUBTLE: readonly CardSize[] = [
+  {
+    frame: "w-[12rem] md:w-[13.5rem]",
+    height: "h-[16rem] md:h-[18.75rem]",
+    name: "text-[1rem] md:text-[1.0625rem]",
+  },
+  {
+    frame: "w-[14.25rem] md:w-[16rem]",
+    height: "h-[18.75rem] md:h-[22.25rem]",
+    name: "text-[1.0625rem] md:text-[1.125rem]",
+  },
+  {
+    frame: "w-[11.25rem] md:w-[12.5rem]",
+    height: "h-[14.75rem] md:h-[17.25rem]",
+    name: "text-[0.975rem] md:text-[1.0625rem]",
+  },
+  {
+    frame: "w-[13.25rem] md:w-[14.75rem]",
+    height: "h-[17.5rem] md:h-[20.5rem]",
+    name: "text-[1.0625rem]",
+  },
+  {
+    frame: "w-[15rem] md:w-[16.75rem]",
+    height: "h-[19.5rem] md:h-[23.5rem]",
+    name: "text-[1.125rem]",
+  },
+];
 
 function padBase<T>(items: readonly T[], min = 8): T[] {
   if (items.length === 0) return [];
@@ -44,18 +79,30 @@ function padBase<T>(items: readonly T[], min = 8): T[] {
 
 export function AboutRosterRail({
   members,
+  sizeScale = "skyline",
+  className,
 }: {
   members: readonly HeroCastMember[];
+  /** `skyline` = About page drama; `subtle` = homepage soft mix. */
+  sizeScale?: "skyline" | "subtle";
+  className?: string;
 }) {
   const original = members.filter((member) => member.name.trim());
   const base = padBase(original);
   const loop = [...base, ...base];
+  const sizes = sizeScale === "subtle" ? CARD_SIZES_SUBTLE : CARD_SIZES_SKYLINE;
+  const trackClass =
+    sizeScale === "subtle" ? "cast-marquee-track" : "about-roster-track";
 
   if (original.length === 0) return null;
 
   return (
     <div
-      className="cast-marquee-window relative mt-12 w-full overflow-hidden"
+      className={cn(
+        "cast-marquee-window relative w-full overflow-hidden",
+        sizeScale === "skyline" ? "mt-12 pt-3" : "pt-3",
+        className,
+      )}
       aria-label="Featured creators"
     >
       <div
@@ -66,17 +113,27 @@ export function AboutRosterRail({
         aria-hidden
         className="pointer-events-none absolute inset-y-0 right-0 z-20 w-10 bg-linear-to-l from-cream via-cream/80 to-transparent md:w-16 lg:w-24"
       />
-      <ul className="about-roster-track flex w-max items-end gap-3 md:gap-4">
+      <ul
+        className={cn(
+          "flex w-max items-end gap-3 md:gap-4",
+          trackClass,
+        )}
+      >
         {loop.map((member, index) => {
           const sourceIndex = index % original.length;
-          const size = CARD_SIZES[sourceIndex % CARD_SIZES.length];
+          const size = sizes[sourceIndex % sizes.length]!;
           const imageSrc =
             member.image?.trim() || "/images/creator-placeholder.png";
           return (
             <li
               key={`${member.id}-${index}`}
               aria-hidden={index >= original.length || undefined}
-              className={cn("relative shrink-0", size.frame)}
+              className={cn(
+                "relative shrink-0 origin-bottom transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                "hover:z-10 hover:-translate-y-2 hover:scale-[1.03]",
+                "focus-within:z-10 focus-within:-translate-y-2 focus-within:scale-[1.03]",
+                size.frame,
+              )}
             >
               <Link
                 href={`/roster/${member.slug}`}
@@ -90,7 +147,7 @@ export function AboutRosterRail({
                     alt=""
                     fill
                     sizes="360px"
-                    className="object-cover object-[center_16%] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+                    className="object-cover object-[center_16%]"
                   />
                   <span
                     aria-hidden

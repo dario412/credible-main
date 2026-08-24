@@ -71,6 +71,8 @@ export type HomePageSections = {
     stats: Array<{ value: string; detail: string }>;
   };
   keyStudy: {
+    logoSrc: string;
+    logoAlt: string;
     headline: string;
     headlineAccent: string;
     summary: string;
@@ -181,6 +183,8 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
     ],
   },
   keyStudy: {
+    logoSrc: "/brand/clients/notion-lockup.png",
+    logoAlt: "Notion",
     headline: "How Notion built B2B's defining founder series —",
     headlineAccent: "without a studio.",
     summary:
@@ -430,6 +434,8 @@ function mergeKeyStudy(raw: unknown): HomePageSections["keyStudy"] {
   >;
   const metricsRaw = Array.isArray(data.metrics) ? data.metrics : [];
   return {
+    logoSrc: asString(data.logoSrc, defaults.logoSrc),
+    logoAlt: asString(data.logoAlt, defaults.logoAlt),
     headline: asString(data.headline, defaults.headline),
     headlineAccent: asString(data.headlineAccent, defaults.headlineAccent),
     summary: asString(data.summary, defaults.summary),

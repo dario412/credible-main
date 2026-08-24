@@ -282,6 +282,29 @@ export function HomePageEditorForm({
 
       <section className="space-y-4">
         <h2 className="font-display text-xl">Key case study</h2>
+        <MediaField
+          label="Client logo"
+          hint={TRUSTED_BY_LOGO_HINT}
+          value={sections.keyStudy.logoSrc}
+          onChange={(logoSrc) =>
+            patch("keyStudy", {
+              ...sections.keyStudy,
+              logoSrc,
+            })
+          }
+        />
+        <Field label="Logo name (alt text)" id="ks-logo-alt">
+          <TextInput
+            id="ks-logo-alt"
+            value={sections.keyStudy.logoAlt}
+            onChange={(e) =>
+              patch("keyStudy", {
+                ...sections.keyStudy,
+                logoAlt: e.target.value,
+              })
+            }
+          />
+        </Field>
         <Field label="Headline" id="ks-headline">
           <TextArea
             id="ks-headline"

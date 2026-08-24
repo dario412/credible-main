@@ -47,6 +47,7 @@ type EditTarget =
   | "roster.cta"
   | "impact.headline"
   | `impact.stat.${number}`
+  | "keyStudy.logo"
   | "keyStudy.headline"
   | "keyStudy.summary"
   | "keyStudy.meta"
@@ -81,6 +82,7 @@ function targetTitle(target: EditTarget): string {
     "roster.subhead": "Roster supporting line",
     "roster.cta": "Roster button",
     "impact.headline": "Impact headline",
+    "keyStudy.logo": "Case study logo",
     "keyStudy.headline": "Case study headline",
     "keyStudy.summary": "Case study summary",
     "keyStudy.meta": "Case study meta",
@@ -466,6 +468,34 @@ function EditorPopover({
                   );
                   patch("impact", { ...sections.impact, stats });
                 }}
+              />
+            </Field>
+          </>
+        ) : null}
+
+        {target === "keyStudy.logo" ? (
+          <>
+            <MediaField
+              label="Client logo"
+              hint={TRUSTED_BY_LOGO_HINT}
+              value={sections.keyStudy.logoSrc}
+              onChange={(logoSrc) =>
+                patch("keyStudy", {
+                  ...sections.keyStudy,
+                  logoSrc,
+                })
+              }
+            />
+            <Field label="Logo name (alt text)" id="ks-logo-alt">
+              <TextInput
+                id="ks-logo-alt"
+                value={sections.keyStudy.logoAlt}
+                onChange={(e) =>
+                  patch("keyStudy", {
+                    ...sections.keyStudy,
+                    logoAlt: e.target.value,
+                  })
+                }
               />
             </Field>
           </>
@@ -1738,6 +1768,15 @@ export function HomeVisualEditor({
         editSlots={
           editing
             ? {
+                logo: (node) =>
+                  hit(
+                    editing,
+                    "keyStudy.logo",
+                    target,
+                    setTarget,
+                    "case study logo",
+                    node,
+                  ),
                 headline: (node) =>
                   hit(
                     editing,

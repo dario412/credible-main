@@ -262,12 +262,12 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
     const url =
       rawUrl && urlMatchesPlatform(rawUrl, def.platform) ? rawUrl : null;
     const followers = followerDisplay(field(fields, ...def.followerAliases));
-    if (!url && !followers) continue;
+    if (!followers) continue;
     channels.push({
       icon: def.icon,
       platform: def.platform,
       handle: url ? handleFromUrl(url, def.platform) : def.platform,
-      followers: followers ?? "—",
+      followers,
       growth90d: "—",
       engagement: "—",
       url: url ?? undefined,

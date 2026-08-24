@@ -79,6 +79,14 @@ function applyAirtableFormatDescriptions(
   });
 }
 
+function hasFollowerCount(value?: string | null): boolean {
+  const t = value?.trim();
+  if (!t || t === "—" || t === "-" || /^n\/?a$/i.test(t)) return false;
+  const numeric = Number(t.replace(/,/g, "").replace(/[kmb+%]/gi, ""));
+  if (Number.isFinite(numeric) && numeric <= 0) return false;
+  return /\d/.test(t);
+}
+
 function mergeProfileContent(
   extras: ProfileExtras,
   enrichment: ExpertProfileEnrichment,
@@ -102,10 +110,7 @@ function mergeProfileContent(
       ) {
         return false;
       }
-      return (
-        Boolean(channel.url) ||
-        (Boolean(channel.followers?.trim()) && channel.followers !== "—")
-      );
+      return hasFollowerCount(channel.followers);
     }) ?? [];
   const topicShares =
     sections?.topicShares?.length

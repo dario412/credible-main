@@ -85,6 +85,7 @@ function FullKeyStudy({
 }: {
   content: HomePageSections["keyStudy"];
   editSlots?: {
+    logo?: (node: ReactNode) => ReactNode;
     headline?: (node: ReactNode) => ReactNode;
     summary?: (node: ReactNode) => ReactNode;
     meta?: (node: ReactNode) => ReactNode;
@@ -92,6 +93,18 @@ function FullKeyStudy({
     metric?: (index: number, node: ReactNode) => ReactNode;
   };
 }) {
+  const logoSrc = content.logoSrc.trim();
+  const logoNode = logoSrc ? (
+    <img
+      src={logoSrc}
+      alt={content.logoAlt.trim() || "Client"}
+      className="h-7 w-auto object-contain md:h-8"
+    />
+  ) : editSlots?.logo ? (
+    <p className="rounded-sm border border-dashed border-charcoal/20 px-4 py-3 text-[0.8125rem] text-charcoal/45">
+      Client logo hidden
+    </p>
+  ) : null;
   const headlineNode = (
     <h2 className="font-display text-[1.85rem] leading-[1.08] tracking-tight text-charcoal sm:text-[2.15rem] md:text-[2.45rem]">
       {content.headline}{" "}
@@ -139,11 +152,9 @@ function FullKeyStudy({
   return (
     <section className="bg-cream-dark px-6 py-12 md:px-10 md:py-14 lg:px-12 lg:py-16">
       <div className="mx-auto max-w-352">
-        <img
-          src="/brand/clients/notion-lockup.png"
-          alt="Notion"
-          className="h-7 w-auto object-contain md:h-8"
-        />
+        {editSlots?.logo && logoNode
+          ? editSlots.logo(logoNode)
+          : logoNode}
 
         <div className="mt-7 grid gap-10 border-b border-charcoal/12 pb-10 md:mt-8 md:gap-12 md:pb-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start lg:gap-14 xl:gap-20">
           <div className="max-w-2xl">
@@ -273,6 +284,7 @@ export function KeyStudy({
   variant?: "boxed" | "full";
   content?: HomePageSections["keyStudy"];
   editSlots?: {
+    logo?: (node: ReactNode) => ReactNode;
     headline?: (node: ReactNode) => ReactNode;
     summary?: (node: ReactNode) => ReactNode;
     meta?: (node: ReactNode) => ReactNode;
