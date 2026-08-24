@@ -59,10 +59,14 @@ export function RosterCard({ expert }: { expert: RosterCardExpert }) {
         )}
         style={{ transitionTimingFunction: EASE }}
       >
-        <div className="relative aspect-4/3 overflow-hidden rounded-sm bg-[#E4EBE6]">
+        <Link
+          href={`/roster/${expert.slug}`}
+          className="relative block aspect-4/3 overflow-hidden rounded-sm bg-[#E4EBE6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+          aria-label={`View ${expert.name}'s profile`}
+        >
           <Image
             src={imageSrc}
-            alt={expert.name}
+            alt=""
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
@@ -91,7 +95,7 @@ export function RosterCard({ expert }: { expert: RosterCardExpert }) {
               {formatLabel(expert.role)}
             </span>
           ) : null}
-        </div>
+        </Link>
 
         <CardBody expert={expert} />
 
