@@ -67,7 +67,7 @@ export default async function CaseStudiesPage({
 
   return (
     <>
-      <section className="px-6 pt-16 pb-12 md:px-10 md:pt-20 md:pb-14 lg:px-12 lg:pt-24 lg:pb-16">
+      <section className="px-6 pt-16 pb-0 md:px-10 md:pt-20 lg:px-12 lg:pt-24">
         <div className="mx-auto max-w-352">
           <h1 className="max-w-[16ch] font-display text-[2.6rem] leading-[1.05] tracking-tight text-charcoal sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.15rem]">
             Work that ran, and
