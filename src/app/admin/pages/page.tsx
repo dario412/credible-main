@@ -43,7 +43,8 @@ const pages: {
   {
     slug: "case-studies",
     title: "Case studies",
-    description: "FAQ accordion under All stories on /case-studies.",
+    description:
+      "Intro, All stories heading, and FAQ accordion on /case-studies.",
   },
   {
     slug: "about",

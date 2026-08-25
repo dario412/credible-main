@@ -34,12 +34,19 @@ export default async function AdminCaseStudiesPageEditor() {
         </Link>
         <h1 className="mt-3 font-display text-3xl">Case studies</h1>
         <p className="mt-2 text-sm text-muted">
-          FAQ under All stories on{" "}
+          Intro, All stories heading, and FAQ on{" "}
           <a
             href="/case-studies"
             className="font-medium text-forest hover:text-forest-dark"
           >
             /case-studies
+          </a>
+          . Or edit live with{" "}
+          <a
+            href="/case-studies"
+            className="font-medium text-forest hover:text-forest-dark"
+          >
+            Edit page
           </a>
           .
         </p>

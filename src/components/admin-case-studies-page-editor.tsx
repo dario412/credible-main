@@ -29,13 +29,25 @@ export function CaseStudiesPageEditorForm({
     setPending(false);
   }
 
+  function setHero(hero: CaseStudiesPageSections["hero"]) {
+    setSections({ ...sections, hero });
+  }
+
+  function setArchive(archive: CaseStudiesPageSections["archive"]) {
+    setSections({ ...sections, archive });
+  }
+
+  function setFaq(faq: CaseStudiesPageSections["faq"]) {
+    setSections({ ...sections, faq });
+  }
+
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-10">
       <section className="space-y-4">
         <div>
-          <h2 className="font-display text-xl">FAQ</h2>
+          <h2 className="font-display text-xl">Intro</h2>
           <p className="mt-1 text-sm text-muted">
-            Accordion under All stories on{" "}
+            Headline and supporting line at the top of{" "}
             <a
               href="/case-studies"
               className="font-medium text-forest hover:text-forest-dark"
@@ -45,15 +57,112 @@ export function CaseStudiesPageEditorForm({
             .
           </p>
         </div>
+        <Field
+          label="Headline"
+          id="cs-hero-headline"
+          hint="First line of the title."
+        >
+          <TextInput
+            id="cs-hero-headline"
+            value={sections.hero.headline}
+            onChange={(e) =>
+              setHero({ ...sections.hero, headline: e.target.value })
+            }
+          />
+        </Field>
+        <Field
+          label="Headline continued"
+          id="cs-hero-continued"
+          hint="Second-line lead-in before the green accent."
+        >
+          <TextInput
+            id="cs-hero-continued"
+            value={sections.hero.headlineContinued}
+            onChange={(e) =>
+              setHero({ ...sections.hero, headlineContinued: e.target.value })
+            }
+          />
+        </Field>
+        <Field
+          label="Headline accent"
+          id="cs-hero-accent"
+          hint="Forest-green end of the title (e.g. next.)."
+        >
+          <TextInput
+            id="cs-hero-accent"
+            value={sections.hero.headlineAccent}
+            onChange={(e) =>
+              setHero({ ...sections.hero, headlineAccent: e.target.value })
+            }
+          />
+        </Field>
+        <Field label="Supporting line" id="cs-hero-subhead">
+          <TextArea
+            id="cs-hero-subhead"
+            rows={3}
+            value={sections.hero.subhead}
+            onChange={(e) =>
+              setHero({ ...sections.hero, subhead: e.target.value })
+            }
+          />
+        </Field>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">All stories</h2>
+          <p className="mt-1 text-sm text-muted">
+            Archive heading and empty states under the featured cards.
+          </p>
+        </div>
+        <Field label="Section headline" id="cs-archive-headline">
+          <TextInput
+            id="cs-archive-headline"
+            value={sections.archive.headline}
+            onChange={(e) =>
+              setArchive({ ...sections.archive, headline: e.target.value })
+            }
+          />
+        </Field>
+        <Field
+          label="Empty — catalogue has featured only"
+          id="cs-archive-empty-filtered"
+        >
+          <TextInput
+            id="cs-archive-empty-filtered"
+            value={sections.archive.emptyFiltered}
+            onChange={(e) =>
+              setArchive({
+                ...sections.archive,
+                emptyFiltered: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Empty — no case studies" id="cs-archive-empty-none">
+          <TextInput
+            id="cs-archive-empty-none"
+            value={sections.archive.emptyNone}
+            onChange={(e) =>
+              setArchive({ ...sections.archive, emptyNone: e.target.value })
+            }
+          />
+        </Field>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">FAQ</h2>
+          <p className="mt-1 text-sm text-muted">
+            Accordion under All stories.
+          </p>
+        </div>
         <Field label="Eyebrow" id="cs-faq-eyebrow">
           <TextInput
             id="cs-faq-eyebrow"
             value={sections.faq.eyebrow}
             onChange={(e) =>
-              setSections({
-                ...sections,
-                faq: { ...sections.faq, eyebrow: e.target.value },
-              })
+              setFaq({ ...sections.faq, eyebrow: e.target.value })
             }
           />
         </Field>
@@ -62,10 +171,7 @@ export function CaseStudiesPageEditorForm({
             id="cs-faq-headline"
             value={sections.faq.headline}
             onChange={(e) =>
-              setSections({
-                ...sections,
-                faq: { ...sections.faq, headline: e.target.value },
-              })
+              setFaq({ ...sections.faq, headline: e.target.value })
             }
           />
         </Field>
@@ -75,10 +181,7 @@ export function CaseStudiesPageEditorForm({
             rows={3}
             value={sections.faq.subhead}
             onChange={(e) =>
-              setSections({
-                ...sections,
-                faq: { ...sections.faq, subhead: e.target.value },
-              })
+              setFaq({ ...sections.faq, subhead: e.target.value })
             }
           />
         </Field>
@@ -92,12 +195,9 @@ export function CaseStudiesPageEditorForm({
               <button
                 type="button"
                 onClick={() =>
-                  setSections({
-                    ...sections,
-                    faq: {
-                      ...sections.faq,
-                      items: sections.faq.items.filter((_, i) => i !== index),
-                    },
+                  setFaq({
+                    ...sections.faq,
+                    items: sections.faq.items.filter((_, i) => i !== index),
                   })
                 }
                 className="text-xs font-medium text-danger hover:underline"
@@ -113,10 +213,7 @@ export function CaseStudiesPageEditorForm({
                   const items = sections.faq.items.map((row, i) =>
                     i === index ? { ...row, q: e.target.value } : row,
                   );
-                  setSections({
-                    ...sections,
-                    faq: { ...sections.faq, items },
-                  });
+                  setFaq({ ...sections.faq, items });
                 }}
               />
             </Field>
@@ -129,10 +226,7 @@ export function CaseStudiesPageEditorForm({
                   const items = sections.faq.items.map((row, i) =>
                     i === index ? { ...row, a: e.target.value } : row,
                   );
-                  setSections({
-                    ...sections,
-                    faq: { ...sections.faq, items },
-                  });
+                  setFaq({ ...sections.faq, items });
                 }}
               />
             </Field>
@@ -141,12 +235,9 @@ export function CaseStudiesPageEditorForm({
         <button
           type="button"
           onClick={() =>
-            setSections({
-              ...sections,
-              faq: {
-                ...sections.faq,
-                items: [...sections.faq.items, emptyCaseStudiesFaqItem()],
-              },
+            setFaq({
+              ...sections.faq,
+              items: [...sections.faq.items, emptyCaseStudiesFaqItem()],
             })
           }
           className="text-sm font-medium text-forest hover:text-forest-dark"
