@@ -215,7 +215,6 @@ function BoxedBrief({
     quote?: (node: ReactNode) => ReactNode;
     formTitle?: (node: ReactNode) => ReactNode;
     formFootnote?: (node: ReactNode) => ReactNode;
-    briefedBy?: (node: ReactNode) => ReactNode;
   };
 }) {
   const eyebrowNode = <SectionEyebrow>{content.eyebrow}</SectionEyebrow>;
@@ -270,7 +269,7 @@ function BoxedBrief({
     </figure>
   );
   const formTitleNode = (
-    <p className="mb-3 font-display text-[1.05rem] leading-tight tracking-tight text-charcoal md:text-[1.15rem]">
+    <p className="mb-5 font-display text-[1.15rem] leading-tight tracking-tight text-charcoal md:text-[1.25rem]">
       {content.formTitle}
     </p>
   );
@@ -281,43 +280,6 @@ function BoxedBrief({
   ) : editSlots?.formFootnote ? (
     <p className="mt-3 rounded-sm border border-dashed border-charcoal/20 px-4 py-3 text-center text-[0.72rem] text-charcoal/45">
       Form footnote hidden
-    </p>
-  ) : null;
-  const logos = content.briefedByLogos.filter(
-    (brand) => brand.name.trim() || brand.src.trim(),
-  );
-  const showBriefedBy = content.briefedByLabel.trim() || logos.length > 0;
-  const briefedByNode = showBriefedBy ? (
-    <div className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2.5 border-t border-charcoal/10 pt-5">
-      {content.briefedByLabel.trim() ? (
-        <p className="shrink-0 text-[0.68rem] font-medium tracking-[0.12em] text-charcoal/40 uppercase">
-          {content.briefedByLabel}
-        </p>
-      ) : null}
-      {logos.length > 0 ? (
-        <ul className="flex flex-wrap items-center gap-x-5 gap-y-3">
-          {logos.map((brand, index) => (
-            <li key={`${brand.name}-${index}`} className="flex h-4 items-center">
-              <span className="sr-only">{brand.name}</span>
-              {brand.src ? (
-                <img
-                  src={brand.src}
-                  alt=""
-                  className="h-[0.95rem] w-auto object-contain brightness-0 opacity-55 md:h-[1.05rem]"
-                />
-              ) : (
-                <span className="text-[0.72rem] font-medium text-charcoal/45">
-                  {brand.name}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </div>
-  ) : editSlots?.briefedBy ? (
-    <p className="mt-7 rounded-sm border border-dashed border-charcoal/20 px-4 py-3 text-[0.8125rem] text-charcoal/45">
-      Briefed-by strip hidden
     </p>
   ) : null;
 
@@ -353,7 +315,7 @@ function BoxedBrief({
               {editSlots?.quote ? editSlots.quote(quoteNode) : quoteNode}
             </div>
 
-            <div className="rounded-sm bg-cream px-5 py-5 shadow-[0_20px_50px_rgba(28,26,23,0.22)] sm:px-6 sm:py-6">
+            <div className="rounded-sm bg-cream px-6 py-7 shadow-[0_20px_50px_rgba(28,26,23,0.22)] sm:px-7 sm:py-8 md:px-8 md:py-9">
               {editSlots?.formTitle
                 ? editSlots.formTitle(formTitleNode)
                 : formTitleNode}
@@ -362,12 +324,6 @@ function BoxedBrief({
                 ? editSlots.formFootnote(formFootnoteNode)
                 : content.formFootnote.trim()
                   ? formFootnoteNode
-                  : null}
-
-              {editSlots?.briefedBy && briefedByNode
-                ? editSlots.briefedBy(briefedByNode)
-                : showBriefedBy
-                  ? briefedByNode
                   : null}
             </div>
           </div>
@@ -394,7 +350,6 @@ export function BrandBrief({
     quote?: (node: ReactNode) => ReactNode;
     formTitle?: (node: ReactNode) => ReactNode;
     formFootnote?: (node: ReactNode) => ReactNode;
-    briefedBy?: (node: ReactNode) => ReactNode;
   };
   creatorCtaEditSlots?: {
     eyebrow?: (node: ReactNode) => ReactNode;

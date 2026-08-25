@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { CaseStudyBlockEditor } from "@/components/case-study-block-editor";
 import { MediaField } from "@/components/media-library";
@@ -17,6 +17,11 @@ import {
 } from "@/lib/case-study-content";
 import { cn } from "@/lib/utils";
 
+export type CaseStudySpeakerOption = {
+  slug: string;
+  name: string;
+};
+
 function initialBlocks(card: CaseStudyCard): CaseStudyBlock[] {
   if (card.blocks && card.blocks.length > 0) {
     return ensureBlockIds(card.blocks);
@@ -24,14 +29,111 @@ function initialBlocks(card: CaseStudyCard): CaseStudyBlock[] {
   return legacyStoryToBlocks(card);
 }
 
+function SpeakersField({
+  speakers,
+  selected,
+  onChange,
+}: {
+  speakers: CaseStudySpeakerOption[];
+  selected: string[];
+  onChange: (next: string[]) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const selectedSet = useMemo(() => new Set(selected), [selected]);
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return speakers;
+    return speakers.filter(
+      (speaker) =>
+        speaker.name.toLowerCase().includes(q) ||
+        speaker.slug.toLowerCase().includes(q),
+    );
+  }, [speakers, query]);
+
+  function toggle(slug: string) {
+    if (selectedSet.has(slug)) {
+      onChange(selected.filter((item) => item !== slug));
+      return;
+    }
+    onChange([...selected, slug]);
+  }
+
+  return (
+    <Field
+      label="Speakers"
+      id="speakers"
+      hint="Link one or more roster creators. Their profile Recent work section will show this case."
+    >
+      <div className="space-y-2">
+        <TextInput
+          id="speakers-search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search roster…"
+        />
+        <div
+          id="speakers"
+          className="max-h-56 space-y-1 overflow-y-auto border border-charcoal/30 bg-white px-3 py-2"
+        >
+          {filtered.map((speaker) => {
+            const checked = selectedSet.has(speaker.slug);
+            return (
+              <label
+                key={speaker.slug}
+                className="flex cursor-pointer items-center gap-2 rounded-sm px-1 py-1.5 text-sm text-charcoal hover:bg-cream-dark/60"
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggle(speaker.slug)}
+                />
+                <span className="min-w-0 flex-1 truncate">{speaker.name}</span>
+                <span className="shrink-0 text-[0.7rem] text-charcoal/40">
+                  {speaker.slug}
+                </span>
+              </label>
+            );
+          })}
+          {filtered.length === 0 ? (
+            <p className="px-1 py-2 text-sm text-charcoal/45">
+              No speakers match that search.
+            </p>
+          ) : null}
+        </div>
+        {selected.length > 0 ? (
+          <p className="text-xs text-charcoal/50">
+            {selected.length} selected
+            {selected.length <= 3
+              ? `: ${selected
+                  .map(
+                    (slug) =>
+                      speakers.find((speaker) => speaker.slug === slug)?.name ??
+                      slug,
+                  )
+                  .join(", ")}`
+              : ""}
+          </p>
+        ) : (
+          <p className="text-xs text-charcoal/45">Optional — none selected.</p>
+        )}
+      </div>
+    </Field>
+  );
+}
+
 export function CaseStudyEditorForm({
   initial,
+  speakers,
   saveAction,
 }: {
   initial: CaseStudyCard;
+  speakers: CaseStudySpeakerOption[];
   saveAction: typeof import("@/lib/actions/admin-cms").saveCaseStudy;
 }) {
-  const [card, setCard] = useState<CaseStudyCard>(initial);
+  const [card, setCard] = useState<CaseStudyCard>({
+    ...initial,
+    relatedExperts: initial.relatedExperts ?? [],
+  });
   const [blocks, setBlocks] = useState<CaseStudyBlock[]>(() =>
     initialBlocks(initial),
   );
@@ -55,6 +157,7 @@ export function CaseStudyEditorForm({
         (card.pillars && card.pillars[0]) ||
         card.pillar ||
         DEFAULT_CASE_STUDY_PILLAR,
+      relatedExperts: card.relatedExperts ?? [],
       blocks: ensureBlockIds(blocks),
     };
     const result = await saveAction(next, {
@@ -101,13 +204,13 @@ export function CaseStudyEditorForm({
           value={card.logo ?? ""}
           onChange={(logo) => setCard({ ...card, logo: logo || undefined })}
         />
-        <Field label="Period" id="period">
-          <TextInput
-            id="period"
-            value={card.period}
-            onChange={(e) => setCard({ ...card, period: e.target.value })}
+        <div className="md:col-span-2">
+          <SpeakersField
+            speakers={speakers}
+            selected={card.relatedExperts ?? []}
+            onChange={(relatedExperts) => setCard({ ...card, relatedExperts })}
           />
-        </Field>
+        </div>
         <Field label="Pillars" id="pillars">
           <div
             id="pillars"

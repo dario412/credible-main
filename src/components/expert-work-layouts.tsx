@@ -29,6 +29,7 @@ function workTypeLabel(meta: string) {
 }
 
 function workCover(item: ExpertRecentWork): string | null {
+  if (item.coverImage?.trim()) return item.coverImage.trim();
   if (!item.href?.startsWith("/case-studies/")) return null;
   const slug = item.href.replace(/^\/case-studies\//, "").replace(/\/$/, "");
   return getCaseStudy(slug)?.coverImage ?? null;

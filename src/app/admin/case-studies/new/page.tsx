@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import type { CaseStudyCard } from "@/lib/case-studies";
 import { DEFAULT_CASE_STUDY_PILLAR } from "@/lib/case-studies";
 import { hasPermission } from "@/lib/permissions";
+import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
@@ -26,6 +27,7 @@ const blank: CaseStudyCard = {
   industry: "",
   size: "",
   period: "",
+  relatedExperts: [],
   coverImage: "/images/case-studies/notion.jpg",
   featured: false,
   blocks: [],
@@ -35,6 +37,11 @@ export default async function AdminNewCaseStudyPage() {
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
   if (!hasPermission(session.user.role, "MANAGE_CONTENT")) redirect("/admin");
+
+  const speakers = await prisma.expert.findMany({
+    orderBy: { name: "asc" },
+    select: { slug: true, name: true },
+  });
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -47,7 +54,11 @@ export default async function AdminNewCaseStudyPage() {
         </Link>
         <h1 className="mt-3 font-display text-3xl">New case study</h1>
       </div>
-      <CaseStudyEditorForm initial={blank} saveAction={saveCaseStudy} />
+      <CaseStudyEditorForm
+        initial={blank}
+        speakers={speakers}
+        saveAction={saveCaseStudy}
+      />
     </div>
   );
 }

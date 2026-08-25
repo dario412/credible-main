@@ -661,6 +661,11 @@ export function caseStudyToCard(row: CaseStudyRow): CaseStudyCard {
     industry: row.industry || "",
     size: row.size || "",
     period: row.period || "",
+    relatedExperts: Array.isArray(row.relatedExperts)
+      ? row.relatedExperts.filter((slug) => typeof slug === "string" && slug.trim())
+      : data.ctaCreator?.slug
+        ? [data.ctaCreator.slug]
+        : [],
     coverImage: row.coverImage || data.coverImage || "/images/case-studies/notion.jpg",
     logo: data.logo ?? CASE_STUDY_LOGO,
     featured: row.featured || Boolean(data.featured),
@@ -681,6 +686,7 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
     industry,
     size,
     period,
+    relatedExperts,
     coverImage,
     featured,
     ...rest
@@ -689,6 +695,15 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
   const meta = [
     { label: "Client", value: client },
     { label: "Pillars used", value: pillars.join(" · ") },
+  ];
+
+  const speakers = [
+    ...new Set(
+      (relatedExperts ?? [])
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .concat(rest.ctaCreator?.slug ? [rest.ctaCreator.slug] : []),
+    ),
   ];
 
   return {
@@ -700,7 +715,7 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
     clientType,
     industry,
     size,
-    period,
+    period: period ?? "",
     coverImage,
     featured: Boolean(featured),
     data: {
@@ -708,6 +723,6 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
       pillars,
       meta: Array.isArray(rest.meta) && rest.meta.length > 0 ? rest.meta : meta,
     },
-    relatedExperts: rest.ctaCreator?.slug ? [rest.ctaCreator.slug] : [],
+    relatedExperts: speakers,
   };
 }

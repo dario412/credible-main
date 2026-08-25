@@ -68,6 +68,7 @@ export type ExpertRecentWork = {
   title: string;
   description: string;
   href?: string;
+  coverImage?: string;
   tone: "forest" | "rust" | "sage";
 };
 

@@ -21,11 +21,14 @@ export function BriefForm({
   formFootnote,
   omitFootnote = false,
   fillHeight = false,
+  spacious = false,
 }: {
   surface?: "dark" | "light";
   formFootnote?: string;
   omitFootnote?: boolean;
   fillHeight?: boolean;
+  /** Extra room between fields — used on /contact. */
+  spacious?: boolean;
 }) {
   const [state, action, pending] = useActionState(submitBrief, initial);
   const light = surface === "light";
@@ -43,23 +46,34 @@ export function BriefForm({
   }
 
   const fieldShell = light
-    ? "w-full rounded-sm border border-forest/40 bg-[#FBF8F5] px-2.5 text-[0.8125rem] text-charcoal outline-none transition-colors placeholder:text-charcoal/45 focus:border-forest focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-forest"
-    : "w-full rounded-sm border border-cream/25 bg-cream/5 px-2.5 text-[0.8125rem] text-cream outline-none transition-colors placeholder:text-cream/35 focus:border-cream focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-cream";
-  const inputClass = cn(fieldShell, "h-8 leading-none");
-  const textareaClass = cn(fieldShell, "min-h-0 resize-none py-1.5 leading-snug");
+    ? "w-full rounded-sm border border-forest/40 bg-white px-3.5 text-[0.9375rem] text-charcoal outline-none transition-colors placeholder:text-charcoal/45 focus:border-forest focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-forest"
+    : "w-full rounded-sm border border-cream/25 bg-cream/5 px-3.5 text-[0.9375rem] text-cream outline-none transition-colors placeholder:text-cream/35 focus:border-cream focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-cream";
+  const inputClass = cn(
+    fieldShell,
+    spacious ? "h-12 leading-none" : "h-11 leading-none",
+  );
+  const textareaClass = cn(
+    fieldShell,
+    spacious
+      ? "min-h-28 resize-y py-3.5 leading-relaxed"
+      : "min-h-24 resize-y py-3 leading-relaxed",
+  );
 
   const labelClass = light
-    ? "block text-[0.7rem] font-medium leading-none text-charcoal"
-    : "block text-[0.7rem] font-medium leading-none text-cream/75";
+    ? "block text-[0.8125rem] font-medium leading-none text-charcoal"
+    : "block text-[0.8125rem] font-medium leading-none text-cream/75";
 
   const optionalClass = light ? "text-charcoal/40" : "text-cream/45";
-  const fieldClass = "space-y-1";
+  const fieldClass = spacious ? "space-y-2.5" : "space-y-2";
 
   return (
     <form
       action={action}
       onSubmit={stampPeptalkFields}
-      className={cn(fillHeight && "flex h-full flex-col", "space-y-2.5")}
+      className={cn(
+        fillHeight && "flex h-full flex-col",
+        spacious ? "space-y-6" : "space-y-5",
+      )}
     >
       <input
         ref={trackingRef}
@@ -73,7 +87,7 @@ export function BriefForm({
         name="peptalkContext"
         defaultValue="{}"
       />
-      <div className={cn("grid gap-2.5 sm:grid-cols-2", fillHeight && "flex-1")}>
+      <div className={cn("grid sm:grid-cols-2", spacious ? "gap-5" : "gap-4", fillHeight && "flex-1")}>
         <div className={fieldClass}>
           <label htmlFor={`${id}-name`} className={labelClass}>
             Name
@@ -149,7 +163,7 @@ export function BriefForm({
             id={`${id}-message`}
             name="brief"
             required
-            rows={2}
+            rows={spacious ? 4 : 3}
             placeholder="Audience, ambition, deadline, budget shape."
             className={textareaClass}
           />
@@ -162,19 +176,20 @@ export function BriefForm({
           <textarea
             id={`${id}-deliverables`}
             name="deliverables"
-            rows={2}
+            rows={spacious ? 4 : 3}
             placeholder="What you need delivered, and by when."
             className={textareaClass}
           />
         </div>
       </div>
 
-      <div className={fillHeight ? "mt-auto" : undefined}>
+      <div className={cn(fillHeight ? "mt-auto" : undefined, spacious ? "pt-2" : "pt-1")}>
         <button
           type="submit"
           disabled={pending}
           className={cn(
-            "inline-flex w-full items-center justify-center gap-2 rounded-sm border px-6 py-2.5 text-[0.8125rem] font-medium transition-colors disabled:opacity-60",
+            "inline-flex w-full items-center justify-center gap-2 rounded-sm border px-6 font-medium transition-colors disabled:opacity-60",
+            spacious ? "py-4 text-base" : "py-3.5 text-[0.9375rem]",
             light
               ? "border-forest bg-forest text-cream hover:border-forest-dark hover:bg-forest-dark"
               : "border-cream bg-cream text-charcoal hover:bg-cream-dark",
@@ -184,7 +199,7 @@ export function BriefForm({
           <ArrowIcon className="size-3.5 shrink-0" />
         </button>
         {light && !omitFootnote && formFootnote?.trim() ? (
-          <p className="mt-3 text-center text-[0.72rem] leading-snug text-charcoal/45">
+          <p className="mt-4 text-center text-[0.8125rem] leading-snug text-charcoal/45">
             {formFootnote}
           </p>
         ) : null}

@@ -58,15 +58,21 @@ export function TrustedBy({
       <div className="mx-auto max-w-352 overflow-visible rounded-sm bg-charcoal px-6 py-6 md:px-10 md:py-10 lg:px-12 lg:py-12">
         <ul className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:grid-cols-5 md:gap-x-8 md:gap-y-14">
           {clients.map((client, index) => {
-            const story = hasTrustedByStory(client);
+            const hasTestimonial = hasTrustedByStory(client);
             const testimonial = client.testimonial;
-            const storyHref = client.caseStudySlug
-              ? `/case-studies/${client.caseStudySlug}`
+            const storyHref = client.caseStudySlug.trim()
+              ? `/case-studies/${client.caseStudySlug.trim()}`
               : null;
+            const showStoryPill = Boolean(storyHref) || hasTestimonial;
+            const logo = (
+              <span className="flex h-6 w-full max-w-[9.5rem] items-center justify-center md:h-7">
+                <BrandMark client={client} />
+              </span>
+            );
 
             const item = (
               <li className="group relative flex flex-col items-center gap-3">
-                {story && testimonial ? (
+                {hasTestimonial && testimonial ? (
                   <div
                     className="pointer-events-none absolute bottom-[calc(100%+0.75rem)] left-1/2 z-20 w-[min(18.5rem,calc(100vw-3rem))] -translate-x-1/2 scale-[0.96] opacity-0 transition-all duration-300 ease-out group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:scale-100 group-focus-within:opacity-100"
                     role="tooltip"
@@ -107,30 +113,40 @@ export function TrustedBy({
                   </div>
                 ) : null}
 
-                <span className="flex h-6 w-full max-w-[9.5rem] items-center justify-center md:h-7">
-                  <BrandMark client={client} />
-                </span>
-
-                {story && storyHref && !disableStoryLinks ? (
+                {storyHref && !disableStoryLinks ? (
                   <Link
                     href={storyHref}
-                    className="inline-flex items-center overflow-hidden rounded-full bg-cream/10 px-2.5 py-1 text-[10px] font-medium tracking-wide text-cream/80 transition-colors duration-200 hover:bg-cream/16 hover:text-cream focus-visible:bg-cream/16 focus-visible:text-cream focus-visible:outline-none"
+                    className="flex h-6 w-full max-w-[9.5rem] items-center justify-center transition-opacity hover:opacity-80 md:h-7"
+                    aria-label={`${client.name} case study`}
                   >
-                    <span className="relative inline-grid grid-cols-1 grid-rows-1 items-center justify-items-center">
-                      <span className="col-start-1 row-start-1 inline-flex items-center gap-1 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1.5 group-hover:opacity-0">
-                        <span className="whitespace-nowrap">Customer story</span>
-                        <ArrowIcon className="size-2.5 shrink-0" />
-                      </span>
-                      <span className="col-start-1 row-start-1 inline-flex -translate-x-1.5 items-center gap-1 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:opacity-100">
-                        <ArrowIcon className="size-2.5 shrink-0" />
-                        <span className="whitespace-nowrap">Customer story</span>
-                      </span>
-                    </span>
+                    <BrandMark client={client} />
                   </Link>
-                ) : story ? (
-                  <span className="inline-flex items-center rounded-full bg-cream/10 px-2.5 py-1 text-[10px] font-medium tracking-wide text-cream/80">
-                    Customer story
-                  </span>
+                ) : (
+                  logo
+                )}
+
+                {showStoryPill ? (
+                  storyHref && !disableStoryLinks ? (
+                    <Link
+                      href={storyHref}
+                      className="inline-flex items-center overflow-hidden rounded-full bg-cream/10 px-2.5 py-1 text-[10px] font-medium tracking-wide text-cream/80 transition-colors duration-200 hover:bg-cream/16 hover:text-cream focus-visible:bg-cream/16 focus-visible:text-cream focus-visible:outline-none"
+                    >
+                      <span className="relative inline-grid grid-cols-1 grid-rows-1 items-center justify-items-center">
+                        <span className="col-start-1 row-start-1 inline-flex items-center gap-1 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1.5 group-hover:opacity-0">
+                          <span className="whitespace-nowrap">Customer story</span>
+                          <ArrowIcon className="size-2.5 shrink-0" />
+                        </span>
+                        <span className="col-start-1 row-start-1 inline-flex -translate-x-1.5 items-center gap-1 opacity-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0 group-hover:opacity-100">
+                          <ArrowIcon className="size-2.5 shrink-0" />
+                          <span className="whitespace-nowrap">Customer story</span>
+                        </span>
+                      </span>
+                    </Link>
+                  ) : (
+                    <span className="inline-flex items-center rounded-full bg-cream/10 px-2.5 py-1 text-[10px] font-medium tracking-wide text-cream/80">
+                      Customer story
+                    </span>
+                  )
                 ) : null}
               </li>
             );

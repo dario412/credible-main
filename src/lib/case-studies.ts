@@ -82,6 +82,8 @@ export type CaseStudyCard = {
   industry: string;
   size: string;
   period: string;
+  /** Roster expert slugs featured on this case study. */
+  relatedExperts?: string[];
   coverImage: string;
   logo?: string;
   featured?: boolean;

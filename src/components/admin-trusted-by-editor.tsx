@@ -77,7 +77,7 @@ export function AdminTrustedByEditor({
       <Field
         label="Case study slug (optional)"
         id="slug"
-        hint="Powers the Customer story link"
+        hint="Links the logo and Customer story pill on the homepage, e.g. stage-to-boardroom"
       >
         <TextInput
           id="slug"
@@ -90,7 +90,7 @@ export function AdminTrustedByEditor({
 
       <div className="flex items-center justify-between gap-3 border-t border-charcoal/10 pt-4">
         <div>
-          <p className="text-sm font-medium text-charcoal">Customer story hover</p>
+          <p className="text-sm font-medium text-charcoal">Testimonial hover</p>
           <p className="mt-0.5 text-xs text-charcoal/50">
             Leave empty for logo-only cells.
           </p>
@@ -108,7 +108,7 @@ export function AdminTrustedByEditor({
             })
           }
         >
-          {client.testimonial ? "Remove story" : "Add story"}
+          {client.testimonial ? "Remove testimonial" : "Add testimonial"}
         </Button>
       </div>
 

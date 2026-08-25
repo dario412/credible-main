@@ -19,7 +19,6 @@ import {
   TextStyleControls,
 } from "@/components/home-style-controls";
 import { MediaField } from "@/components/media-library";
-import { ImpactStats } from "@/components/impact-stats";
 import { KeyStudy } from "@/components/key-study";
 import type { RosterCardExpert } from "@/components/roster-card";
 import { TrustedBy } from "@/components/trusted-by";
@@ -59,7 +58,6 @@ type EditTarget =
   | "brandBrief.quote"
   | "brandBrief.formTitle"
   | "brandBrief.formFootnote"
-  | "brandBrief.briefedBy"
   | "creatorCta.eyebrow"
   | "creatorCta.headline"
   | "creatorCta.subhead"
@@ -93,7 +91,6 @@ function targetTitle(target: EditTarget): string {
     "brandBrief.quote": "Brief quote",
     "brandBrief.formTitle": "Brief form title",
     "brandBrief.formFootnote": "Brief form footnote",
-    "brandBrief.briefedBy": "Briefed-by logos",
     "creatorCta.eyebrow": "Creators eyebrow",
     "creatorCta.headline": "Creators headline",
     "creatorCta.subhead": "Creators supporting line",
@@ -930,92 +927,6 @@ function EditorPopover({
           </>
         ) : null}
 
-        {target === "brandBrief.briefedBy" ? (
-          <>
-            <Field label="Label" id="bb-briefed-label">
-              <TextInput
-                id="bb-briefed-label"
-                value={sections.brandBrief.briefedByLabel}
-                onChange={(e) =>
-                  patch("brandBrief", {
-                    ...sections.brandBrief,
-                    briefedByLabel: e.target.value,
-                  })
-                }
-              />
-            </Field>
-            {sections.brandBrief.briefedByLogos.map((logo, index) => (
-              <div
-                key={`bb-logo-${index}`}
-                className="space-y-3 rounded-sm border border-charcoal/10 p-4"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium">Logo {index + 1}</p>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      patch("brandBrief", {
-                        ...sections.brandBrief,
-                        briefedByLogos: sections.brandBrief.briefedByLogos.filter(
-                          (_, i) => i !== index,
-                        ),
-                      })
-                    }
-                    className="text-xs font-medium text-danger hover:underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-                <Field label="Name" id={`bb-logo-name-${index}`}>
-                  <TextInput
-                    id={`bb-logo-name-${index}`}
-                    value={logo.name}
-                    onChange={(e) => {
-                      const briefedByLogos = sections.brandBrief.briefedByLogos.map(
-                        (row, i) =>
-                          i === index ? { ...row, name: e.target.value } : row,
-                      );
-                      patch("brandBrief", {
-                        ...sections.brandBrief,
-                        briefedByLogos,
-                      });
-                    }}
-                  />
-                </Field>
-                <MediaField
-                  label="Logo image"
-                  hint={TRUSTED_BY_LOGO_HINT}
-                  value={logo.src}
-                  onChange={(src) => {
-                    const briefedByLogos = sections.brandBrief.briefedByLogos.map(
-                      (row, i) => (i === index ? { ...row, src } : row),
-                    );
-                    patch("brandBrief", {
-                      ...sections.brandBrief,
-                      briefedByLogos,
-                    });
-                  }}
-                />
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
-                patch("brandBrief", {
-                  ...sections.brandBrief,
-                  briefedByLogos: [
-                    ...sections.brandBrief.briefedByLogos,
-                    { name: "", src: "" },
-                  ],
-                })
-              }
-              className="text-sm font-medium text-forest hover:text-forest-dark"
-            >
-              + Add logo
-            </button>
-          </>
-        ) : null}
-
         {target === "creatorCta.eyebrow" ? (
           <Field label="Eyebrow" id="cc-eyebrow">
             <TextInput
@@ -1261,7 +1172,7 @@ function EditorPopover({
                 <Field
                   label="Case study slug (optional)"
                   id="tb-slug"
-                  hint="Powers the Customer story link, e.g. stage-to-boardroom"
+                  hint="Links the logo and Customer story pill on the homepage, e.g. stage-to-boardroom"
                 >
                   <TextInput
                     id="tb-slug"
@@ -1274,7 +1185,7 @@ function EditorPopover({
 
                 <div className="flex items-center justify-between gap-3 border-t border-charcoal/10 pt-3">
                   <p className="text-sm font-medium text-charcoal">
-                    Customer story hover
+                    Testimonial hover
                   </p>
                   <Button
                     type="button"
@@ -1288,7 +1199,7 @@ function EditorPopover({
                       })
                     }
                   >
-                    {hasStory ? "Remove story" : "Add story"}
+                    {hasStory ? "Remove testimonial" : "Add testimonial"}
                   </Button>
                 </div>
 
@@ -1732,36 +1643,6 @@ export function HomeVisualEditor({
         }
       />
 
-      <ImpactStats
-        content={sections.impact}
-        editSlots={
-          editing
-            ? {
-                headline: (node) =>
-                  hit(
-                    editing,
-                    "impact.headline",
-                    target,
-                    setTarget,
-                    "impact headline",
-                    node,
-                    true,
-                  ),
-                stat: (index, node) =>
-                  hit(
-                    editing,
-                    `impact.stat.${index}`,
-                    target,
-                    setTarget,
-                    `impact stat ${index + 1}`,
-                    node,
-                    true,
-                  ),
-              }
-            : undefined
-        }
-      />
-
       <KeyStudy
         variant="full"
         content={sections.keyStudy}
@@ -1900,16 +1781,6 @@ export function HomeVisualEditor({
                     setTarget,
                     "brief form footnote",
                     node,
-                  ),
-                briefedBy: (node) =>
-                  hit(
-                    editing,
-                    "brandBrief.briefedBy",
-                    target,
-                    setTarget,
-                    "briefed-by logos",
-                    node,
-                    true,
                   ),
               }
             : undefined

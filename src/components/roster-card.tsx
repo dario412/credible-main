@@ -61,7 +61,7 @@ export function RosterCard({ expert }: { expert: RosterCardExpert }) {
       >
         <Link
           href={`/roster/${expert.slug}`}
-          className="relative block aspect-4/3 overflow-hidden rounded-sm bg-[#E4EBE6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+          className="relative block aspect-4/3 overflow-hidden rounded-sm bg-[#C9C8C3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
           aria-label={`View ${expert.name}'s profile`}
         >
           <Image

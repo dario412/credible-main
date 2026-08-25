@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
   APPLY_BENEFIT_ICONS,
-  emptyApplyAuthorityItem,
   emptyApplyBenefit,
   emptyApplyFaqItem,
   emptyApplyPathStep,
@@ -154,115 +153,6 @@ export function ApplyPageEditorForm({
             })
           }
         />
-      </section>
-
-      <section className="space-y-4">
-        <div>
-          <h2 className="font-display text-xl">Authority</h2>
-        </div>
-        <Field label="Headline" id="apply-authority-headline">
-          <TextArea
-            id="apply-authority-headline"
-            rows={2}
-            value={sections.authority.headline}
-            onChange={(e) =>
-              setSections({
-                ...sections,
-                authority: { ...sections.authority, headline: e.target.value },
-              })
-            }
-          />
-        </Field>
-        {sections.authority.items.map((item, index) => (
-          <div
-            key={`apply-auth-${index}`}
-            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium">Stat {index + 1}</p>
-              <button
-                type="button"
-                onClick={() =>
-                  setSections({
-                    ...sections,
-                    authority: {
-                      ...sections.authority,
-                      items: sections.authority.items.filter(
-                        (_, i) => i !== index,
-                      ),
-                    },
-                  })
-                }
-                className="text-xs font-medium text-danger hover:underline"
-              >
-                Remove
-              </button>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Value" id={`apply-auth-value-${index}`}>
-                <TextInput
-                  id={`apply-auth-value-${index}`}
-                  value={item.value}
-                  onChange={(e) => {
-                    const items = sections.authority.items.map((row, i) =>
-                      i === index ? { ...row, value: e.target.value } : row,
-                    );
-                    setSections({
-                      ...sections,
-                      authority: { ...sections.authority, items },
-                    });
-                  }}
-                />
-              </Field>
-              <Field label="Label" id={`apply-auth-label-${index}`}>
-                <TextInput
-                  id={`apply-auth-label-${index}`}
-                  value={item.label}
-                  onChange={(e) => {
-                    const items = sections.authority.items.map((row, i) =>
-                      i === index ? { ...row, label: e.target.value } : row,
-                    );
-                    setSections({
-                      ...sections,
-                      authority: { ...sections.authority, items },
-                    });
-                  }}
-                />
-              </Field>
-            </div>
-            <Field label="Note" id={`apply-auth-note-${index}`}>
-              <TextArea
-                id={`apply-auth-note-${index}`}
-                rows={2}
-                value={item.note}
-                onChange={(e) => {
-                  const items = sections.authority.items.map((row, i) =>
-                    i === index ? { ...row, note: e.target.value } : row,
-                  );
-                  setSections({
-                    ...sections,
-                    authority: { ...sections.authority, items },
-                  });
-                }}
-              />
-            </Field>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() =>
-            setSections({
-              ...sections,
-              authority: {
-                ...sections.authority,
-                items: [...sections.authority.items, emptyApplyAuthorityItem()],
-              },
-            })
-          }
-          className="text-sm font-medium text-forest hover:text-forest-dark"
-        >
-          + Add stat
-        </button>
       </section>
 
       <section className="space-y-4">

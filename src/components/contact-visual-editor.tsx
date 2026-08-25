@@ -202,10 +202,9 @@ function ContactNextSteps({
       onSelect={() => onSelect("nextSteps")}
       label="What happens next"
       block
-      className="h-full"
       ringOffset="ring-offset-cream"
     >
-      <div className="flex h-full flex-col rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-6 md:p-7">
+      <div className="flex flex-col rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-6 md:p-7">
             {sections.nextSteps.eyebrow.trim() ? (
               <p className="text-[0.7rem] font-medium tracking-[0.16em] text-charcoal/45 uppercase">
                 {sections.nextSteps.eyebrow}
@@ -423,7 +422,9 @@ function ContactFooter({
       {showOffice || showPhone || showSocials ? (
         <div
           className={
-            showChannels ? "mt-4 grid gap-4 lg:grid-cols-3" : "grid gap-4 lg:grid-cols-3"
+            showChannels
+              ? "mt-4 grid items-stretch gap-4 lg:grid-cols-3"
+              : "grid items-stretch gap-4 lg:grid-cols-3"
           }
         >
           {showOffice ? (
@@ -435,7 +436,7 @@ function ContactFooter({
               block
               ringOffset="ring-offset-cream"
             >
-              <div className="rounded-sm border border-charcoal/10 p-5 md:p-6">
+              <div className="flex h-full flex-col rounded-sm border border-charcoal/10 p-5 md:p-6">
                 {footer.office.eyebrow.trim() ? (
                   <p className={EYEBROW}>{footer.office.eyebrow}</p>
                 ) : editing ? (
@@ -472,7 +473,7 @@ function ContactFooter({
               block
               ringOffset="ring-offset-cream"
             >
-              <div className="rounded-sm border border-charcoal/10 p-5 md:p-6">
+              <div className="flex h-full flex-col rounded-sm border border-charcoal/10 p-5 md:p-6">
                 {footer.phone.eyebrow.trim() ? (
                   <p className={EYEBROW}>{footer.phone.eyebrow}</p>
                 ) : editing ? (
@@ -518,7 +519,7 @@ function ContactFooter({
               block
               ringOffset="ring-offset-cream"
             >
-              <div className="rounded-sm border border-charcoal/10 p-5 md:p-6">
+              <div className="flex h-full flex-col rounded-sm border border-charcoal/10 p-5 md:p-6">
                 {footer.socials.eyebrow.trim() ? (
                   <p className={EYEBROW}>{footer.socials.eyebrow}</p>
                 ) : editing ? (
@@ -1276,23 +1277,22 @@ export function ContactVisualEditor({
         onSelect={setTarget}
       />
 
-      <div className="mt-10 flex flex-col gap-5 md:mt-12">
-        <ContactBriefedBy
-          sections={sections}
-          editing={editing && canEdit}
-          selected={target}
-          onSelect={setTarget}
-        />
-
-        <div className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12">
-          <div className="h-full min-h-0">{form}</div>
+      <div className="mt-10 grid items-start gap-8 md:mt-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12">
+        <div className="min-h-0">{form}</div>
+        <aside className="flex flex-col gap-5 lg:sticky lg:top-28 lg:self-start">
+          <ContactBriefedBy
+            sections={sections}
+            editing={editing && canEdit}
+            selected={target}
+            onSelect={setTarget}
+          />
           <ContactNextSteps
             sections={sections}
             editing={editing && canEdit}
             selected={target}
             onSelect={setTarget}
           />
-        </div>
+        </aside>
       </div>
 
       <ContactFooter

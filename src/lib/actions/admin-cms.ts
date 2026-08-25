@@ -34,6 +34,10 @@ import {
   type RosterPageSections,
 } from "@/lib/roster-page";
 import {
+  mergeCaseStudiesSections,
+  type CaseStudiesPageSections,
+} from "@/lib/case-studies-page";
+import {
   ensureBlockIds,
   parseInsightBlocks,
   type InsightBlock,
@@ -244,6 +248,10 @@ export async function saveCaseStudy(
   revalidatePath(`/case-studies/${slug}`);
   revalidatePath("/admin/case-studies");
   revalidatePath(`/admin/case-studies/${slug}`);
+  revalidatePath("/roster");
+  for (const expertSlug of row.relatedExperts) {
+    revalidatePath(`/roster/${expertSlug}`);
+  }
   return { ok: true as const, message: "Case study saved.", slug };
 }
 
@@ -518,4 +526,36 @@ export async function saveRosterPage(sections: RosterPageSections) {
   revalidatePath("/admin/pages");
   revalidatePath("/admin/pages/roster");
   return { ok: true as const, message: "Roster page saved." };
+}
+
+export async function getCaseStudiesPageSections(): Promise<CaseStudiesPageSections> {
+  const page = await prisma.pageContent.findUnique({
+    where: { slug: "case-studies" },
+  });
+  return mergeCaseStudiesSections(page?.sections);
+}
+
+export async function saveCaseStudiesPage(sections: CaseStudiesPageSections) {
+  const session = await requireContentEditor();
+  if (!session) return { ok: false as const, message: "Unauthorized" };
+
+  const merged = mergeCaseStudiesSections(sections);
+
+  await prisma.pageContent.upsert({
+    where: { slug: "case-studies" },
+    create: {
+      slug: "case-studies",
+      title: "Case studies",
+      sections: merged,
+    },
+    update: {
+      title: "Case studies",
+      sections: merged,
+    },
+  });
+
+  revalidatePath("/case-studies");
+  revalidatePath("/admin/pages");
+  revalidatePath("/admin/pages/case-studies");
+  return { ok: true as const, message: "Case studies page saved." };
 }

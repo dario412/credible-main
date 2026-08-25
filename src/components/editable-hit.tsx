@@ -25,7 +25,9 @@ export function EditableHit({
 }) {
   if (!active) {
     return (
-      <div className={cn(block && "block w-full", className)}>{children}</div>
+      <div className={cn(block && "block h-full w-full", className)}>
+        {children}
+      </div>
     );
   }
 
@@ -33,7 +35,7 @@ export function EditableHit({
     <div
       className={cn(
         "relative max-w-full",
-        block ? "block w-full" : "inline-block",
+        block ? "block h-full w-full" : "inline-block",
         className,
       )}
     >
@@ -51,7 +53,9 @@ export function EditableHit({
           selected ? "ring-forest" : "ring-transparent hover:ring-forest/50",
         )}
       />
-      <div className={cn(selected && "relative z-10")}>{children}</div>
+      <div className={cn(block && "h-full", selected && "relative z-10")}>
+        {children}
+      </div>
     </div>
   );
 }

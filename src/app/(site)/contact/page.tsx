@@ -34,10 +34,11 @@ export default async function ContactPage() {
           canEdit={canEdit}
           saveAction={saveContactPage}
           form={
-            <div className="flex h-full min-h-0 flex-col rounded-sm border border-charcoal/8 bg-[#FBF8F5] p-5 shadow-[0_10px_28px_rgba(28,26,23,0.06)] sm:p-6 md:p-8">
+            <div className="flex h-full min-h-0 flex-col rounded-sm border border-charcoal/8 bg-[#FBF8F5] p-6 shadow-[0_10px_28px_rgba(28,26,23,0.06)] sm:p-8 md:p-10">
               <BriefForm
                 surface="light"
                 fillHeight
+                spacious
                 formFootnote="Same-day acknowledgement · shortlist within 48 hours · no pitch deck required"
               />
             </div>

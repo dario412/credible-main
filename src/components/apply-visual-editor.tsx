@@ -26,7 +26,6 @@ import { RepresentationFaq } from "@/components/representation-faq";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
   APPLY_BENEFIT_ICONS,
-  emptyApplyAuthorityItem,
   emptyApplyBenefit,
   emptyApplyFaqItem,
   emptyApplyPathStep,
@@ -52,8 +51,6 @@ const BENEFIT_ICON_LABEL: Record<ApplyBenefitIcon, string> = {
 
 type EditTarget =
   | "hero"
-  | "authority"
-  | `authority.${number}`
   | "qualify"
   | "fit"
   | "notFit"
@@ -65,9 +62,6 @@ type EditTarget =
   | "cta";
 
 function targetTitle(target: EditTarget): string {
-  if (target.startsWith("authority.")) {
-    return `Authority ${Number(target.split(".")[1]) + 1}`;
-  }
   if (target.startsWith("path.")) {
     return `Path step ${Number(target.split(".")[1]) + 1}`;
   }
@@ -76,7 +70,6 @@ function targetTitle(target: EditTarget): string {
   }
   const map: Record<string, string> = {
     hero: "Apply intro",
-    authority: "Authority intro",
     qualify: "Self qualify",
     fit: "Likely a fit",
     notFit: "Probably not a fit",
@@ -170,17 +163,12 @@ function EditorPopover({
     };
   }, [onClose]);
 
-  const authorityIndex = target.startsWith("authority.")
-    ? Number(target.split(".")[1])
-    : -1;
   const pathIndex = target.startsWith("path.")
     ? Number(target.split(".")[1])
     : -1;
   const benefitIndex = target.startsWith("benefit.")
     ? Number(target.split(".")[1])
     : -1;
-  const authorityItem =
-    authorityIndex >= 0 ? sections.authority.items[authorityIndex] : null;
   const pathStep = pathIndex >= 0 ? sections.path.steps[pathIndex] : null;
   const benefit = benefitIndex >= 0 ? sections.benefits.items[benefitIndex] : null;
 
@@ -285,100 +273,6 @@ function EditorPopover({
               }
               rows={4}
             />
-          </>
-        ) : null}
-
-        {target === "authority" ? (
-          <Field label="Headline" id="ve-apply-authority-headline">
-            <TextArea
-              id="ve-apply-authority-headline"
-              rows={2}
-              value={sections.authority.headline}
-              onChange={(e) =>
-                onChange({
-                  ...sections,
-                  authority: {
-                    ...sections.authority,
-                    headline: e.target.value,
-                  },
-                })
-              }
-            />
-          </Field>
-        ) : null}
-
-        {authorityItem ? (
-          <>
-            <Field label="Value" id="ve-apply-auth-value">
-              <TextInput
-                id="ve-apply-auth-value"
-                value={authorityItem.value}
-                onChange={(e) => {
-                  const items = sections.authority.items.map((row, i) =>
-                    i === authorityIndex
-                      ? { ...row, value: e.target.value }
-                      : row,
-                  );
-                  onChange({
-                    ...sections,
-                    authority: { ...sections.authority, items },
-                  });
-                }}
-              />
-            </Field>
-            <Field label="Label" id="ve-apply-auth-label">
-              <TextInput
-                id="ve-apply-auth-label"
-                value={authorityItem.label}
-                onChange={(e) => {
-                  const items = sections.authority.items.map((row, i) =>
-                    i === authorityIndex
-                      ? { ...row, label: e.target.value }
-                      : row,
-                  );
-                  onChange({
-                    ...sections,
-                    authority: { ...sections.authority, items },
-                  });
-                }}
-              />
-            </Field>
-            <Field label="Note" id="ve-apply-auth-note">
-              <TextArea
-                id="ve-apply-auth-note"
-                rows={2}
-                value={authorityItem.note}
-                onChange={(e) => {
-                  const items = sections.authority.items.map((row, i) =>
-                    i === authorityIndex
-                      ? { ...row, note: e.target.value }
-                      : row,
-                  );
-                  onChange({
-                    ...sections,
-                    authority: { ...sections.authority, items },
-                  });
-                }}
-              />
-            </Field>
-            <button
-              type="button"
-              onClick={() => {
-                onChange({
-                  ...sections,
-                  authority: {
-                    ...sections.authority,
-                    items: sections.authority.items.filter(
-                      (_, i) => i !== authorityIndex,
-                    ),
-                  },
-                });
-                onClose();
-              }}
-              className="text-sm font-medium text-danger hover:underline"
-            >
-              Remove this stat
-            </button>
           </>
         ) : null}
 
@@ -1084,49 +978,65 @@ function ApplyView({
           <FadeUp>
             {hit(
               editing,
-              "authority",
+              "benefits",
               selected,
               onSelect,
-              "authority intro",
-              <h2 className="max-w-[16ch] font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.5rem]">
-                {sections.authority.headline}
-              </h2>,
+              "what you get",
+              <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end">
+                <div>
+                  <p className={EYEBROW}>{sections.benefits.eyebrow}</p>
+                  <h2 className="mt-3 max-w-[16ch] font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.5rem]">
+                    {sections.benefits.headline}
+                  </h2>
+                </div>
+                <p className="text-[0.9375rem] leading-relaxed text-charcoal/60">
+                  {sections.benefits.subhead}
+                </p>
+              </div>,
               { block: true },
             )}
           </FadeUp>
-          <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {sections.authority.items.map((item, index) => (
-              <li key={`${item.label}-${index}`}>
-                <FadeUp delay={index * 80} y={18} threshold={0.15}>
-                  {hit(
-                    editing,
-                    `authority.${index}`,
-                    selected,
-                    onSelect,
-                    item.label || `authority ${index + 1}`,
-                    <div className="border-t border-charcoal/10 pt-5">
-                      <p className="flex flex-wrap items-baseline gap-2">
-                        <span className="font-display text-[2.5rem] leading-none tracking-tight text-charcoal">
-                          {item.value}
-                        </span>
-                        <span className="text-[0.9375rem] text-charcoal/70">
-                          {item.label}
-                        </span>
-                      </p>
-                      <p className="mt-3 text-[0.875rem] leading-relaxed text-charcoal/55">
-                        {item.note}
-                      </p>
-                    </div>,
-                    { block: true },
-                  )}
-                </FadeUp>
-              </li>
-            ))}
+          <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {sections.benefits.items.map((item, index) => {
+              const Icon = BENEFIT_ICON[item.icon] ?? EnvelopeSimple;
+              return (
+                <li key={`${item.title}-${index}`}>
+                  <FadeUp
+                    delay={index * 80}
+                    y={18}
+                    threshold={0.15}
+                    className="h-full"
+                  >
+                    {hit(
+                      editing,
+                      `benefit.${index}`,
+                      selected,
+                      onSelect,
+                      item.title || `benefit ${index + 1}`,
+                      <div className="flex h-full min-h-[13.75rem] flex-col rounded-sm bg-cream-dark p-7">
+                        <Icon
+                          weight="regular"
+                          className="size-6 text-forest"
+                          aria-hidden
+                        />
+                        <h3 className="mt-6 font-display text-[1.25rem] leading-snug tracking-tight text-charcoal">
+                          {item.title}
+                        </h3>
+                        <p className="mt-3 text-[0.875rem] leading-relaxed text-charcoal/60">
+                          {item.body}
+                        </p>
+                      </div>,
+                      { block: true, ringOffset: "ring-offset-cream-dark" },
+                    )}
+                  </FadeUp>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </section>
 
-      <section className="bg-cream px-6 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
+      <section className="bg-white px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
         <div className={PAGE_SHELL}>
           <FadeUp>
             {hit(
@@ -1217,7 +1127,7 @@ function ApplyView({
         </div>
       </section>
 
-      <section className="bg-charcoal px-6 py-20 text-cream md:px-10 md:py-24 lg:px-12 lg:py-28">
+      <section className="bg-charcoal px-6 py-16 text-cream md:px-10 md:py-20 lg:px-12 lg:py-24">
         <div className={PAGE_SHELL}>
           <FadeUp>
             {hit(
@@ -1297,70 +1207,7 @@ function ApplyView({
         </div>
       </section>
 
-      <section className="bg-cream px-6 py-20 md:px-10 md:py-24 lg:px-12 lg:py-28">
-        <div className={PAGE_SHELL}>
-          <FadeUp>
-            {hit(
-              editing,
-              "benefits",
-              selected,
-              onSelect,
-              "what you get",
-              <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:items-end">
-                <div>
-                  <p className={EYEBROW}>{sections.benefits.eyebrow}</p>
-                  <h2 className="mt-3 max-w-[16ch] font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal md:text-[2.5rem]">
-                    {sections.benefits.headline}
-                  </h2>
-                </div>
-                <p className="text-[0.9375rem] leading-relaxed text-charcoal/60">
-                  {sections.benefits.subhead}
-                </p>
-              </div>,
-              { block: true },
-            )}
-          </FadeUp>
-          <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {sections.benefits.items.map((item, index) => {
-              const Icon = BENEFIT_ICON[item.icon] ?? EnvelopeSimple;
-              return (
-                <li key={`${item.title}-${index}`}>
-                  <FadeUp
-                    delay={index * 80}
-                    y={18}
-                    threshold={0.15}
-                    className="h-full"
-                  >
-                    {hit(
-                      editing,
-                      `benefit.${index}`,
-                      selected,
-                      onSelect,
-                      item.title || `benefit ${index + 1}`,
-                      <div className="flex h-full min-h-[13.75rem] flex-col rounded-sm bg-cream-dark p-7">
-                        <Icon
-                          weight="regular"
-                          className="size-6 text-forest"
-                          aria-hidden
-                        />
-                        <h3 className="mt-6 font-display text-[1.25rem] leading-snug tracking-tight text-charcoal">
-                          {item.title}
-                        </h3>
-                        <p className="mt-3 text-[0.875rem] leading-relaxed text-charcoal/60">
-                          {item.body}
-                        </p>
-                      </div>,
-                      { block: true, ringOffset: "ring-offset-cream-dark" },
-                    )}
-                  </FadeUp>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </section>
-
-      <section className="bg-cream px-6 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
+      <section className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
         <div className={PAGE_SHELL}>
           <FadeUp>
             {hit(
@@ -1395,7 +1242,7 @@ function ApplyView({
         </div>
       </section>
 
-      <section className="px-6 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
+      <section className="bg-white px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
         <div className={PAGE_SHELL}>
           <FadeUp>
             {hit(

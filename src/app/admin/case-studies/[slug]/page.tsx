@@ -6,6 +6,7 @@ import { getCaseStudyCard, saveCaseStudy } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import { loadCaseStudy } from "@/lib/case-studies-server";
 import { hasPermission } from "@/lib/permissions";
+import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -25,7 +26,13 @@ export default async function AdminEditCaseStudyPage({ params }: Props) {
   if (!hasPermission(session.user.role, "MANAGE_CONTENT")) redirect("/admin");
 
   const { slug } = await params;
-  const fromDb = await getCaseStudyCard(slug);
+  const [fromDb, speakers] = await Promise.all([
+    getCaseStudyCard(slug),
+    prisma.expert.findMany({
+      orderBy: { name: "asc" },
+      select: { slug: true, name: true },
+    }),
+  ]);
   const study = fromDb ?? (await loadCaseStudy(slug));
   if (!study) notFound();
 
@@ -41,7 +48,11 @@ export default async function AdminEditCaseStudyPage({ params }: Props) {
         <h1 className="mt-3 font-display text-3xl">Edit case study</h1>
         <p className="mt-1 text-sm text-muted">{study.slug}</p>
       </div>
-      <CaseStudyEditorForm initial={study} saveAction={saveCaseStudy} />
+      <CaseStudyEditorForm
+        initial={study}
+        speakers={speakers}
+        saveAction={saveCaseStudy}
+      />
     </div>
   );
 }

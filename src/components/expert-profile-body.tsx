@@ -21,7 +21,7 @@ import { ExpertFormatsGrid } from "@/components/expert-formats-grid";
 import { ExpertInterestCta } from "@/components/expert-interest-cta";
 import { ExpertProfileSimilarIntro } from "@/components/expert-profile-similar-intro";
 import { ExpertQuoteCard } from "@/components/expert-quote-card";
-import { ExpertWorkLayoutPreviews } from "@/components/expert-work-layouts";
+import { FeaturedCaseStudyCard } from "@/components/expert-work-layouts";
 import { PatternField } from "@/components/pattern-field";
 import type { RosterCardExpert } from "@/components/roster-card";
 import { SimilarCreatorsGrid } from "@/components/similar-creators-grid";
@@ -372,12 +372,24 @@ function workTypeLabel(meta: string) {
 }
 
 function workCover(item: ExpertRecentWork): string | null {
+  if (item.coverImage?.trim()) return item.coverImage.trim();
   if (!item.href?.startsWith("/case-studies/")) return null;
   const slug = item.href.replace(/^\/case-studies\//, "").replace(/\/$/, "");
   return getCaseStudy(slug)?.coverImage ?? null;
 }
 
 function RecentWorkSection({ work }: { work: ExpertRecentWork[] }) {
+  if (work.length === 1) {
+    return (
+      <section id="work" className="scroll-mt-28">
+        <SectionHeading>Recent work.</SectionHeading>
+        <div className="mt-8">
+          <FeaturedCaseStudyCard item={work[0]!} />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="work" className="scroll-mt-28">
       <SectionHeading>Recent work.</SectionHeading>
@@ -437,7 +449,7 @@ function RecentWorkSection({ work }: { work: ExpertRecentWork[] }) {
           );
 
           return (
-            <li key={item.title}>
+            <li key={`${item.href ?? item.title}-${item.client}`}>
               {item.href ? (
                 <Link href={item.href} className="group block">
                   {card}
@@ -504,16 +516,7 @@ export function ExpertProfileMain({
       ) : null}
 
       {recentWork && recentWork.length > 0 ? (
-        <>
-          <RecentWorkSection work={recentWork} />
-          <section
-            id="work-layout-options"
-            className="scroll-mt-28"
-            aria-label="Recent work layout options"
-          >
-            <ExpertWorkLayoutPreviews work={recentWork} />
-          </section>
-        </>
+        <RecentWorkSection work={recentWork} />
       ) : null}
     </div>
   );

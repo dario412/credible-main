@@ -110,7 +110,7 @@ export function ShortlistMenu({ inverted = false }: { inverted?: boolean }) {
                     key={entry.slug}
                     className="flex items-center gap-3 border-b border-charcoal/6 px-4 py-2.5 last:border-b-0"
                   >
-                    <div className="relative size-9 shrink-0 overflow-hidden rounded-sm bg-[#E4EBE6]">
+                    <div className="relative size-9 shrink-0 overflow-hidden rounded-sm bg-[#C9C8C3]">
                       {entry.image ? (
                         <Image
                           src={entry.image}

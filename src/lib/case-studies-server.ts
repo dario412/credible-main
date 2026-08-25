@@ -5,7 +5,26 @@ import {
   type CaseStudyCard,
 } from "@/lib/case-studies";
 import { caseStudyToCard } from "@/lib/cms";
+import type { ExpertRecentWork } from "@/lib/expert-profiles";
 import { prisma } from "@/lib/prisma";
+
+const WORK_TONES: ExpertRecentWork["tone"][] = ["forest", "rust", "sage"];
+
+export function caseStudyToExpertWork(
+  study: CaseStudyCard,
+  index = 0,
+): ExpertRecentWork {
+  const pillars = normalizeCaseStudyPillars(study);
+  return {
+    client: study.client,
+    meta: pillars[0] ?? study.pillar,
+    title: study.title,
+    description: study.summary,
+    href: `/case-studies/${study.slug}`,
+    coverImage: study.coverImage || undefined,
+    tone: WORK_TONES[index % WORK_TONES.length]!,
+  };
+}
 
 /** CMS database is the source of truth. Static catalog is first-run / outage fallback only. */
 export async function loadCaseStudies(): Promise<CaseStudyCard[]> {
@@ -59,4 +78,22 @@ export async function loadFilteredCaseStudies(filters: {
   q?: string;
 }) {
   return filterCaseStudies(filters, await loadCaseStudies());
+}
+
+/** Case studies linked to a roster expert via relatedExperts. */
+export async function loadCaseStudiesForExpert(
+  expertSlug: string,
+): Promise<CaseStudyCard[]> {
+  const slug = expertSlug.trim();
+  if (!slug) return [];
+
+  try {
+    const rows = await prisma.caseStudy.findMany({
+      where: { relatedExperts: { has: slug } },
+      orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
+    });
+    return rows.map(caseStudyToCard);
+  } catch {
+    return [];
+  }
 }

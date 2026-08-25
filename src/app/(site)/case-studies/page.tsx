@@ -4,7 +4,10 @@ import {
   CaseStudiesFeatured,
 } from "@/components/case-studies-featured";
 import { CaseStudyFilters } from "@/components/case-study-filters";
-import { ImpactStats } from "@/components/impact-stats";
+import { FadeUp } from "@/components/fade-up";
+import { EYEBROW } from "@/components/inner-page";
+import { RepresentationFaq } from "@/components/representation-faq";
+import { getCaseStudiesPageSections } from "@/lib/actions/admin-cms";
 import { filterCaseStudies } from "@/lib/case-studies";
 import { loadCaseStudies } from "@/lib/case-studies-server";
 import { createMetadata } from "@/lib/seo";
@@ -49,12 +52,18 @@ export default async function CaseStudiesPage({
   const pillar = SHOW_CASE_STUDY_FILTERS ? params.pillar?.trim() : undefined;
   const q = SHOW_CASE_STUDY_FILTERS ? params.q?.trim() : undefined;
 
-  const all = await loadCaseStudies();
+  const [all, pageSections] = await Promise.all([
+    loadCaseStudies(),
+    getCaseStudiesPageSections(),
+  ]);
   const lead = featuredLeadCount(CASE_STUDIES_FEATURED_LAYOUT);
   const rest = all.slice(lead);
   const stories = SHOW_CASE_STUDY_FILTERS
     ? filterCaseStudies({ clientType, pillar, q }, rest)
     : rest;
+  const faqItems = pageSections.faq.items.filter(
+    (item) => item.q.trim() && item.a.trim(),
+  );
 
   return (
     <>
@@ -75,8 +84,6 @@ export default async function CaseStudiesPage({
       <section className="px-6 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
         <CaseStudiesFeatured studies={all} />
       </section>
-
-      <ImpactStats />
 
       <section
         id="all-case-studies"
@@ -114,6 +121,30 @@ export default async function CaseStudiesPage({
           )}
         </div>
       </section>
+
+      {faqItems.length > 0 ? (
+        <section
+          id="case-studies-faq"
+          className="scroll-mt-8 bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24"
+        >
+          <div className="mx-auto max-w-352">
+            <FadeUp>
+              <div className="mx-auto max-w-[52.5rem] text-center">
+                <p className={EYEBROW}>{pageSections.faq.eyebrow}</p>
+                <h2 className="mt-4 font-display text-[2rem] leading-[1.1] tracking-tight text-charcoal md:text-[3.25rem]">
+                  {pageSections.faq.headline}
+                </h2>
+                <p className="mx-auto mt-5 max-w-[32.5rem] text-[1.0625rem] leading-relaxed text-charcoal/70">
+                  {pageSections.faq.subhead}
+                </p>
+              </div>
+            </FadeUp>
+            <div className="mx-auto mt-14 max-w-[47.5rem]">
+              <RepresentationFaq items={faqItems} />
+            </div>
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }

@@ -41,6 +41,11 @@ const pages: {
     description: "Intro headline and supporting line on /roster.",
   },
   {
+    slug: "case-studies",
+    title: "Case studies",
+    description: "FAQ accordion under All stories on /case-studies.",
+  },
+  {
     slug: "about",
     title: "About",
     description:
@@ -56,7 +61,7 @@ const pages: {
     slug: "apply-for-representation",
     title: "Apply for representation",
     description:
-      "Intro, authority stats, self-qualify, path, benefits, FAQ, and start-application CTA.",
+      "Intro, what you get, self-qualify, path, FAQ, and start-application CTA.",
   },
 ];
 

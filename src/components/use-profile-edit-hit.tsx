@@ -19,12 +19,14 @@ export function ProfileEditHit({
   label,
   block,
   ringOffset = "ring-offset-cream",
+  className,
   children,
 }: {
   field: string;
   label: string;
   block?: boolean;
   ringOffset?: string;
+  className?: string;
   children: ReactNode;
 }) {
   const hit = useProfileEditHit(field);
@@ -36,6 +38,7 @@ export function ProfileEditHit({
       label={label}
       block={block}
       ringOffset={ringOffset}
+      className={className}
     >
       {children}
     </EditableHit>

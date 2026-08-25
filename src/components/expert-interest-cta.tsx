@@ -61,11 +61,12 @@ export function ExpertInterestCta({
               field="profileCta.primaryCta"
               label="footer primary button"
               block
+              className="w-full sm:flex-1"
               ringOffset="ring-offset-charcoal"
             >
               <Link
                 href={primaryHref}
-                className="group inline-flex flex-1 items-center justify-center gap-2 rounded-sm bg-cream px-6 py-3.5 text-[0.9375rem] font-medium text-charcoal transition-colors hover:bg-cream-dark"
+                className="group flex w-full items-center justify-center gap-2 rounded-sm bg-cream px-6 py-3.5 text-[0.9375rem] font-medium text-charcoal transition-colors hover:bg-cream-dark"
               >
                 {copy.primaryCtaLabel}
                 <ArrowRight
@@ -81,11 +82,12 @@ export function ExpertInterestCta({
               field="profileCta.secondaryCta"
               label="footer secondary button"
               block
+              className="w-full sm:flex-1"
               ringOffset="ring-offset-charcoal"
             >
               <Link
                 href={copy.secondaryCtaHref}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-sm border border-cream/25 bg-charcoal/20 px-6 py-3.5 text-[0.9375rem] font-medium text-cream backdrop-blur-sm transition-colors hover:border-cream/50 hover:bg-cream/10"
+                className="flex w-full items-center justify-center gap-2 rounded-sm border border-cream/25 bg-charcoal/20 px-6 py-3.5 text-[0.9375rem] font-medium text-cream backdrop-blur-sm transition-colors hover:border-cream/50 hover:bg-cream/10"
               >
                 {copy.secondaryCtaLabel}
               </Link>

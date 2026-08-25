@@ -113,7 +113,7 @@ export function ExpertProfileShell({
               </ProfileEditHit>
 
               <div className="flex items-center gap-3">
-                <div className="relative size-12 shrink-0 overflow-hidden rounded-sm bg-[#E4EBE6]">
+                <div className="relative size-12 shrink-0 overflow-hidden rounded-sm bg-[#C9C8C3]">
                   {image ? (
                     <Image
                       src={image}

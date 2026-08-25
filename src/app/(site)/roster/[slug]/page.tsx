@@ -33,6 +33,10 @@ import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 import { getSiteChrome, saveSiteChrome } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
+import {
+  caseStudyToExpertWork,
+  loadCaseStudiesForExpert,
+} from "@/lib/case-studies-server";
 import { hasPermission } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
@@ -304,9 +308,10 @@ export default async function ExpertPage({ params }: Props) {
   const expert = await prisma.expert.findUnique({ where: { slug } });
   if (!expert) notFound();
 
-  const [siteChrome, session] = await Promise.all([
+  const [siteChrome, session, linkedCaseStudies] = await Promise.all([
     getSiteChrome(),
     auth(),
+    loadCaseStudiesForExpert(expert.slug),
   ]);
   const canEdit = Boolean(
     session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
@@ -316,6 +321,7 @@ export default async function ExpertPage({ params }: Props) {
   const content = mergeProfileContent(extras, enrichment);
   const trustedBy = resolveTrustedBy(extras, enrichment.trustedBy);
   const similarSorted = await loadSimilarCreators(expert, extras);
+  const recentWork = linkedCaseStudies.map(caseStudyToExpertWork);
 
   const heroStats = buildStats(expert, extras, enrichment.stats);
   const heroProof =
@@ -366,7 +372,7 @@ export default async function ExpertPage({ params }: Props) {
             content.topicShares?.length && content.audience,
           ),
           hasFormats: Boolean(content.formats?.length),
-          hasWork: Boolean(enrichment.recentWork?.length),
+          hasWork: recentWork.length > 0,
         }}
       >
         <ExpertProfileMain
@@ -378,7 +384,7 @@ export default async function ExpertPage({ params }: Props) {
           topicShares={content.topicShares}
           audience={content.audience}
           formats={content.formats}
-          recentWork={enrichment.recentWork}
+          recentWork={recentWork}
         />
       </ExpertProfileShell>
 

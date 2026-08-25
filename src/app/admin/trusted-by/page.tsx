@@ -43,7 +43,7 @@ export default async function AdminTrustedByPage() {
             <tr>
               <th className="px-4 py-3 font-medium">Client</th>
               <th className="px-4 py-3 font-medium">Logo</th>
-              <th className="px-4 py-3 font-medium">Story</th>
+              <th className="px-4 py-3 font-medium">Testimonial</th>
               <th className="px-4 py-3 font-medium" />
             </tr>
           </thead>
