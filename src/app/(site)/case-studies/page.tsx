@@ -81,13 +81,13 @@ export default async function CaseStudiesPage({
         </div>
       </section>
 
-      <section className="px-6 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
+      <section className="px-6 pb-0 md:px-10 lg:px-12">
         <CaseStudiesFeatured studies={all} />
       </section>
 
       <section
         id="all-case-studies"
-        className="scroll-mt-8 bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24"
+        className="scroll-mt-8 bg-cream px-6 pt-10 pb-16 md:px-10 md:pt-12 md:pb-20 lg:px-12 lg:pt-14 lg:pb-24"
       >
         <div className="mx-auto max-w-352">
           <h2 className="text-center font-display text-[2rem] leading-[1.12] tracking-tight text-charcoal sm:text-[2.4rem] md:text-[2.75rem]">
