@@ -1,27 +1,27 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { ContactPageEditorForm } from "@/components/admin-contact-page-editor";
+import { RosterPageEditorForm } from "@/components/admin-roster-page-editor";
 import {
-  getContactPageSections,
-  saveContactPage,
+  getRosterPageSections,
+  saveRosterPage,
 } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Edit Contact",
-  path: "/admin/pages/contact",
+  title: "Edit Roster",
+  path: "/admin/pages/roster",
   noIndex: true,
 });
 
-export default async function AdminContactPageEditor() {
+export default async function AdminRosterPageEditor() {
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
   if (!hasPermission(session.user.role, "MANAGE_CONTENT")) redirect("/admin");
 
-  const sections = await getContactPageSections();
+  const sections = await getRosterPageSections();
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -32,19 +32,18 @@ export default async function AdminContactPageEditor() {
         >
           ← Pages
         </Link>
-        <h1 className="mt-3 font-display text-3xl">Contact</h1>
+        <h1 className="mt-3 font-display text-3xl">Roster</h1>
         <p className="mt-2 text-sm text-muted">
-          Intro, sidebar cards, and footer contact blocks on{" "}
+          Intro copy on{" "}
           <a
-            href="/contact"
+            href="/roster"
             className="font-medium text-forest hover:text-forest-dark"
           >
-            /contact
+            /roster
           </a>
-          — briefed-by logos, what happens next, email channels, office, phone,
-          and social links. Or edit live with{" "}
+          . Or edit live with{" "}
           <a
-            href="/contact"
+            href="/roster"
             className="font-medium text-forest hover:text-forest-dark"
           >
             Edit page
@@ -52,9 +51,9 @@ export default async function AdminContactPageEditor() {
           .
         </p>
       </div>
-      <ContactPageEditorForm
+      <RosterPageEditorForm
         initial={sections}
-        saveAction={saveContactPage}
+        saveAction={saveRosterPage}
       />
     </div>
   );

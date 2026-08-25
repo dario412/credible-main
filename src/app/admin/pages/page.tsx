@@ -33,7 +33,12 @@ const pages: {
     slug: "contact",
     title: "Contact",
     description:
-      "Briefed-by logos and What happens next sidebar on /contact.",
+      "Intro, briefed-by logos, What happens next sidebar, and footer contact blocks on /contact.",
+  },
+  {
+    slug: "roster",
+    title: "Roster",
+    description: "Intro headline and supporting line on /roster.",
   },
   {
     slug: "about",

@@ -1,4 +1,5 @@
 export const PEPTALK_SUBMIT_URL =
+  process.env.PEPTALK_SUBMIT_URL?.trim() ||
   "https://api.ops.getapeptalk.com/api/webflow/submit";
 
 export const PEPTALK_WEBSITE = "Credible";
@@ -98,6 +99,16 @@ export type SendBriefPeptalkInput = {
   brief?: string;
 };
 
+export type HomeBriefPeptalkInput = {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  role?: string;
+  brief: string;
+  deliverables?: string;
+};
+
 function asString(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;
 }
@@ -191,6 +202,34 @@ export function buildSendBriefPeptalkPayload(
       budget: input.budget?.trim() || "Not set yet",
       budgetCurrency: "USD",
       details,
+      website: PEPTALK_WEBSITE,
+    },
+  };
+}
+
+/** Homepage brand-brief form → Peptalk webflow submit JSON. */
+export function buildHomeBriefPeptalkPayload(
+  input: HomeBriefPeptalkInput,
+  tracking: PeptalkTracking,
+  context: PeptalkContext,
+): PeptalkPayload {
+  return {
+    contact: {
+      name: input.name.trim(),
+      email: input.email.trim(),
+      phone: input.phone.trim(),
+    },
+    tracking: { ...EMPTY_PEPTALK_TRACKING, ...tracking },
+    context: { ...EMPTY_PEPTALK_CONTEXT, ...context },
+    formData: {
+      topic: "",
+      date: "",
+      dateUnsure: true,
+      eventType: "Not sure",
+      location: "",
+      budget: "Not set yet",
+      budgetCurrency: "USD",
+      details: input.deliverables?.trim() || "",
       website: PEPTALK_WEBSITE,
     },
   };

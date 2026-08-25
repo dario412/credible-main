@@ -9,7 +9,24 @@ export type ContactNextStep = {
   body: string;
 };
 
+export type ContactChannel = {
+  label: string;
+  address: string;
+  body: string;
+};
+
+export type ContactSocial = {
+  label: string;
+  handle: string;
+  href: string;
+};
+
 export type ContactPageSections = {
+  hero: {
+    headline: string;
+    headlineAccent: string;
+    subhead: string;
+  };
   briefedBy: {
     label: string;
     logos: ContactLogo[];
@@ -23,9 +40,33 @@ export type ContactPageSections = {
     emailLabel: string;
     email: string;
   };
+  footer: {
+    channels: ContactChannel[];
+    office: {
+      eyebrow: string;
+      title: string;
+      body: string;
+    };
+    phone: {
+      eyebrow: string;
+      number: string;
+      tel: string;
+      body: string;
+    };
+    socials: {
+      eyebrow: string;
+      items: ContactSocial[];
+    };
+  };
 };
 
 export const DEFAULT_CONTACT_SECTIONS: ContactPageSections = {
+  hero: {
+    headline: "Brief the voices your buyers",
+    headlineAccent: "already trust.",
+    subhead:
+      "In-house, agency or creator — send us the ambition. We'll come back with a named shortlist within 48 hours.",
+  },
   briefedBy: {
     label: "Briefed by teams at",
     logos: [
@@ -58,6 +99,51 @@ export const DEFAULT_CONTACT_SECTIONS: ContactPageSections = {
     browseHref: "/roster",
     emailLabel: "email us",
     email: "hello@crediblecreators.com",
+  },
+  footer: {
+    channels: [
+      {
+        label: "Direct email",
+        address: "hello@crediblecreators.com",
+        body: "General enquiries and anything that doesn’t fit a box.",
+      },
+      {
+        label: "Speaking & events",
+        address: "bookings@crediblecreators.com",
+        body: "Keynotes, firesides, panels and live programming.",
+      },
+      {
+        label: "Brand partnerships",
+        address: "partnerships@crediblecreators.com",
+        body: "Content series, newsletters and ambassador terms.",
+      },
+    ],
+    office: {
+      eyebrow: "London office",
+      title: "Credible Talent Ltd",
+      body: "Somers Town, London NW1",
+    },
+    phone: {
+      eyebrow: "By phone",
+      number: "+44 20 7946 0018",
+      tel: "+442079460018",
+      body: "Weekdays, 9am–6pm GMT",
+    },
+    socials: {
+      eyebrow: "Follow along",
+      items: [
+        {
+          label: "LinkedIn",
+          handle: "/credible-talent",
+          href: "https://www.linkedin.com/",
+        },
+        {
+          label: "Substack",
+          handle: "The Credible Brief",
+          href: "https://substack.com/",
+        },
+      ],
+    },
   },
 };
 
@@ -107,20 +193,86 @@ function mergeSteps(
   return merged.length > 0 ? merged : defaults.map((step) => ({ ...step }));
 }
 
+function mergeChannels(
+  raw: unknown,
+  defaults: ContactChannel[],
+): ContactChannel[] {
+  if (!Array.isArray(raw)) return defaults.map((channel) => ({ ...channel }));
+
+  const merged = raw
+    .map((item, i) => {
+      const row = (item && typeof item === "object" ? item : {}) as Partial<
+        ContactChannel
+      >;
+      const fallback = defaults[i] ?? { label: "", address: "", body: "" };
+      const label = asString(row.label, fallback.label);
+      const address = asString(row.address, fallback.address);
+      const body = asString(row.body, fallback.body);
+      if (!label.trim() && !address.trim() && !body.trim()) return null;
+      return { label, address, body };
+    })
+    .filter((item): item is ContactChannel => item !== null);
+
+  return merged.length > 0 ? merged : defaults.map((channel) => ({ ...channel }));
+}
+
+function mergeSocials(raw: unknown, defaults: ContactSocial[]): ContactSocial[] {
+  if (!Array.isArray(raw)) return defaults.map((item) => ({ ...item }));
+
+  const merged = raw
+    .map((item, i) => {
+      const row = (item && typeof item === "object" ? item : {}) as Partial<
+        ContactSocial
+      >;
+      const fallback = defaults[i] ?? { label: "", handle: "", href: "" };
+      const label = asString(row.label, fallback.label);
+      const handle = asString(row.handle, fallback.handle);
+      const href = asString(row.href, fallback.href);
+      if (!label.trim() && !handle.trim() && !href.trim()) return null;
+      return { label, handle, href };
+    })
+    .filter((item): item is ContactSocial => item !== null);
+
+  return merged.length > 0 ? merged : defaults.map((item) => ({ ...item }));
+}
+
 export function mergeContactSections(raw: unknown): ContactPageSections {
   const data = (raw && typeof raw === "object" ? raw : {}) as {
+    hero?: Partial<ContactPageSections["hero"]>;
     briefedBy?: Partial<ContactPageSections["briefedBy"]> & {
       logos?: unknown;
     };
     nextSteps?: Partial<ContactPageSections["nextSteps"]> & {
       steps?: unknown;
     };
+    footer?: Partial<ContactPageSections["footer"]> & {
+      channels?: unknown;
+      socials?: Partial<ContactPageSections["footer"]["socials"]> & {
+        items?: unknown;
+      };
+    };
   };
   const defaults = DEFAULT_CONTACT_SECTIONS;
+  const hero = data.hero ?? {};
   const briefedBy = data.briefedBy ?? {};
   const nextSteps = data.nextSteps ?? {};
+  const footer = data.footer ?? {};
+  const office = (footer.office ??
+    {}) as Partial<ContactPageSections["footer"]["office"]>;
+  const phone = (footer.phone ??
+    {}) as Partial<ContactPageSections["footer"]["phone"]>;
+  const socials = (footer.socials ??
+    {}) as Partial<ContactPageSections["footer"]["socials"]>;
 
   return {
+    hero: {
+      headline: asString(hero.headline, defaults.hero.headline),
+      headlineAccent: asString(
+        hero.headlineAccent,
+        defaults.hero.headlineAccent,
+      ),
+      subhead: asString(hero.subhead, defaults.hero.subhead),
+    },
     briefedBy: {
       label: asString(briefedBy.label, defaults.briefedBy.label),
       logos: mergeLogos(briefedBy.logos, defaults.briefedBy.logos),
@@ -137,6 +289,24 @@ export function mergeContactSections(raw: unknown): ContactPageSections {
       emailLabel: asString(nextSteps.emailLabel, defaults.nextSteps.emailLabel),
       email: asString(nextSteps.email, defaults.nextSteps.email),
     },
+    footer: {
+      channels: mergeChannels(footer.channels, defaults.footer.channels),
+      office: {
+        eyebrow: asString(office.eyebrow, defaults.footer.office.eyebrow),
+        title: asString(office.title, defaults.footer.office.title),
+        body: asString(office.body, defaults.footer.office.body),
+      },
+      phone: {
+        eyebrow: asString(phone.eyebrow, defaults.footer.phone.eyebrow),
+        number: asString(phone.number, defaults.footer.phone.number),
+        tel: asString(phone.tel, defaults.footer.phone.tel),
+        body: asString(phone.body, defaults.footer.phone.body),
+      },
+      socials: {
+        eyebrow: asString(socials.eyebrow, defaults.footer.socials.eyebrow),
+        items: mergeSocials(socials.items, defaults.footer.socials.items),
+      },
+    },
   };
 }
 
@@ -146,4 +316,12 @@ export function emptyContactLogo(): ContactLogo {
 
 export function emptyContactStep(): ContactNextStep {
   return { title: "", body: "" };
+}
+
+export function emptyContactChannel(): ContactChannel {
+  return { label: "", address: "", body: "" };
+}
+
+export function emptyContactSocial(): ContactSocial {
+  return { label: "", handle: "", href: "" };
 }

@@ -30,6 +30,10 @@ import {
   type ApplyPageSections,
 } from "@/lib/apply-page";
 import {
+  mergeRosterSections,
+  type RosterPageSections,
+} from "@/lib/roster-page";
+import {
   ensureBlockIds,
   parseInsightBlocks,
   type InsightBlock,
@@ -482,4 +486,36 @@ export async function saveApplyPage(sections: ApplyPageSections) {
   revalidatePath("/admin/pages");
   revalidatePath("/admin/pages/apply-for-representation");
   return { ok: true as const, message: "Apply page saved." };
+}
+
+export async function getRosterPageSections(): Promise<RosterPageSections> {
+  const page = await prisma.pageContent.findUnique({
+    where: { slug: "roster" },
+  });
+  return mergeRosterSections(page?.sections);
+}
+
+export async function saveRosterPage(sections: RosterPageSections) {
+  const session = await requireContentEditor();
+  if (!session) return { ok: false as const, message: "Unauthorized" };
+
+  const merged = mergeRosterSections(sections);
+
+  await prisma.pageContent.upsert({
+    where: { slug: "roster" },
+    create: {
+      slug: "roster",
+      title: "Roster",
+      sections: merged,
+    },
+    update: {
+      title: "Roster",
+      sections: merged,
+    },
+  });
+
+  revalidatePath("/roster");
+  revalidatePath("/admin/pages");
+  revalidatePath("/admin/pages/roster");
+  return { ok: true as const, message: "Roster page saved." };
 }

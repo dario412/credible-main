@@ -5,7 +5,9 @@ import { useState } from "react";
 import { MediaField } from "@/components/media-library";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
+  emptyContactChannel,
   emptyContactLogo,
+  emptyContactSocial,
   emptyContactStep,
   type ContactPageSections,
 } from "@/lib/contact-page";
@@ -36,12 +38,65 @@ export function ContactPageEditorForm({
     setSections({ ...sections, briefedBy });
   }
 
+  function setHero(hero: ContactPageSections["hero"]) {
+    setSections({ ...sections, hero });
+  }
+
   function setNextSteps(nextSteps: ContactPageSections["nextSteps"]) {
     setSections({ ...sections, nextSteps });
   }
 
+  function setFooter(footer: ContactPageSections["footer"]) {
+    setSections({ ...sections, footer });
+  }
+
   return (
     <form onSubmit={onSubmit} className="space-y-10">
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Page intro</h2>
+          <p className="mt-1 text-sm text-muted">
+            Headline and supporting line at the top of /contact.
+          </p>
+        </div>
+        <Field
+          label="Headline"
+          id="ct-hero-headline"
+          hint="First line, before the accent."
+        >
+          <TextInput
+            id="ct-hero-headline"
+            value={sections.hero.headline}
+            onChange={(e) =>
+              setHero({ ...sections.hero, headline: e.target.value })
+            }
+          />
+        </Field>
+        <Field
+          label="Headline accent"
+          id="ct-hero-headline-accent"
+          hint="Shown in forest green."
+        >
+          <TextInput
+            id="ct-hero-headline-accent"
+            value={sections.hero.headlineAccent}
+            onChange={(e) =>
+              setHero({ ...sections.hero, headlineAccent: e.target.value })
+            }
+          />
+        </Field>
+        <Field label="Supporting line" id="ct-hero-subhead">
+          <TextArea
+            id="ct-hero-subhead"
+            rows={3}
+            value={sections.hero.subhead}
+            onChange={(e) =>
+              setHero({ ...sections.hero, subhead: e.target.value })
+            }
+          />
+        </Field>
+      </section>
+
       <section className="space-y-4">
         <div>
           <h2 className="font-display text-xl">Briefed-by logos</h2>
@@ -264,6 +319,299 @@ export function ContactPageEditorForm({
             />
           </Field>
         </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Email channels</h2>
+          <p className="mt-1 text-sm text-muted">
+            Three mailto cards below the form on /contact.
+          </p>
+        </div>
+        {sections.footer.channels.map((channel, index) => (
+          <div
+            key={`ct-channel-${index}`}
+            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-medium">Channel {index + 1}</p>
+              <button
+                type="button"
+                onClick={() =>
+                  setFooter({
+                    ...sections.footer,
+                    channels: sections.footer.channels.filter(
+                      (_, i) => i !== index,
+                    ),
+                  })
+                }
+                className="text-xs font-medium text-danger hover:underline"
+              >
+                Remove
+              </button>
+            </div>
+            <Field label="Label" id={`ct-channel-label-${index}`}>
+              <TextInput
+                id={`ct-channel-label-${index}`}
+                value={channel.label}
+                onChange={(e) => {
+                  const channels = sections.footer.channels.map((row, i) =>
+                    i === index ? { ...row, label: e.target.value } : row,
+                  );
+                  setFooter({ ...sections.footer, channels });
+                }}
+              />
+            </Field>
+            <Field label="Email address" id={`ct-channel-address-${index}`}>
+              <TextInput
+                id={`ct-channel-address-${index}`}
+                value={channel.address}
+                onChange={(e) => {
+                  const channels = sections.footer.channels.map((row, i) =>
+                    i === index ? { ...row, address: e.target.value } : row,
+                  );
+                  setFooter({ ...sections.footer, channels });
+                }}
+              />
+            </Field>
+            <Field label="Description" id={`ct-channel-body-${index}`}>
+              <TextArea
+                id={`ct-channel-body-${index}`}
+                rows={2}
+                value={channel.body}
+                onChange={(e) => {
+                  const channels = sections.footer.channels.map((row, i) =>
+                    i === index ? { ...row, body: e.target.value } : row,
+                  );
+                  setFooter({ ...sections.footer, channels });
+                }}
+              />
+            </Field>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setFooter({
+              ...sections.footer,
+              channels: [...sections.footer.channels, emptyContactChannel()],
+            })
+          }
+          className="text-sm font-medium text-forest hover:text-forest-dark"
+        >
+          + Add channel
+        </button>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">London office</h2>
+        </div>
+        <Field label="Eyebrow" id="ct-office-eyebrow">
+          <TextInput
+            id="ct-office-eyebrow"
+            value={sections.footer.office.eyebrow}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                office: { ...sections.footer.office, eyebrow: e.target.value },
+              })
+            }
+          />
+        </Field>
+        <Field label="Title" id="ct-office-title">
+          <TextInput
+            id="ct-office-title"
+            value={sections.footer.office.title}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                office: { ...sections.footer.office, title: e.target.value },
+              })
+            }
+          />
+        </Field>
+        <Field label="Address" id="ct-office-body">
+          <TextArea
+            id="ct-office-body"
+            rows={2}
+            value={sections.footer.office.body}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                office: { ...sections.footer.office, body: e.target.value },
+              })
+            }
+          />
+        </Field>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">By phone</h2>
+        </div>
+        <Field label="Eyebrow" id="ct-phone-eyebrow">
+          <TextInput
+            id="ct-phone-eyebrow"
+            value={sections.footer.phone.eyebrow}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                phone: { ...sections.footer.phone, eyebrow: e.target.value },
+              })
+            }
+          />
+        </Field>
+        <Field label="Display number" id="ct-phone-number">
+          <TextInput
+            id="ct-phone-number"
+            value={sections.footer.phone.number}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                phone: { ...sections.footer.phone, number: e.target.value },
+              })
+            }
+          />
+        </Field>
+        <Field
+          label="Tel link"
+          id="ct-phone-tel"
+          hint="Digits only, e.g. +442079460018"
+        >
+          <TextInput
+            id="ct-phone-tel"
+            value={sections.footer.phone.tel}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                phone: { ...sections.footer.phone, tel: e.target.value },
+              })
+            }
+          />
+        </Field>
+        <Field label="Hours / note" id="ct-phone-body">
+          <TextArea
+            id="ct-phone-body"
+            rows={2}
+            value={sections.footer.phone.body}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                phone: { ...sections.footer.phone, body: e.target.value },
+              })
+            }
+          />
+        </Field>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Follow along</h2>
+        </div>
+        <Field label="Eyebrow" id="ct-socials-eyebrow">
+          <TextInput
+            id="ct-socials-eyebrow"
+            value={sections.footer.socials.eyebrow}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                socials: {
+                  ...sections.footer.socials,
+                  eyebrow: e.target.value,
+                },
+              })
+            }
+          />
+        </Field>
+        {sections.footer.socials.items.map((social, index) => (
+          <div
+            key={`ct-social-${index}`}
+            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-medium">Link {index + 1}</p>
+              <button
+                type="button"
+                onClick={() =>
+                  setFooter({
+                    ...sections.footer,
+                    socials: {
+                      ...sections.footer.socials,
+                      items: sections.footer.socials.items.filter(
+                        (_, i) => i !== index,
+                      ),
+                    },
+                  })
+                }
+                className="text-xs font-medium text-danger hover:underline"
+              >
+                Remove
+              </button>
+            </div>
+            <Field label="Network" id={`ct-social-label-${index}`}>
+              <TextInput
+                id={`ct-social-label-${index}`}
+                value={social.label}
+                onChange={(e) => {
+                  const items = sections.footer.socials.items.map((row, i) =>
+                    i === index ? { ...row, label: e.target.value } : row,
+                  );
+                  setFooter({
+                    ...sections.footer,
+                    socials: { ...sections.footer.socials, items },
+                  });
+                }}
+              />
+            </Field>
+            <Field label="Handle" id={`ct-social-handle-${index}`}>
+              <TextInput
+                id={`ct-social-handle-${index}`}
+                value={social.handle}
+                onChange={(e) => {
+                  const items = sections.footer.socials.items.map((row, i) =>
+                    i === index ? { ...row, handle: e.target.value } : row,
+                  );
+                  setFooter({
+                    ...sections.footer,
+                    socials: { ...sections.footer.socials, items },
+                  });
+                }}
+              />
+            </Field>
+            <Field label="URL" id={`ct-social-href-${index}`}>
+              <TextInput
+                id={`ct-social-href-${index}`}
+                value={social.href}
+                onChange={(e) => {
+                  const items = sections.footer.socials.items.map((row, i) =>
+                    i === index ? { ...row, href: e.target.value } : row,
+                  );
+                  setFooter({
+                    ...sections.footer,
+                    socials: { ...sections.footer.socials, items },
+                  });
+                }}
+                placeholder="https://…"
+              />
+            </Field>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setFooter({
+              ...sections.footer,
+              socials: {
+                ...sections.footer.socials,
+                items: [...sections.footer.socials.items, emptyContactSocial()],
+              },
+            })
+          }
+          className="text-sm font-medium text-forest hover:text-forest-dark"
+        >
+          + Add link
+        </button>
       </section>
 
       <div className="flex flex-wrap items-center gap-3 border-t border-charcoal/10 pt-6">

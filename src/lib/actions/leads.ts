@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 import {
+  buildHomeBriefPeptalkPayload,
   buildSendBriefPeptalkPayload,
   parsePeptalkContext,
   parsePeptalkTracking,
@@ -77,6 +78,34 @@ export async function submitBrief(
     };
   }
 
+  let trackingRaw: unknown = {};
+  let contextRaw: unknown = {};
+  try {
+    trackingRaw = JSON.parse(String(formData.get("peptalkTracking") || "{}"));
+  } catch {
+    trackingRaw = {};
+  }
+  try {
+    contextRaw = JSON.parse(String(formData.get("peptalkContext") || "{}"));
+  } catch {
+    contextRaw = {};
+  }
+
+  try {
+    await submitPeptalkPayload(
+      buildHomeBriefPeptalkPayload(
+        parsed.data,
+        parsePeptalkTracking(trackingRaw),
+        parsePeptalkContext(contextRaw),
+      ),
+    );
+  } catch {
+    return {
+      ok: false,
+      message: "We couldn’t send your brief just now. Please try again.",
+    };
+  }
+
   const message = [
     parsed.data.phone ? `Phone: ${parsed.data.phone}` : null,
     parsed.data.role ? `Role: ${parsed.data.role}` : null,
@@ -88,15 +117,19 @@ export async function submitBrief(
     .filter((line): line is string => Boolean(line))
     .join("\n\n");
 
-  await prisma.lead.create({
-    data: {
-      email: parsed.data.email,
-      name: parsed.data.name,
-      company: parsed.data.company,
-      message,
-      source: "CONTACT",
-    },
-  });
+  try {
+    await prisma.lead.create({
+      data: {
+        email: parsed.data.email,
+        name: parsed.data.name,
+        company: parsed.data.company,
+        message,
+        source: "CONTACT",
+      },
+    });
+  } catch {
+    // Peptalk already received the brief — don't fail the visitor.
+  }
 
   return {
     ok: true,

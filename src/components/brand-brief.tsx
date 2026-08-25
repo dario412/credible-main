@@ -2,20 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useActionState, useId, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { CreatorFacesMarquee } from "@/components/creator-faces-marquee";
+import { BriefForm } from "@/components/brief-form";
 import { Home2WaveField } from "@/components/home-2/home-2-wave-field";
 import { PatternField } from "@/components/pattern-field";
-import { submitBrief, type FormState } from "@/lib/actions/leads";
 import {
   DEFAULT_HOME_SECTIONS,
   type HomePageSections,
 } from "@/lib/cms";
 import { cn } from "@/lib/utils";
 
-const initial: FormState = { ok: false, message: "" };
 const CREAM_RGB = { r: 249, g: 243, b: 239 };
 
 function SectionEyebrow({ children }: { children: ReactNode }) {
@@ -163,170 +162,6 @@ function CreatorCta({
   );
 }
 
-function BriefForm({
-  surface = "dark",
-  formFootnote,
-  omitFootnote = false,
-}: {
-  surface?: "dark" | "light";
-  formFootnote?: string;
-  omitFootnote?: boolean;
-}) {
-  const [state, action, pending] = useActionState(submitBrief, initial);
-  const light = surface === "light";
-  const id = useId();
-
-  const fieldShell = light
-    ? "w-full rounded-sm border border-forest/40 bg-[#FBF8F5] px-2.5 text-[0.8125rem] text-charcoal outline-none transition-colors placeholder:text-charcoal/45 focus:border-forest focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-forest"
-    : "w-full rounded-sm border border-cream/25 bg-cream/5 px-2.5 text-[0.8125rem] text-cream outline-none transition-colors placeholder:text-cream/35 focus:border-cream focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-cream";
-  const inputClass = cn(fieldShell, "h-8 leading-none");
-  const textareaClass = cn(fieldShell, "min-h-0 resize-none py-1.5 leading-snug");
-
-  const labelClass = light
-    ? "block text-[0.7rem] font-medium leading-none text-charcoal"
-    : "block text-[0.7rem] font-medium leading-none text-cream/75";
-
-  const optionalClass = light ? "text-charcoal/40" : "text-cream/45";
-  const fieldClass = "space-y-1";
-
-  return (
-    <form action={action} className="space-y-2.5">
-      <div className="grid gap-2.5 sm:grid-cols-2">
-        <div className={fieldClass}>
-          <label htmlFor={`${id}-name`} className={labelClass}>
-            Name
-          </label>
-          <input
-            id={`${id}-name`}
-            name="name"
-            required
-            autoComplete="name"
-            placeholder="First and last"
-            className={inputClass}
-          />
-        </div>
-        <div className={fieldClass}>
-          <label htmlFor={`${id}-email`} className={labelClass}>
-            Work Email
-          </label>
-          <input
-            id={`${id}-email`}
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            placeholder="you@company.com"
-            className={inputClass}
-          />
-        </div>
-        <div className={fieldClass}>
-          <label htmlFor={`${id}-phone`} className={labelClass}>
-            Phone
-          </label>
-          <input
-            id={`${id}-phone`}
-            name="phone"
-            type="tel"
-            required
-            autoComplete="tel"
-            placeholder="+1 555 000 0000"
-            className={inputClass}
-          />
-        </div>
-        <div className={fieldClass}>
-          <label htmlFor={`${id}-company`} className={labelClass}>
-            Company
-          </label>
-          <input
-            id={`${id}-company`}
-            name="company"
-            required
-            autoComplete="organization"
-            placeholder="Where you're briefing from"
-            className={inputClass}
-          />
-        </div>
-        <div className={cn(fieldClass, "sm:col-span-2")}>
-          <label htmlFor={`${id}-role`} className={labelClass}>
-            Role{" "}
-            <span className={cn("font-normal", optionalClass)}>(Optional)</span>
-          </label>
-          <input
-            id={`${id}-role`}
-            name="role"
-            autoComplete="organization-title"
-            placeholder="Head of Brand"
-            className={inputClass}
-          />
-        </div>
-        <div className={cn(fieldClass, "sm:col-span-2")}>
-          <label htmlFor={`${id}-message`} className={labelClass}>
-            Brief
-          </label>
-          <textarea
-            id={`${id}-message`}
-            name="brief"
-            required
-            rows={2}
-            placeholder="Audience, ambition, deadline, budget shape."
-            className={textareaClass}
-          />
-        </div>
-        <div className={cn(fieldClass, "sm:col-span-2")}>
-          <label htmlFor={`${id}-deliverables`} className={labelClass}>
-            Deliverables{" "}
-            <span className={cn("font-normal", optionalClass)}>(Optional)</span>
-          </label>
-          <textarea
-            id={`${id}-deliverables`}
-            name="deliverables"
-            rows={2}
-            placeholder="What you need delivered, and by when."
-            className={textareaClass}
-          />
-        </div>
-      </div>
-
-      <div>
-        <button
-          type="submit"
-          disabled={pending}
-          className={cn(
-            "inline-flex w-full items-center justify-center gap-2 rounded-sm border px-6 py-2.5 text-[0.8125rem] font-medium transition-colors disabled:opacity-60",
-            light
-              ? "border-forest bg-forest text-cream hover:border-forest-dark hover:bg-forest-dark"
-              : "border-cream bg-cream text-charcoal hover:bg-cream-dark",
-          )}
-        >
-          {pending ? "Sending…" : "Send brief"}
-          <ArrowIcon className="size-3.5 shrink-0" />
-        </button>
-        {light && !omitFootnote && formFootnote?.trim() ? (
-          <p className="mt-3 text-center text-[0.72rem] leading-snug text-charcoal/45">
-            {formFootnote}
-          </p>
-        ) : null}
-      </div>
-
-      {state.message ? (
-        <p
-          role="status"
-          className={cn(
-            "text-sm",
-            state.ok
-              ? light
-                ? "text-forest"
-                : "text-[#E4EBE6]"
-              : "text-danger",
-          )}
-        >
-          {state.message}
-        </p>
-      ) : null}
-    </form>
-  );
-}
-
 function BriefBody({
   formInCard = false,
 }: {
@@ -370,12 +205,9 @@ function BriefBody({
 
 function BoxedBrief({
   content,
-  creatorCta,
   editSlots,
-  creatorCtaEditSlots,
 }: {
   content: HomePageSections["brandBrief"];
-  creatorCta: HomePageSections["creatorCta"];
   editSlots?: {
     eyebrow?: (node: ReactNode) => ReactNode;
     headline?: (node: ReactNode) => ReactNode;
@@ -384,13 +216,6 @@ function BoxedBrief({
     formTitle?: (node: ReactNode) => ReactNode;
     formFootnote?: (node: ReactNode) => ReactNode;
     briefedBy?: (node: ReactNode) => ReactNode;
-  };
-  creatorCtaEditSlots?: {
-    eyebrow?: (node: ReactNode) => ReactNode;
-    headline?: (node: ReactNode) => ReactNode;
-    subhead?: (node: ReactNode) => ReactNode;
-    stats?: (node: ReactNode) => ReactNode;
-    buttons?: (node: ReactNode) => ReactNode;
   };
 }) {
   const eyebrowNode = <SectionEyebrow>{content.eyebrow}</SectionEyebrow>;
@@ -548,10 +373,6 @@ function BoxedBrief({
           </div>
         </div>
       </div>
-
-      <div className="mx-auto mt-4 max-w-352 md:mt-5">
-        <CreatorCta content={creatorCta} editSlots={creatorCtaEditSlots} />
-      </div>
     </section>
   );
 }
@@ -587,9 +408,7 @@ export function BrandBrief({
     return (
       <BoxedBrief
         content={content ?? DEFAULT_HOME_SECTIONS.brandBrief}
-        creatorCta={creatorCta ?? DEFAULT_HOME_SECTIONS.creatorCta}
         editSlots={editSlots}
-        creatorCtaEditSlots={creatorCtaEditSlots}
       />
     );
   }

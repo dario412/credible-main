@@ -135,11 +135,11 @@ export function Home2Hero({
 
       {/* Bottom dissolve into next cream section — sits above cast so portraits ease out */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-40 md:h-48 lg:h-56"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 md:h-20"
         aria-hidden
         style={{
           background:
-            "linear-gradient(to top, #F9F3EF 0%, rgba(249,243,239,0.92) 22%, rgba(249,243,239,0.55) 48%, rgba(249,243,239,0.18) 72%, transparent 100%)",
+            "linear-gradient(to top, #F9F3EF 0%, rgba(249,243,239,0.9) 35%, rgba(249,243,239,0.35) 70%, transparent 100%)",
         }}
       />
 
@@ -156,12 +156,12 @@ export function Home2Hero({
         </div>
       </div>
 
-      <div className="relative z-10 w-full pb-20 pt-10 md:pb-24 md:pt-14">
+      <div className="relative z-10 w-full pt-8 md:pt-10">
         {cast.length > 0 ? (
           <AboutRosterRail
             members={cast}
             sizeScale="subtle"
-            className="py-8 md:py-10"
+            className="pt-4 md:pt-5"
           />
         ) : null}
       </div>

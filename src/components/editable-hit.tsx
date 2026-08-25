@@ -12,6 +12,7 @@ export function EditableHit({
   label,
   block = false,
   ringOffset = "ring-offset-cream",
+  className,
 }: {
   active: boolean;
   selected: boolean;
@@ -20,14 +21,20 @@ export function EditableHit({
   label: string;
   block?: boolean;
   ringOffset?: string;
+  className?: string;
 }) {
-  if (!active) return <>{children}</>;
+  if (!active) {
+    return (
+      <div className={cn(block && "block w-full", className)}>{children}</div>
+    );
+  }
 
   return (
     <div
       className={cn(
         "relative max-w-full",
         block ? "block w-full" : "inline-block",
+        className,
       )}
     >
       <button

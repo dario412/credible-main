@@ -1,9 +1,16 @@
-import { prisma } from "@/lib/prisma";
-import { createMetadata } from "@/lib/seo";
-import { parseExpertChannels } from "@/lib/expert-channels";
-import { isLinkedInTopVoice } from "@/lib/expert-profiles";
+import { RosterVisualEditor } from "@/components/roster-visual-editor";
 import { RosterCard, type RosterCardExpert } from "@/components/roster-card";
 import { StickyRosterFilters } from "@/components/roster-filters";
+import {
+  getRosterPageSections,
+  saveRosterPage,
+} from "@/lib/actions/admin-cms";
+import { auth } from "@/lib/auth";
+import { parseExpertChannels } from "@/lib/expert-channels";
+import { isLinkedInTopVoice } from "@/lib/expert-profiles";
+import { hasPermission } from "@/lib/permissions";
+import { prisma } from "@/lib/prisma";
+import { createMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +37,15 @@ export default async function RosterPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const params = await searchParams;
+  const [params, sections, session] = await Promise.all([
+    searchParams,
+    getRosterPageSections(),
+    auth(),
+  ]);
+  const canEdit = Boolean(
+    session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
+  );
+
   const archetype = (params.archetype ?? params.category)?.trim();
   const topic = params.topic?.trim();
   const channelParam = params.channels?.trim() || params.format?.trim();
@@ -99,37 +114,30 @@ export default async function RosterPage({
   return (
     <div className="px-6 py-16 md:px-10 md:py-20 lg:px-12">
       <div className="mx-auto max-w-352">
-        <div className="mx-auto max-w-3xl text-center">
-          <h1 className="font-display text-[2.6rem] leading-[1.08] tracking-tight text-charcoal sm:text-[3.15rem] md:text-[3.65rem]">
-            24 B2B expert creators
-            <br />
-            <span className="text-forest">ready to brief.</span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-lg text-[0.9rem] leading-relaxed text-charcoal/65 md:text-[0.95rem]">
-            Filter by role, topic or channel. Each profile carries reach
-            data, past collaborations and format-level pricing so you can
-            shortlist before you brief.
+        <RosterVisualEditor
+          initial={sections}
+          canEdit={canEdit}
+          saveAction={saveRosterPage}
+        >
+          <StickyRosterFilters
+            currentArchetype={archetype}
+            currentTopic={topic}
+            currentChannels={selectedChannels}
+            currentQuery={q}
+          />
+
+          <p className="mt-8 text-sm text-charcoal/50">
+            {experts.length === 0
+              ? "No experts match these filters."
+              : `${experts.length} ${experts.length === 1 ? "expert" : "experts"}`}
           </p>
-        </div>
 
-        <StickyRosterFilters
-          currentArchetype={archetype}
-          currentTopic={topic}
-          currentChannels={selectedChannels}
-          currentQuery={q}
-        />
-
-        <p className="mt-8 text-sm text-charcoal/50">
-          {experts.length === 0
-            ? "No experts match these filters."
-            : `${experts.length} ${experts.length === 1 ? "expert" : "experts"}`}
-        </p>
-
-        <div className="mt-5 grid items-stretch gap-x-5 gap-y-10 overflow-visible sm:grid-cols-2 lg:grid-cols-3">
-          {cards.map((expert) => (
-            <RosterCard key={expert.id} expert={expert} />
-          ))}
-        </div>
+          <div className="mt-5 grid items-stretch gap-x-5 gap-y-10 overflow-visible sm:grid-cols-2 lg:grid-cols-3">
+            {cards.map((expert) => (
+              <RosterCard key={expert.id} expert={expert} />
+            ))}
+          </div>
+        </RosterVisualEditor>
       </div>
     </div>
   );
