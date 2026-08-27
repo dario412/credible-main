@@ -26,7 +26,16 @@ type ProfileEditTarget =
   | "profileCta.primaryCta"
   | "profileCta.secondaryCta"
   | "profileCta.similar"
-  | `profileFormats.${ProfileFormatKind}`;
+  | `profileFormats.${ProfileFormatKind}`
+  | "profileLayout.heroBriefCtaLabel"
+  | "profileLayout.trustedByLabel"
+  | "profileLayout.headings.overview"
+  | "profileLayout.headings.overviewEyebrow"
+  | "profileLayout.headings.channels"
+  | "profileLayout.headings.topics"
+  | "profileLayout.headings.formats"
+  | "profileLayout.headings.work"
+  | "profileLayout.sectionOrder";
 
 const NAV_LABEL_HINTS: Record<keyof ProfileRailNavLabels, string> = {
   overview: "Overview",
@@ -54,6 +63,15 @@ function targetTitle(target: ProfileEditTarget): string {
     "profileCta.primaryCta": "Footer primary button",
     "profileCta.secondaryCta": "Footer secondary button",
     "profileCta.similar": "Similar creators strip",
+    "profileLayout.heroBriefCtaLabel": "Hero brief CTA",
+    "profileLayout.trustedByLabel": "Trusted by label",
+    "profileLayout.headings.overview": "Overview heading",
+    "profileLayout.headings.overviewEyebrow": "Overview eyebrow",
+    "profileLayout.headings.channels": "Channels heading",
+    "profileLayout.headings.topics": "Topics heading",
+    "profileLayout.headings.formats": "Formats heading",
+    "profileLayout.headings.work": "Recent work heading",
+    "profileLayout.sectionOrder": "Section order",
   };
   if (target.startsWith("profileRail.nav.")) {
     const key = target.split(".")[2] as keyof ProfileRailNavLabels;
@@ -71,6 +89,7 @@ function profileSnapshot(chrome: SiteChromeSections) {
     profileRail: chrome.profileRail,
     profileCta: chrome.profileCta,
     profileFormats: chrome.profileFormats,
+    profileLayout: chrome.profileLayout,
   };
 }
 
@@ -121,10 +140,15 @@ function EditorPopover({
     onChange({ ...chrome, profileFormats });
   }
 
+  function setLayout(profileLayout: SiteChromeSections["profileLayout"]) {
+    onChange({ ...chrome, profileLayout });
+  }
+
   const navMatch = target.match(
     /^profileRail\.nav\.(overview|channels|topics|formats|work)$/,
   );
   const navKey = navMatch?.[1] as keyof ProfileRailNavLabels | undefined;
+  const layout = chrome.profileLayout;
 
   return (
     <div
@@ -420,6 +444,144 @@ function EditorPopover({
             </div>
           ) : null,
         )}
+
+        {target === "profileLayout.heroBriefCtaLabel" ? (
+          <Field
+            label="Hero brief CTA"
+            id="pl-hero-brief"
+            hint="Use {first}."
+          >
+            <TextInput
+              id="pl-hero-brief"
+              value={layout.heroBriefCtaLabel}
+              onChange={(e) =>
+                setLayout({ ...layout, heroBriefCtaLabel: e.target.value })
+              }
+            />
+          </Field>
+        ) : null}
+
+        {target === "profileLayout.trustedByLabel" ? (
+          <Field label="Trusted by label" id="pl-trusted-by">
+            <TextInput
+              id="pl-trusted-by"
+              value={layout.trustedByLabel}
+              onChange={(e) =>
+                setLayout({ ...layout, trustedByLabel: e.target.value })
+              }
+            />
+          </Field>
+        ) : null}
+
+        {(
+          [
+            ["overview", "Overview heading"],
+            ["overviewEyebrow", "Overview eyebrow"],
+            ["channels", "Channels heading"],
+            ["topics", "Topics heading"],
+            ["formats", "Formats heading"],
+            ["work", "Recent work heading"],
+          ] as const
+        ).map(([key, label]) =>
+          target === `profileLayout.headings.${key}` ? (
+            <Field key={key} label={label} id={`pl-h-${key}`}>
+              <TextInput
+                id={`pl-h-${key}`}
+                value={layout.headings[key]}
+                onChange={(e) =>
+                  setLayout({
+                    ...layout,
+                    headings: { ...layout.headings, [key]: e.target.value },
+                  })
+                }
+              />
+            </Field>
+          ) : null,
+        )}
+
+        {target === "profileLayout.sectionOrder" ? (
+          <div className="space-y-3">
+            <p className="text-xs text-charcoal/55">
+              Move sections up or down. Empty sections stay hidden on each
+              profile.
+            </p>
+            {layout.sectionOrder.map((id, index) => (
+              <div
+                key={id}
+                className="flex items-center justify-between gap-2 rounded-sm border border-charcoal/10 px-2.5 py-2"
+              >
+                <span className="text-sm capitalize text-charcoal">{id}</span>
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    disabled={index === 0}
+                    className="rounded-sm border border-charcoal/15 px-2 py-0.5 text-xs disabled:opacity-30"
+                    onClick={() => {
+                      const next = [...layout.sectionOrder];
+                      const [item] = next.splice(index, 1);
+                      next.splice(index - 1, 0, item!);
+                      setLayout({ ...layout, sectionOrder: next });
+                    }}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    disabled={index >= layout.sectionOrder.length - 1}
+                    className="rounded-sm border border-charcoal/15 px-2 py-0.5 text-xs disabled:opacity-30"
+                    onClick={() => {
+                      const next = [...layout.sectionOrder];
+                      const [item] = next.splice(index, 1);
+                      next.splice(index + 1, 0, item!);
+                      setLayout({ ...layout, sectionOrder: next });
+                    }}
+                  >
+                    ↓
+                  </button>
+                </div>
+              </div>
+            ))}
+            <p className="pt-2 text-xs font-medium text-charcoal/55">
+              Closing blocks
+            </p>
+            {layout.footerOrder.map((id, index) => (
+              <div
+                key={id}
+                className="flex items-center justify-between gap-2 rounded-sm border border-charcoal/10 px-2.5 py-2"
+              >
+                <span className="text-sm text-charcoal">{id}</span>
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    disabled={index === 0}
+                    className="rounded-sm border border-charcoal/15 px-2 py-0.5 text-xs disabled:opacity-30"
+                    onClick={() => {
+                      const next = [...layout.footerOrder];
+                      const [item] = next.splice(index, 1);
+                      next.splice(index - 1, 0, item!);
+                      setLayout({ ...layout, footerOrder: next });
+                    }}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    disabled={index >= layout.footerOrder.length - 1}
+                    className="rounded-sm border border-charcoal/15 px-2 py-0.5 text-xs disabled:opacity-30"
+                    onClick={() => {
+                      const next = [...layout.footerOrder];
+                      const [item] = next.splice(index, 1);
+                      next.splice(index + 1, 0, item!);
+                      setLayout({ ...layout, footerOrder: next });
+                    }}
+                  >
+                    ↓
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -480,6 +642,7 @@ export function ProfileVisualEditor({
       profileRail: baseline.profileRail,
       profileCta: baseline.profileCta,
       profileFormats: baseline.profileFormats,
+      profileLayout: baseline.profileLayout,
     });
     setSelected(null);
     setMessage("");
@@ -506,6 +669,14 @@ export function ProfileVisualEditor({
           <>
             <Button
               type="button"
+              variant="ghost"
+              className="px-3! py-2! text-xs"
+              onClick={() => setSelected("profileLayout.sectionOrder")}
+            >
+              Reorder sections
+            </Button>
+            <Button
+              type="button"
               variant="primary"
               className="px-4! py-2! text-xs"
               disabled={!dirty || pending}
@@ -523,7 +694,7 @@ export function ProfileVisualEditor({
               Discard
             </Button>
             <a
-              href="/admin/pages/site"
+              href="/admin/pages/profile"
               className="px-2 text-xs font-medium text-charcoal/55 hover:text-charcoal"
             >
               Admin form

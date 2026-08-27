@@ -21,7 +21,7 @@ const nav = [
   },
   {
     href: "/admin/case-studies",
-    label: "Case studies",
+    label: "Projects",
     permission: "MANAGE_CONTENT" as const,
   },
   {

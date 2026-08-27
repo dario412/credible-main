@@ -12,7 +12,7 @@ export function RepresentationFaq({
   items: readonly { q: string; a: string }[];
 }) {
   const baseId = useId();
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <dl className="flex flex-col gap-3">
@@ -23,15 +23,21 @@ export function RepresentationFaq({
 
         return (
           <FadeUp key={item.q} delay={index * 70} y={16} threshold={0.12}>
-            <div className="rounded-sm bg-cream-dark px-6 py-7 md:px-10 md:py-8">
+            <div
+              className="cursor-pointer rounded-sm bg-cream-dark px-6 py-7 md:px-10 md:py-8"
+              onClick={() => setOpenIndex(open ? null : index)}
+            >
             <dt>
               <button
                 id={buttonId}
                 type="button"
                 aria-expanded={open}
                 aria-controls={panelId}
-                onClick={() => setOpenIndex(open ? null : index)}
-                className="flex w-full items-center justify-between gap-6 text-left"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpenIndex(open ? null : index);
+                }}
+                className="flex w-full cursor-pointer items-center justify-between gap-6 text-left"
               >
                 <span className="min-w-0 flex-1 font-display text-[1.25rem] leading-[1.3] tracking-tight text-charcoal md:text-[1.5rem]">
                   {item.q}

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { CaseStudyLinkField } from "@/components/case-study-link-field";
 import { MediaField } from "@/components/media-library";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
@@ -13,10 +14,12 @@ import {
 
 export function AdminTrustedByEditor({
   initial,
+  caseStudyOptions = [],
   saveAction,
   deleteAction,
 }: {
   initial: TrustedByClient;
+  caseStudyOptions?: Array<{ slug: string; label: string }>;
   saveAction: typeof import("@/lib/actions/admin-trusted-by").saveTrustedClient;
   deleteAction?: typeof import("@/lib/actions/admin-trusted-by").deleteTrustedClient;
 }) {
@@ -74,25 +77,19 @@ export function AdminTrustedByEditor({
         />
       </div>
 
-      <Field
-        label="Case study slug (optional)"
+      <CaseStudyLinkField
         id="slug"
-        hint="Links the logo and Customer story pill on the homepage, e.g. stage-to-boardroom"
-      >
-        <TextInput
-          id="slug"
-          value={client.caseStudySlug}
-          onChange={(e) =>
-            setClient({ ...client, caseStudySlug: e.target.value })
-          }
-        />
-      </Field>
+        value={client.caseStudySlug}
+        options={caseStudyOptions}
+        onChange={(caseStudySlug) => setClient({ ...client, caseStudySlug })}
+      />
 
       <div className="flex items-center justify-between gap-3 border-t border-charcoal/10 pt-4">
         <div>
           <p className="text-sm font-medium text-charcoal">Testimonial hover</p>
           <p className="mt-0.5 text-xs text-charcoal/50">
-            Leave empty for logo-only cells.
+            Optional quote box on hover — independent of the Customer story
+            button.
           </p>
         </div>
         <Button

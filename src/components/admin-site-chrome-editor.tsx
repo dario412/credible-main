@@ -7,10 +7,14 @@ import {
   emptyFooterColumn,
   emptyNavLink,
   emptySocialLink,
+  PROFILE_BODY_SECTION_LABELS,
+  PROFILE_FOOTER_BLOCK_LABELS,
   PROFILE_FORMAT_KINDS,
   SOCIAL_NETWORKS,
   type FooterColumn,
   type NavLink,
+  type ProfileBodySectionId,
+  type ProfileFooterBlockId,
   type SiteChromeSections,
   type SocialLink,
   type SocialNetwork,
@@ -126,14 +130,18 @@ function NavLinkRows({
 export function SiteChromeEditorForm({
   initial,
   saveAction,
+  focus = "all",
 }: {
   initial: SiteChromeSections;
   saveAction: typeof import("@/lib/actions/admin-cms").saveSiteChrome;
+  /** "profile" shows only creator-profile template fields. */
+  focus?: "all" | "profile";
 }) {
   const [sections, setSections] = useState(initial);
   const [message, setMessage] = useState("");
   const [ok, setOk] = useState(false);
   const [pending, setPending] = useState(false);
+  const profileOnly = focus === "profile";
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -150,6 +158,10 @@ export function SiteChromeEditorForm({
 
   function setProfileRail(profileRail: SiteChromeSections["profileRail"]) {
     setSections({ ...sections, profileRail });
+  }
+
+  function setProfileLayout(profileLayout: SiteChromeSections["profileLayout"]) {
+    setSections({ ...sections, profileLayout });
   }
 
   function setProfileCta(profileCta: SiteChromeSections["profileCta"]) {
@@ -214,6 +226,7 @@ export function SiteChromeEditorForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-10">
+      {!profileOnly ? (
       <section className="space-y-4">
         <div>
           <h2 className="font-display text-xl">Header</h2>
@@ -249,6 +262,7 @@ export function SiteChromeEditorForm({
           </Field>
         </div>
       </section>
+      ) : null}
 
       <section className="space-y-4">
         <div>
@@ -415,6 +429,133 @@ export function SiteChromeEditorForm({
             />
           </Field>
         </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Creator profile page layout</h2>
+          <p className="mt-1 text-sm text-muted">
+            Reorder body sections and closing blocks on every roster profile.
+            Use {"{first}"} in headings and the hero CTA label.
+          </p>
+        </div>
+
+        <div className="space-y-3 rounded-sm border border-charcoal/10 p-4">
+          <p className="text-sm font-medium">Body section order</p>
+          <p className="text-xs text-muted">
+            Sections without creator content stay hidden; order still applies
+            when they appear.
+          </p>
+          {sections.profileLayout.sectionOrder.map((id, index) => (
+            <div
+              key={id}
+              className="flex items-center justify-between gap-3 rounded-sm border border-charcoal/8 bg-cream/40 px-3 py-2"
+            >
+              <p className="text-sm text-charcoal">
+                {PROFILE_BODY_SECTION_LABELS[id]}
+              </p>
+              <MoveButtons
+                index={index}
+                total={sections.profileLayout.sectionOrder.length}
+                onMove={(from, to) => {
+                  const next = [...sections.profileLayout.sectionOrder];
+                  const [item] = next.splice(from, 1);
+                  next.splice(to, 0, item as ProfileBodySectionId);
+                  setProfileLayout({
+                    ...sections.profileLayout,
+                    sectionOrder: next,
+                  });
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-3 rounded-sm border border-charcoal/10 p-4">
+          <p className="text-sm font-medium">Closing block order</p>
+          {sections.profileLayout.footerOrder.map((id, index) => (
+            <div
+              key={id}
+              className="flex items-center justify-between gap-3 rounded-sm border border-charcoal/8 bg-cream/40 px-3 py-2"
+            >
+              <p className="text-sm text-charcoal">
+                {PROFILE_FOOTER_BLOCK_LABELS[id]}
+              </p>
+              <MoveButtons
+                index={index}
+                total={sections.profileLayout.footerOrder.length}
+                onMove={(from, to) => {
+                  const next = [...sections.profileLayout.footerOrder];
+                  const [item] = next.splice(from, 1);
+                  next.splice(to, 0, item as ProfileFooterBlockId);
+                  setProfileLayout({
+                    ...sections.profileLayout,
+                    footerOrder: next,
+                  });
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-3 rounded-sm border border-charcoal/10 p-4">
+          <p className="text-sm font-medium">Section headings</p>
+          {(
+            [
+              ["overview", "Overview heading"],
+              ["overviewEyebrow", "Overview eyebrow"],
+              ["channels", "Channels heading"],
+              ["topics", "Topics heading"],
+              ["formats", "Formats heading"],
+              ["work", "Recent work heading"],
+            ] as const
+          ).map(([key, label]) => (
+            <Field key={key} label={label} id={`pl-heading-${key}`}>
+              <TextInput
+                id={`pl-heading-${key}`}
+                value={sections.profileLayout.headings[key]}
+                onChange={(e) =>
+                  setProfileLayout({
+                    ...sections.profileLayout,
+                    headings: {
+                      ...sections.profileLayout.headings,
+                      [key]: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+          ))}
+        </div>
+
+        <Field
+          label="Hero brief CTA"
+          id="pl-hero-brief"
+          hint="Use {first}. Shown on the full-bleed profile hero."
+        >
+          <TextInput
+            id="pl-hero-brief"
+            value={sections.profileLayout.heroBriefCtaLabel}
+            onChange={(e) =>
+              setProfileLayout({
+                ...sections.profileLayout,
+                heroBriefCtaLabel: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Trusted by label" id="pl-trusted-by">
+          <TextInput
+            id="pl-trusted-by"
+            value={sections.profileLayout.trustedByLabel}
+            onChange={(e) =>
+              setProfileLayout({
+                ...sections.profileLayout,
+                trustedByLabel: e.target.value,
+              })
+            }
+          />
+        </Field>
       </section>
 
       <section className="space-y-4">
@@ -595,6 +736,8 @@ export function SiteChromeEditorForm({
         </div>
       </section>
 
+      {!profileOnly ? (
+      <>
       <section className="space-y-4">
         <div>
           <h2 className="font-display text-xl">Insights page promos</h2>
@@ -1209,6 +1352,8 @@ export function SiteChromeEditorForm({
           }
         />
       </section>
+      </>
+      ) : null}
 
       <div
         className={cn(
@@ -1216,15 +1361,19 @@ export function SiteChromeEditorForm({
         )}
       >
         <Button type="submit" variant="primary" disabled={pending}>
-          {pending ? "Saving…" : "Save header & footer"}
+          {pending
+            ? "Saving…"
+            : profileOnly
+              ? "Save profile template"
+              : "Save header & footer"}
         </Button>
         <a
-          href="/"
+          href={profileOnly ? "/roster" : "/"}
           target="_blank"
           rel="noreferrer"
           className="text-sm font-medium text-charcoal/60 hover:text-charcoal"
         >
-          View site ↗
+          {profileOnly ? "View roster ↗" : "View site ↗"}
         </a>
         {message ? (
           <p className={`text-sm ${ok ? "text-success" : "text-danger"}`}>

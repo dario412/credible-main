@@ -139,7 +139,7 @@ export function CaseStudiesPageEditorForm({
             }
           />
         </Field>
-        <Field label="Empty — no case studies" id="cs-archive-empty-none">
+        <Field label="Empty — no projects" id="cs-archive-empty-none">
           <TextInput
             id="cs-archive-empty-none"
             value={sections.archive.emptyNone}

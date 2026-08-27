@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -26,6 +28,8 @@ import { PatternField } from "@/components/pattern-field";
 import type { RosterCardExpert } from "@/components/roster-card";
 import { SimilarCreatorsGrid } from "@/components/similar-creators-grid";
 import { StatCounter } from "@/components/stat-counter";
+import { useSiteChrome } from "@/components/site-chrome-context";
+import { ProfileEditHit } from "@/components/use-profile-edit-hit";
 import {
   firstName,
   type ExpertAudience,
@@ -35,6 +39,11 @@ import {
   type ExpertTopicShare,
 } from "@/lib/expert-profiles";
 import { getCaseStudy } from "@/lib/case-studies";
+import {
+  applyProfileRailTemplate,
+  type ProfileBodySectionId,
+  type ProfileFooterBlockId,
+} from "@/lib/site-chrome";
 import { cn } from "@/lib/utils";
 
 function SectionHeading({
@@ -194,23 +203,38 @@ function IntroBlock({
   bio,
   quote,
   quoteAttribution,
+  title,
+  eyebrow,
 }: {
   first: string;
   bio: string;
   quote?: string;
   quoteAttribution?: string;
+  title: string;
+  eyebrow: string;
 }) {
   const paragraphs = bioParagraphs(bio);
 
   return (
     <div id="overview" className="scroll-mt-28">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h2 className="max-w-[16ch] font-display text-[1.75rem] leading-[1.08] tracking-tight text-charcoal md:text-[2rem]">
-          About {first}.
-        </h2>
-        <p className="text-[0.7rem] font-medium tracking-[0.14em] text-charcoal/40 uppercase">
-          Biography
-        </p>
+        <ProfileEditHit
+          field="profileLayout.headings.overview"
+          label="Overview heading"
+          block
+        >
+          <h2 className="max-w-[16ch] font-display text-[1.75rem] leading-[1.08] tracking-tight text-charcoal md:text-[2rem]">
+            {title}
+          </h2>
+        </ProfileEditHit>
+        <ProfileEditHit
+          field="profileLayout.headings.overviewEyebrow"
+          label="Overview eyebrow"
+        >
+          <p className="text-[0.7rem] font-medium tracking-[0.14em] text-charcoal/40 uppercase">
+            {eyebrow}
+          </p>
+        </ProfileEditHit>
       </div>
 
       <div
@@ -243,12 +267,20 @@ function IntroBlock({
 
 function ChannelsSection({
   channels,
+  title,
 }: {
   channels: ExpertChannelPresence[];
+  title: string;
 }) {
   return (
     <section id="channels" className="scroll-mt-28">
-      <SectionHeading>Presence across channels.</SectionHeading>
+      <ProfileEditHit
+        field="profileLayout.headings.channels"
+        label="Channels heading"
+        block
+      >
+        <SectionHeading>{title}</SectionHeading>
+      </ProfileEditHit>
 
       <div className="mt-8 overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] shadow-[0_12px_32px_rgba(28,26,23,0.06)]">
         <div className="overflow-x-auto">
@@ -317,20 +349,25 @@ function ChannelsSection({
 }
 
 function TopicsAndAudience({
-  first,
   topicShares,
   audience,
+  title,
 }: {
   first: string;
   topicShares: ExpertTopicShare[];
   audience: ExpertAudience;
+  title: string;
 }) {
   return (
     <section id="topics" className="scroll-mt-28">
       <div className="max-w-2xl">
-        <SectionHeading className="max-w-none">
-          What {first} covers — and who shows up for it.
-        </SectionHeading>
+        <ProfileEditHit
+          field="profileLayout.headings.topics"
+          label="Topics heading"
+          block
+        >
+          <SectionHeading className="max-w-none">{title}</SectionHeading>
+        </ProfileEditHit>
       </div>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-4 md:mt-12 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-5">
@@ -353,13 +390,21 @@ function TopicsAndAudience({
 function FormatsSection({
   formats,
   name,
+  title,
 }: {
   formats: ExpertFormatOffering[];
   name: string;
+  title: string;
 }) {
   return (
     <section id="formats" className="scroll-mt-28">
-      <SectionHeading>Formats available.</SectionHeading>
+      <ProfileEditHit
+        field="profileLayout.headings.formats"
+        label="Formats heading"
+        block
+      >
+        <SectionHeading>{title}</SectionHeading>
+      </ProfileEditHit>
       <ExpertFormatsGrid formats={formats} name={name} />
     </section>
   );
@@ -378,11 +423,23 @@ function workCover(item: ExpertRecentWork): string | null {
   return getCaseStudy(slug)?.coverImage ?? null;
 }
 
-function RecentWorkSection({ work }: { work: ExpertRecentWork[] }) {
+function RecentWorkSection({
+  work,
+  title,
+}: {
+  work: ExpertRecentWork[];
+  title: string;
+}) {
   if (work.length === 1) {
     return (
       <section id="work" className="scroll-mt-28">
-        <SectionHeading>Recent work.</SectionHeading>
+        <ProfileEditHit
+          field="profileLayout.headings.work"
+          label="Recent work heading"
+          block
+        >
+          <SectionHeading>{title}</SectionHeading>
+        </ProfileEditHit>
         <div className="mt-8">
           <FeaturedCaseStudyCard item={work[0]!} />
         </div>
@@ -392,7 +449,13 @@ function RecentWorkSection({ work }: { work: ExpertRecentWork[] }) {
 
   return (
     <section id="work" className="scroll-mt-28">
-      <SectionHeading>Recent work.</SectionHeading>
+      <ProfileEditHit
+        field="profileLayout.headings.work"
+        label="Recent work heading"
+        block
+      >
+        <SectionHeading>{title}</SectionHeading>
+      </ProfileEditHit>
 
       <ul className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
         {work.map((item) => {
@@ -436,7 +499,7 @@ function RecentWorkSection({ work }: { work: ExpertRecentWork[] }) {
               </p>
               {item.href ? (
                 <span className="mt-3 inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-charcoal/50 transition-colors duration-300 group-hover:text-forest">
-                  View case
+                  View project
                   <span
                     aria-hidden
                     className="transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5"
@@ -486,38 +549,65 @@ export function ExpertProfileMain({
   recentWork?: ExpertRecentWork[];
   name: string;
 }) {
+  const { chrome } = useSiteChrome();
+  const layout = chrome.profileLayout;
   const first = firstName(name);
+  const vars = { first, name };
   const hasTopicsAudience =
     (topicShares?.length ?? 0) > 0 && audience != null;
 
-  return (
-    <div className="flex flex-col gap-14 md:gap-16 lg:gap-20 lg:pt-1">
+  const heading = {
+    overview: applyProfileRailTemplate(layout.headings.overview, vars),
+    overviewEyebrow: layout.headings.overviewEyebrow,
+    channels: applyProfileRailTemplate(layout.headings.channels, vars),
+    topics: applyProfileRailTemplate(layout.headings.topics, vars),
+    formats: applyProfileRailTemplate(layout.headings.formats, vars),
+    work: applyProfileRailTemplate(layout.headings.work, vars),
+  };
+
+  const sectionNodes: Partial<Record<ProfileBodySectionId, ReactNode>> = {
+    overview: (
       <IntroBlock
         first={first}
         bio={bio}
         quote={quote}
         quoteAttribution={quoteAttribution}
+        title={heading.overview}
+        eyebrow={heading.overviewEyebrow}
       />
-
-      {channels && channels.length > 0 ? (
-        <ChannelsSection channels={channels} />
-      ) : null}
-
-      {hasTopicsAudience ? (
-        <TopicsAndAudience
-          first={first}
-          topicShares={topicShares!}
-          audience={audience!}
+    ),
+    channels:
+      channels && channels.length > 0 ? (
+        <ChannelsSection channels={channels} title={heading.channels} />
+      ) : null,
+    topics: hasTopicsAudience ? (
+      <TopicsAndAudience
+        first={first}
+        topicShares={topicShares!}
+        audience={audience!}
+        title={heading.topics}
+      />
+    ) : null,
+    formats:
+      formats && formats.length > 0 ? (
+        <FormatsSection
+          formats={formats}
+          name={name}
+          title={heading.formats}
         />
-      ) : null}
+      ) : null,
+    work:
+      recentWork && recentWork.length > 0 ? (
+        <RecentWorkSection work={recentWork} title={heading.work} />
+      ) : null,
+  };
 
-      {formats && formats.length > 0 ? (
-        <FormatsSection formats={formats} name={name} />
-      ) : null}
-
-      {recentWork && recentWork.length > 0 ? (
-        <RecentWorkSection work={recentWork} />
-      ) : null}
+  return (
+    <div className="flex flex-col gap-14 md:gap-16 lg:gap-20 lg:pt-1">
+      {layout.sectionOrder.map((id) => {
+        const node = sectionNodes[id];
+        return node ? <div key={id}>{node}</div> : null;
+      })}
     </div>
   );
 }
@@ -533,9 +623,15 @@ export function ExpertProfileFooter({
   slug: string;
   similar: RosterCardExpert[];
 }) {
-  return (
-    <>
-      <section className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
+  const { chrome } = useSiteChrome();
+  const footerOrder = chrome.profileLayout.footerOrder;
+
+  const blocks: Record<ProfileFooterBlockId, ReactNode> = {
+    interestCta: (
+      <section
+        key="interestCta"
+        className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24"
+      >
         <div className="mx-auto max-w-352">
           <div className="relative isolate overflow-hidden rounded-sm bg-charcoal px-6 py-12 text-center shadow-[0_24px_60px_rgba(28,26,23,0.18)] md:px-12 md:py-14">
             <PatternField
@@ -550,18 +646,23 @@ export function ExpertProfileFooter({
           </div>
         </div>
       </section>
-
-      {similar.length > 0 ? (
-        <section className="bg-cream px-6 pt-4 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
+    ),
+    similar:
+      similar.length > 0 ? (
+        <section
+          key="similar"
+          className="bg-cream px-6 pt-4 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24"
+        >
           <div className="mx-auto max-w-352">
             <ExpertProfileSimilarIntro />
 
             <SimilarCreatorsGrid experts={similar} />
           </div>
         </section>
-      ) : null}
-    </>
-  );
+      ) : null,
+  };
+
+  return <>{footerOrder.map((id) => blocks[id])}</>;
 }
 
 /** @deprecated Prefer ExpertProfileMain + ExpertProfileFooter */

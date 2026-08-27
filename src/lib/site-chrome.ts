@@ -24,6 +24,53 @@ export type ProfileRailNavLabels = {
   work: string;
 };
 
+export const PROFILE_BODY_SECTION_IDS = [
+  "overview",
+  "channels",
+  "topics",
+  "formats",
+  "work",
+] as const;
+
+export type ProfileBodySectionId = (typeof PROFILE_BODY_SECTION_IDS)[number];
+
+export const PROFILE_FOOTER_BLOCK_IDS = ["interestCta", "similar"] as const;
+
+export type ProfileFooterBlockId = (typeof PROFILE_FOOTER_BLOCK_IDS)[number];
+
+export const PROFILE_BODY_SECTION_LABELS: Record<ProfileBodySectionId, string> =
+  {
+    overview: "About / overview",
+    channels: "Channels",
+    topics: "Topics & audience",
+    formats: "Formats",
+    work: "Recent work",
+  };
+
+export const PROFILE_FOOTER_BLOCK_LABELS: Record<ProfileFooterBlockId, string> =
+  {
+    interestCta: "Interest CTA",
+    similar: "Similar creators",
+  };
+
+export type ProfileLayoutSections = {
+  /** Order of body sections on every roster profile. */
+  sectionOrder: ProfileBodySectionId[];
+  /** Order of closing blocks below the profile shell. */
+  footerOrder: ProfileFooterBlockId[];
+  headings: {
+    overview: string;
+    overviewEyebrow: string;
+    channels: string;
+    topics: string;
+    formats: string;
+    work: string;
+  };
+  /** Hero primary button. Use {first}. */
+  heroBriefCtaLabel: string;
+  trustedByLabel: string;
+};
+
 export type ProfileRailSections = {
   availabilityLabel: string;
   signedBadgeLabel: string;
@@ -133,6 +180,7 @@ export type SiteChromeSections = {
   profileRail: ProfileRailSections;
   profileCta: ProfileCtaSections;
   profileFormats: ProfileFormatsSections;
+  profileLayout: ProfileLayoutSections;
   insightsPromo: InsightsPromoSections;
   articleSidebarCta: ArticleSidebarCtaSections;
   caseStudyCreatorCta: CaseStudyCreatorCtaSections;
@@ -153,7 +201,7 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
     links: [
       { href: "/roster", label: "Roster" },
       { href: "/what-we-do", label: "What we do" },
-      { href: "/case-studies", label: "Case Studies" },
+      { href: "/case-studies", label: "Projects" },
       { href: "/insights", label: "Insights" },
       { href: "/about", label: "About" },
     ],
@@ -212,7 +260,7 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
         title: "Company",
         links: [
           { href: "/about", label: "About" },
-          { href: "/case-studies", label: "Case studies" },
+          { href: "/case-studies", label: "Projects" },
           { href: "/insights", label: "Insights" },
           { href: "/contact", label: "Contact" },
         ],
@@ -276,6 +324,20 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
         "12–18 month terms only. Selective — {first} takes on a small number of brand partners per year.",
     },
   },
+  profileLayout: {
+    sectionOrder: [...PROFILE_BODY_SECTION_IDS],
+    footerOrder: [...PROFILE_FOOTER_BLOCK_IDS],
+    headings: {
+      overview: "About {first}.",
+      overviewEyebrow: "Biography",
+      channels: "Presence across channels.",
+      topics: "What {first} covers — and who shows up for it.",
+      formats: "Formats available.",
+      work: "Recent work.",
+    },
+    heroBriefCtaLabel: "Brief {first}",
+    trustedByLabel: "Trusted by",
+  },
   insightsPromo: {
     newsletter: {
       eyebrow: "Newsletter",
@@ -320,23 +382,44 @@ function asString(value: unknown, fallback: string) {
   return typeof value === "string" ? value : fallback;
 }
 
+/** Rename legacy “Case Studies” nav labels to “Projects”. */
+function projectsNavLabel(href: string, label: string) {
+  const path = href.replace(/\/$/, "");
+  if (path !== "/case-studies") return label;
+  if (/^case\s*stud(y|ies)$/i.test(label.trim())) return "Projects";
+  return label;
+}
+
 function mergeNavLink(raw: unknown, fallback?: NavLink): NavLink | null {
   if (!raw || typeof raw !== "object") {
     return fallback ? { ...fallback } : null;
   }
   const data = raw as Partial<NavLink>;
-  const label = asString(data.label, fallback?.label ?? "");
   const href = asString(data.href, fallback?.href ?? "");
+  const label = projectsNavLabel(
+    href,
+    asString(data.label, fallback?.label ?? ""),
+  );
   if (!label.trim() && !href.trim()) return null;
   return { label, href };
 }
 
 function mergeNavLinks(raw: unknown, fallback: NavLink[]): NavLink[] {
-  if (!Array.isArray(raw)) return fallback.map((l) => ({ ...l }));
+  if (!Array.isArray(raw)) {
+    return fallback.map((l) => ({
+      ...l,
+      label: projectsNavLabel(l.href, l.label),
+    }));
+  }
   const links = raw
     .map((item, i) => mergeNavLink(item, fallback[i]))
     .filter((l): l is NavLink => Boolean(l));
-  return links.length > 0 ? links : fallback.map((l) => ({ ...l }));
+  return links.length > 0
+    ? links
+    : fallback.map((l) => ({
+        ...l,
+        label: projectsNavLabel(l.href, l.label),
+      }));
 }
 
 function mergeSocial(raw: unknown, fallback?: SocialLink): SocialLink | null {
@@ -583,21 +666,89 @@ export function buildProfileNav(
     hasFormats: boolean;
     hasWork: boolean;
   },
+  sectionOrder: ProfileBodySectionId[] = [...PROFILE_BODY_SECTION_IDS],
 ): NavLink[] {
-  const items: NavLink[] = [{ href: "#overview", label: labels.overview }];
-  if (sections.hasChannels) {
-    items.push({ href: "#channels", label: labels.channels });
+  const available: Record<ProfileBodySectionId, boolean> = {
+    overview: true,
+    channels: sections.hasChannels,
+    topics: sections.hasTopics,
+    formats: sections.hasFormats,
+    work: sections.hasWork,
+  };
+  const hrefById: Record<ProfileBodySectionId, string> = {
+    overview: "#overview",
+    channels: "#channels",
+    topics: "#topics",
+    formats: "#formats",
+    work: "#work",
+  };
+
+  return sectionOrder
+    .filter((id) => available[id])
+    .map((id) => ({ href: hrefById[id], label: labels[id] }));
+}
+
+function mergeOrderedIds<T extends string>(
+  raw: unknown,
+  defaults: readonly T[],
+  allowed: readonly T[],
+): T[] {
+  const allow = new Set(allowed);
+  const fromRaw = Array.isArray(raw)
+    ? raw.filter((item): item is T => typeof item === "string" && allow.has(item as T))
+    : [];
+  const seen = new Set<T>();
+  const ordered: T[] = [];
+  for (const id of fromRaw) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    ordered.push(id);
   }
-  if (sections.hasTopics) {
-    items.push({ href: "#topics", label: labels.topics });
+  for (const id of defaults) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    ordered.push(id);
   }
-  if (sections.hasFormats) {
-    items.push({ href: "#formats", label: labels.formats });
-  }
-  if (sections.hasWork) {
-    items.push({ href: "#work", label: labels.work });
-  }
-  return items;
+  return ordered;
+}
+
+function mergeProfileLayout(raw: unknown): ProfileLayoutSections {
+  const defaults = DEFAULT_SITE_CHROME.profileLayout;
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    ProfileLayoutSections
+  >;
+  const headings = (data.headings ?? {}) as Partial<
+    ProfileLayoutSections["headings"]
+  >;
+
+  return {
+    sectionOrder: mergeOrderedIds(
+      data.sectionOrder,
+      defaults.sectionOrder,
+      PROFILE_BODY_SECTION_IDS,
+    ),
+    footerOrder: mergeOrderedIds(
+      data.footerOrder,
+      defaults.footerOrder,
+      PROFILE_FOOTER_BLOCK_IDS,
+    ),
+    headings: {
+      overview: asString(headings.overview, defaults.headings.overview),
+      overviewEyebrow: asString(
+        headings.overviewEyebrow,
+        defaults.headings.overviewEyebrow,
+      ),
+      channels: asString(headings.channels, defaults.headings.channels),
+      topics: asString(headings.topics, defaults.headings.topics),
+      formats: asString(headings.formats, defaults.headings.formats),
+      work: asString(headings.work, defaults.headings.work),
+    },
+    heroBriefCtaLabel: asString(
+      data.heroBriefCtaLabel,
+      defaults.heroBriefCtaLabel,
+    ),
+    trustedByLabel: asString(data.trustedByLabel, defaults.trustedByLabel),
+  };
 }
 
 export function mergeSiteChrome(raw: unknown): SiteChromeSections {
@@ -607,6 +758,7 @@ export function mergeSiteChrome(raw: unknown): SiteChromeSections {
     profileRail?: unknown;
     profileCta?: unknown;
     profileFormats?: unknown;
+    profileLayout?: unknown;
     insightsPromo?: unknown;
     articleSidebarCta?: unknown;
     caseStudyCreatorCta?: unknown;
@@ -659,6 +811,7 @@ export function mergeSiteChrome(raw: unknown): SiteChromeSections {
     profileRail: mergeProfileRail(data.profileRail),
     profileCta: mergeProfileCta(data.profileCta),
     profileFormats: mergeProfileFormats(data.profileFormats),
+    profileLayout: mergeProfileLayout(data.profileLayout),
     insightsPromo: mergeInsightsPromo(data.insightsPromo),
     articleSidebarCta: mergeArticleSidebarCta(data.articleSidebarCta),
     caseStudyCreatorCta: mergeCaseStudyCreatorCta(data.caseStudyCreatorCta),

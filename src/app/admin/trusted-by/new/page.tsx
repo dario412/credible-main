@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { AdminTrustedByEditor } from "@/components/admin-trusted-by-editor";
 import { saveTrustedClient } from "@/lib/actions/admin-trusted-by";
 import { auth } from "@/lib/auth";
+import { loadCaseStudyLinkOptions } from "@/lib/case-studies-server";
 import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
 import { emptyTrustedByClient } from "@/lib/trusted-by";
@@ -19,6 +20,8 @@ export default async function AdminTrustedByNewPage() {
   if (!session?.user) redirect("/admin/login");
   if (!hasPermission(session.user.role, "MANAGE_CONTENT")) redirect("/admin");
 
+  const caseStudyOptions = await loadCaseStudyLinkOptions();
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
@@ -32,6 +35,7 @@ export default async function AdminTrustedByNewPage() {
       </div>
       <AdminTrustedByEditor
         initial={emptyTrustedByClient()}
+        caseStudyOptions={caseStudyOptions}
         saveAction={saveTrustedClient}
       />
     </div>

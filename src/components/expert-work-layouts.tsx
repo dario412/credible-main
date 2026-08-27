@@ -130,7 +130,7 @@ export function FeaturedCaseStudyCard({
           </p>
           {item.href ? (
             <span className="mt-7 inline-flex w-fit items-center gap-2 rounded-sm bg-forest px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors duration-300 group-hover:bg-forest-dark">
-              Read the case study
+              Read the project
               <CtaArrow className="text-cream" />
             </span>
           ) : null}

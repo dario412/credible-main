@@ -85,7 +85,7 @@ export function ExpertProfileShell({
     templateVars,
   );
   const builtNav = navSections
-    ? buildProfileNav(rail.nav, navSections)
+    ? buildProfileNav(rail.nav, navSections, chrome.profileLayout.sectionOrder)
     : nav;
 
   return (

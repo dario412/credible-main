@@ -11,7 +11,7 @@ import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "New case study",
+  title: "New project",
   path: "/admin/case-studies/new",
   noIndex: true,
 });
@@ -50,9 +50,9 @@ export default async function AdminNewCaseStudyPage() {
           href="/admin/case-studies"
           className="text-sm text-charcoal/55 hover:text-charcoal"
         >
-          ← Case studies
+          ← Projects
         </Link>
-        <h1 className="mt-3 font-display text-3xl">New case study</h1>
+        <h1 className="mt-3 font-display text-3xl">New project</h1>
       </div>
       <CaseStudyEditorForm
         initial={blank}

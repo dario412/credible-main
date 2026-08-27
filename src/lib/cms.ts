@@ -65,6 +65,8 @@ export type HomePageSections = {
     subhead: string;
     ctaLabel: string;
     ctaHref: string;
+    /** Ordered expert slugs for the homepage roster preview (up to 4). */
+    featuredSlugs: string[];
   };
   impact: {
     headline: string;
@@ -172,6 +174,7 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
       "Twenty-four founders, operators, investors and specialists. Each profile carries reach data, past work and format-level pricing.",
     ctaLabel: "See all 24 creators",
     ctaHref: "/roster",
+    featuredSlugs: [],
   },
   impact: {
     headline: "Credible gives your brand\nan unfair advantage.",
@@ -195,7 +198,7 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
       { label: "Term", value: "22 months" },
     ],
     showCta: true,
-    ctaLabel: "Read the full case study",
+    ctaLabel: "Read the full project",
     ctaHref: "/case-studies/notion-founders-journal",
     metrics: [
       {
@@ -358,6 +361,21 @@ function mergeWaysIn(raw: unknown): HomePageSections["waysIn"] {
   };
 }
 
+function mergeFeaturedSlugs(raw: unknown, fallback: string[]): string[] {
+  if (!Array.isArray(raw)) return [...fallback];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const item of raw) {
+    if (typeof item !== "string") continue;
+    const slug = item.trim();
+    if (!slug || seen.has(slug)) continue;
+    seen.add(slug);
+    out.push(slug);
+    if (out.length >= 4) break;
+  }
+  return out;
+}
+
 function mergeRoster(raw: unknown): HomePageSections["roster"] {
   const defaults = DEFAULT_HOME_SECTIONS.roster;
   const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
@@ -368,6 +386,7 @@ function mergeRoster(raw: unknown): HomePageSections["roster"] {
     subhead: asString(data.subhead, defaults.subhead),
     ctaLabel: asString(data.ctaLabel, defaults.ctaLabel),
     ctaHref: asString(data.ctaHref, defaults.ctaHref),
+    featuredSlugs: mergeFeaturedSlugs(data.featuredSlugs, defaults.featuredSlugs),
   };
 }
 
@@ -446,7 +465,12 @@ function mergeKeyStudy(raw: unknown): HomePageSections["keyStudy"] {
         : !asString(data.ctaLabel, defaults.ctaLabel).trim()
           ? false
           : defaults.showCta,
-    ctaLabel: asString(data.ctaLabel, defaults.ctaLabel),
+    ctaLabel: (() => {
+      const label = asString(data.ctaLabel, defaults.ctaLabel);
+      return /^read the full case study$/i.test(label.trim())
+        ? "Read the full project"
+        : label;
+    })(),
     ctaHref: asString(data.ctaHref, defaults.ctaHref),
     metrics: defaults.metrics.map((metric, i) => {
       const row = (metricsRaw[i] && typeof metricsRaw[i] === "object"

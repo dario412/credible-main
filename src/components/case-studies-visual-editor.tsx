@@ -52,7 +52,7 @@ function CaseStudiesHero({
           <h1 className="max-w-[16ch] font-display text-[2.6rem] leading-[1.05] tracking-tight text-charcoal sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.15rem]">
             {headline.trim() || editing ? (
               <>
-                {headline.trim() || (editing ? "Case studies headline" : null)}
+                {headline.trim() || (editing ? "Projects headline" : null)}
                 {headlineContinued.trim() ||
                 headlineAccent.trim() ||
                 editing ? (
@@ -357,7 +357,7 @@ function EditorPopover({
               />
             </Field>
             <Field
-              label="Empty — no case studies"
+              label="Empty — no projects"
               id="ve-cs-archive-empty-none"
             >
               <TextInput
@@ -538,7 +538,7 @@ export function CaseStudiesVisualEditor({
     setPending(true);
     const result = await saveAction(sections);
     setOk(result.ok);
-    setMessage(result.ok ? "Case studies page saved." : result.message);
+    setMessage(result.ok ? "Projects page saved." : result.message);
     setPending(false);
     if (result.ok) {
       setBaseline(sections);

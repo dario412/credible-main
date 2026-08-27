@@ -63,7 +63,8 @@ export function TrustedBy({
             const storyHref = client.caseStudySlug.trim()
               ? `/case-studies/${client.caseStudySlug.trim()}`
               : null;
-            const showStoryPill = Boolean(storyHref) || hasTestimonial;
+            // Pill only when a case study is linked; hover box only when a quote exists.
+            const showStoryPill = Boolean(storyHref);
             const logo = (
               <span className="flex h-6 w-full max-w-[9.5rem] items-center justify-center md:h-7">
                 <BrandMark client={client} />
@@ -117,7 +118,7 @@ export function TrustedBy({
                   <Link
                     href={storyHref}
                     className="flex h-6 w-full max-w-[9.5rem] items-center justify-center transition-opacity hover:opacity-80 md:h-7"
-                    aria-label={`${client.name} case study`}
+                    aria-label={`${client.name} project`}
                   >
                     <BrandMark client={client} />
                   </Link>

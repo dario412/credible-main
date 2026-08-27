@@ -18,6 +18,7 @@ export function RosterPreviewSection({
     headline?: (node: ReactNode) => ReactNode;
     subhead?: (node: ReactNode) => ReactNode;
     cta?: (node: ReactNode) => ReactNode;
+    grid?: (node: ReactNode) => ReactNode;
   };
   disableCtaLink?: boolean;
 }) {
@@ -51,6 +52,8 @@ export function RosterPreviewSection({
     </Link>
   );
 
+  const gridNode = <RosterPreviewGrid cards={cards} />;
+
   return (
     <section className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12">
       <div className="mx-auto max-w-352">
@@ -62,7 +65,7 @@ export function RosterPreviewSection({
           </div>
         </div>
 
-        <RosterPreviewGrid cards={cards} />
+        {editSlots?.grid ? editSlots.grid(gridNode) : gridNode}
       </div>
     </section>
   );

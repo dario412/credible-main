@@ -252,7 +252,7 @@ export async function saveCaseStudy(
   for (const expertSlug of row.relatedExperts) {
     revalidatePath(`/roster/${expertSlug}`);
   }
-  return { ok: true as const, message: "Case study saved.", slug };
+  return { ok: true as const, message: "Project saved.", slug };
 }
 
 export async function deleteCaseStudy(slug: string) {
@@ -269,7 +269,7 @@ export async function deleteCaseStudy(slug: string) {
   revalidatePath("/case-studies");
   revalidatePath(`/case-studies/${slug}`);
   revalidatePath("/admin/case-studies");
-  return { ok: true as const, message: "Case study deleted." };
+  return { ok: true as const, message: "Project deleted." };
 }
 
 export async function getCaseStudyCard(slug: string): Promise<CaseStudyCard | null> {
@@ -545,11 +545,11 @@ export async function saveCaseStudiesPage(sections: CaseStudiesPageSections) {
     where: { slug: "case-studies" },
     create: {
       slug: "case-studies",
-      title: "Case studies",
+      title: "Projects",
       sections: merged,
     },
     update: {
-      title: "Case studies",
+      title: "Projects",
       sections: merged,
     },
   });
@@ -557,5 +557,5 @@ export async function saveCaseStudiesPage(sections: CaseStudiesPageSections) {
   revalidatePath("/case-studies");
   revalidatePath("/admin/pages");
   revalidatePath("/admin/pages/case-studies");
-  return { ok: true as const, message: "Case studies page saved." };
+  return { ok: true as const, message: "Projects page saved." };
 }

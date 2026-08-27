@@ -1,10 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { ExpertHeroStats } from "@/components/expert-hero-stats";
+import { useSiteChrome } from "@/components/site-chrome-context";
+import { ProfileEditHit } from "@/components/use-profile-edit-hit";
 import { brandsWithLogos } from "@/lib/brand-logos";
 import { firstName, type ExpertProfileStat } from "@/lib/expert-profiles";
+import { applyProfileRailTemplate } from "@/lib/site-chrome";
 import { cn } from "@/lib/utils";
 
 export function ExpertProfileStageHero({
@@ -32,11 +37,16 @@ export function ExpertProfileStageHero({
   trustedBy?: { name: string; logo?: string }[];
   stats: ExpertProfileStat[];
 }) {
+  const { chrome } = useSiteChrome();
   const first = firstName(name);
   const cover = stageImage ?? portraitImage ?? "/images/case-studies/notion.jpg";
   const proof =
-    heroProof ??
-    [title, archetype, based].filter(Boolean).join(" · ");
+    heroProof ?? [title, archetype, based].filter(Boolean).join(" · ");
+  const briefLabel = applyProfileRailTemplate(
+    chrome.profileLayout.heroBriefCtaLabel,
+    { first, name, slug },
+  );
+  const trustedByLabel = chrome.profileLayout.trustedByLabel;
 
   // Tall Trusted-by hero only when we have real logos; otherwise compact new-creator layout
   const logoBrands = brandsWithLogos(trustedBy);
@@ -112,17 +122,23 @@ export function ExpertProfileStageHero({
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Link
-                  href={`/contact?expert=${encodeURIComponent(slug)}`}
-                  className="group inline-flex items-center justify-center gap-2 rounded-sm bg-forest px-6 py-3.5 text-[0.875rem] font-medium text-cream transition-colors hover:bg-forest-dark"
+                <ProfileEditHit
+                  field="profileLayout.heroBriefCtaLabel"
+                  label="Hero brief CTA"
+                  ringOffset="ring-offset-charcoal"
                 >
-                  Brief {first}
-                  <ArrowRight
-                    weight="bold"
-                    className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
-                    aria-hidden
-                  />
-                </Link>
+                  <Link
+                    href={`/contact?expert=${encodeURIComponent(slug)}`}
+                    className="group inline-flex items-center justify-center gap-2 rounded-sm bg-forest px-6 py-3.5 text-[0.875rem] font-medium text-cream transition-colors hover:bg-forest-dark"
+                  >
+                    {briefLabel}
+                    <ArrowRight
+                      weight="bold"
+                      className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+                      aria-hidden
+                    />
+                  </Link>
+                </ProfileEditHit>
               </div>
             </div>
 
@@ -131,12 +147,19 @@ export function ExpertProfileStageHero({
 
           {showTrustedBy ? (
             <div className="mt-14 border-t border-cream/30 pt-8 md:mt-16">
-              <p className="text-[0.7rem] font-medium tracking-[0.16em] text-cream/70 uppercase">
-                Trusted by
-              </p>
+              <ProfileEditHit
+                field="profileLayout.trustedByLabel"
+                label="Trusted by label"
+                ringOffset="ring-offset-charcoal"
+              >
+                <p className="text-[0.7rem] font-medium tracking-[0.16em] text-cream/70 uppercase">
+                  {trustedByLabel}
+                </p>
+              </ProfileEditHit>
               <ul className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-5 md:gap-x-8">
                 {logoBrands.map((brand) => (
                   <li key={brand.name} className="flex h-6 items-center md:h-7">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={brand.logo}
                       alt={brand.name}

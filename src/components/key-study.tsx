@@ -52,7 +52,7 @@ function ArrowIcon({ className }: { className?: string }) {
 function CaseStudyCta({
   className,
   tone = "cream",
-  label = "Read the full case study",
+  label = "Read the full project",
   href = CASE_STUDY_HREF,
 }: {
   className?: string;
@@ -229,7 +229,7 @@ function BoxedKeyStudy() {
             />
 
             <p className="mt-6 text-[0.7rem] font-medium tracking-[0.18em] text-cream/55 uppercase">
-              Case study
+              Project
             </p>
 
             <h2 className="mt-3 max-w-2xl font-display text-[2.3rem] leading-[1.06] tracking-tight text-cream sm:text-[2.8rem] md:text-[3.25rem]">

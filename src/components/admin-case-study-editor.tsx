@@ -271,7 +271,7 @@ export function CaseStudyEditorForm({
             checked={Boolean(card.featured)}
             onChange={(e) => setCard({ ...card, featured: e.target.checked })}
           />
-          Featured on case studies index
+          Featured on projects index
         </label>
         <Field label="Hero title (optional)" id="heroTitle">
           <TextInput
@@ -312,7 +312,7 @@ export function CaseStudyEditorForm({
         )}
       >
         <Button type="submit" variant="primary" disabled={pending}>
-          {pending ? "Saving…" : "Save case study"}
+          {pending ? "Saving…" : "Save project"}
         </Button>
         {card.slug ? (
           <a

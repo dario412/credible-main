@@ -39,6 +39,17 @@ export async function loadCaseStudies(): Promise<CaseStudyCard[]> {
   }
 }
 
+/** Slim options for linking a homepage logo to a case study. */
+export async function loadCaseStudyLinkOptions(): Promise<
+  Array<{ slug: string; label: string }>
+> {
+  const studies = await loadCaseStudies();
+  return studies.map((study) => ({
+    slug: study.slug,
+    label: `${study.client} — ${study.title}`,
+  }));
+}
+
 export async function loadCaseStudy(
   slug: string,
 ): Promise<CaseStudyCard | undefined> {

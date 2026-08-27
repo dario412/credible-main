@@ -5,19 +5,26 @@ import type { HeroCastMember } from "@/components/home-2/hero-cast";
 import { parseExpertChannels } from "@/lib/expert-channels";
 import { isLinkedInTopVoice } from "@/lib/expert-profiles";
 import { prisma } from "@/lib/prisma";
+import { selectRosterPreviewCards } from "@/lib/roster-preview";
 
 export type { HeroCastMember };
+export { selectRosterPreviewCards };
 
-const PREVIEW_COUNT = 4;
-const HERO_CAST_COUNT = 6;
-
-export async function loadRosterPreviewCards(): Promise<RosterCardExpert[]> {
-  const experts = await prisma.expert.findMany({
-    orderBy: { name: "asc" },
-    take: PREVIEW_COUNT,
-  });
-
-  return experts.map((expert) => ({
+function toRosterCard(expert: {
+  id: string;
+  slug: string;
+  name: string;
+  shortBio: string | null;
+  image: string | null;
+  categories: string[];
+  topics: string[];
+  combinedReach: string | null;
+  growth90d: string | null;
+  audienceWho: string | null;
+  audienceWhere: string | null;
+  channels: unknown;
+}): RosterCardExpert {
+  return {
     id: expert.id,
     slug: expert.slug,
     name: expert.name,
@@ -31,44 +38,31 @@ export async function loadRosterPreviewCards(): Promise<RosterCardExpert[]> {
     audienceWhere: expert.audienceWhere,
     channels: parseExpertChannels(expert.channels),
     linkedinTopVoice: isLinkedInTopVoice(expert.slug),
-  }));
+  };
 }
 
-/** Prefer experts with portraits for the home hero cast band. */
-export async function loadHeroCast(
-  count = HERO_CAST_COUNT,
-): Promise<HeroCastMember[]> {
-  const withImages = await prisma.expert.findMany({
-    where: { image: { not: null } },
+/** Full roster as cards, A–Z — used for homepage preview + editor picker. */
+export async function loadRosterCards(): Promise<RosterCardExpert[]> {
+  const experts = await prisma.expert.findMany({
     orderBy: { name: "asc" },
-    take: count * 2,
+  });
+  return experts.map(toRosterCard);
+}
+
+export async function loadRosterPreviewCards(
+  featuredSlugs: string[] = [],
+): Promise<RosterCardExpert[]> {
+  const all = await loadRosterCards();
+  return selectRosterPreviewCards(all, featuredSlugs);
+}
+
+/** Full roster for hero / about cast rails, A–Z by name. */
+export async function loadHeroCast(): Promise<HeroCastMember[]> {
+  const experts = await prisma.expert.findMany({
+    orderBy: { name: "asc" },
   });
 
-  let pool = withImages.filter((e) => Boolean(e.image?.trim()));
-
-  if (pool.length < count) {
-    const extras = await prisma.expert.findMany({
-      where: {
-        id: { notIn: pool.map((e) => e.id) },
-      },
-      orderBy: { name: "asc" },
-      take: count - pool.length,
-    });
-    pool = [...pool, ...extras];
-  }
-
-  // Spread across the list so adjacent panels aren't alphabetical clones.
-  const step = Math.max(1, Math.floor(pool.length / count));
-  const picked: typeof pool = [];
-  for (let i = 0; picked.length < count && i < pool.length; i += step) {
-    picked.push(pool[i]!);
-  }
-  for (const expert of pool) {
-    if (picked.length >= count) break;
-    if (!picked.some((p) => p.id === expert.id)) picked.push(expert);
-  }
-
-  return picked.slice(0, count).map((expert) => ({
+  return experts.map((expert) => ({
     id: expert.id,
     slug: expert.slug,
     name: expert.name,

@@ -7,6 +7,7 @@ import {
   HeadlineStyleControls,
   TextStyleControls,
 } from "@/components/home-style-controls";
+import { RosterFeaturedSlotsField } from "@/components/roster-featured-slots-field";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import { MediaField } from "@/components/media-library";
 import type { HomePageSections } from "@/lib/cms";
@@ -16,9 +17,11 @@ import { cn } from "@/lib/utils";
 
 export function HomePageEditorForm({
   initial,
+  rosterOptions = [],
   saveAction,
 }: {
   initial: HomePageSections;
+  rosterOptions?: Array<{ slug: string; name: string }>;
   saveAction: typeof import("@/lib/actions/admin-cms").saveHomePage;
 }) {
   const [sections, setSections] = useState(initial);
@@ -232,6 +235,19 @@ export function HomePageEditorForm({
               }
             />
           </Field>
+        </div>
+        <div className="rounded-sm border border-charcoal/10 p-4">
+          <h3 className="mb-3 text-sm font-medium text-charcoal">
+            Featured creators
+          </h3>
+          <RosterFeaturedSlotsField
+            options={rosterOptions}
+            value={sections.roster.featuredSlugs}
+            fallbackSlugs={rosterOptions.slice(0, 4).map((o) => o.slug)}
+            onChange={(featuredSlugs) =>
+              patch("roster", { ...sections.roster, featuredSlugs })
+            }
+          />
         </div>
       </section>
 

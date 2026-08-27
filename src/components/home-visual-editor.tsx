@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { BrandBrief } from "@/components/brand-brief";
+import { CaseStudyLinkField } from "@/components/case-study-link-field";
 import { EditableHit } from "@/components/editable-hit";
 import { useHomeCms, useSiteChrome } from "@/components/home-cms-context";
 import {
@@ -21,10 +22,12 @@ import {
 import { MediaField } from "@/components/media-library";
 import { KeyStudy } from "@/components/key-study";
 import type { RosterCardExpert } from "@/components/roster-card";
+import { RosterFeaturedSlotsField } from "@/components/roster-featured-slots-field";
 import { TrustedBy } from "@/components/trusted-by";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type { HomePageSections } from "@/lib/cms";
 import { DEFAULT_HOME_SECTIONS } from "@/lib/cms";
+import { selectRosterPreviewCards } from "@/lib/roster-preview";
 import type { SiteChromeSections } from "@/lib/site-chrome";
 import {
   TRUSTED_BY_LOGO_HINT,
@@ -44,6 +47,7 @@ type EditTarget =
   | "roster.headline"
   | "roster.subhead"
   | "roster.cta"
+  | "roster.featured"
   | "impact.headline"
   | `impact.stat.${number}`
   | "keyStudy.logo"
@@ -79,6 +83,7 @@ function targetTitle(target: EditTarget): string {
     "roster.headline": "Roster headline",
     "roster.subhead": "Roster supporting line",
     "roster.cta": "Roster button",
+    "roster.featured": "Roster preview creators",
     "impact.headline": "Impact headline",
     "keyStudy.logo": "Case study logo",
     "keyStudy.headline": "Case study headline",
@@ -120,6 +125,9 @@ function EditorPopover({
   sections,
   footer,
   trustedClients,
+  rosterOptions,
+  rosterFallbackSlugs,
+  caseStudyOptions,
   onChange,
   onFooterChange,
   onTrustedClientsChange,
@@ -129,6 +137,9 @@ function EditorPopover({
   sections: HomePageSections;
   footer: SiteChromeSections["footer"];
   trustedClients: TrustedByClient[];
+  rosterOptions: Array<{ slug: string; name: string }>;
+  rosterFallbackSlugs: string[];
+  caseStudyOptions: Array<{ slug: string; label: string }>;
   onChange: (next: HomePageSections) => void;
   onFooterChange: (next: Partial<SiteChromeSections["footer"]>) => void;
   onTrustedClientsChange: (next: TrustedByClient[]) => void;
@@ -415,6 +426,17 @@ function EditorPopover({
               />
             </Field>
           </>
+        ) : null}
+
+        {target === "roster.featured" ? (
+          <RosterFeaturedSlotsField
+            options={rosterOptions}
+            value={sections.roster.featuredSlugs}
+            fallbackSlugs={rosterFallbackSlugs}
+            onChange={(featuredSlugs) =>
+              patch("roster", { ...sections.roster, featuredSlugs })
+            }
+          />
         ) : null}
 
         {target === "impact.headline" ? (
@@ -1169,24 +1191,23 @@ function EditorPopover({
                   value={client.logoSrc}
                   onChange={(logoSrc) => updateClient({ logoSrc })}
                 />
-                <Field
-                  label="Case study slug (optional)"
-                  id="tb-slug"
-                  hint="Links the logo and Customer story pill on the homepage, e.g. stage-to-boardroom"
-                >
-                  <TextInput
-                    id="tb-slug"
-                    value={client.caseStudySlug}
-                    onChange={(e) =>
-                      updateClient({ caseStudySlug: e.target.value })
-                    }
-                  />
-                </Field>
+                <CaseStudyLinkField
+                  id="tb-case-study"
+                  value={client.caseStudySlug}
+                  options={caseStudyOptions}
+                  onChange={(caseStudySlug) => updateClient({ caseStudySlug })}
+                />
 
                 <div className="flex items-center justify-between gap-3 border-t border-charcoal/10 pt-3">
-                  <p className="text-sm font-medium text-charcoal">
-                    Testimonial hover
-                  </p>
+                  <div>
+                    <p className="text-sm font-medium text-charcoal">
+                      Testimonial hover
+                    </p>
+                    <p className="mt-0.5 text-xs text-charcoal/50">
+                      Optional. Shows the quote box on hover — separate from the
+                      Customer story button.
+                    </p>
+                  </div>
                   <Button
                     type="button"
                     variant={hasStory ? "secondary" : "primary"}
@@ -1264,7 +1285,8 @@ function EditorPopover({
                   </>
                 ) : (
                   <p className="text-[0.75rem] leading-relaxed text-charcoal/50">
-                    No story — logo only, like the empty cells in the grid.
+                    No hover quote. Add a case study above for a Customer story
+                    button, or leave both empty for logo only.
                   </p>
                 )}
 
@@ -1382,6 +1404,7 @@ export function HomeVisualEditor({
   canEdit,
   rosterCards,
   heroCast,
+  caseStudyOptions = [],
   saveAction,
   saveChromeAction,
   saveTrustedByAction,
@@ -1392,6 +1415,7 @@ export function HomeVisualEditor({
   canEdit: boolean;
   rosterCards: RosterCardExpert[];
   heroCast: HeroCastMember[];
+  caseStudyOptions?: Array<{ slug: string; label: string }>;
   saveAction: typeof import("@/lib/actions/admin-cms").saveHomePage;
   saveChromeAction: typeof import("@/lib/actions/admin-cms").saveSiteChrome;
   saveTrustedByAction: typeof import("@/lib/actions/admin-trusted-by").saveTrustedClientsList;
@@ -1419,6 +1443,20 @@ export function HomeVisualEditor({
     JSON.stringify(sections) !== JSON.stringify(baseline) ||
     JSON.stringify(chrome) !== JSON.stringify(chromeBaseline) ||
     JSON.stringify(trustedClients) !== JSON.stringify(trustedBaseline);
+
+  const rosterPreviewCards = useMemo(
+    () =>
+      selectRosterPreviewCards(rosterCards, sections.roster.featuredSlugs),
+    [rosterCards, sections.roster.featuredSlugs],
+  );
+  const rosterOptions = useMemo(
+    () => rosterCards.map((card) => ({ slug: card.slug, name: card.name })),
+    [rosterCards],
+  );
+  const rosterFallbackSlugs = useMemo(
+    () => rosterCards.slice(0, 4).map((card) => card.slug),
+    [rosterCards],
+  );
 
   useEffect(() => {
     setCanEdit(canEdit);
@@ -1604,7 +1642,7 @@ export function HomeVisualEditor({
 
       <RosterPreviewSection
         content={sections.roster}
-        cards={rosterCards}
+        cards={rosterPreviewCards}
         disableCtaLink={editing}
         editSlots={
           editing
@@ -1637,6 +1675,16 @@ export function HomeVisualEditor({
                     setTarget,
                     "roster button",
                     node,
+                  ),
+                grid: (node) =>
+                  hit(
+                    editing,
+                    "roster.featured",
+                    target,
+                    setTarget,
+                    "roster preview creators",
+                    node,
+                    true,
                   ),
               }
             : undefined
@@ -1924,6 +1972,9 @@ export function HomeVisualEditor({
           sections={sections}
           footer={chrome.footer}
           trustedClients={trustedClients}
+          rosterOptions={rosterOptions}
+          rosterFallbackSlugs={rosterFallbackSlugs}
+          caseStudyOptions={caseStudyOptions}
           onChange={setSections}
           onFooterChange={(patch) =>
             setChrome({

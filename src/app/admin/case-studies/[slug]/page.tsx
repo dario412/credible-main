@@ -14,7 +14,7 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   return createMetadata({
-    title: `Edit case study · ${slug}`,
+    title: `Edit project · ${slug}`,
     path: `/admin/case-studies/${slug}`,
     noIndex: true,
   });
@@ -43,9 +43,9 @@ export default async function AdminEditCaseStudyPage({ params }: Props) {
           href="/admin/case-studies"
           className="text-sm text-charcoal/55 hover:text-charcoal"
         >
-          ← Case studies
+          ← Projects
         </Link>
-        <h1 className="mt-3 font-display text-3xl">Edit case study</h1>
+        <h1 className="mt-3 font-display text-3xl">Edit project</h1>
         <p className="mt-1 text-sm text-muted">{study.slug}</p>
       </div>
       <CaseStudyEditorForm

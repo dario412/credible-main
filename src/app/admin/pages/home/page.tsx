@@ -5,6 +5,7 @@ import { HomePageEditorForm } from "@/components/admin-home-page-editor";
 import { getHomePageSections, saveHomePage } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
+import { loadHeroCast } from "@/lib/roster-preview-server";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
@@ -18,7 +19,10 @@ export default async function AdminHomePageEditor() {
   if (!session?.user) redirect("/admin/login");
   if (!hasPermission(session.user.role, "MANAGE_CONTENT")) redirect("/admin");
 
-  const sections = await getHomePageSections();
+  const [sections, rosterOptions] = await Promise.all([
+    getHomePageSections(),
+    loadHeroCast(),
+  ]);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -52,7 +56,14 @@ export default async function AdminHomePageEditor() {
           .
         </p>
       </div>
-      <HomePageEditorForm initial={sections} saveAction={saveHomePage} />
+      <HomePageEditorForm
+        initial={sections}
+        rosterOptions={rosterOptions.map((member) => ({
+          slug: member.slug,
+          name: member.name,
+        }))}
+        saveAction={saveHomePage}
+      />
     </div>
   );
 }

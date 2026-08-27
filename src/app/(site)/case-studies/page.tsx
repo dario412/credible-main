@@ -31,7 +31,7 @@ function featuredLeadCount(
 }
 
 export const metadata = createMetadata({
-  title: "Case studies",
+  title: "Projects",
   description:
     "Work that ran — deals Credible structured, delivered, and measured across content, brand, speaking, and live events.",
   path: "/case-studies",

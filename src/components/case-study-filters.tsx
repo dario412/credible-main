@@ -113,7 +113,7 @@ export function CaseStudyFilters({
               <input
                 id={searchId}
                 type="search"
-                placeholder="Search case studies"
+                placeholder="Search projects"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full bg-transparent pr-7 text-[0.8125rem] text-charcoal outline-none placeholder:text-charcoal/40"

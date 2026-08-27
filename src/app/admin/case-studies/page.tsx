@@ -9,7 +9,7 @@ import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Case studies CMS",
+  title: "Projects CMS",
   path: "/admin/case-studies",
   noIndex: true,
 });
@@ -25,16 +25,16 @@ export default async function AdminCaseStudiesPage() {
     <div className="mx-auto max-w-5xl space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl">Case studies</h1>
+          <h1 className="font-display text-3xl">Projects</h1>
           <p className="mt-2 text-sm text-muted">
-            Edit case study pages shown on the marketing site.
+            Edit project pages shown on the marketing site.
           </p>
         </div>
         <Link
           href="/admin/case-studies/new"
           className="inline-flex items-center rounded-sm bg-forest px-4 py-2.5 text-sm font-medium text-cream hover:bg-forest-dark"
         >
-          New case study
+          New project
         </Link>
       </div>
 
@@ -89,7 +89,7 @@ export default async function AdminCaseStudiesPage() {
                   colSpan={4}
                   className="px-4 py-10 text-center text-sm text-muted"
                 >
-                  No case studies in the database yet. Run seed or create one.
+                  No projects in the database yet. Run seed or create one.
                 </td>
               </tr>
             ) : null}

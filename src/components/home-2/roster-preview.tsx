@@ -10,6 +10,6 @@ export async function RosterPreview({
 }: {
   content: HomePageSections["roster"];
 }) {
-  const cards = await loadRosterPreviewCards();
+  const cards = await loadRosterPreviewCards(content.featuredSlugs);
   return <RosterPreviewSection content={content} cards={cards} />;
 }

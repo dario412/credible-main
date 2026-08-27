@@ -176,7 +176,7 @@ export default async function CaseStudyPage({ params }: Props) {
             <section className="mt-16 pb-10 md:mt-20 md:pb-12 lg:pb-14">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <h2 className="font-display text-[1.65rem] leading-tight tracking-tight text-charcoal md:text-[1.85rem]">
-                  Similar case studies
+                  Similar projects
                 </h2>
                 <ViewMoreLink href="/case-studies">View all</ViewMoreLink>
               </div>

@@ -1,4 +1,8 @@
 import { Faculty_Glyphic, Instrument_Sans } from "next/font/google";
+import {
+  GoogleTagManager,
+  GoogleTagManagerNoscript,
+} from "@/components/google-tag-manager";
 import { Providers } from "@/components/providers";
 import { createMetadata, organizationJsonLd } from "@/lib/seo";
 import { getSiteFontStylesheet } from "@/lib/site-fonts-server";
@@ -35,6 +39,8 @@ export default async function RootLayout({
         className="flex min-h-full flex-col bg-cream text-charcoal"
         suppressHydrationWarning
       >
+        <GoogleTagManagerNoscript />
+        <GoogleTagManager />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

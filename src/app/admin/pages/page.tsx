@@ -21,13 +21,19 @@ const pages: {
     slug: "home",
     title: "Home",
     description:
-      "Hero, ways in, roster, impact stats, case study, and brief. Logos live under Homepage logos.",
+      "Hero, ways in, roster, impact stats, featured project, and brief. Logos live under Homepage logos.",
+  },
+  {
+    slug: "profile",
+    title: "Creator profile",
+    description:
+      "Section order, headings, hero CTA, sidebar, formats, and footer CTA on every roster profile.",
   },
   {
     slug: "site",
-    title: "Header, footer & profile template",
+    title: "Header & footer",
     description:
-      "Nav, Send brief CTA, footer, profile template, format cards, Insights promos, and article sidebar CTA.",
+      "Nav, Send brief CTA, footer columns, Insights promos, and article sidebar CTA.",
   },
   {
     slug: "contact",
@@ -42,7 +48,7 @@ const pages: {
   },
   {
     slug: "case-studies",
-    title: "Case studies",
+    title: "Projects",
     description:
       "Intro, All stories heading, and FAQ accordion on /case-studies.",
   },

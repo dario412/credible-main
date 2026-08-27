@@ -37,7 +37,7 @@ export const DEFAULT_CASE_STUDIES_SECTIONS: CaseStudiesPageSections = {
   archive: {
     headline: "All stories",
     emptyFiltered: "More stories will land here as the catalogue grows.",
-    emptyNone: "No case studies yet.",
+    emptyNone: "No projects yet.",
   },
   faq: {
     eyebrow: "FAQ",

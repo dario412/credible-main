@@ -18,7 +18,7 @@ export default async function AboutPage() {
   const [sections, session, members] = await Promise.all([
     getAboutPageSections(),
     auth(),
-    loadHeroCast(8),
+    loadHeroCast(),
   ]);
   const canEdit = Boolean(
     session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),

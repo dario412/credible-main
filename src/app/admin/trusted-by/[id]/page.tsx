@@ -8,6 +8,7 @@ import {
   saveTrustedClient,
 } from "@/lib/actions/admin-trusted-by";
 import { auth } from "@/lib/auth";
+import { loadCaseStudyLinkOptions } from "@/lib/case-studies-server";
 import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
 
@@ -27,7 +28,10 @@ export default async function AdminTrustedByEditPage({
   if (!hasPermission(session.user.role, "MANAGE_CONTENT")) redirect("/admin");
 
   const { id } = await params;
-  const client = await getTrustedClientCard(id);
+  const [client, caseStudyOptions] = await Promise.all([
+    getTrustedClientCard(id),
+    loadCaseStudyLinkOptions(),
+  ]);
   if (!client) notFound();
 
   return (
@@ -43,6 +47,7 @@ export default async function AdminTrustedByEditPage({
       </div>
       <AdminTrustedByEditor
         initial={client}
+        caseStudyOptions={caseStudyOptions}
         saveAction={saveTrustedClient}
         deleteAction={deleteTrustedClient}
       />

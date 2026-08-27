@@ -22,7 +22,7 @@ export function CaseStudyStoryToc({
   return (
     <nav aria-label="On this page" className={className}>
       <p className="font-display text-[1.05rem] font-medium leading-snug tracking-tight text-charcoal">
-        In this case study
+        In this project
       </p>
       <ol className="mt-3 space-y-2.5">
         {toc.map((item) => (

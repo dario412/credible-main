@@ -29,10 +29,17 @@ export default async function AdminSiteChromePage() {
         >
           ← Pages
         </Link>
-        <h1 className="mt-3 font-display text-3xl">Header, footer & profile sidebar</h1>
+        <h1 className="mt-3 font-display text-3xl">Header & footer</h1>
         <p className="mt-2 text-sm text-muted">
-          Site-wide navigation, creator profile sidebar copy, footer content, and
-          link columns. Changes apply on every page.
+          Site-wide navigation, footer content, and link columns. Creator
+          profile template lives under{" "}
+          <a
+            href="/admin/pages/profile"
+            className="font-medium text-forest hover:text-forest-dark"
+          >
+            Creator profile
+          </a>
+          .
         </p>
       </div>
       <SiteChromeEditorForm initial={sections} saveAction={saveSiteChrome} />

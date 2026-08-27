@@ -896,7 +896,7 @@ function ApplyView({
     <>
       <section
         id="apply"
-        className="scroll-mt-24 bg-cream-dark px-6 pt-8 pb-12 md:px-10 md:pt-10 md:pb-16 lg:px-12 lg:pt-12 lg:pb-20"
+        className="scroll-mt-24 bg-cream px-6 pt-8 pb-12 md:px-10 md:pt-10 md:pb-16 lg:px-12 lg:pt-12 lg:pb-20"
       >
         <div
           className={`${PAGE_SHELL} grid items-start gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-10`}
