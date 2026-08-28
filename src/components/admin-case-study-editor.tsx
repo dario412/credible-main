@@ -221,10 +221,15 @@ export function CaseStudyEditorForm({
   const [message, setMessage] = useState("");
   const [ok, setOk] = useState(false);
   const [pending, setPending] = useState(false);
-
-  const useSameMetaTitle = !(card.seoTitle?.trim());
-  const useSameMetaDescription = !(card.seoDescription?.trim());
-  const useSameOgImage = !(card.ogImage?.trim());
+  const [useSameMetaTitle, setUseSameMetaTitle] = useState(
+    () => !initial.seoTitle?.trim(),
+  );
+  const [useSameMetaDescription, setUseSameMetaDescription] = useState(
+    () => !initial.seoDescription?.trim(),
+  );
+  const [useSameOgImage, setUseSameOgImage] = useState(
+    () => !initial.ogImage?.trim(),
+  );
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -233,8 +238,8 @@ export function CaseStudyEditorForm({
     const validationError = validateProjectCmsFields({
       summary: card.summary,
       heroSummary: card.heroSummary,
-      seoTitle: card.seoTitle,
-      seoDescription: card.seoDescription,
+      seoTitle: useSameMetaTitle ? undefined : card.seoTitle,
+      seoDescription: useSameMetaDescription ? undefined : card.seoDescription,
       title: card.title,
     });
     if (validationError) {
@@ -243,9 +248,28 @@ export function CaseStudyEditorForm({
       return;
     }
 
+    if (!useSameMetaTitle && !card.seoTitle?.trim()) {
+      setOk(false);
+      setMessage("Enter a custom meta title or check Same as page title.");
+      return;
+    }
+
+    if (!useSameMetaDescription && !card.seoDescription?.trim()) {
+      setOk(false);
+      setMessage(
+        "Enter a custom meta description or check Same as card summary.",
+      );
+      return;
+    }
+
     setPending(true);
     const next: CaseStudyCard = {
       ...card,
+      seoTitle: useSameMetaTitle ? undefined : card.seoTitle?.trim() || undefined,
+      seoDescription: useSameMetaDescription
+        ? undefined
+        : card.seoDescription?.trim() || undefined,
+      ogImage: useSameOgImage ? undefined : card.ogImage?.trim() || undefined,
       id: card.id ?? initial.id,
       pillars:
         card.pillars && card.pillars.length > 0
@@ -451,6 +475,7 @@ export function CaseStudyEditorForm({
                 id="seoTitleSameAsPageTitle"
                 checked={useSameMetaTitle}
                 onChange={(checked) => {
+                  setUseSameMetaTitle(checked);
                   if (checked) {
                     setCard({ ...card, seoTitle: undefined });
                     return;
@@ -498,11 +523,10 @@ export function CaseStudyEditorForm({
                 id="ogImageSameAsCover"
                 checked={useSameOgImage}
                 onChange={(checked) => {
+                  setUseSameOgImage(checked);
                   if (checked) {
                     setCard({ ...card, ogImage: undefined });
-                    return;
                   }
-                  setCard({ ...card, ogImage: "" });
                 }}
               >
                 Same as cover image
@@ -552,6 +576,7 @@ export function CaseStudyEditorForm({
                   id="seoDescriptionSameAsSummary"
                   checked={useSameMetaDescription}
                   onChange={(checked) => {
+                    setUseSameMetaDescription(checked);
                     if (checked) {
                       setCard({ ...card, seoDescription: undefined });
                       return;
