@@ -55,6 +55,7 @@ export default async function AdminEditInsightPage({ params }: Props) {
           excerpt: insight.excerpt,
           category: insight.category,
           coverImage: insight.coverImage ?? "",
+          coverImageAlt: insight.coverImageAlt ?? "",
           seoTitle: insight.seoTitle ?? "",
           seoDescription: insight.seoDescription ?? "",
           publishedAt: local,

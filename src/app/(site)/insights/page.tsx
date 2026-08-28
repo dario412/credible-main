@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
-import { readingTime } from "@/lib/insight-content";
+import { insightCoverAlt, readingTime } from "@/lib/insight-content";
 import { INSIGHT_TOPICS } from "@/lib/insight-topics";
 import { ViewMoreLink } from "@/components/view-more-link";
 import { InsightsVisualEditor } from "@/components/insights-visual-editor";
@@ -52,6 +52,7 @@ type InsightCardData = {
   body: string;
   category: string;
   coverImage: string | null;
+  coverImageAlt?: string | null;
 };
 
 function coverFor(insight: { slug: string; coverImage: string | null }) {
@@ -154,7 +155,7 @@ export default async function InsightsPage({
                 {coverFor(featured) ? (
                   <Image
                     src={coverFor(featured)!}
-                    alt=""
+                    alt={insightCoverAlt(featured)}
                     fill
                     priority
                     sizes="(min-width: 1024px) 45vw, 100vw"
@@ -254,7 +255,7 @@ function InsightCard({
         {cover ? (
           <Image
             src={cover}
-            alt=""
+            alt={insightCoverAlt(insight)}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"

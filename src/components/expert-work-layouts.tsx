@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { getCaseStudy } from "@/lib/case-studies";
 import type { ExpertRecentWork } from "@/lib/expert-profiles";
+import { coverAltFor } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
 
 export type ExpertTestimonial = {
@@ -94,7 +95,7 @@ export function FeaturedCaseStudyCard({
             <>
               <Image
                 src={cover}
-                alt=""
+                alt={coverAltFor(`${item.client} project`)}
                 fill
                 sizes="(min-width: 1024px) 28rem, (min-width: 768px) 50vw, 100vw"
                 className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"

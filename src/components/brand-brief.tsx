@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { portraitAltFor } from "@/lib/image-alt";
 import Link from "next/link";
 import { type ReactNode } from "react";
 import { ArrowRight } from "@phosphor-icons/react/ssr";
@@ -243,7 +244,7 @@ function BoxedBrief({
           <div className="relative h-11 w-9 shrink-0 overflow-hidden rounded-sm bg-cream/15 md:h-12 md:w-10">
             <Image
               src={content.quotePhoto}
-              alt=""
+              alt={portraitAltFor(content.quoteName, content.quoteRole)}
               fill
               sizes="40px"
               className="object-cover object-top"

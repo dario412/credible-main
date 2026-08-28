@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { FadeUp } from "@/components/fade-up";
-import { insightCover, readingTime } from "@/lib/insight-content";
+import { insightCover, insightCoverAlt, readingTime } from "@/lib/insight-content";
 
 type RelatedInsight = {
   id: string;
@@ -12,6 +12,7 @@ type RelatedInsight = {
   title: string;
   body: string;
   coverImage: string | null;
+  coverImageAlt?: string | null;
 };
 
 export function RelatedInsightsGrid({ items }: { items: RelatedInsight[] }) {
@@ -37,7 +38,7 @@ export function RelatedInsightsGrid({ items }: { items: RelatedInsight[] }) {
                   {itemCover ? (
                     <Image
                       src={itemCover}
-                      alt=""
+                      alt={insightCoverAlt(item)}
                       fill
                       sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"

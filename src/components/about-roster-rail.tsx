@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { HeroCastMember } from "@/components/home-2/hero-cast";
 import { SiteImage } from "@/components/site-image";
+import { portraitAltFor } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
 
 type CardSize = {
@@ -144,7 +145,7 @@ export function AboutRosterRail({
                 <span className={cn("relative block", size.height)}>
                   <SiteImage
                     src={imageSrc}
-                    alt=""
+                    alt={portraitAltFor(member.name, member.role)}
                     fill
                     sizes="360px"
                     className="object-cover object-[center_16%]"

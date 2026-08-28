@@ -46,6 +46,10 @@ import {
 import { hasPermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import {
+  mergeLegalSections,
+  type LegalPagesSections,
+} from "@/lib/legal-pages";
+import {
   mergeSiteChrome,
   type SiteChromeSections,
 } from "@/lib/site-chrome";
@@ -74,6 +78,7 @@ const insightMetaSchema = z.object({
   excerpt: z.string().min(1).max(600),
   category: z.string().min(1).max(80),
   coverImage: z.string().max(500).optional().nullable(),
+  coverImageAlt: z.string().max(200).optional().nullable(),
   seoTitle: z.string().max(200).optional().nullable(),
   seoDescription: z.string().max(400).optional().nullable(),
   publishedAt: z.string().min(1),
@@ -105,6 +110,7 @@ export async function saveInsight(input: {
     excerpt: parsed.data.excerpt,
     category: parsed.data.category,
     coverImage: parsed.data.coverImage || null,
+    coverImageAlt: parsed.data.coverImageAlt?.trim() || null,
     seoTitle: parsed.data.seoTitle || null,
     seoDescription: parsed.data.seoDescription || null,
     publishedAt,
@@ -570,4 +576,38 @@ export async function saveCaseStudiesPage(sections: CaseStudiesPageSections) {
   revalidatePath("/admin/pages");
   revalidatePath("/admin/pages/case-studies");
   return { ok: true as const, message: "Projects page saved." };
+}
+
+export async function getLegalPageSections(): Promise<LegalPagesSections> {
+  const page = await prisma.pageContent.findUnique({
+    where: { slug: "legal" },
+  });
+  return mergeLegalSections(page?.sections);
+}
+
+export async function saveLegalPages(sections: LegalPagesSections) {
+  const session = await requireContentEditor();
+  if (!session) return { ok: false as const, message: "Unauthorized" };
+
+  const merged = mergeLegalSections(sections);
+
+  await prisma.pageContent.upsert({
+    where: { slug: "legal" },
+    create: {
+      slug: "legal",
+      title: "Legal pages",
+      sections: merged,
+    },
+    update: {
+      title: "Legal pages",
+      sections: merged,
+    },
+  });
+
+  revalidatePath("/privacy");
+  revalidatePath("/terms");
+  revalidatePath("/accessibility-statement");
+  revalidatePath("/admin/pages");
+  revalidatePath("/admin/pages/legal");
+  return { ok: true as const, message: "Legal pages saved." };
 }

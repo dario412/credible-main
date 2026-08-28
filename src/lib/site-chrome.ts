@@ -231,20 +231,20 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
         links: [
           { href: "/roster", label: "All creators" },
           {
-            href: `/roster?archetype=${encodeURIComponent("Founder / C-Suite")}`,
-            label: "Founders/Csuite",
+            href: `/roster?archetype=${encodeURIComponent("Founder")}`,
+            label: "Founders",
           },
           {
-            href: `/roster?archetype=${encodeURIComponent("Subject Matter Expert")}`,
-            label: "Subject Matter Experts",
+            href: `/roster?archetype=${encodeURIComponent("CEO")}`,
+            label: "CEOs",
           },
           {
-            href: `/roster?archetype=${encodeURIComponent("Investor / Analyst")}`,
+            href: `/roster?archetype=${encodeURIComponent("Investor")}`,
             label: "Investors",
           },
           {
-            href: `/roster?archetype=${encodeURIComponent("Category Specialist")}`,
-            label: "Category Specialists",
+            href: `/roster?archetype=${encodeURIComponent("Category expert")}`,
+            label: "Category experts",
           },
         ],
       },
@@ -269,6 +269,10 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
     legalLinks: [
       { href: "/privacy", label: "Privacy Policy" },
       { href: "/terms", label: "Terms of Service" },
+      {
+        href: "/accessibility-statement",
+        label: "Accessibility Statement",
+      },
     ],
   },
   profileRail: {

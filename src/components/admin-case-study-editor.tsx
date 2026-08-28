@@ -22,6 +22,7 @@ import {
   PROJECT_SUMMARY_MAX,
   validateProjectCmsFields,
 } from "@/lib/project-cms-limits";
+import { coverAltFor, logoAltFor } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
 
 export type CaseStudySpeakerOption = {
@@ -333,6 +334,11 @@ export function CaseStudyEditorForm({
           hint="Brand mark on the project hero and catalogue cards — not used for SEO or social previews."
           value={card.logo ?? ""}
           onChange={(logo) => setCard({ ...card, logo: logo || undefined })}
+          alt={card.logoAlt ?? ""}
+          onAltChange={(logoAlt) =>
+            setCard({ ...card, logoAlt: logoAlt.trim() || undefined })
+          }
+          suggestedAlt={logoAltFor(card.client)}
         />
         <div className="md:col-span-2">
           <SpeakersField
@@ -401,6 +407,11 @@ export function CaseStudyEditorForm({
           hint="Full-bleed hero on the project page. Can also be reused as the social share image in Search & social below."
           value={card.coverImage ?? ""}
           onChange={(coverImage) => setCard({ ...card, coverImage })}
+          alt={card.coverImageAlt ?? ""}
+          onAltChange={(coverImageAlt) =>
+            setCard({ ...card, coverImageAlt: coverImageAlt.trim() || undefined })
+          }
+          suggestedAlt={coverAltFor(card.title)}
         />
         <label className="flex items-center gap-2 self-end pb-3 text-sm">
           <input
@@ -561,6 +572,14 @@ export function CaseStudyEditorForm({
                   onChange={(ogImage) =>
                     setCard({ ...card, ogImage: ogImage || undefined })
                   }
+                  alt={card.ogImageAlt ?? ""}
+                  onAltChange={(ogImageAlt) =>
+                    setCard({
+                      ...card,
+                      ogImageAlt: ogImageAlt.trim() || undefined,
+                    })
+                  }
+                  suggestedAlt={coverAltFor(card.title)}
                 />
               )}
             </div>

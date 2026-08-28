@@ -85,7 +85,10 @@ export type CaseStudyCard = {
   /** Roster expert slugs featured on this case study. */
   relatedExperts?: string[];
   coverImage: string;
+  coverImageAlt?: string;
   logo?: string;
+  /** Overrides default client-name logo alt when set. */
+  logoAlt?: string;
   featured?: boolean;
   /** Overrides `<title>` / Open Graph title when set. */
   seoTitle?: string;
@@ -93,6 +96,8 @@ export type CaseStudyCard = {
   seoDescription?: string;
   /** Open Graph / Twitter image. Falls back to cover image. */
   ogImage?: string;
+  /** Alt text for custom social share image. */
+  ogImageAlt?: string;
 };
 
 /** Placeholder brand mark for development — Notion cube everywhere */

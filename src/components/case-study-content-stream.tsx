@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { SiteImage } from "@/components/site-image";
 import { StatCounter } from "@/components/stat-counter";
+import { logoAltFor } from "@/lib/image-alt";
 import type {
   CaseStudyBlock,
   CaseStudyTocItem,
@@ -156,7 +157,7 @@ function DeliverablesBlock({
             <div>
               <SiteImage
                 src={item.logo}
-                alt={item.label}
+                alt={logoAltFor(item.label)}
                 width={120}
                 height={28}
                 className="h-6 w-auto max-w-[7.5rem] object-contain object-left"

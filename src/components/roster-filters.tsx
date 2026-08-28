@@ -13,23 +13,6 @@ import {
 
 import { cn } from "@/lib/utils";
 
-export const ARCHETYPE_OPTIONS = [
-  "Founder / C-Suite",
-  "Investor / Analyst",
-  "Subject Matter Expert",
-  "Category Specialist",
-] as const;
-
-export const TOPIC_OPTIONS = [
-  "SaaS",
-  "Fintech",
-  "AI",
-  "Marketing",
-  "Sales",
-  "Product",
-  "Media",
-] as const;
-
 export const CHANNEL_FILTER_OPTIONS = [
   { label: "LinkedIn", value: "linkedin" },
   { label: "X", value: "x" },
@@ -111,12 +94,16 @@ export function StickyRosterFilters(
 }
 
 export function RosterFilters({
+  archetypeOptions,
+  topicOptions,
   currentArchetype,
   currentTopic,
   currentChannels = [],
   currentQuery,
   elevated = false,
 }: {
+  archetypeOptions: string[];
+  topicOptions: string[];
   currentArchetype?: string;
   currentTopic?: string;
   currentChannels?: string[];
@@ -263,7 +250,7 @@ export function RosterFilters({
             label="Roles"
             value={currentArchetype}
             placeholder="All roles"
-            options={ARCHETYPE_OPTIONS}
+            options={archetypeOptions}
             open={open === "archetype"}
             onToggle={() =>
               setOpen((current) =>
@@ -284,7 +271,7 @@ export function RosterFilters({
             label="Topic"
             value={currentTopic}
             placeholder="All topics"
-            options={TOPIC_OPTIONS}
+            options={topicOptions}
             open={open === "topic"}
             onToggle={() =>
               setOpen((current) => (current === "topic" ? null : "topic"))

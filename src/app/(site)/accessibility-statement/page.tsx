@@ -7,16 +7,16 @@ import { createMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const sections = await getLegalPageSections();
-  const page = getLegalPage(sections, "privacy");
+  const page = getLegalPage(sections, "accessibility");
   return createMetadata({
     title: page.title,
     description: page.metaDescription,
-    path: "/privacy",
+    path: "/accessibility-statement",
   });
 }
 
-export default async function PrivacyPage() {
+export default async function AccessibilityStatementPage() {
   const sections = await getLegalPageSections();
-  const page = getLegalPage(sections, "privacy");
+  const page = getLegalPage(sections, "accessibility");
   return <LegalPageView page={page} />;
 }

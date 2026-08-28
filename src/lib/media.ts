@@ -17,6 +17,12 @@ export function isMediaAssetUrl(src: string | null | undefined) {
   return src.startsWith("/api/media/");
 }
 
+export function mediaAssetIdFromUrl(src: string | null | undefined): string | null {
+  if (!src || !isMediaAssetUrl(src)) return null;
+  const id = src.replace(/^\/api\/media\//, "").split(/[?#]/)[0];
+  return id || null;
+}
+
 /** Use with next/image — media library bytes should not go through the optimizer. */
 export function imageUnoptimized(src: string | null | undefined) {
   return isMediaAssetUrl(src);

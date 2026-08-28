@@ -11,6 +11,7 @@ import {
   removeFromShortlist,
   useShortlist,
 } from "@/lib/shortlist";
+import { portraitAltFor } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
 
 export function ShortlistMenu({ inverted = false }: { inverted?: boolean }) {
@@ -114,7 +115,7 @@ export function ShortlistMenu({ inverted = false }: { inverted?: boolean }) {
                       {entry.image ? (
                         <Image
                           src={entry.image}
-                          alt=""
+                          alt={portraitAltFor(entry.name)}
                           fill
                           sizes="36px"
                           className="object-cover object-top"

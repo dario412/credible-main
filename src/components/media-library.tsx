@@ -2,12 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 
-import { Button } from "@/components/ui";
+import { Button, Field, TextInput } from "@/components/ui";
 import {
   deleteMediaAsset,
   listMediaAssets,
+  updateMediaAlt,
   uploadMediaAsset,
 } from "@/lib/actions/admin-media";
+import { IMAGE_ALT_MAX } from "@/lib/image-alt";
 import { formatBytes, type MediaAssetCard } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
@@ -16,12 +18,14 @@ function MediaGrid({
   selectedUrl,
   onSelect,
   onDelete,
+  onAltChange,
   pending,
 }: {
   assets: MediaAssetCard[];
   selectedUrl?: string;
   onSelect?: (asset: MediaAssetCard) => void;
   onDelete?: (id: string) => void;
+  onAltChange?: (id: string, alt: string) => void;
   pending?: boolean;
 }) {
   if (assets.length === 0) {
@@ -64,6 +68,32 @@ function MediaGrid({
                 <span className="block text-[0.65rem] text-charcoal/45">
                   {formatBytes(asset.byteSize)}
                 </span>
+                {onAltChange ? (
+                  <label className="mt-2 block space-y-1">
+                    <span className="text-[0.65rem] font-medium text-charcoal/55">
+                      Alt text
+                    </span>
+                    <input
+                      type="text"
+                      defaultValue={asset.alt}
+                      key={`${asset.id}-${asset.alt}`}
+                      maxLength={IMAGE_ALT_MAX}
+                      disabled={pending}
+                      placeholder="Describe the image"
+                      onClick={(e) => e.stopPropagation()}
+                      onBlur={(e) => {
+                        if (e.target.value !== asset.alt) {
+                          onAltChange(asset.id, e.target.value);
+                        }
+                      }}
+                      className="w-full border border-charcoal/20 bg-white px-2 py-1 text-[0.7rem] text-charcoal"
+                    />
+                  </label>
+                ) : asset.alt ? (
+                  <span className="mt-1 block line-clamp-2 text-[0.65rem] text-charcoal/50">
+                    Alt: {asset.alt}
+                  </span>
+                ) : null}
               </span>
             </button>
             {onDelete ? (
@@ -88,14 +118,17 @@ export function MediaLibraryPanel({
   selectable = false,
   selectedUrl,
   onSelect,
+  allowAltEdit = true,
 }: {
   initial: MediaAssetCard[];
   selectable?: boolean;
   selectedUrl?: string;
   onSelect?: (asset: MediaAssetCard) => void;
+  allowAltEdit?: boolean;
 }) {
   const [assets, setAssets] = useState(initial);
   const [message, setMessage] = useState("");
+  const [uploadAlt, setUploadAlt] = useState("");
   const [pending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -115,14 +148,28 @@ export function MediaLibraryPanel({
     if (!file) return;
     const data = new FormData();
     data.set("file", file);
+    if (uploadAlt.trim()) data.set("alt", uploadAlt.trim());
     startTransition(async () => {
       const result = await uploadMediaAsset(data);
       setMessage(result.message);
       if (result.ok && result.asset) {
         setAssets((prev) => [result.asset!, ...prev]);
         if (selectable) onSelect?.(result.asset);
+        setUploadAlt("");
       }
       if (inputRef.current) inputRef.current.value = "";
+    });
+  }
+
+  function onAltSave(id: string, alt: string) {
+    startTransition(async () => {
+      const result = await updateMediaAlt(id, alt);
+      setMessage(result.message);
+      if (result.ok) {
+        setAssets((prev) =>
+          prev.map((asset) => (asset.id === id ? { ...asset, alt } : asset)),
+        );
+      }
     });
   }
 
@@ -140,7 +187,7 @@ export function MediaLibraryPanel({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-end gap-3">
         <Button
           type="button"
           variant="primary"
@@ -149,6 +196,17 @@ export function MediaLibraryPanel({
         >
           {pending ? "Working…" : "Upload image"}
         </Button>
+        <label className="min-w-[14rem] flex-1 space-y-1">
+          <span className="text-xs font-medium text-charcoal/70">
+            Alt text for upload (optional)
+          </span>
+          <TextInput
+            value={uploadAlt}
+            maxLength={IMAGE_ALT_MAX}
+            placeholder="Describe the image for screen readers"
+            onChange={(e) => setUploadAlt(e.target.value)}
+          />
+        </label>
         <input
           ref={inputRef}
           type="file"
@@ -170,6 +228,7 @@ export function MediaLibraryPanel({
         pending={pending}
         onSelect={selectable ? onSelect : undefined}
         onDelete={onDelete}
+        onAltChange={allowAltEdit ? onAltSave : undefined}
       />
     </div>
   );
@@ -179,11 +238,19 @@ export function MediaField({
   label,
   value,
   onChange,
+  alt,
+  onAltChange,
+  altHint = "Describe the image for screen readers and search.",
+  suggestedAlt,
   hint,
 }: {
   label: string;
   value: string;
   onChange: (url: string) => void;
+  alt?: string;
+  onAltChange?: (alt: string) => void;
+  altHint?: string;
+  suggestedAlt?: string;
   hint?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -191,6 +258,10 @@ export function MediaField({
   const [loading, setLoading] = useState(false);
 
   const preview = useMemo(() => value.trim(), [value]);
+  const previewAlt = useMemo(
+    () => alt?.trim() || suggestedAlt?.trim() || "Image preview",
+    [alt, suggestedAlt],
+  );
 
   async function openPicker() {
     setOpen(true);
@@ -213,7 +284,7 @@ export function MediaField({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={preview}
-              alt=""
+              alt={previewAlt}
               className="max-h-full max-w-full object-contain"
             />
           ) : (
@@ -248,6 +319,18 @@ export function MediaField({
           ) : null}
         </div>
       </div>
+
+      {onAltChange ? (
+        <Field label="Alt text" id={`${label}-alt`} hint={altHint}>
+          <TextInput
+            id={`${label}-alt`}
+            value={alt ?? ""}
+            maxLength={IMAGE_ALT_MAX}
+            placeholder={suggestedAlt || "Describe this image"}
+            onChange={(e) => onAltChange(e.target.value)}
+          />
+        </Field>
+      ) : null}
 
       {open ? (
         <div
@@ -288,9 +371,13 @@ export function MediaField({
                 <MediaLibraryPanel
                   initial={assets}
                   selectable
+                  allowAltEdit={false}
                   selectedUrl={preview}
                   onSelect={(asset) => {
                     onChange(asset.url);
+                    if (onAltChange && !alt?.trim() && asset.alt.trim()) {
+                      onAltChange(asset.alt);
+                    }
                     setOpen(false);
                   }}
                 />

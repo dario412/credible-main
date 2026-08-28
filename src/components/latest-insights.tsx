@@ -1,6 +1,6 @@
 import { ViewMoreLink } from "@/components/view-more-link";
 import { LatestInsightsGrid } from "@/components/latest-insights-grid";
-import { insightCover, readingTime } from "@/lib/insight-content";
+import { insightCover, insightCoverAlt, readingTime } from "@/lib/insight-content";
 import { prisma } from "@/lib/prisma";
 
 export async function LatestInsights() {
@@ -17,6 +17,7 @@ export async function LatestInsights() {
     title: insight.title,
     excerpt: insight.excerpt,
     cover: insightCover(insight),
+    coverAlt: insightCoverAlt(insight),
     mins: readingTime(insight.body),
   }));
 

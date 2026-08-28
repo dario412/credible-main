@@ -10,6 +10,7 @@ import { parseExpertChannels } from "@/lib/expert-channels";
 import { isLinkedInTopVoice } from "@/lib/expert-profiles";
 import { hasPermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
+import { buildRosterFilterOptions } from "@/lib/roster-filter-options";
 import { createMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -58,6 +59,7 @@ export default async function RosterPage({
   const q = params.q?.trim();
 
   const all = await prisma.expert.findMany({ orderBy: { name: "asc" } });
+  const { archetypeOptions, topicOptions } = buildRosterFilterOptions(all);
 
   const experts = all.filter((expert) => {
     const categories = expert.categories ?? [];
@@ -120,6 +122,8 @@ export default async function RosterPage({
           saveAction={saveRosterPage}
         >
           <StickyRosterFilters
+            archetypeOptions={archetypeOptions}
+            topicOptions={topicOptions}
             currentArchetype={archetype}
             currentTopic={topic}
             currentChannels={selectedChannels}

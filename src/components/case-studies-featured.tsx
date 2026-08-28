@@ -4,6 +4,7 @@ import { CaseStudyClientMark } from "@/components/case-study-archive-card";
 import { SiteImage } from "@/components/site-image";
 import type { CaseStudyCard } from "@/lib/case-studies";
 import { formatCaseStudyPillars } from "@/lib/case-studies";
+import { coverAltFor, resolveImageAlt } from "@/lib/image-alt";
 
 /**
  * Featured catalogue hero on /case-studies.
@@ -36,7 +37,7 @@ function FeaturedCoverCard({
     >
       <SiteImage
         src={study.coverImage}
-        alt=""
+        alt={resolveImageAlt(study.coverImageAlt, coverAltFor(study.title))}
         fill
         priority={priority}
         sizes={sizes}
@@ -45,7 +46,12 @@ function FeaturedCoverCard({
       <div className="absolute inset-0 bg-linear-to-t from-charcoal/85 via-charcoal/35 to-charcoal/15" />
 
       <div className="absolute inset-0 flex flex-col justify-between p-6 md:p-8 lg:p-9">
-        <CaseStudyClientMark client={study.client} logo={study.logo} />
+        <CaseStudyClientMark
+          client={study.client}
+          logo={study.logo}
+          logoAlt={study.logoAlt}
+          size="lg"
+        />
 
         <div>
           <h2 className="max-w-lg font-display text-[1.65rem] leading-[1.12] tracking-tight text-cream sm:text-[1.9rem] md:text-[2.15rem]">
@@ -69,13 +75,18 @@ function SecondaryCard({ study }: { study: CaseStudyCard }) {
       <div className="relative aspect-3/4 overflow-hidden rounded-sm bg-[#E4EBE6]">
         <SiteImage
           src={study.coverImage}
-          alt=""
+          alt={resolveImageAlt(study.coverImageAlt, coverAltFor(study.title))}
           fill
           sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 100vw"
           className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
         />
         <div className="absolute top-3 left-3">
-          <CaseStudyClientMark client={study.client} logo={study.logo} />
+          <CaseStudyClientMark
+            client={study.client}
+            logo={study.logo}
+            logoAlt={study.logoAlt}
+            size="sm"
+          />
         </div>
       </div>
       <h3 className="mt-3.5 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal transition-colors group-hover:text-forest md:text-[1.25rem]">

@@ -645,6 +645,7 @@ type CaseStudyRow = {
   size: string;
   period: string;
   coverImage: string | null;
+  coverImageAlt?: string | null;
   featured: boolean;
   data: unknown;
   relatedExperts?: string[];
@@ -691,13 +692,19 @@ export function caseStudyToCard(row: CaseStudyRow): CaseStudyCard {
         ? [data.ctaCreator.slug]
         : [],
     coverImage: row.coverImage || data.coverImage || "/images/case-studies/notion.jpg",
+    coverImageAlt: row.coverImageAlt?.trim() || data.coverImageAlt?.trim() || undefined,
     logo: data.logo ?? CASE_STUDY_LOGO,
+    logoAlt: typeof data.logoAlt === "string" ? data.logoAlt.trim() || undefined : undefined,
     featured: row.featured || Boolean(data.featured),
     seoTitle: row.seoTitle ?? undefined,
     seoDescription: row.seoDescription ?? undefined,
     ogImage:
       typeof data.ogImage === "string" && data.ogImage.trim()
         ? data.ogImage.trim()
+        : undefined,
+    ogImageAlt:
+      typeof data.ogImageAlt === "string" && data.ogImageAlt.trim()
+        ? data.ogImageAlt.trim()
         : undefined,
   };
 }
@@ -718,6 +725,7 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
     period,
     relatedExperts,
     coverImage,
+    coverImageAlt: _coverImageAlt,
     featured,
     seoTitle: _seoTitle,
     seoDescription: _seoDescription,
@@ -750,6 +758,7 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
     size,
     period: period ?? "",
     coverImage,
+    coverImageAlt: card.coverImageAlt?.trim() || null,
     featured: Boolean(featured),
     seoTitle: card.seoTitle?.trim() || null,
     seoDescription: card.seoDescription?.trim() || null,
@@ -757,6 +766,7 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
       ...rest,
       pillars,
       ogImage: card.ogImage?.trim() || undefined,
+      ogImageAlt: card.ogImageAlt?.trim() || undefined,
       meta: Array.isArray(rest.meta) && rest.meta.length > 0 ? rest.meta : meta,
     },
     relatedExperts: speakers,

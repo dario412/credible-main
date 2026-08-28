@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Minus, Plus } from "@phosphor-icons/react";
 
 import { toggleShortlist, useIsShortlisted } from "@/lib/shortlist";
+import { portraitAltFor } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
 import type { ExpertChannel } from "@/lib/expert-channels";
 
@@ -169,7 +170,7 @@ export function RosterCard({ expert }: { expert: RosterCardExpert }) {
           <RosterPhotoBackdrop seed={expert.slug} />
           <Image
             src={imageSrc}
-            alt=""
+            alt={portraitAltFor(expert.name, expert.role)}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
@@ -182,7 +183,7 @@ export function RosterCard({ expert }: { expert: RosterCardExpert }) {
             >
               <Image
                 src="/brand/linkedin-in-bug.png"
-                alt=""
+                alt="LinkedIn"
                 width={20}
                 height={20}
                 className="size-5 shrink-0"

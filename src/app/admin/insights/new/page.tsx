@@ -41,6 +41,7 @@ export default async function AdminNewInsightPage() {
           excerpt: "",
           category: "Strategy",
           coverImage: "",
+          coverImageAlt: "",
           seoTitle: "",
           seoDescription: "",
           publishedAt: local,

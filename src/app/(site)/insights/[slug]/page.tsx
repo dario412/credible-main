@@ -4,6 +4,7 @@ import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { ArticleSidebarCtaEditorProvider } from "@/components/article-sidebar-cta-editor";
 import { InsightArticleCta } from "@/components/insight-article-cta";
+import { InsightHeroCoverEditable } from "@/components/insight-hero-cover-editable";
 import { InsightShare } from "@/components/insight-share";
 import { RelatedInsightsGrid } from "@/components/related-insights-grid";
 import { SiteImage } from "@/components/site-image";
@@ -18,11 +19,12 @@ import {
   resolveInsightContent,
   type InsightBlock,
 } from "@/lib/insight-content";
-import { saveSiteChrome } from "@/lib/actions/admin-cms";
+import { saveInsight, saveSiteChrome } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { hasPermission } from "@/lib/permissions";
 import { absoluteUrl, createMetadata } from "@/lib/seo";
+import { resolveImageAlt } from "@/lib/image-alt";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +66,12 @@ export default async function InsightPage({ params }: Props) {
   const canEdit = Boolean(
     session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
   );
+  const publishedLocal = new Date(
+    insight.publishedAt.getTime() -
+      insight.publishedAt.getTimezoneOffset() * 60000,
+  )
+    .toISOString()
+    .slice(0, 16);
 
   return (
     <>
@@ -137,25 +145,26 @@ export default async function InsightPage({ params }: Props) {
           </div>
 
           <div className="lg:flex lg:items-center">
-            <div className="relative aspect-16/10 w-full overflow-hidden rounded-sm bg-forest/10 lg:aspect-auto lg:min-h-112">
-              {cover ? (
-                <SiteImage
-                  src={cover}
-                  alt=""
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 45vw, 100vw"
-                  className="object-cover"
-                />
-              ) : (
-                <span
-                  aria-hidden
-                  className="absolute inset-0 flex items-center justify-center font-display text-7xl text-charcoal/15"
-                >
-                  {insight.title.charAt(0)}
-                </span>
-              )}
-            </div>
+            <InsightHeroCoverEditable
+              insightId={insight.id}
+              insightSlug={insight.slug}
+              title={insight.title}
+              cover={cover}
+              initialMeta={{
+                title: insight.title,
+                slug: insight.slug,
+                excerpt: insight.excerpt,
+                category: insight.category,
+                coverImage: insight.coverImage ?? "",
+                coverImageAlt: insight.coverImageAlt ?? "",
+                seoTitle: insight.seoTitle ?? "",
+                seoDescription: insight.seoDescription ?? "",
+                publishedAt: publishedLocal,
+              }}
+              initialBlocks={blocks}
+              canEdit={canEdit}
+              saveAction={saveInsight}
+            />
           </div>
         </div>
       </section>
@@ -354,7 +363,7 @@ function InsightBlockView({ block }: { block: InsightBlock }) {
           <div className="relative aspect-16/10 w-full overflow-hidden rounded-sm bg-forest/10">
             <SiteImage
               src={block.src}
-              alt={block.alt ?? ""}
+              alt={resolveImageAlt(block.alt, block.caption)}
               fill
               sizes="(min-width: 1024px) 60vw, 100vw"
               className="object-cover"

@@ -130,13 +130,12 @@ export function CreatorFacesMarquee({
               >
                 <Image
                   src={face.src}
-                  alt=""
+                  alt={face.name}
                   fill
                   sizes={imageSizes}
                   className="object-cover object-top"
                 />
               </span>
-              <span className="sr-only">{face.name}</span>
             </li>
           ))}
         </ul>

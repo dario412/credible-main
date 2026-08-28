@@ -70,6 +70,12 @@ const pages: {
     description:
       "Intro, what you get, self-qualify, path, FAQ, and start-application CTA.",
   },
+  {
+    slug: "legal",
+    title: "Legal pages",
+    description:
+      "Privacy policy, terms of service, and accessibility statement.",
+  },
 ];
 
 export default async function AdminPagesPage() {

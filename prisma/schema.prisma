@@ -80,6 +80,7 @@ model CaseStudy {
   size           String   @default("")
   period         String   @default("")
   coverImage     String?
+  coverImageAlt  String?
   featured       Boolean  @default(false)
   /// Full CaseStudyCard extras: hero, meta, results, quote, story, ctaCreator, logo…
   data           Json     @default("{}")
@@ -102,6 +103,7 @@ model Insight {
   blocks         Json?
   category       String   @default("Perspective")
   coverImage     String?
+  coverImageAlt  String?
   seoTitle       String?
   seoDescription String?
   publishedAt    DateTime @default(now())

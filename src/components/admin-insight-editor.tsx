@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MediaField } from "@/components/media-library";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type { InsightBlock } from "@/lib/insight-content";
+import { coverAltFor } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
 
 type BlockType = InsightBlock["type"];
@@ -205,14 +206,10 @@ export function InsightBlockEditor({
                   label="Image"
                   value={block.src}
                   onChange={(src) => updateAt(index, { ...block, src })}
+                  alt={block.alt ?? ""}
+                  onAltChange={(alt) => updateAt(index, { ...block, alt })}
+                  altHint="Required for accessibility. Describe what the image shows."
                   hint="Pick from the media library or paste a URL."
-                />
-                <TextInput
-                  value={block.alt ?? ""}
-                  onChange={(e) =>
-                    updateAt(index, { ...block, alt: e.target.value })
-                  }
-                  placeholder="Alt text"
                 />
                 <TextInput
                   value={block.caption ?? ""}
@@ -269,6 +266,7 @@ export function InsightEditorForm({
     excerpt: string;
     category: string;
     coverImage: string;
+    coverImageAlt: string;
     seoTitle: string;
     seoDescription: string;
     publishedAt: string;
@@ -346,6 +344,11 @@ export function InsightEditorForm({
           label="Cover image"
           value={meta.coverImage ?? ""}
           onChange={(coverImage) => setMeta({ ...meta, coverImage })}
+          alt={meta.coverImageAlt ?? ""}
+          onAltChange={(coverImageAlt) =>
+            setMeta({ ...meta, coverImageAlt })
+          }
+          suggestedAlt={coverAltFor(meta.title)}
         />
         <Field label="SEO title" id="seoTitle">
           <TextInput

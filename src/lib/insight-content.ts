@@ -1,3 +1,5 @@
+import { coverAltFor, resolveImageAlt } from "@/lib/image-alt";
+
 export const INSIGHT_COVER_BY_SLUG: Record<string, string> = {
   "why-creator-label-doesnt-fit-b2b": "/images/insights/operator-creator.jpg",
   "rise-of-the-creator-marketing-manager":
@@ -26,6 +28,13 @@ export function insightCover(insight: {
   coverImage: string | null;
 }) {
   return insight.coverImage ?? INSIGHT_COVER_BY_SLUG[insight.slug] ?? null;
+}
+
+export function insightCoverAlt(insight: {
+  title: string;
+  coverImageAlt?: string | null;
+}): string {
+  return resolveImageAlt(insight.coverImageAlt, coverAltFor(insight.title));
 }
 
 export function readingTime(body: string) {

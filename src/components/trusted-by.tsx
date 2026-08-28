@@ -7,6 +7,7 @@ import {
   hasTrustedByStory,
   type TrustedByClient,
 } from "@/lib/trusted-by";
+import { logoAltFor, portraitAltFor } from "@/lib/image-alt";
 
 const LOGO_CLASS =
   "h-full w-auto max-w-full object-contain object-center brightness-0 invert transition-opacity duration-200";
@@ -14,10 +15,11 @@ const LOGO_CLASS =
 function BrandMark({ client }: { client: TrustedByClient }) {
   if (client.logoSrc) {
     return (
-      <>
-        <span className="sr-only">{client.name}</span>
-        <img src={client.logoSrc} alt="" className={LOGO_CLASS} />
-      </>
+      <img
+        src={client.logoSrc}
+        alt={logoAltFor(client.name)}
+        className={LOGO_CLASS}
+      />
     );
   }
 
@@ -95,7 +97,10 @@ export function TrustedBy({
                               testimonial.imageSrc ||
                               "/images/creator-placeholder.png"
                             }
-                            alt=""
+                            alt={portraitAltFor(
+                              testimonial.name,
+                              testimonial.title,
+                            )}
                             width={32}
                             height={32}
                             className="size-8 rounded-full object-cover"

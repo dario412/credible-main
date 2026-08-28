@@ -5,7 +5,8 @@ import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { FadeUp } from "@/components/fade-up";
 import { INSIGHT_AUTHORS } from "@/lib/insight-authors";
-import { insightCover, readingTime } from "@/lib/insight-content";
+import { insightCover, insightCoverAlt, readingTime } from "@/lib/insight-content";
+import { portraitAltFor } from "@/lib/image-alt";
 import { prisma } from "@/lib/prisma";
 import { createMetadata } from "@/lib/seo";
 
@@ -62,7 +63,7 @@ export default async function InsightAuthorPage({ params }: Props) {
               {author.image ? (
                 <Image
                   src={author.image}
-                  alt=""
+                  alt={portraitAltFor(author.name, author.role)}
                   fill
                   priority
                   sizes="(min-width: 1024px) 28vw, 60vw"
@@ -122,7 +123,7 @@ export default async function InsightAuthorPage({ params }: Props) {
                       {cover ? (
                         <Image
                           src={cover}
-                          alt=""
+                          alt={insightCoverAlt(item)}
                           fill
                           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                           className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"

@@ -10,6 +10,7 @@ import { ProfileEditHit } from "@/components/use-profile-edit-hit";
 import { brandsWithLogos } from "@/lib/brand-logos";
 import { firstName, type ExpertProfileStat } from "@/lib/expert-profiles";
 import { applyProfileRailTemplate } from "@/lib/site-chrome";
+import { coverAltFor, logoAltFor } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
 
 export function ExpertProfileStageHero({
@@ -67,7 +68,7 @@ export function ExpertProfileStageHero({
     >
       <Image
         src={cover}
-        alt=""
+        alt={coverAltFor(name)}
         fill
         priority
         sizes="100vw"
@@ -162,7 +163,7 @@ export function ExpertProfileStageHero({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={brand.logo}
-                      alt={brand.name}
+                      alt={logoAltFor(brand.name)}
                       className="h-5 w-auto object-contain brightness-0 invert md:h-6"
                     />
                   </li>
