@@ -121,7 +121,7 @@ export const LEGAL_PAGE_ROUTES: Record<
   privacy: { path: "/privacy", label: "Privacy Policy" },
   terms: { path: "/terms", label: "Terms of Service" },
   accessibility: {
-    path: "/accessibility-statement",
+    path: "/accessibility",
     label: "Accessibility Statement",
   },
 };

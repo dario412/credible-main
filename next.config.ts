@@ -68,8 +68,8 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
-        source: "/v2-apply-for-representation",
-        destination: "/apply-for-representation",
+        source: "/accessibility-statement",
+        destination: "/accessibility",
         permanent: true,
       },
     ];

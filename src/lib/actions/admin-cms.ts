@@ -606,6 +606,7 @@ export async function saveLegalPages(sections: LegalPagesSections) {
 
   revalidatePath("/privacy");
   revalidatePath("/terms");
+  revalidatePath("/accessibility");
   revalidatePath("/accessibility-statement");
   revalidatePath("/admin/pages");
   revalidatePath("/admin/pages/legal");

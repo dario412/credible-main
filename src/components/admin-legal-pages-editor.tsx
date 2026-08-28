@@ -10,7 +10,7 @@ const tabs: { key: LegalPageKey; label: string; publicPath: string }[] = [
   {
     key: "accessibility",
     label: "Accessibility Statement",
-    publicPath: "/accessibility-statement",
+    publicPath: "/accessibility",
   },
 ];
 

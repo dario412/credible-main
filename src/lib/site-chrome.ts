@@ -270,7 +270,7 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
       { href: "/privacy", label: "Privacy Policy" },
       { href: "/terms", label: "Terms of Service" },
       {
-        href: "/accessibility-statement",
+        href: "/accessibility",
         label: "Accessibility Statement",
       },
     ],
@@ -424,6 +424,32 @@ function mergeNavLinks(raw: unknown, fallback: NavLink[]): NavLink[] {
         ...l,
         label: projectsNavLabel(l.href, l.label),
       }));
+}
+
+function mergeLegalLinks(raw: unknown, fallback: NavLink[]): NavLink[] {
+  const normalizeHref = (href: string) =>
+    href === "/accessibility-statement" ? "/accessibility" : href;
+
+  const normalizedFallback = fallback.map((link) => ({
+    ...link,
+    href: normalizeHref(link.href),
+    label: projectsNavLabel(link.href, link.label),
+  }));
+
+  const merged = mergeNavLinks(raw, normalizedFallback).map((link) => ({
+    ...link,
+    href: normalizeHref(link.href),
+    label: projectsNavLabel(link.href, link.label),
+  }));
+
+  const hrefs = new Set(merged.map((link) => link.href));
+  for (const link of normalizedFallback) {
+    if (!hrefs.has(link.href)) {
+      merged.push(link);
+    }
+  }
+
+  return merged;
 }
 
 function mergeSocial(raw: unknown, fallback?: SocialLink): SocialLink | null {
@@ -810,7 +836,7 @@ export function mergeSiteChrome(raw: unknown): SiteChromeSections {
               title: c.title,
               links: c.links.map((l) => ({ ...l })),
             })),
-      legalLinks: mergeNavLinks(footer.legalLinks, defaults.footer.legalLinks),
+      legalLinks: mergeLegalLinks(footer.legalLinks, defaults.footer.legalLinks),
     },
     profileRail: mergeProfileRail(data.profileRail),
     profileCta: mergeProfileCta(data.profileCta),

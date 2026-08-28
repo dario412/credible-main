@@ -50,10 +50,10 @@ export default async function AdminLegalPagesEditorPage() {
           </a>
           , and{" "}
           <a
-            href="/accessibility-statement"
+            href="/accessibility"
             className="font-medium text-forest hover:text-forest-dark"
           >
-            /accessibility-statement
+            /accessibility
           </a>
           .
         </p>
