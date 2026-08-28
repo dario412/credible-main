@@ -179,6 +179,7 @@ export async function saveCaseStudy(
     heroSummary: card.heroSummary,
     seoTitle: card.seoTitle,
     seoDescription: card.seoDescription,
+    title: card.title,
   });
   if (cmsLimitError) {
     return { ok: false as const, message: cmsLimitError };

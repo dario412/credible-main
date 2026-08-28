@@ -151,6 +151,56 @@ function CharCount({
   );
 }
 
+function UseSameCheckbox({
+  id,
+  checked,
+  onChange,
+  children,
+}: {
+  id: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <label
+      htmlFor={id}
+      className="flex cursor-pointer items-center gap-2 text-sm text-charcoal"
+    >
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      {children}
+    </label>
+  );
+}
+
+function SeoFallbackPreview({
+  value,
+  max,
+  emptyLabel,
+}: {
+  value: string;
+  max: number;
+  emptyLabel: string;
+}) {
+  const preview = value.trim();
+  return (
+    <div className="rounded-sm border border-charcoal/15 bg-cream-dark/40 px-3 py-2.5">
+      <p className="text-xs font-medium text-charcoal/55">Will use</p>
+      <p className="mt-1 text-sm text-charcoal">
+        {preview || (
+          <span className="text-charcoal/45 italic">{emptyLabel}</span>
+        )}
+      </p>
+      {preview ? <CharCount value={preview} max={max} /> : null}
+    </div>
+  );
+}
+
 export function CaseStudyEditorForm({
   initial,
   speakers,
@@ -172,6 +222,10 @@ export function CaseStudyEditorForm({
   const [ok, setOk] = useState(false);
   const [pending, setPending] = useState(false);
 
+  const useSameMetaTitle = !(card.seoTitle?.trim());
+  const useSameMetaDescription = !(card.seoDescription?.trim());
+  const useSameOgImage = !(card.ogImage?.trim());
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (pending) return;
@@ -181,6 +235,7 @@ export function CaseStudyEditorForm({
       heroSummary: card.heroSummary,
       seoTitle: card.seoTitle,
       seoDescription: card.seoDescription,
+      title: card.title,
     });
     if (validationError) {
       setOk(false);
@@ -319,7 +374,7 @@ export function CaseStudyEditorForm({
         </div>
         <MediaField
           label="Cover image"
-          hint="Full-bleed hero on the project page. Also used as the social share image unless you set one below."
+          hint="Full-bleed hero on the project page. Can also be reused as the social share image in Search & social below."
           value={card.coverImage ?? ""}
           onChange={(coverImage) => setCard({ ...card, coverImage })}
         />
@@ -381,55 +436,156 @@ export function CaseStudyEditorForm({
           <h2 className="font-display text-xl">Search &amp; social (SEO)</h2>
           <p className="mt-1 text-sm text-muted">
             Controls the browser tab title, Google search snippet, and link
-            previews on LinkedIn, Slack, etc. If left blank, the page falls
-            back to the page title, card summary, and cover image.
+            previews on LinkedIn, Slack, etc. Check &ldquo;same as&rdquo; to
+            reuse page content, or enter custom values below.
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <Field
             label="Meta title"
             id="seoTitle"
-            hint={`Google & browser tab title. Max ${PROJECT_SEO_TITLE_MAX} characters. Defaults to page title.`}
+            hint={`Google & browser tab title. Max ${PROJECT_SEO_TITLE_MAX} characters.`}
           >
-            <TextInput
-              id="seoTitle"
-              maxLength={PROJECT_SEO_TITLE_MAX}
-              value={card.seoTitle ?? ""}
-              onChange={(e) =>
-                setCard({ ...card, seoTitle: e.target.value })
-              }
-              placeholder={card.title || "Page title"}
-            />
-            <CharCount value={card.seoTitle ?? ""} max={PROJECT_SEO_TITLE_MAX} />
+            <div className="space-y-2">
+              <UseSameCheckbox
+                id="seoTitleSameAsPageTitle"
+                checked={useSameMetaTitle}
+                onChange={(checked) => {
+                  if (checked) {
+                    setCard({ ...card, seoTitle: undefined });
+                    return;
+                  }
+                  setCard({ ...card, seoTitle: card.title });
+                }}
+              >
+                Same as page title
+              </UseSameCheckbox>
+              {useSameMetaTitle ? (
+                <SeoFallbackPreview
+                  value={card.title}
+                  max={PROJECT_SEO_TITLE_MAX}
+                  emptyLabel="Add a page title above"
+                />
+              ) : (
+                <>
+                  <TextInput
+                    id="seoTitle"
+                    maxLength={PROJECT_SEO_TITLE_MAX}
+                    value={card.seoTitle ?? ""}
+                    onChange={(e) =>
+                      setCard({ ...card, seoTitle: e.target.value })
+                    }
+                    placeholder="Custom meta title"
+                  />
+                  <CharCount
+                    value={card.seoTitle ?? ""}
+                    max={PROJECT_SEO_TITLE_MAX}
+                  />
+                </>
+              )}
+            </div>
           </Field>
-          <MediaField
-            label="Social share image (OG)"
-            hint="1200×630 recommended. Defaults to cover image."
-            value={card.ogImage ?? ""}
-            onChange={(ogImage) =>
-              setCard({ ...card, ogImage: ogImage || undefined })
-            }
-          />
+          <div className="space-y-1.5">
+            <p className="block text-sm font-medium text-charcoal">
+              Social share image (OG)
+            </p>
+            <p className="text-xs text-muted">
+              1200×630 recommended. Used for link previews on LinkedIn, Slack,
+              etc.
+            </p>
+            <div className="space-y-2">
+              <UseSameCheckbox
+                id="ogImageSameAsCover"
+                checked={useSameOgImage}
+                onChange={(checked) => {
+                  if (checked) {
+                    setCard({ ...card, ogImage: undefined });
+                    return;
+                  }
+                  setCard({ ...card, ogImage: "" });
+                }}
+              >
+                Same as cover image
+              </UseSameCheckbox>
+              {useSameOgImage ? (
+                <div className="flex items-stretch gap-3 rounded-sm border border-charcoal/15 bg-cream-dark/40 px-3 py-2.5">
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-charcoal/10 bg-[#f4f2ef]">
+                    {card.coverImage?.trim() ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={card.coverImage}
+                        alt=""
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    ) : (
+                      <span className="px-2 text-center text-[0.65rem] text-charcoal/40">
+                        No cover
+                      </span>
+                    )}
+                  </div>
+                  <p className="self-center text-sm text-charcoal/70">
+                    {card.coverImage?.trim()
+                      ? "Using the cover image from Page content."
+                      : "Add a cover image above to use it here."}
+                  </p>
+                </div>
+              ) : (
+                <MediaField
+                  label=""
+                  hint=""
+                  value={card.ogImage ?? ""}
+                  onChange={(ogImage) =>
+                    setCard({ ...card, ogImage: ogImage || undefined })
+                  }
+                />
+              )}
+            </div>
+          </div>
           <div className="md:col-span-2">
             <Field
               label="Meta description"
               id="seoDescription"
-              hint={`The snippet Google shows in search results. Max ${PROJECT_SEO_DESCRIPTION_MAX} characters. Not the same as card summary. Defaults to card summary if empty.`}
+              hint={`The snippet Google shows in search results. Max ${PROJECT_SEO_DESCRIPTION_MAX} characters.`}
             >
-              <TextArea
-                id="seoDescription"
-                rows={3}
-                maxLength={PROJECT_SEO_DESCRIPTION_MAX}
-                value={card.seoDescription ?? ""}
-                onChange={(e) =>
-                  setCard({ ...card, seoDescription: e.target.value })
-                }
-                placeholder={card.summary || "Card summary"}
-              />
-              <CharCount
-                value={card.seoDescription ?? ""}
-                max={PROJECT_SEO_DESCRIPTION_MAX}
-              />
+              <div className="space-y-2">
+                <UseSameCheckbox
+                  id="seoDescriptionSameAsSummary"
+                  checked={useSameMetaDescription}
+                  onChange={(checked) => {
+                    if (checked) {
+                      setCard({ ...card, seoDescription: undefined });
+                      return;
+                    }
+                    setCard({ ...card, seoDescription: card.summary });
+                  }}
+                >
+                  Same as card summary
+                </UseSameCheckbox>
+                {useSameMetaDescription ? (
+                  <SeoFallbackPreview
+                    value={card.summary}
+                    max={PROJECT_SEO_DESCRIPTION_MAX}
+                    emptyLabel="Add a card summary above"
+                  />
+                ) : (
+                  <>
+                    <TextArea
+                      id="seoDescription"
+                      rows={3}
+                      maxLength={PROJECT_SEO_DESCRIPTION_MAX}
+                      value={card.seoDescription ?? ""}
+                      onChange={(e) =>
+                        setCard({ ...card, seoDescription: e.target.value })
+                      }
+                      placeholder="Custom meta description"
+                    />
+                    <CharCount
+                      value={card.seoDescription ?? ""}
+                      max={PROJECT_SEO_DESCRIPTION_MAX}
+                    />
+                  </>
+                )}
+              </div>
             </Field>
           </div>
         </div>

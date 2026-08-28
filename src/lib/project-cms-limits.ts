@@ -9,6 +9,8 @@ export function validateProjectCmsFields(fields: {
   heroSummary?: string;
   seoTitle?: string;
   seoDescription?: string;
+  /** Used when meta title is left blank (same as page title). */
+  title?: string;
 }): string | null {
   const summary = fields.summary?.trim() ?? "";
   if (summary.length > PROJECT_SUMMARY_MAX) {
@@ -22,9 +24,17 @@ export function validateProjectCmsFields(fields: {
   if (seoTitle.length > PROJECT_SEO_TITLE_MAX) {
     return `Meta title must be ${PROJECT_SEO_TITLE_MAX} characters or fewer.`;
   }
+  const effectiveSeoTitle = seoTitle || fields.title?.trim() || "";
+  if (!seoTitle && effectiveSeoTitle.length > PROJECT_SEO_TITLE_MAX) {
+    return `Page title is ${effectiveSeoTitle.length} characters — shorten it or write a custom meta title (max ${PROJECT_SEO_TITLE_MAX}).`;
+  }
   const seoDescription = fields.seoDescription?.trim() ?? "";
   if (seoDescription.length > PROJECT_SEO_DESCRIPTION_MAX) {
     return `Meta description must be ${PROJECT_SEO_DESCRIPTION_MAX} characters or fewer.`;
+  }
+  const effectiveSeoDescription = seoDescription || summary;
+  if (!seoDescription && effectiveSeoDescription.length > PROJECT_SEO_DESCRIPTION_MAX) {
+    return `Card summary is ${effectiveSeoDescription.length} characters — shorten it or write a custom meta description (max ${PROJECT_SEO_DESCRIPTION_MAX}).`;
   }
   return null;
 }
