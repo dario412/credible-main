@@ -13,6 +13,7 @@ import {
   type HomePageSections,
 } from "@/lib/cms";
 import type { CaseStudyCard } from "@/lib/case-studies";
+import { validateProjectCmsFields } from "@/lib/project-cms-limits";
 import {
   mergeContactSections,
   type ContactPageSections,
@@ -171,6 +172,16 @@ export async function saveCaseStudy(
 
   if (!card.slug?.trim() || !card.title?.trim()) {
     return { ok: false as const, message: "Title and slug are required." };
+  }
+
+  const cmsLimitError = validateProjectCmsFields({
+    summary: card.summary,
+    heroSummary: card.heroSummary,
+    seoTitle: card.seoTitle,
+    seoDescription: card.seoDescription,
+  });
+  if (cmsLimitError) {
+    return { ok: false as const, message: cmsLimitError };
   }
 
   const slug = slugify(card.slug);

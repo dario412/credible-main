@@ -693,6 +693,12 @@ export function caseStudyToCard(row: CaseStudyRow): CaseStudyCard {
     coverImage: row.coverImage || data.coverImage || "/images/case-studies/notion.jpg",
     logo: data.logo ?? CASE_STUDY_LOGO,
     featured: row.featured || Boolean(data.featured),
+    seoTitle: row.seoTitle ?? undefined,
+    seoDescription: row.seoDescription ?? undefined,
+    ogImage:
+      typeof data.ogImage === "string" && data.ogImage.trim()
+        ? data.ogImage.trim()
+        : undefined,
   };
 }
 
@@ -713,6 +719,9 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
     relatedExperts,
     coverImage,
     featured,
+    seoTitle: _seoTitle,
+    seoDescription: _seoDescription,
+    ogImage: _ogImage,
     ...rest
   } = card;
 
@@ -742,9 +751,12 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
     period: period ?? "",
     coverImage,
     featured: Boolean(featured),
+    seoTitle: card.seoTitle?.trim() || null,
+    seoDescription: card.seoDescription?.trim() || null,
     data: {
       ...rest,
       pillars,
+      ogImage: card.ogImage?.trim() || undefined,
       meta: Array.isArray(rest.meta) && rest.meta.length > 0 ? rest.meta : meta,
     },
     relatedExperts: speakers,

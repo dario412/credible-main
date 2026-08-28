@@ -33,10 +33,13 @@ export async function generateMetadata({ params }: Props) {
   if (!study) return {};
 
   const hero = caseStudyHero(study);
+  const shareImage = study.ogImage?.trim() || study.coverImage;
   return createMetadata({
-    title: study.title,
-    description: hero.summary,
+    title: study.seoTitle?.trim() || study.title,
+    description:
+      study.seoDescription?.trim() || hero.summary || study.summary,
     path: `/case-studies/${study.slug}`,
+    image: shareImage,
   });
 }
 

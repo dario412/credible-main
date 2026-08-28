@@ -87,6 +87,12 @@ export type CaseStudyCard = {
   coverImage: string;
   logo?: string;
   featured?: boolean;
+  /** Overrides `<title>` / Open Graph title when set. */
+  seoTitle?: string;
+  /** Meta description for Google and social previews. */
+  seoDescription?: string;
+  /** Open Graph / Twitter image. Falls back to cover image. */
+  ogImage?: string;
 };
 
 /** Placeholder brand mark for development — Notion cube everywhere */

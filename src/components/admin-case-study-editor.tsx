@@ -15,6 +15,13 @@ import {
   legacyStoryToBlocks,
   type CaseStudyBlock,
 } from "@/lib/case-study-content";
+import {
+  PROJECT_HERO_SUMMARY_MAX,
+  PROJECT_SEO_DESCRIPTION_MAX,
+  PROJECT_SEO_TITLE_MAX,
+  PROJECT_SUMMARY_MAX,
+  validateProjectCmsFields,
+} from "@/lib/project-cms-limits";
 import { cn } from "@/lib/utils";
 
 export type CaseStudySpeakerOption = {
@@ -121,6 +128,29 @@ function SpeakersField({
   );
 }
 
+function CharCount({
+  value,
+  max,
+}: {
+  value: string;
+  max: number;
+}) {
+  const count = value.length;
+  const over = count > max;
+  const near = count > max * 0.85;
+  return (
+    <p
+      className={cn(
+        "text-right text-xs tabular-nums",
+        over ? "text-danger" : near ? "text-charcoal/55" : "text-charcoal/40",
+      )}
+    >
+      {count}/{max}
+      {over ? " — too long" : ""}
+    </p>
+  );
+}
+
 export function CaseStudyEditorForm({
   initial,
   speakers,
@@ -145,6 +175,19 @@ export function CaseStudyEditorForm({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (pending) return;
+
+    const validationError = validateProjectCmsFields({
+      summary: card.summary,
+      heroSummary: card.heroSummary,
+      seoTitle: card.seoTitle,
+      seoDescription: card.seoDescription,
+    });
+    if (validationError) {
+      setOk(false);
+      setMessage(validationError);
+      return;
+    }
+
     setPending(true);
     const next: CaseStudyCard = {
       ...card,
@@ -172,9 +215,17 @@ export function CaseStudyEditorForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-8">
+    <form onSubmit={onSubmit} className="space-y-10">
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Page content</h2>
+          <p className="mt-1 text-sm text-muted">
+            What visitors see on the project page and projects index. This is
+            separate from Google / social fields below.
+          </p>
+        </div>
       <div className="grid gap-4 md:grid-cols-2">
-        <Field label="Title" id="title">
+        <Field label="Page title" id="title" hint="Main headline on the project page.">
           <TextInput
             id="title"
             value={card.title}
@@ -200,7 +251,7 @@ export function CaseStudyEditorForm({
         </Field>
         <MediaField
           label="Client logo"
-          hint="Shown on the case study hero and catalogue cards. Prefer a simple mark on transparent or dark-ready artwork."
+          hint="Brand mark on the project hero and catalogue cards — not used for SEO or social previews."
           value={card.logo ?? ""}
           onChange={(logo) => setCard({ ...card, logo: logo || undefined })}
         />
@@ -250,18 +301,25 @@ export function CaseStudyEditorForm({
           </div>
         </Field>
         <div className="md:col-span-2">
-          <Field label="Summary" id="summary">
+          <Field
+            label="Card summary"
+            id="summary"
+            hint="Short teaser on the projects index and cards. Not the Google meta description — use Search & social below for that."
+          >
             <TextArea
               id="summary"
               rows={3}
+              maxLength={PROJECT_SUMMARY_MAX}
               value={card.summary}
               onChange={(e) => setCard({ ...card, summary: e.target.value })}
               required
             />
+            <CharCount value={card.summary} max={PROJECT_SUMMARY_MAX} />
           </Field>
         </div>
         <MediaField
           label="Cover image"
+          hint="Full-bleed hero on the project page. Also used as the social share image unless you set one below."
           value={card.coverImage ?? ""}
           onChange={(coverImage) => setCard({ ...card, coverImage })}
         />
@@ -273,14 +331,21 @@ export function CaseStudyEditorForm({
           />
           Featured on projects index
         </label>
-        <Field label="Hero title (optional)" id="heroTitle">
+        <div className="md:col-span-2 border-t border-charcoal/10 pt-4">
+          <p className="text-sm font-medium text-charcoal">Hero overrides (optional)</p>
+          <p className="mt-0.5 text-xs text-muted">
+            Replace the default title and intro on the full-bleed hero. Leave
+            blank to use the page title and card summary.
+          </p>
+        </div>
+        <Field label="Hero headline" id="heroTitle">
           <TextInput
             id="heroTitle"
             value={card.heroTitle ?? ""}
             onChange={(e) => setCard({ ...card, heroTitle: e.target.value })}
           />
         </Field>
-        <Field label="Hero emphasis (optional)" id="heroTitleEmphasis">
+        <Field label="Hero emphasis" id="heroTitleEmphasis" hint="Optional italic or accent phrase at the end of the hero headline.">
           <TextInput
             id="heroTitleEmphasis"
             value={card.heroTitleEmphasis ?? ""}
@@ -290,16 +355,85 @@ export function CaseStudyEditorForm({
           />
         </Field>
         <div className="md:col-span-2">
-          <Field label="Hero summary (optional)" id="heroSummary">
+          <Field
+            label="Hero intro"
+            id="heroSummary"
+            hint="Supporting line under the hero headline on the project page only."
+          >
             <TextArea
               id="heroSummary"
               rows={2}
+              maxLength={PROJECT_HERO_SUMMARY_MAX}
               value={card.heroSummary ?? ""}
               onChange={(e) => setCard({ ...card, heroSummary: e.target.value })}
+            />
+            <CharCount
+              value={card.heroSummary ?? ""}
+              max={PROJECT_HERO_SUMMARY_MAX}
             />
           </Field>
         </div>
       </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Search &amp; social (SEO)</h2>
+          <p className="mt-1 text-sm text-muted">
+            Controls the browser tab title, Google search snippet, and link
+            previews on LinkedIn, Slack, etc. If left blank, the page falls
+            back to the page title, card summary, and cover image.
+          </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field
+            label="Meta title"
+            id="seoTitle"
+            hint={`Google & browser tab title. Max ${PROJECT_SEO_TITLE_MAX} characters. Defaults to page title.`}
+          >
+            <TextInput
+              id="seoTitle"
+              maxLength={PROJECT_SEO_TITLE_MAX}
+              value={card.seoTitle ?? ""}
+              onChange={(e) =>
+                setCard({ ...card, seoTitle: e.target.value })
+              }
+              placeholder={card.title || "Page title"}
+            />
+            <CharCount value={card.seoTitle ?? ""} max={PROJECT_SEO_TITLE_MAX} />
+          </Field>
+          <MediaField
+            label="Social share image (OG)"
+            hint="1200×630 recommended. Defaults to cover image."
+            value={card.ogImage ?? ""}
+            onChange={(ogImage) =>
+              setCard({ ...card, ogImage: ogImage || undefined })
+            }
+          />
+          <div className="md:col-span-2">
+            <Field
+              label="Meta description"
+              id="seoDescription"
+              hint={`The snippet Google shows in search results. Max ${PROJECT_SEO_DESCRIPTION_MAX} characters. Not the same as card summary. Defaults to card summary if empty.`}
+            >
+              <TextArea
+                id="seoDescription"
+                rows={3}
+                maxLength={PROJECT_SEO_DESCRIPTION_MAX}
+                value={card.seoDescription ?? ""}
+                onChange={(e) =>
+                  setCard({ ...card, seoDescription: e.target.value })
+                }
+                placeholder={card.summary || "Card summary"}
+              />
+              <CharCount
+                value={card.seoDescription ?? ""}
+                max={PROJECT_SEO_DESCRIPTION_MAX}
+              />
+            </Field>
+          </div>
+        </div>
+      </section>
 
       <div className="space-y-4">
         <h2 className="font-display text-xl">Story content</h2>

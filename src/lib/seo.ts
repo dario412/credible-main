@@ -15,14 +15,22 @@ export function createMetadata({
   description = defaultDescription,
   path = "/",
   noIndex = false,
+  image,
 }: {
   title?: string;
   description?: string;
   path?: string;
   noIndex?: boolean;
+  /** Absolute or site-relative URL for Open Graph / Twitter cards. */
+  image?: string;
 } = {}): Metadata {
   const fullTitle = title ? `${title} | ${siteName}` : `${siteName} — Talent agency for the expert economy`;
   const url = absoluteUrl(path);
+  const imageUrl = image
+    ? image.startsWith("http")
+      ? image
+      : absoluteUrl(image)
+    : undefined;
 
   return {
     title: fullTitle,
@@ -34,11 +42,13 @@ export function createMetadata({
       url,
       siteName,
       type: "website",
+      ...(imageUrl ? { images: [{ url: imageUrl }] } : {}),
     },
     twitter: {
-      card: "summary_large_image",
+      card: imageUrl ? "summary_large_image" : "summary_large_image",
       title: fullTitle,
       description,
+      ...(imageUrl ? { images: [imageUrl] } : {}),
     },
     robots: noIndex
       ? { index: false, follow: false, nocache: true }
