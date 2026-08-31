@@ -47,6 +47,9 @@ const NAV_LABEL_HINTS: Record<keyof ProfileRailNavLabels, string> = {
   topics: "Topics & audience",
   formats: "Formats",
   work: "Recent work",
+  testimonials: "Testimonials",
+  faq: "FAQ",
+  cta: "Send brief",
 };
 
 const FORMAT_LABEL_HINTS = Object.fromEntries(

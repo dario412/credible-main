@@ -11,6 +11,7 @@ import { useSiteChrome } from "@/components/site-chrome-context";
 import {
   applyProfileRailTemplate,
   buildProfileNav,
+  profileNavKeyFromHref,
   type NavLink,
 } from "@/lib/site-chrome";
 import {
@@ -41,6 +42,9 @@ export type ExpertProfileShellProps = {
     hasTopics: boolean;
     hasFormats: boolean;
     hasWork: boolean;
+    hasTestimonials?: boolean;
+    hasFaq?: boolean;
+    hasCta?: boolean;
   };
   children: ReactNode;
 };
@@ -203,16 +207,15 @@ export function ExpertProfileShell({
               >
                 <ul>
                   {builtNav.map((item) => {
-                    const navKey = item.href.replace("#", "") as
-                      | "overview"
-                      | "channels"
-                      | "topics"
-                      | "formats"
-                      | "work";
+                    const navKey = profileNavKeyFromHref(item.href);
                     return (
                       <li key={item.href}>
                         <ProfileEditHit
-                          field={`profileRail.nav.${navKey}`}
+                          field={
+                            navKey
+                              ? (`profileRail.nav.${navKey}` as const)
+                              : "profileRail.nav.overview"
+                          }
                           label={`nav ${item.label}`}
                           block
                         >

@@ -325,6 +325,9 @@ export default async function ExpertPage({ params }: Props) {
   const similarSorted = await loadSimilarCreators(expert, extras);
   const recentWork = linkedCaseStudies.map(caseStudyToExpertWork);
   const testimonials = extras.testimonials ?? [];
+  const hasFaq = siteChrome.profileFaq.items.some(
+    (item) => item.q.trim() && item.a.trim(),
+  );
 
   const heroStats = buildStats(expert, extras, enrichment.stats);
   const heroProof =
@@ -376,6 +379,9 @@ export default async function ExpertPage({ params }: Props) {
           ),
           hasFormats: Boolean(content.formats?.length),
           hasWork: recentWork.length > 0,
+          hasTestimonials: testimonials.length > 0,
+          hasFaq,
+          hasCta: true,
         }}
       >
         <ExpertProfileMain

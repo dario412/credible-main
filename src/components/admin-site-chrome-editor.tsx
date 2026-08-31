@@ -337,6 +337,9 @@ export function SiteChromeEditorForm({
                 ["topics", "Topics & audience"],
                 ["formats", "Formats"],
                 ["work", "Recent work"],
+                ["testimonials", "Testimonials"],
+                ["faq", "FAQ"],
+                ["cta", "Send brief"],
               ] as const
             ).map(([key, hint]) => (
               <Field key={key} label={hint} id={`pr-nav-${key}`}>

@@ -22,6 +22,9 @@ export type ProfileRailNavLabels = {
   topics: string;
   formats: string;
   work: string;
+  testimonials: string;
+  faq: string;
+  cta: string;
 };
 
 export const PROFILE_BODY_SECTION_IDS = [
@@ -304,6 +307,9 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
       topics: "Topics & audience",
       formats: "Formats",
       work: "Recent work",
+      testimonials: "Testimonials",
+      faq: "FAQ",
+      cta: "Send brief",
     },
   },
   profileCta: {
@@ -557,6 +563,9 @@ function mergeProfileRailNav(
     topics: asString(data.topics, defaults.topics),
     formats: asString(data.formats, defaults.formats),
     work: asString(data.work, defaults.work),
+    testimonials: asString(data.testimonials, defaults.testimonials),
+    faq: asString(data.faq, defaults.faq),
+    cta: asString(data.cta, defaults.cta),
   };
 }
 
@@ -744,6 +753,23 @@ export function applyProfileRailTemplate(
     .replace(/\{possessive\}/g, possessive);
 }
 
+export function profileNavKeyFromHref(
+  href: string,
+): keyof ProfileRailNavLabels | null {
+  const id = href.replace(/^#/, "");
+  const byId: Record<string, keyof ProfileRailNavLabels> = {
+    overview: "overview",
+    channels: "channels",
+    topics: "topics",
+    formats: "formats",
+    work: "work",
+    testimonials: "testimonials",
+    "profile-faq": "faq",
+    "profile-cta": "cta",
+  };
+  return byId[id] ?? null;
+}
+
 export function buildProfileNav(
   labels: ProfileRailNavLabels,
   sections: {
@@ -751,6 +777,9 @@ export function buildProfileNav(
     hasTopics: boolean;
     hasFormats: boolean;
     hasWork: boolean;
+    hasTestimonials?: boolean;
+    hasFaq?: boolean;
+    hasCta?: boolean;
   },
   sectionOrder: ProfileBodySectionId[] = [...PROFILE_BODY_SECTION_IDS],
 ): NavLink[] {
@@ -769,9 +798,22 @@ export function buildProfileNav(
     work: "#work",
   };
 
-  return sectionOrder
+  const bodyNav = sectionOrder
     .filter((id) => available[id])
     .map((id) => ({ href: hrefById[id], label: labels[id] }));
+
+  const extraNav: NavLink[] = [];
+  if (sections.hasTestimonials) {
+    extraNav.push({ href: "#testimonials", label: labels.testimonials });
+  }
+  if (sections.hasFaq) {
+    extraNav.push({ href: "#profile-faq", label: labels.faq });
+  }
+  if (sections.hasCta !== false) {
+    extraNav.push({ href: "#profile-cta", label: labels.cta });
+  }
+
+  return [...bodyNav, ...extraNav];
 }
 
 function mergeOrderedIds<T extends string>(
