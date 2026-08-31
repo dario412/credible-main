@@ -70,3 +70,25 @@ export async function loadHeroCast(): Promise<HeroCastMember[]> {
     role: expert.categories[0] ?? null,
   }));
 }
+
+/** Roster faces with portraits for CTA marquees — featured first, then A–Z. */
+export async function loadCreatorMarqueeFaces(): Promise<
+  Array<{ slug: string; name: string; image: string }>
+> {
+  const experts = await prisma.expert.findMany({
+    where: { image: { not: null } },
+    orderBy: [{ featured: "desc" }, { name: "asc" }],
+    select: { slug: true, name: true, image: true },
+  });
+
+  return experts
+    .filter(
+      (expert): expert is { slug: string; name: string; image: string } =>
+        Boolean(expert.image?.trim()),
+    )
+    .map((expert) => ({
+      slug: expert.slug,
+      name: expert.name,
+      image: expert.image.trim(),
+    }));
+}

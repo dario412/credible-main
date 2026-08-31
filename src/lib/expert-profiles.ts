@@ -10,6 +10,10 @@ export type ExpertChannelPresence = {
   followers: string;
   growth90d: string;
   engagement: string;
+  /** Optional synced follower history for sparklines (oldest → newest). */
+  sparkline?: number[];
+  /** Demo-only preview curves until real platform history is synced. */
+  usePreviewSparkline?: boolean;
   icon:
     | "linkedin"
     | "youtube"
@@ -1307,7 +1311,16 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
 export function getExpertProfileEnrichment(
   slug: string,
 ): ExpertProfileEnrichment {
-  return EXPERT_PROFILE_ENRICHMENT[slug] ?? {};
+  const enrichment = EXPERT_PROFILE_ENRICHMENT[slug] ?? {};
+  if (!enrichment.channels?.length) return enrichment;
+
+  return {
+    ...enrichment,
+    channels: enrichment.channels.map((channel) => ({
+      ...channel,
+      usePreviewSparkline: true,
+    })),
+  };
 }
 
 export function isLinkedInTopVoice(slug: string) {

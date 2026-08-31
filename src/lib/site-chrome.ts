@@ -185,6 +185,8 @@ export type SiteChromeSections = {
   footer: {
     tagline: string;
     companyLine: string;
+    companyLineHref: string;
+    companyLineLinkLabel: string;
     email: string;
     copyright: string;
     socials: SocialLink[];
@@ -226,6 +228,8 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
   footer: {
     tagline: "The talent agency for the expert economy.",
     companyLine: "A PepTalk company.",
+    companyLineHref: "https://www.getapeptalk.com",
+    companyLineLinkLabel: "getapeptalk.com",
     email: "hello@crediblecreators.com",
     copyright: "Credible Talent Ltd. All rights reserved.",
     socials: [
@@ -243,25 +247,7 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
     columns: [
       {
         title: "Roster",
-        links: [
-          { href: "/roster", label: "All creators" },
-          {
-            href: `/roster?archetype=${encodeURIComponent("Founder")}`,
-            label: "Founders",
-          },
-          {
-            href: `/roster?archetype=${encodeURIComponent("CEO")}`,
-            label: "CEOs",
-          },
-          {
-            href: `/roster?archetype=${encodeURIComponent("Investor")}`,
-            label: "Investors",
-          },
-          {
-            href: `/roster?archetype=${encodeURIComponent("Category expert")}`,
-            label: "Category experts",
-          },
-        ],
+        links: [{ href: "/roster", label: "All creators" }],
       },
       {
         title: "What we do",
@@ -955,6 +941,14 @@ export function mergeSiteChrome(raw: unknown): SiteChromeSections {
     footer: {
       tagline: asString(footer.tagline, defaults.footer.tagline),
       companyLine: asString(footer.companyLine, defaults.footer.companyLine),
+      companyLineHref: asString(
+        footer.companyLineHref,
+        defaults.footer.companyLineHref,
+      ),
+      companyLineLinkLabel: asString(
+        footer.companyLineLinkLabel,
+        defaults.footer.companyLineLinkLabel,
+      ),
       email: asString(footer.email, defaults.footer.email),
       copyright: asString(footer.copyright, defaults.footer.copyright),
       socials:

@@ -2,20 +2,26 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { TopicAudienceListItem } from "@/components/topic-audience-icon";
 import type {
   ExpertAudienceSlice,
   ExpertTopicShare,
 } from "@/lib/expert-profiles";
+import type { TopicAudienceIconComponent } from "@/lib/topic-audience-icons";
 import { cn } from "@/lib/utils";
 
 export function AudienceShareList({
   title,
   items,
+  iconMap,
+  iconContext = "audience",
   delay = 0,
   className,
 }: {
   title: string;
   items: ExpertAudienceSlice[];
+  iconMap?: Map<string, TopicAudienceIconComponent>;
+  iconContext?: "audience" | "industry";
   delay?: number;
   className?: string;
 }) {
@@ -59,11 +65,12 @@ export function AudienceShareList({
       </p>
       <ul className="mt-4 divide-y divide-charcoal/8">
         {items.map((item) => (
-          <li key={item.label} className="py-2.5 first:pt-0 last:pb-0">
-            <span className="text-[0.875rem] leading-snug text-charcoal/75">
-              {item.label}
-            </span>
-          </li>
+          <TopicAudienceListItem
+            key={item.label}
+            label={item.label}
+            context={iconContext}
+            iconMap={iconMap}
+          />
         ))}
       </ul>
     </div>
@@ -72,9 +79,11 @@ export function AudienceShareList({
 
 export function TopicMixPie({
   topics,
+  iconMap,
   className,
 }: {
   topics: ExpertTopicShare[];
+  iconMap?: Map<string, TopicAudienceIconComponent>;
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -117,22 +126,15 @@ export function TopicMixPie({
       </p>
       <ul className="mt-4 divide-y divide-charcoal/8">
         {ranked.map((topic, index) => (
-          <li
+          <TopicAudienceListItem
             key={topic.label}
-            className={cn(
-              "py-2.5 transition-[opacity,transform] duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] first:pt-0 last:pb-0",
-              visible
-                ? "translate-y-0 opacity-100"
-                : "translate-y-4 opacity-0",
-            )}
-            style={{
-              transitionDelay: visible ? `${120 + index * 80}ms` : "0ms",
-            }}
-          >
-            <p className="text-[0.875rem] leading-snug text-charcoal/80">
-              {topic.label}
-            </p>
-          </li>
+            label={topic.label}
+            context="topic"
+            iconMap={iconMap}
+            animate
+            visible={visible}
+            delayMs={120 + index * 80}
+          />
         ))}
       </ul>
     </div>

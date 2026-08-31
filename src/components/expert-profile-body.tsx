@@ -5,16 +5,11 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   ArrowSquareOut,
-  EnvelopeSimple,
-  FacebookLogo,
-  InstagramLogo,
-  LinkedinLogo,
-  Microphone,
-  TiktokLogo,
-  XLogo,
-  YoutubeLogo,
 } from "@phosphor-icons/react/ssr";
 
+import { ChannelBrandIcon } from "@/components/channel-brand-icon";
+
+import { ChannelSparkline } from "@/components/channel-sparkline";
 import {
   AudienceShareList,
   TopicMixPie,
@@ -48,6 +43,7 @@ import {
   type ProfileFooterBlockId,
 } from "@/lib/site-chrome";
 import { coverAltFor } from "@/lib/image-alt";
+import { buildTopicAudienceIconMap } from "@/lib/topic-audience-icons";
 import { cn } from "@/lib/utils";
 
 function SectionHeading({
@@ -111,60 +107,12 @@ function channelMark(
 }
 
 function ChannelGlyph({ channel }: { channel: ExpertChannelPresence }) {
-  const mark = channelMark(channel);
-  const className = "size-5";
-
-  const styles: Record<
-    ExpertChannelPresence["icon"],
-    { tint: string; icon: ReactNode }
-  > = {
-    linkedin: {
-      tint: "bg-[#0A66C2] text-white",
-      icon: <LinkedinLogo weight="fill" className={className} aria-hidden />,
-    },
-    youtube: {
-      tint: "bg-[#FF0000] text-white",
-      icon: <YoutubeLogo weight="fill" className={className} aria-hidden />,
-    },
-    x: {
-      tint: "bg-charcoal text-cream",
-      icon: <XLogo weight="fill" className={className} aria-hidden />,
-    },
-    instagram: {
-      tint: "bg-[#E1306C] text-white",
-      icon: <InstagramLogo weight="fill" className={className} aria-hidden />,
-    },
-    facebook: {
-      tint: "bg-[#1877F2] text-white",
-      icon: <FacebookLogo weight="fill" className={className} aria-hidden />,
-    },
-    newsletter: {
-      tint: "bg-forest text-cream",
-      icon: <EnvelopeSimple weight="fill" className={className} aria-hidden />,
-    },
-    podcast: {
-      tint: "bg-[#935B3B] text-cream",
-      icon: <Microphone weight="fill" className={className} aria-hidden />,
-    },
-    tiktok: {
-      tint: "bg-charcoal text-cream",
-      icon: <TiktokLogo weight="fill" className={className} aria-hidden />,
-    },
-  };
-
-  const visual = styles[mark] ?? styles.newsletter;
-
   return (
-    <span
-      className={cn(
-        "inline-flex size-10 shrink-0 items-center justify-center rounded-sm shadow-[inset_0_0_0_1px_rgba(28,26,23,0.06)]",
-        visual.tint,
-      )}
-      aria-hidden
-      title={channel.platform}
-    >
-      {visual.icon}
-    </span>
+    <ChannelBrandIcon
+      icon={channelMark(channel)}
+      url={channel.url}
+      platform={channel.platform}
+    />
   );
 }
 
@@ -291,10 +239,16 @@ function ChannelsSection({
           <table className="w-full min-w-[24rem] border-collapse text-left">
             <thead>
               <tr className="border-b border-charcoal/10 bg-cream">
-                {["", "Platform", "Followers"].map((label) => (
+                {["", "Platform", "Followers", "90d trend"].map((label) => (
                   <th
                     key={label || "icon"}
-                    className="px-3 py-3.5 text-[0.65rem] font-medium tracking-[0.14em] text-charcoal/45 uppercase first:w-14 first:pl-4 last:pr-4 md:px-4"
+                    className={cn(
+                      "px-3 py-2 text-[0.65rem] font-medium tracking-[0.14em] text-charcoal/45 uppercase first:w-14 first:pl-4 md:px-4",
+                      label === "90d trend" &&
+                        "w-[11.5rem] border-l border-charcoal/10 bg-cream/80 pr-4",
+                      label === "Followers" &&
+                        "border-l border-charcoal/10 bg-cream/80 pr-2",
+                    )}
                   >
                     {label}
                   </th>
@@ -310,12 +264,12 @@ function ChannelsSection({
                     key={`${channel.platform}-${channel.handle}`}
                     className="border-b border-charcoal/8 last:border-b-0"
                   >
-                    <td className="px-3 py-4 first:pl-4 md:px-4 md:py-4.5">
+                    <td className="w-14 px-3 py-2.5 first:pl-4 md:px-4 md:py-3">
                       <ChannelGlyph channel={channel} />
                     </td>
-                    <td className="px-3 py-4 md:px-4 md:py-4.5">
-                      <div className="flex items-center gap-2">
-                        <p className="text-[0.9375rem] font-medium text-charcoal">
+                    <td className="px-3 py-2 md:px-4 md:py-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[0.875rem] font-medium leading-tight text-charcoal">
                           {channel.platform}
                         </p>
                         {href ? (
@@ -324,22 +278,25 @@ function ChannelsSection({
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label={`Open ${channel.platform} profile`}
-                            className="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-charcoal/40 transition-colors hover:bg-charcoal/5 hover:text-forest"
+                            className="inline-flex size-5 shrink-0 items-center justify-center rounded-sm text-charcoal/40 transition-colors hover:bg-charcoal/5 hover:text-forest"
                           >
                             <ArrowSquareOut
                               weight="bold"
-                              className="size-3.5"
+                              className="size-3"
                               aria-hidden
                             />
                           </a>
                         ) : null}
                       </div>
-                      <p className="mt-1 text-[0.8125rem] font-medium tracking-tight text-charcoal/70">
+                      <p className="mt-0.5 text-[0.75rem] font-medium leading-tight tracking-tight text-charcoal/65">
                         {channel.handle}
                       </p>
                     </td>
-                    <td className="px-3 py-4 text-[1.05rem] font-medium tabular-nums tracking-tight text-charcoal last:pr-4 md:px-4 md:py-4.5 md:text-[1.125rem]">
+                    <td className="border-l border-charcoal/10 bg-cream/25 px-3 py-2 text-[0.9375rem] font-medium tabular-nums tracking-tight text-charcoal md:px-4 md:py-2.5 md:text-[1rem]">
                       <StatCounter value={channel.followers} />
+                    </td>
+                    <td className="border-l border-charcoal/10 bg-cream/25 px-3 py-2 pr-4 md:px-4 md:py-2.5">
+                      <ChannelSparkline channel={channel} />
                     </td>
                   </tr>
                 );
@@ -362,6 +319,12 @@ function TopicsAndAudience({
   audience: ExpertAudience;
   title: string;
 }) {
+  const iconMap = buildTopicAudienceIconMap({
+    topics: topicShares.map((topic) => topic.label),
+    audience: audience.seniority.map((item) => item.label),
+    industry: audience.industry.map((item) => item.label),
+  });
+
   return (
     <section id="topics" className="scroll-mt-28">
       <div className="max-w-2xl">
@@ -375,14 +338,25 @@ function TopicsAndAudience({
       </div>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-4 md:mt-12 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-5">
-        <TopicMixPie topics={topicShares} className="sm:col-span-2 lg:col-span-1" />
+        <TopicMixPie
+          topics={topicShares}
+          iconMap={iconMap}
+          className="sm:col-span-2 lg:col-span-1"
+        />
         {audience.seniority.length > 0 ? (
-          <AudienceShareList title="Audience" items={audience.seniority} />
+          <AudienceShareList
+            title="Audience"
+            items={audience.seniority}
+            iconMap={iconMap}
+            iconContext="audience"
+          />
         ) : null}
         {audience.industry.length > 0 ? (
           <AudienceShareList
             title="Best for"
             items={audience.industry}
+            iconMap={iconMap}
+            iconContext="industry"
             delay={120}
           />
         ) : null}

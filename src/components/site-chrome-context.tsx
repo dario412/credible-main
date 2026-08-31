@@ -14,7 +14,12 @@ import {
   type SiteChromeSections,
 } from "@/lib/site-chrome";
 
-type FooterField = "tagline" | "companyLine" | "email";
+type FooterField =
+  | "tagline"
+  | "companyLine"
+  | "companyLineHref"
+  | "companyLineLinkLabel"
+  | "email";
 
 type SiteChromeContextValue = {
   chrome: SiteChromeSections;

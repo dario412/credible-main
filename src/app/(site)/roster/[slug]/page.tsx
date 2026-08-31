@@ -15,6 +15,10 @@ import {
 } from "@/lib/brand-logos";
 import { parseHighlightStat } from "@/lib/airtable/map-expert";
 import type { AirtableProfileSections } from "@/lib/airtable/map-profile-sections";
+import {
+  enrichChannelsWithFollowerHistory,
+  type ChannelFollowerHistory,
+} from "@/lib/channel-follower-history";
 import { parseExpertChannels } from "@/lib/expert-channels";
 import {
   getExpertProfileEnrichment,
@@ -59,6 +63,7 @@ type ProfileExtras = {
   trustedBy?: TrustedBrand[];
   similarProfileIds?: string[];
   profileSections?: AirtableProfileSections;
+  channelFollowerHistory?: ChannelFollowerHistory;
   testimonials?: ExpertProfileTestimonial[];
 };
 
@@ -106,7 +111,7 @@ function mergeProfileContent(
   linkedinTopVoice: boolean;
 } {
   const sections = extras.profileSections;
-  const channels =
+  const channels = enrichChannelsWithFollowerHistory(
     sections?.channels?.filter((channel) => {
       if (
         channel.platform === "TikTok" ||
@@ -117,7 +122,9 @@ function mergeProfileContent(
         return false;
       }
       return hasFollowerCount(channel.followers);
-    }) ?? [];
+    }) ?? [],
+    extras.channelFollowerHistory,
+  );
   const topicShares =
     sections?.topicShares?.length
       ? sections.topicShares

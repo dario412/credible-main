@@ -8,8 +8,12 @@ import { PatternField } from "@/components/pattern-field";
 import { EditableHit } from "@/components/editable-hit";
 import { useSiteChrome } from "@/components/site-chrome-context";
 import { ShortlistMenu } from "@/components/shortlist-menu";
-import type { SocialNetwork } from "@/lib/site-chrome";
+import type { NavLink, SocialNetwork } from "@/lib/site-chrome";
 import { cn } from "@/lib/utils";
+import {
+  expandFooterNavLists,
+  footerNavGridClasses,
+} from "@/lib/roster-filter-options";
 
 const FOOTER_PATTERN_COLOR = { r: 249, g: 243, b: 239 };
 
@@ -197,7 +201,7 @@ export function SiteHeader() {
   );
 }
 
-export function SiteFooter() {
+export function SiteFooter({ rosterNavLinks }: { rosterNavLinks?: NavLink[] }) {
   const year = new Date().getFullYear();
   const {
     chrome,
@@ -207,6 +211,7 @@ export function SiteFooter() {
     onSelectFooterField,
   } = useSiteChrome();
   const footer = chrome.footer;
+  const footerNavLists = expandFooterNavLists(footer.columns, rosterNavLinks);
 
   return (
     <footer className="mt-auto bg-cream px-6 py-8 md:px-10 md:py-10 lg:px-12">
@@ -255,27 +260,30 @@ export function SiteFooter() {
               </p>
             </EditableHit>
 
-            <div className="mt-10">
+            {footer.companyLineHref ? (
               <EditableHit
                 active={editing && canEdit}
-                selected={selected === "footer.email"}
-                label="footer email"
+                selected={selected === "footer.companyLineLinkLabel"}
+                label="footer PepTalk link label"
+                block
                 ringOffset="ring-offset-charcoal"
-                onSelect={() => onSelectFooterField?.("email")}
+                onSelect={() => onSelectFooterField?.("companyLineLinkLabel")}
               >
                 <a
-                  href={`mailto:${footer.email}`}
-                  className="block w-fit text-sm font-medium text-cream/90 transition-colors hover:text-cream"
+                  href={footer.companyLineHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2.5 block w-fit text-sm font-medium text-cream/90 underline decoration-cream/25 underline-offset-[0.2em] transition-colors hover:text-cream hover:decoration-cream/60"
                   onClick={(e) => {
                     if (editing) e.preventDefault();
                   }}
                 >
-                  {footer.email}
+                  {footer.companyLineLinkLabel}
                 </a>
               </EditableHit>
-            </div>
+            ) : null}
 
-            <div className="mt-8 flex items-center gap-5">
+            <div className="mt-10 flex items-center gap-5">
               {footer.socials.map((social) => (
                 <a
                   key={`${social.network}-${social.href}`}
@@ -295,12 +303,18 @@ export function SiteFooter() {
           </div>
 
           <nav
-            className="grid grid-cols-2 gap-x-10 gap-y-10 sm:grid-cols-3 sm:gap-x-16"
+            className={cn(
+              footerNavGridClasses(footerNavLists.length),
+              "min-w-0 flex-1 lg:justify-end",
+            )}
             aria-label="Footer"
           >
-            {footer.columns.map((column, columnIndex) => (
-              <ul key={`${column.title}-${columnIndex}`} className="space-y-3.5">
-                {column.links.map((link, linkIndex) => (
+            {footerNavLists.map((links, columnIndex) => (
+              <ul
+                key={`footer-nav-${columnIndex}-${links[0]?.href ?? "empty"}`}
+                className="space-y-3.5"
+              >
+                {links.map((link, linkIndex) => (
                   <li key={`${columnIndex}-${linkIndex}-${link.label}`}>
                     <Link
                       href={link.href}

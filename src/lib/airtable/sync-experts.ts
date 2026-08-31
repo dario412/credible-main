@@ -15,9 +15,23 @@ import {
 } from "./map-expert";
 import { loadOrganisationBrandsByIds } from "./organisations";
 import {
+  mergeChannelFollowerHistory,
+  type ChannelFollowerHistory,
+} from "@/lib/channel-follower-history";
+import {
   loadTestimonialsByIds,
   resolveOrderedTestimonials,
 } from "./testimonials";
+
+function parseExistingProfileExtras(value: unknown): {
+  channelFollowerHistory?: ChannelFollowerHistory;
+} {
+  if (!value || typeof value !== "object") return {};
+  const data = value as { channelFollowerHistory?: ChannelFollowerHistory };
+  return {
+    channelFollowerHistory: data.channelFollowerHistory,
+  };
+}
 
 export type SyncExpertsResult = {
   ok: boolean;
@@ -210,51 +224,63 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
       .filter((brand) => Boolean(brand.logo))
       .slice(0, 12);
 
-    const data = {
-      airtableId: mapped.airtableId,
-      slug,
-      name: mapped.name,
-      title: mapped.title,
-      bio: mapped.bio,
-      shortBio: mapped.shortBio,
-      image: mapped.image,
-      categories: mapped.categories,
-      topics: mapped.topics,
-      formats: mapped.formats,
-      combinedReach: mapped.combinedReach,
-      growth90d: mapped.growth90d,
-      audienceWho: mapped.audienceWho,
-      audienceWhere: mapped.audienceWhere,
-      channels: mapped.channels,
-      featured: mapped.featured,
-      seoTitle: mapped.seoTitle,
-      seoDescription: mapped.seoDescription,
-      profileExtras: {
-        nameFirst: mapped.nameFirst,
-        bannerImage: mapped.bannerImage,
-        highlight1: mapped.highlight1,
-        highlight2: mapped.highlight2,
-        highlight3: mapped.highlight3,
-        highlight4: mapped.highlight4,
-        websiteSubtitle: mapped.websiteSubtitle,
-        exclusive: mapped.exclusive,
-        quote: mapped.quote,
-        quoteSource: mapped.quoteSource,
-        brandPartnershipsCopy: mapped.brandPartnershipsCopy,
-        trustedBy,
-        similarProfileIds: mapped.similarProfileIds,
-        profileSections: mapped.profileSections,
-        testimonials: resolveOrderedTestimonials(
-          mapped.testimonialIds,
-          testimonialsById,
-        ),
-      },
-    };
-
     try {
       const byAirtable = await prisma.expert.findUnique({
         where: { airtableId: mapped.airtableId },
       });
+      const bySlug = byAirtable
+        ? null
+        : await prisma.expert.findUnique({ where: { slug } });
+      const existingExpert = byAirtable ?? bySlug;
+      const existingExtras = parseExistingProfileExtras(
+        existingExpert?.profileExtras,
+      );
+      const channelFollowerHistory = mergeChannelFollowerHistory(
+        existingExtras.channelFollowerHistory,
+        mapped.profileSections.channels,
+      );
+
+      const data = {
+        airtableId: mapped.airtableId,
+        slug,
+        name: mapped.name,
+        title: mapped.title,
+        bio: mapped.bio,
+        shortBio: mapped.shortBio,
+        image: mapped.image,
+        categories: mapped.categories,
+        topics: mapped.topics,
+        formats: mapped.formats,
+        combinedReach: mapped.combinedReach,
+        growth90d: mapped.growth90d,
+        audienceWho: mapped.audienceWho,
+        audienceWhere: mapped.audienceWhere,
+        channels: mapped.channels,
+        featured: mapped.featured,
+        seoTitle: mapped.seoTitle,
+        seoDescription: mapped.seoDescription,
+        profileExtras: {
+          nameFirst: mapped.nameFirst,
+          bannerImage: mapped.bannerImage,
+          highlight1: mapped.highlight1,
+          highlight2: mapped.highlight2,
+          highlight3: mapped.highlight3,
+          highlight4: mapped.highlight4,
+          websiteSubtitle: mapped.websiteSubtitle,
+          exclusive: mapped.exclusive,
+          quote: mapped.quote,
+          quoteSource: mapped.quoteSource,
+          brandPartnershipsCopy: mapped.brandPartnershipsCopy,
+          trustedBy,
+          similarProfileIds: mapped.similarProfileIds,
+          profileSections: mapped.profileSections,
+          channelFollowerHistory,
+          testimonials: resolveOrderedTestimonials(
+            mapped.testimonialIds,
+            testimonialsById,
+          ),
+        },
+      };
 
       if (byAirtable) {
         await prisma.expert.update({
@@ -271,7 +297,6 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
         continue;
       }
 
-      const bySlug = await prisma.expert.findUnique({ where: { slug } });
       if (bySlug) {
         await prisma.expert.update({
           where: { id: bySlug.id },

@@ -1263,6 +1263,31 @@ export function SiteChromeEditorForm({
             }
           />
         </Field>
+        <Field
+          label="Company link URL"
+          id="ft-company-href"
+          hint="External link shown under the company line (e.g. PepTalk)."
+        >
+          <TextInput
+            id="ft-company-href"
+            value={sections.footer.companyLineHref}
+            onChange={(e) =>
+              setFooter({ ...sections.footer, companyLineHref: e.target.value })
+            }
+          />
+        </Field>
+        <Field label="Company link label" id="ft-company-link-label">
+          <TextInput
+            id="ft-company-link-label"
+            value={sections.footer.companyLineLinkLabel}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                companyLineLinkLabel: e.target.value,
+              })
+            }
+          />
+        </Field>
         <Field label="Email" id="ft-email">
           <TextInput
             id="ft-email"

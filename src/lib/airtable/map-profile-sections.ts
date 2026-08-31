@@ -5,6 +5,10 @@ import type {
   ExpertFormatOffering,
   ExpertTopicShare,
 } from "@/lib/expert-profiles";
+import {
+  growthDisplayFromFields,
+  parseChannelFollowerHistory,
+} from "@/lib/channel-follower-history";
 import type { AirtableRecord } from "./client";
 
 function field(fields: Record<string, unknown>, ...aliases: string[]): unknown {
@@ -206,12 +210,14 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
   const defs: Array<{
     icon: ExpertChannelPresence["icon"];
     platform: string;
+    platformKey: string;
     urlAliases: string[];
     followerAliases: string[];
   }> = [
     {
       icon: "linkedin",
       platform: "LinkedIn",
+      platformKey: "LinkedIn",
       urlAliases: ["Channel | LinkedIn | URL", "LinkedIn"],
       followerAliases: [
         "Channel | LinkedIn | Followers",
@@ -221,6 +227,7 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
     {
       icon: "youtube",
       platform: "YouTube",
+      platformKey: "YouTube",
       urlAliases: ["Channel | YouTube | URL", "YouTube"],
       followerAliases: [
         "Channel | YouTube | Followers",
@@ -230,6 +237,7 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
     {
       icon: "x",
       platform: "X / Twitter",
+      platformKey: "x.com",
       urlAliases: ["Channel | x.com | URL", "X", "Twitter"],
       followerAliases: [
         "Channel | x.com | Followers",
@@ -239,18 +247,21 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
     {
       icon: "newsletter",
       platform: "Newsletter",
+      platformKey: "Newsletter",
       urlAliases: ["Channel | Newsletter | URL"],
       followerAliases: ["Channel | Newsletter | Followers"],
     },
     {
       icon: "instagram",
       platform: "Instagram",
+      platformKey: "Instagram",
       urlAliases: ["Channel | Instagram | URL", "Instagram"],
       followerAliases: ["Channel | Instagram | Followers"],
     },
     {
       icon: "facebook",
       platform: "Facebook",
+      platformKey: "Facebook",
       urlAliases: ["Channel | Facebook | URL", "Facebook"],
       followerAliases: ["Channel | Facebook | Followers"],
     },
@@ -263,14 +274,34 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
       rawUrl && urlMatchesPlatform(rawUrl, def.platform) ? rawUrl : null;
     const followers = followerDisplay(field(fields, ...def.followerAliases));
     if (!followers) continue;
+
+    const growthRaw = asString(
+      field(
+        fields,
+        `Channel | ${def.platformKey} | Growth (90d)`,
+        `Channel | ${def.platformKey} | Growth 90d`,
+        `Channel | ${def.platformKey} | 90d Growth`,
+        `Channel | ${def.platformKey} | 90d growth`,
+      ),
+    );
+    const sparkline = parseChannelFollowerHistory(
+      field(
+        fields,
+        `Channel | ${def.platformKey} | Follower history`,
+        `Channel | ${def.platformKey} | Followers history`,
+        `Channel | ${def.platformKey} | Sparkline`,
+      ),
+    );
+
     channels.push({
       icon: def.icon,
       platform: def.platform,
       handle: url ? handleFromUrl(url, def.platform) : def.platform,
       followers,
-      growth90d: "—",
+      growth90d: growthDisplayFromFields(growthRaw, sparkline ?? undefined),
       engagement: "—",
       url: url ?? undefined,
+      sparkline: sparkline ?? undefined,
     });
   }
   return channels;

@@ -78,6 +78,8 @@ type EditTarget =
   | `trustedBy.client.${number}`
   | "footer.tagline"
   | "footer.companyLine"
+  | "footer.companyLineHref"
+  | "footer.companyLineLinkLabel"
   | "footer.email";
 
 function targetTitle(target: EditTarget): string {
@@ -113,6 +115,8 @@ function targetTitle(target: EditTarget): string {
     "trustedBy.introLine": "Trusted by intro",
     "footer.tagline": "Footer tagline",
     "footer.companyLine": "Footer company line",
+    "footer.companyLineHref": "Footer PepTalk link URL",
+    "footer.companyLineLinkLabel": "Footer PepTalk link label",
     "footer.email": "Footer email",
   };
   if (target.startsWith("waysIn.item.")) {
@@ -1463,6 +1467,30 @@ function EditorPopover({
               id="ft-company"
               value={footer.companyLine}
               onChange={(e) => onFooterChange({ companyLine: e.target.value })}
+            />
+          </Field>
+        ) : null}
+
+        {target === "footer.companyLineHref" ? (
+          <Field label="Company link URL" id="ft-company-href">
+            <TextInput
+              id="ft-company-href"
+              value={footer.companyLineHref}
+              onChange={(e) =>
+                onFooterChange({ companyLineHref: e.target.value })
+              }
+            />
+          </Field>
+        ) : null}
+
+        {target === "footer.companyLineLinkLabel" ? (
+          <Field label="Company link label" id="ft-company-link-label">
+            <TextInput
+              id="ft-company-link-label"
+              value={footer.companyLineLinkLabel}
+              onChange={(e) =>
+                onFooterChange({ companyLineLinkLabel: e.target.value })
+              }
             />
           </Field>
         ) : null}
