@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 export const metadata = createMetadata({
   title: "Roster",
   description:
-    "Twenty-four B2B expert creators ready to brief — filter by archetype, topic or channel.",
+    "Twenty-four B2B expert creators ready to brief — filter by role, category or channel.",
   path: "/roster",
 });
 
