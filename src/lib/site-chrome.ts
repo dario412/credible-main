@@ -34,7 +34,7 @@ export const PROFILE_BODY_SECTION_IDS = [
 
 export type ProfileBodySectionId = (typeof PROFILE_BODY_SECTION_IDS)[number];
 
-export const PROFILE_FOOTER_BLOCK_IDS = ["interestCta", "similar", "faq"] as const;
+export const PROFILE_FOOTER_BLOCK_IDS = ["interestCta", "similar"] as const;
 
 export type ProfileFooterBlockId = (typeof PROFILE_FOOTER_BLOCK_IDS)[number];
 
@@ -51,7 +51,6 @@ export const PROFILE_FOOTER_BLOCK_LABELS: Record<ProfileFooterBlockId, string> =
   {
     interestCta: "Interest CTA",
     similar: "Similar creators",
-    faq: "FAQ",
   };
 
 export type ProfileFaqItem = {
