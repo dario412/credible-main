@@ -51,7 +51,7 @@ function isLightLogoAsset(src: string) {
   return /-white\.(svg|png|webp)$/i.test(src) || src.includes("-wordmark-white");
 }
 
-/** Logo for project cards and heroes — white wordmarks on dark, stored assets on light. */
+/** Logo for project cards and heroes — CMS upload first, then brand fallbacks. */
 export function resolveCaseStudyClientLogo(
   client: string,
   logo?: string | null,
@@ -60,26 +60,24 @@ export function resolveCaseStudyClientLogo(
   const tone = options?.tone ?? "dark";
   const trimmed = logo?.trim();
 
+  if (trimmed && !isLegacyCaseStudyPlaceholder(trimmed)) {
+    return trimmed;
+  }
+
   if (tone === "dark") {
-    if (trimmed && !isLegacyCaseStudyPlaceholder(trimmed)) {
-      if (isLightLogoAsset(trimmed) || /^https?:\/\//i.test(trimmed)) {
-        return trimmed;
-      }
-    }
     return (
       resolveBrandLogo(client) ?? "/brand/clients/notion-wordmark-white.svg"
     );
   }
 
-  if (trimmed && !isLegacyCaseStudyPlaceholder(trimmed)) {
-    return trimmed;
-  }
   return "/brand/clients/notion-wordmark.png";
 }
 
 export function caseStudyLogoNeedsInvert(src: string) {
+  if (isLightLogoAsset(src)) return false;
+  if (src.startsWith("/api/media/")) return false;
   if (/^https?:\/\//i.test(src)) return true;
-  return !isLightLogoAsset(src);
+  return true;
 }
 
 export type TrustedBrand = {
