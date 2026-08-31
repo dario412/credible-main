@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { ADMIN_EDITORIAL_GUIDES } from "@/lib/admin-editorial-guides";
 import { prisma } from "@/lib/prisma";
 import { hasPermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
@@ -157,11 +158,33 @@ export default async function AdminDashboardPage() {
                 </li>
               ) : null}
               {hasPermission(session.user.role, "MANAGE_CONTENT") ? (
-                <li>
-                  <Link href="/admin/sync" className="hover:text-forest">
-                    Sync roster from Airtable
-                  </Link>
-                </li>
+                <>
+                  <li>
+                    <Link
+                      href={ADMIN_EDITORIAL_GUIDES.project.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hover:text-forest"
+                    >
+                      {ADMIN_EDITORIAL_GUIDES.project.label} (PDF)
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href={ADMIN_EDITORIAL_GUIDES.insight.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hover:text-forest"
+                    >
+                      {ADMIN_EDITORIAL_GUIDES.insight.label} (PDF)
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/admin/sync" className="hover:text-forest">
+                      Sync roster from Airtable
+                    </Link>
+                  </li>
+                </>
               ) : null}
             </ul>
           </div>

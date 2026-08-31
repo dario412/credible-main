@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { InsightEditorForm } from "@/components/admin-insight-editor";
+import { AdminEditorialGuideLink } from "@/components/admin-editorial-guide-link";
 import { saveInsight } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
@@ -33,6 +34,9 @@ export default async function AdminNewInsightPage() {
           ← Insights
         </Link>
         <h1 className="mt-3 font-display text-3xl">New insight</h1>
+        <p className="mt-2">
+          <AdminEditorialGuideLink kind="insight" />
+        </p>
       </div>
       <InsightEditorForm
         initialMeta={{

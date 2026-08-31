@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AdminDeleteButton } from "@/components/admin-delete-button";
+import { AdminEditorialGuideLink } from "@/components/admin-editorial-guide-link";
 import { auth } from "@/lib/auth";
 import { listCaseStudyCards } from "@/lib/actions/admin-cms";
 import { formatCaseStudyPillars } from "@/lib/case-studies";
@@ -28,6 +29,9 @@ export default async function AdminCaseStudiesPage() {
           <h1 className="font-display text-3xl">Projects</h1>
           <p className="mt-2 text-sm text-muted">
             Edit project pages shown on the marketing site.
+          </p>
+          <p className="mt-2">
+            <AdminEditorialGuideLink kind="project" />
           </p>
         </div>
         <Link

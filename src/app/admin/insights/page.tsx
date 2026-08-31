@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AdminDeleteButton } from "@/components/admin-delete-button";
+import { AdminEditorialGuideLink } from "@/components/admin-editorial-guide-link";
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
@@ -37,6 +38,9 @@ export default async function AdminInsightsPage() {
           <h1 className="font-display text-3xl">Insights</h1>
           <p className="mt-2 text-sm text-muted">
             Write and publish articles with structured content blocks.
+          </p>
+          <p className="mt-2">
+            <AdminEditorialGuideLink kind="insight" />
           </p>
         </div>
         <Link

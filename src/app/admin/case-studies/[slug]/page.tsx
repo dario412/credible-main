@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { CaseStudyEditorForm } from "@/components/admin-case-study-editor";
+import { AdminEditorialGuideLink } from "@/components/admin-editorial-guide-link";
 import { getCaseStudyCard, saveCaseStudy } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import { loadCaseStudy } from "@/lib/case-studies-server";
@@ -47,6 +48,9 @@ export default async function AdminEditCaseStudyPage({ params }: Props) {
         </Link>
         <h1 className="mt-3 font-display text-3xl">Edit project</h1>
         <p className="mt-1 text-sm text-muted">{study.slug}</p>
+        <p className="mt-2">
+          <AdminEditorialGuideLink kind="project" />
+        </p>
       </div>
       <CaseStudyEditorForm
         initial={study}

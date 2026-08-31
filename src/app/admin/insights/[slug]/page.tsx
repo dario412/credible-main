@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { InsightEditorForm } from "@/components/admin-insight-editor";
+import { AdminEditorialGuideLink } from "@/components/admin-editorial-guide-link";
 import { ensureInsightBlocks, saveInsight } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
@@ -46,6 +47,9 @@ export default async function AdminEditInsightPage({ params }: Props) {
         </Link>
         <h1 className="mt-3 font-display text-3xl">Edit insight</h1>
         <p className="mt-1 text-sm text-muted">{insight.slug}</p>
+        <p className="mt-2">
+          <AdminEditorialGuideLink kind="insight" />
+        </p>
       </div>
       <InsightEditorForm
         id={insight.id}
