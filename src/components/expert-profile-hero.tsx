@@ -91,13 +91,18 @@ export function ExpertProfileShell({
   const builtNav = navSections
     ? buildProfileNav(rail.nav, navSections, chrome.profileLayout.sectionOrder)
     : nav;
+  const profileCtaNav = builtNav.find((item) => item.href === "#profile-cta");
+  const profileSectionNav = builtNav.filter(
+    (item) => item.href !== "#profile-cta",
+  );
 
   return (
     <div className="bg-cream px-6 pt-8 pb-16 md:px-10 md:pt-12 md:pb-20 lg:px-12 lg:pt-14 lg:pb-24">
       <div className="mx-auto grid max-w-352 items-start gap-10 md:gap-12 lg:grid-cols-[minmax(0,18.5rem)_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[minmax(0,19.5rem)_minmax(0,1fr)] xl:gap-14">
         {/* Premium agency talent card — sticky CRO rail */}
         <aside className="order-1 self-start lg:sticky lg:top-32">
-          <div className="overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] shadow-[0_18px_44px_rgba(28,26,23,0.07)] lg:max-h-[calc(100vh-9rem)]">
+          <div className="overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] shadow-[0_18px_44px_rgba(28,26,23,0.07)] lg:flex lg:max-h-[calc(100vh-9rem)] lg:flex-col">
+            <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
             {/* Identity */}
             <div className="border-b border-charcoal/8 px-4 py-3.5">
               <ProfileEditHit
@@ -200,13 +205,13 @@ export function ExpertProfileShell({
             ) : null}
 
             {/* Dossier nav */}
-            {builtNav.length > 0 ? (
+            {profileSectionNav.length > 0 ? (
               <nav
                 aria-label="On this profile"
                 className="border-b border-charcoal/8 px-2 py-1.5"
               >
                 <ul>
-                  {builtNav.map((item) => {
+                  {profileSectionNav.map((item) => {
                     const navKey = profileNavKeyFromHref(item.href);
                     return (
                       <li key={item.href}>
@@ -237,7 +242,7 @@ export function ExpertProfileShell({
                   })}
                 </ul>
               </nav>
-            ) : topicLine.length > 0 ? (
+            ) : topicLine.length > 0 && builtNav.length === 0 ? (
               <div className="border-b border-charcoal/8 px-4 py-3">
                 <ProfileEditHit
                   field="profileRail.focusLabel"
@@ -253,9 +258,26 @@ export function ExpertProfileShell({
                 </p>
               </div>
             ) : null}
+            </div>
 
-            {/* Conversion */}
-            <div className="px-4 py-4">
+            {/* Pinned conversion — stays visible when the nav list scrolls */}
+            <div className="shrink-0 border-t border-charcoal/8 bg-[#FBF8F5] px-4 py-4">
+              {profileCtaNav ? (
+                <ProfileEditHit
+                  field="profileRail.nav.cta"
+                  label="nav Send brief button"
+                  block
+                >
+                  <a
+                    href={profileCtaNav.href}
+                    className="flex w-full items-center justify-center rounded-sm border border-forest bg-forest px-3 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-forest-dark hover:bg-forest-dark"
+                  >
+                    {profileCtaNav.label}
+                  </a>
+                </ProfileEditHit>
+              ) : null}
+
+              <div className={profileCtaNav ? "mt-4" : undefined}>
               <ProfileEditHit
                 field="profileRail.workWith"
                 label="work-with block"
@@ -329,6 +351,7 @@ export function ExpertProfileShell({
                   </p>
                 </ProfileEditHit>
               ) : null}
+              </div>
             </div>
           </div>
         </aside>
