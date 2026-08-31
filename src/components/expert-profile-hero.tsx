@@ -296,10 +296,11 @@ export function ExpertProfileShell({
                   field="profileRail.primaryCta"
                   label="get rates button"
                   block
+                  className="min-w-0 flex-1"
                 >
                   <Link
                     href={`/contact?expert=${encodeURIComponent(slug)}`}
-                    className="inline-flex min-w-0 flex-[1.65] items-center justify-center rounded-sm border border-forest bg-forest px-3 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-forest-dark hover:bg-forest-dark"
+                    className="flex w-full items-center justify-center rounded-sm border border-forest bg-forest px-3 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-forest-dark hover:bg-forest-dark"
                   >
                     {rail.primaryCtaLabel}
                   </Link>
