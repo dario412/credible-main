@@ -4,11 +4,9 @@ import {
   mapAirtableProfileSections,
   type AirtableProfileSections,
 } from "./map-profile-sections";
-import { AIRTABLE_CREATOR_PROFILE_TOPICS_FIELD } from "./topics";
+import { websiteCategoriesFromFields } from "./website-categories";
 
-export type MapExpertOptions = {
-  topicNamesById?: Map<string, string>;
-};
+export type MapExpertOptions = Record<string, never>;
 
 export type MappedExpert = {
   airtableId: string;
@@ -248,23 +246,12 @@ function slugFromValue(raw: string | null, fallbackName: string): string {
   return slugify(raw);
 }
 
-function linkedProfileTopics(
-  fields: Record<string, unknown>,
-  topicNamesById: Map<string, string>,
-): string[] {
-  const raw = field(fields, AIRTABLE_CREATOR_PROFILE_TOPICS_FIELD, "Profile | Topics");
-  const ids = recordIds(raw);
-  return ids
-    .map((id) => topicNamesById.get(id))
-    .filter((name): name is string => Boolean(name?.trim()));
-}
-
 /**
  * Map a Credible | Data Airtable record into an Expert upsert payload.
  */
 export function mapAirtableRecordToExpert(
   record: AirtableRecord,
-  options: MapExpertOptions = {},
+  _options: MapExpertOptions = {},
 ): MappedExpert | null {
   const { fields, id: airtableId } = record;
 
@@ -356,21 +343,7 @@ export function mapAirtableRecordToExpert(
     name;
   const bio = longBio ?? shortBio ?? title;
 
-  const topicNamesById = options.topicNamesById ?? new Map<string, string>();
-  const linkedTopics = linkedProfileTopics(fields, topicNamesById);
-  const topics = (
-    linkedTopics.length > 0
-      ? linkedTopics
-      : asStringList(
-          field(
-            fields,
-            "Creator | Profile | Key themes",
-            "Industries",
-            "Topics",
-            "Tags",
-          ),
-        )
-  ).slice(0, 3);
+  const topics = websiteCategoriesFromFields(fields).slice(0, 6);
 
   const highlight1 = highlightField(fields, 1);
   const highlight2 = highlightField(fields, 2);

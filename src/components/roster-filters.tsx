@@ -268,9 +268,9 @@ export function RosterFilters({
           />
 
           <FilterSegment
-            label="Topic"
+            label="Category"
             value={currentTopic}
-            placeholder="All topics"
+            placeholder="All categories"
             options={topicOptions}
             open={open === "topic"}
             onToggle={() =>

@@ -11,10 +11,8 @@ import {
 } from "./client";
 import {
   mapAirtableRecordToExpert,
-  type MapExpertOptions,
 } from "./map-expert";
 import { loadOrganisationBrandsByIds } from "./organisations";
-import { loadTopicNamesById } from "./topics";
 
 export type SyncExpertsResult = {
   ok: boolean;
@@ -132,7 +130,7 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
   const mappedRows = records
     .map((record) => ({
       record,
-      mapped: mapAirtableRecordToExpert(record, mapOptions),
+      mapped: mapAirtableRecordToExpert(record),
     }))
     .filter(
       (row): row is { record: AirtableRecord; mapped: NonNullable<typeof row.mapped> } =>
@@ -156,7 +154,6 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
   const companyLogoIds = mappedRows.flatMap((row) => row.mapped.companyLogoIds);
   let trustedByMap = new Map<string, TrustedBrand[]>();
   let organisationBrands = new Map<string, TrustedBrand>();
-  let topicNamesById = new Map<string, string>();
   try {
     trustedByMap = await loadTrustedByByExpertId(expertIds);
   } catch {
@@ -167,13 +164,6 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
   } catch {
     organisationBrands = new Map();
   }
-  try {
-    topicNamesById = await loadTopicNamesById();
-  } catch {
-    topicNamesById = new Map();
-  }
-
-  const mapOptions: MapExpertOptions = { topicNamesById };
 
   let created = 0;
   let updated = 0;

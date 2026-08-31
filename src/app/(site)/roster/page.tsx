@@ -11,6 +11,7 @@ import { isLinkedInTopVoice } from "@/lib/expert-profiles";
 import { hasPermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { buildRosterFilterOptions } from "@/lib/roster-filter-options";
+import { loadWebsiteCategoryChoices } from "@/lib/airtable/website-categories";
 import { createMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -58,8 +59,14 @@ export default async function RosterPage({
     : [];
   const q = params.q?.trim();
 
-  const all = await prisma.expert.findMany({ orderBy: { name: "asc" } });
-  const { archetypeOptions, topicOptions } = buildRosterFilterOptions(all);
+  const [all, categoryChoices] = await Promise.all([
+    prisma.expert.findMany({ orderBy: { name: "asc" } }),
+    loadWebsiteCategoryChoices(),
+  ]);
+  const { archetypeOptions, topicOptions } = buildRosterFilterOptions(
+    all,
+    categoryChoices,
+  );
 
   const experts = all.filter((expert) => {
     const categories = expert.categories ?? [];

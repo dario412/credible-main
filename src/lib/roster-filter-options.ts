@@ -64,7 +64,10 @@ type ExpertFilterSource = {
   topics?: string[] | null;
 };
 
-export function buildRosterFilterOptions(experts: ExpertFilterSource[]) {
+export function buildRosterFilterOptions(
+  experts: ExpertFilterSource[],
+  categoryOrder: string[] = [],
+) {
   const archetypeSet = new Set<string>();
   const topicSet = new Set<string>();
 
@@ -79,8 +82,23 @@ export function buildRosterFilterOptions(experts: ExpertFilterSource[]) {
     }
   }
 
+  const topicOptions =
+    categoryOrder.length > 0
+      ? [
+          ...categoryOrder,
+          ...[...topicSet]
+            .filter(
+              (category) =>
+                !categoryOrder.some(
+                  (item) => item.toLowerCase() === category.toLowerCase(),
+                ),
+            )
+            .sort((a, b) => a.localeCompare(b)),
+        ]
+      : [...topicSet].sort((a, b) => a.localeCompare(b));
+
   return {
     archetypeOptions: sortByArchetypeOrder([...archetypeSet]),
-    topicOptions: [...topicSet].sort((a, b) => a.localeCompare(b)),
+    topicOptions,
   };
 }
