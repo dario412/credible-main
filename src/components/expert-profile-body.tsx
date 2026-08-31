@@ -584,6 +584,31 @@ function ProfileFaqSection() {
   );
 }
 
+const CTA_PATTERN_COLOR = { r: 249, g: 243, b: 239 };
+
+function ProfileInterestCtaSection({
+  name,
+  slug,
+}: {
+  name: string;
+  slug: string;
+}) {
+  return (
+    <section id="profile-cta" className="scroll-mt-28">
+      <div className="relative isolate overflow-hidden rounded-sm bg-charcoal px-6 py-12 text-center shadow-[0_24px_60px_rgba(28,26,23,0.18)] md:px-10 md:py-14">
+        <PatternField
+          color={CTA_PATTERN_COLOR}
+          className="opacity-[0.12]"
+          mask="radial-gradient(120% 100% at 100% 50%, black 0%, rgba(0,0,0,0.55) 38%, transparent 78%)"
+        />
+        <div className="relative z-2">
+          <ExpertInterestCta name={name} slug={slug} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function ExpertProfileMain({
   bio,
   quote,
@@ -595,6 +620,7 @@ export function ExpertProfileMain({
   recentWork,
   testimonials,
   name,
+  slug,
 }: {
   bio: string;
   quote?: string;
@@ -606,6 +632,7 @@ export function ExpertProfileMain({
   recentWork?: ExpertRecentWork[];
   testimonials?: ExpertProfileTestimonial[];
   name: string;
+  slug: string;
 }) {
   const { chrome } = useSiteChrome();
   const layout = chrome.profileLayout;
@@ -675,15 +702,12 @@ export function ExpertProfileMain({
         </div>
       ) : null}
       <ProfileFaqSection />
+      <ProfileInterestCtaSection name={name} slug={slug} />
     </div>
   );
 }
 
-const CTA_PATTERN_COLOR = { r: 249, g: 243, b: 239 };
-
 export function ExpertProfileFooter({
-  name,
-  slug,
   similar,
 }: {
   name: string;
@@ -694,26 +718,6 @@ export function ExpertProfileFooter({
   const footerOrder = chrome.profileLayout.footerOrder;
 
   const blocks: Record<ProfileFooterBlockId, ReactNode> = {
-    interestCta: (
-      <section
-        key="interestCta"
-        className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24"
-      >
-        <div className="mx-auto max-w-352">
-          <div className="relative isolate overflow-hidden rounded-sm bg-charcoal px-6 py-12 text-center shadow-[0_24px_60px_rgba(28,26,23,0.18)] md:px-12 md:py-14">
-            <PatternField
-              color={CTA_PATTERN_COLOR}
-              className="opacity-[0.12]"
-              mask="radial-gradient(120% 100% at 100% 50%, black 0%, rgba(0,0,0,0.55) 38%, transparent 78%)"
-            />
-
-            <div className="relative z-2">
-              <ExpertInterestCta name={name} slug={slug} />
-            </div>
-          </div>
-        </div>
-      </section>
-    ),
     similar:
       similar.length > 0 ? (
         <section

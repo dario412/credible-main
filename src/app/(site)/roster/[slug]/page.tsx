@@ -380,6 +380,7 @@ export default async function ExpertPage({ params }: Props) {
       >
         <ExpertProfileMain
           name={expert.name}
+          slug={expert.slug}
           bio={expert.bio}
           quote={content.quote}
           quoteAttribution={content.quoteAttribution}
