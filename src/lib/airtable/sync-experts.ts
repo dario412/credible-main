@@ -1,6 +1,7 @@
 import "server-only";
 
 import { withResolvedLogos, type TrustedBrand } from "@/lib/brand-logos";
+import type { ExpertProfileTestimonial } from "@/lib/expert-profiles";
 import { prisma } from "@/lib/prisma";
 
 import {
@@ -13,6 +14,10 @@ import {
   mapAirtableRecordToExpert,
 } from "./map-expert";
 import { loadOrganisationBrandsByIds } from "./organisations";
+import {
+  loadTestimonialsByIds,
+  resolveOrderedTestimonials,
+} from "./testimonials";
 
 export type SyncExpertsResult = {
   ok: boolean;
@@ -165,6 +170,14 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
     organisationBrands = new Map();
   }
 
+  const allTestimonialIds = mappedRows.flatMap((row) => row.mapped.testimonialIds);
+  let testimonialsById = new Map<string, ExpertProfileTestimonial>();
+  try {
+    testimonialsById = await loadTestimonialsByIds(allTestimonialIds);
+  } catch {
+    testimonialsById = new Map();
+  }
+
   let created = 0;
   let updated = 0;
   let skipped = records.length - mappedRows.length;
@@ -231,6 +244,10 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
         trustedBy,
         similarProfileIds: mapped.similarProfileIds,
         profileSections: mapped.profileSections,
+        testimonials: resolveOrderedTestimonials(
+          mapped.testimonialIds,
+          testimonialsById,
+        ),
       },
     };
 

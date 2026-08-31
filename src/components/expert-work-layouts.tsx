@@ -6,16 +6,11 @@ import { ArrowRight, CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
 import { getCaseStudy, projectSlugFromHref } from "@/lib/case-studies";
-import type { ExpertRecentWork } from "@/lib/expert-profiles";
+import type { ExpertRecentWork, ExpertProfileTestimonial } from "@/lib/expert-profiles";
 import { coverAltFor } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
 
-export type ExpertTestimonial = {
-  quote: string;
-  name: string;
-  title: string;
-  company?: string;
-};
+export type ExpertTestimonial = ExpertProfileTestimonial;
 
 const WORK_TONE: Record<ExpertRecentWork["tone"], string> = {
   forest: "bg-[#345B47] text-cream",
@@ -273,9 +268,9 @@ export function ExpertTestimonialSlider({
             transform: `translateX(-${safeIndex * (100 / perView)}%)`,
           }}
         >
-          {items.map((item) => (
+          {items.map((item, index) => (
             <li
-              key={item.name}
+              key={`${item.name}-${index}`}
               className="shrink-0 px-1.5 first:pl-0 last:pr-0 sm:px-2"
               style={{ width: `${100 / perView}%` }}
             >

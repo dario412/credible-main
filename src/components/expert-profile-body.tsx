@@ -23,7 +23,7 @@ import { ExpertFormatsGrid } from "@/components/expert-formats-grid";
 import { ExpertInterestCta } from "@/components/expert-interest-cta";
 import { ExpertProfileSimilarIntro } from "@/components/expert-profile-similar-intro";
 import { ExpertQuoteCard } from "@/components/expert-quote-card";
-import { FeaturedCaseStudyCard } from "@/components/expert-work-layouts";
+import { FeaturedCaseStudyCard, ExpertTestimonials } from "@/components/expert-work-layouts";
 import { FadeUp } from "@/components/fade-up";
 import { EYEBROW } from "@/components/inner-page";
 import { PatternField } from "@/components/pattern-field";
@@ -38,6 +38,7 @@ import {
   type ExpertAudience,
   type ExpertChannelPresence,
   type ExpertFormatOffering,
+  type ExpertProfileTestimonial,
   type ExpertRecentWork,
   type ExpertTopicShare,
 } from "@/lib/expert-profiles";
@@ -532,6 +533,23 @@ function RecentWorkSection({
   );
 }
 
+function TestimonialsSection({
+  items,
+  title,
+}: {
+  items: ExpertProfileTestimonial[];
+  title: string;
+}) {
+  return (
+    <section id="testimonials" className="scroll-mt-28">
+      <SectionHeading>{title}</SectionHeading>
+      <div className="mt-8">
+        <ExpertTestimonials items={items} />
+      </div>
+    </section>
+  );
+}
+
 export function ExpertProfileMain({
   bio,
   quote,
@@ -541,6 +559,7 @@ export function ExpertProfileMain({
   audience,
   formats,
   recentWork,
+  testimonials,
   name,
 }: {
   bio: string;
@@ -551,6 +570,7 @@ export function ExpertProfileMain({
   audience?: ExpertAudience;
   formats?: ExpertFormatOffering[];
   recentWork?: ExpertRecentWork[];
+  testimonials?: ExpertProfileTestimonial[];
   name: string;
 }) {
   const { chrome } = useSiteChrome();
@@ -612,6 +632,14 @@ export function ExpertProfileMain({
         const node = sectionNodes[id];
         return node ? <div key={id}>{node}</div> : null;
       })}
+      {testimonials && testimonials.length > 0 ? (
+        <div key="testimonials">
+          <TestimonialsSection
+            items={testimonials}
+            title="What partners say."
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

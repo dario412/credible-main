@@ -27,6 +27,7 @@ import {
   type ExpertFormatOffering,
   type ExpertProfileEnrichment,
   type ExpertProfileStat,
+  type ExpertProfileTestimonial,
   type ExpertTopicShare,
 } from "@/lib/expert-profiles";
 import { prisma } from "@/lib/prisma";
@@ -58,6 +59,7 @@ type ProfileExtras = {
   trustedBy?: TrustedBrand[];
   similarProfileIds?: string[];
   profileSections?: AirtableProfileSections;
+  testimonials?: ExpertProfileTestimonial[];
 };
 
 function parseProfileExtras(value: unknown): ProfileExtras {
@@ -322,6 +324,7 @@ export default async function ExpertPage({ params }: Props) {
   const trustedBy = resolveTrustedBy(extras, enrichment.trustedBy);
   const similarSorted = await loadSimilarCreators(expert, extras);
   const recentWork = linkedCaseStudies.map(caseStudyToExpertWork);
+  const testimonials = extras.testimonials ?? [];
 
   const heroStats = buildStats(expert, extras, enrichment.stats);
   const heroProof =
@@ -385,6 +388,7 @@ export default async function ExpertPage({ params }: Props) {
           audience={content.audience}
           formats={content.formats}
           recentWork={recentWork}
+          testimonials={testimonials}
         />
       </ExpertProfileShell>
 

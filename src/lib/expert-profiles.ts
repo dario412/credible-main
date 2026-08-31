@@ -72,6 +72,14 @@ export type ExpertRecentWork = {
   tone: "forest" | "rust" | "sage";
 };
 
+/** Brand partner quote — synced from Airtable Credible | Testimonials. */
+export type ExpertProfileTestimonial = {
+  quote: string;
+  name: string;
+  title: string;
+  company?: string;
+};
+
 export type ExpertProfileEnrichment = {
   based?: string;
   languages?: string[];

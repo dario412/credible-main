@@ -5,6 +5,7 @@ import {
   type AirtableProfileSections,
 } from "./map-profile-sections";
 import { websiteCategoriesFromFields } from "./website-categories";
+import { AIRTABLE_CREATOR_TESTIMONIALS_FIELD } from "./testimonials";
 
 export type MapExpertOptions = Record<string, never>;
 
@@ -43,6 +44,7 @@ export type MappedExpert = {
   companyLogoIds: string[];
   similarProfileIds: string[];
   profileSections: AirtableProfileSections;
+  testimonialIds: string[];
 };
 
 function normalizeKey(key: string): string {
@@ -463,5 +465,8 @@ export function mapAirtableRecordToExpert(
       field(fields, "Similar profiles", "Similar Profiles"),
     ),
     profileSections,
+    testimonialIds: recordIds(
+      field(fields, AIRTABLE_CREATOR_TESTIMONIALS_FIELD, "Credible |  Testimonials"),
+    ),
   };
 }
