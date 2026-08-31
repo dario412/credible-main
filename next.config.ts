@@ -72,6 +72,16 @@ const nextConfig: NextConfig = {
         destination: "/accessibility",
         permanent: true,
       },
+      {
+        source: "/case-studies",
+        destination: "/projects",
+        permanent: true,
+      },
+      {
+        source: "/case-studies/:slug",
+        destination: "/projects/:slug",
+        permanent: true,
+      },
     ];
   },
 };

@@ -215,7 +215,7 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
     links: [
       { href: "/roster", label: "Roster" },
       { href: "/what-we-do", label: "What we do" },
-      { href: "/case-studies", label: "Projects" },
+      { href: "/projects", label: "Projects" },
       { href: "/insights", label: "Insights" },
       { href: "/about", label: "About" },
     ],
@@ -274,7 +274,7 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
         title: "Company",
         links: [
           { href: "/about", label: "About" },
-          { href: "/case-studies", label: "Projects" },
+          { href: "/projects", label: "Projects" },
           { href: "/insights", label: "Insights" },
           { href: "/contact", label: "Contact" },
         ],
@@ -433,19 +433,29 @@ function asString(value: unknown, fallback: string) {
 }
 
 /** Rename legacy “Case Studies” nav labels to “Projects”. */
+function normalizeProjectsHref(href: string) {
+  return href.replace(/^\/case-studies(?=\/|$)/, "/projects");
+}
+
 function projectsNavLabel(href: string, label: string) {
-  const path = href.replace(/\/$/, "");
-  if (path !== "/case-studies") return label;
+  const path = normalizeProjectsHref(href.replace(/\/$/, ""));
+  if (path !== "/projects") return label;
   if (/^case\s*stud(y|ies)$/i.test(label.trim())) return "Projects";
   return label;
 }
 
 function mergeNavLink(raw: unknown, fallback?: NavLink): NavLink | null {
   if (!raw || typeof raw !== "object") {
-    return fallback ? { ...fallback } : null;
+    return fallback
+      ? {
+          ...fallback,
+          href: normalizeProjectsHref(fallback.href),
+          label: projectsNavLabel(fallback.href, fallback.label),
+        }
+      : null;
   }
   const data = raw as Partial<NavLink>;
-  const href = asString(data.href, fallback?.href ?? "");
+  const href = normalizeProjectsHref(asString(data.href, fallback?.href ?? ""));
   const label = projectsNavLabel(
     href,
     asString(data.label, fallback?.label ?? ""),
@@ -458,6 +468,7 @@ function mergeNavLinks(raw: unknown, fallback: NavLink[]): NavLink[] {
   if (!Array.isArray(raw)) {
     return fallback.map((l) => ({
       ...l,
+      href: normalizeProjectsHref(l.href),
       label: projectsNavLabel(l.href, l.label),
     }));
   }
@@ -468,6 +479,7 @@ function mergeNavLinks(raw: unknown, fallback: NavLink[]): NavLink[] {
     ? links
     : fallback.map((l) => ({
         ...l,
+        href: normalizeProjectsHref(l.href),
         label: projectsNavLabel(l.href, l.label),
       }));
 }
@@ -478,13 +490,13 @@ function mergeLegalLinks(raw: unknown, fallback: NavLink[]): NavLink[] {
 
   const normalizedFallback = fallback.map((link) => ({
     ...link,
-    href: normalizeHref(link.href),
+    href: normalizeProjectsHref(normalizeHref(link.href)),
     label: projectsNavLabel(link.href, link.label),
   }));
 
   const merged = mergeNavLinks(raw, normalizedFallback).map((link) => ({
     ...link,
-    href: normalizeHref(link.href),
+    href: normalizeProjectsHref(normalizeHref(link.href)),
     label: projectsNavLabel(link.href, link.label),
   }));
 

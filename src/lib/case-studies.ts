@@ -590,3 +590,18 @@ export function filterCaseStudies(
     return true;
   });
 }
+
+/** Public URL prefix for the projects catalogue. */
+export const PROJECTS_PATH = "/projects";
+
+export function projectHref(slug?: string) {
+  if (!slug?.trim()) return PROJECTS_PATH;
+  return `${PROJECTS_PATH}/${slug.trim()}`;
+}
+
+/** Parse a project slug from public or legacy case-study hrefs. */
+export function projectSlugFromHref(href?: string | null) {
+  if (!href?.trim()) return null;
+  const match = href.trim().match(/^\/(?:case-studies|projects)\/([^/?#]+)/);
+  return match?.[1]?.replace(/\/$/, "") ?? null;
+}

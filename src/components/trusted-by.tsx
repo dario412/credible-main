@@ -8,6 +8,7 @@ import {
   type TrustedByClient,
 } from "@/lib/trusted-by";
 import { logoAltFor, portraitAltFor } from "@/lib/image-alt";
+import { projectHref } from "@/lib/case-studies";
 
 const LOGO_CLASS =
   "h-full w-auto max-w-full object-contain object-center brightness-0 invert transition-opacity duration-200";
@@ -46,24 +47,42 @@ function ArrowIcon({ className }: { className?: string }) {
 
 export function TrustedBy({
   clients = DEFAULT_TRUSTED_CLIENTS,
+  introLine,
   editSlots,
   disableStoryLinks = false,
 }: {
   clients?: TrustedByClient[];
+  introLine?: string;
   editSlots?: {
+    introLine?: (node: ReactNode) => ReactNode;
     client?: (index: number, node: ReactNode) => ReactNode;
   };
   disableStoryLinks?: boolean;
 }) {
+  const introNode = introLine?.trim() ? (
+    <p className="text-center text-[0.7rem] font-medium tracking-[0.16em] text-cream/70 uppercase">
+      {introLine}
+    </p>
+  ) : null;
+
   return (
     <section className="bg-cream px-6 py-8 md:px-10 md:py-10 lg:px-12">
       <div className="mx-auto max-w-352 overflow-visible rounded-sm bg-charcoal px-6 py-6 md:px-10 md:py-10 lg:px-12 lg:py-12">
+        {introNode ? (
+          editSlots?.introLine ? (
+            editSlots.introLine(
+              <div className="mb-8 md:mb-10">{introNode}</div>,
+            )
+          ) : (
+            <div className="mb-8 md:mb-10">{introNode}</div>
+          )
+        ) : null}
         <ul className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:grid-cols-5 md:gap-x-8 md:gap-y-14">
           {clients.map((client, index) => {
             const hasTestimonial = hasTrustedByStory(client);
             const testimonial = client.testimonial;
             const storyHref = client.caseStudySlug.trim()
-              ? `/case-studies/${client.caseStudySlug.trim()}`
+              ? projectHref(client.caseStudySlug.trim())
               : null;
             // Pill only when a case study is linked; hover box only when a quote exists.
             const showStoryPill = Boolean(storyHref);

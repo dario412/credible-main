@@ -9,6 +9,7 @@ import {
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
+import { PROJECTS_PATH } from "@/lib/case-studies";
 
 export const metadata = createMetadata({
   title: "Edit Projects",
@@ -36,14 +37,14 @@ export default async function AdminCaseStudiesPageEditor() {
         <p className="mt-2 text-sm text-muted">
           Intro and All stories heading on{" "}
           <a
-            href="/case-studies"
+            href={PROJECTS_PATH}
             className="font-medium text-forest hover:text-forest-dark"
           >
-            /case-studies
+            /projects
           </a>
           . Or edit live with{" "}
           <a
-            href="/case-studies"
+            href={PROJECTS_PATH}
             className="font-medium text-forest hover:text-forest-dark"
           >
             Edit page

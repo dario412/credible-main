@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type { CaseStudiesPageSections } from "@/lib/case-studies-page";
+import { PROJECTS_PATH } from "@/lib/case-studies";
 
 export function CaseStudiesPageEditorForm({
   initial,
@@ -42,10 +43,10 @@ export function CaseStudiesPageEditorForm({
           <p className="mt-1 text-sm text-muted">
             Headline and supporting line at the top of{" "}
             <a
-              href="/case-studies"
+              href={PROJECTS_PATH}
               className="font-medium text-forest hover:text-forest-dark"
             >
-              /case-studies
+              /projects
             </a>
             .
           </p>

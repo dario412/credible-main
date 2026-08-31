@@ -8,6 +8,7 @@ import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
   CASE_STUDY_PILLARS,
   DEFAULT_CASE_STUDY_PILLAR,
+  projectHref,
   type CaseStudyCard,
 } from "@/lib/case-studies";
 import {
@@ -650,7 +651,7 @@ export function CaseStudyEditorForm({
         </Button>
         {card.slug ? (
           <a
-            href={`/case-studies/${card.slug}`}
+            href={projectHref(card.slug)}
             target="_blank"
             rel="noreferrer"
             className="text-sm font-medium text-charcoal/60 hover:text-charcoal"

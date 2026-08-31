@@ -6,6 +6,7 @@ import { PatternField } from "@/components/pattern-field";
 import { StatCounter } from "@/components/stat-counter";
 import type { HomePageSections } from "@/lib/cms";
 import { DEFAULT_HOME_SECTIONS } from "@/lib/cms";
+import { projectHref } from "@/lib/case-studies";
 import { cn } from "@/lib/utils";
 
 const CREAM_RGB = { r: 249, g: 243, b: 239 };
@@ -33,7 +34,7 @@ const boxedMetrics = [
   },
 ] as const;
 
-const CASE_STUDY_HREF = "/case-studies/notion-founders-journal";
+const CASE_STUDY_HREF = projectHref("notion-founders-journal");
 
 function ArrowIcon({ className }: { className?: string }) {
   return (

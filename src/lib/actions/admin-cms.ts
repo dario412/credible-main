@@ -13,6 +13,7 @@ import {
   type HomePageSections,
 } from "@/lib/cms";
 import type { CaseStudyCard } from "@/lib/case-studies";
+import { projectHref, PROJECTS_PATH } from "@/lib/case-studies";
 import { validateProjectCmsFields } from "@/lib/project-cms-limits";
 import {
   mergeContactSections,
@@ -259,9 +260,12 @@ export async function saveCaseStudy(
   }
 
   if (previousSlug && previousSlug !== slug) {
+    revalidatePath(projectHref(previousSlug));
     revalidatePath(`/case-studies/${previousSlug}`);
     revalidatePath(`/admin/case-studies/${previousSlug}`);
   }
+  revalidatePath(PROJECTS_PATH);
+  revalidatePath(projectHref(slug));
   revalidatePath("/case-studies");
   revalidatePath(`/case-studies/${slug}`);
   revalidatePath("/admin/case-studies");
@@ -284,6 +288,8 @@ export async function deleteCaseStudy(slug: string) {
   }
 
   revalidatePath("/");
+  revalidatePath(PROJECTS_PATH);
+  revalidatePath(projectHref(slug));
   revalidatePath("/case-studies");
   revalidatePath(`/case-studies/${slug}`);
   revalidatePath("/admin/case-studies");
@@ -572,6 +578,7 @@ export async function saveCaseStudiesPage(sections: CaseStudiesPageSections) {
     },
   });
 
+  revalidatePath(PROJECTS_PATH);
   revalidatePath("/case-studies");
   revalidatePath("/admin/pages");
   revalidatePath("/admin/pages/case-studies");

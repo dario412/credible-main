@@ -11,7 +11,7 @@ import { RosterFeaturedSlotsField } from "@/components/roster-featured-slots-fie
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import { MediaField } from "@/components/media-library";
 import type { HomePageSections } from "@/lib/cms";
-import { DEFAULT_HOME_SECTIONS } from "@/lib/cms";
+import { DEFAULT_HOME_SECTIONS, emptyHomeFaqItem } from "@/lib/cms";
 import { TRUSTED_BY_LOGO_HINT } from "@/lib/trusted-by";
 import { cn } from "@/lib/utils";
 
@@ -133,6 +133,34 @@ export function HomePageEditorForm({
             />
           </div>
         </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">Trusted by</h2>
+          <p className="mt-1 text-sm text-muted">
+            Intro line above the logo grid. Logos are managed in{" "}
+            <a
+              href="/admin/trusted-by"
+              className="font-medium text-forest hover:text-forest-dark"
+            >
+              Homepage logos
+            </a>
+            .
+          </p>
+        </div>
+        <Field label="Intro line" id="tb-intro">
+          <TextInput
+            id="tb-intro"
+            value={sections.trustedBy.introLine}
+            onChange={(e) =>
+              patch("trustedBy", {
+                ...sections.trustedBy,
+                introLine: e.target.value,
+              })
+            }
+          />
+        </Field>
       </section>
 
       <section className="space-y-4">
@@ -772,6 +800,102 @@ export function HomePageEditorForm({
             + Add logo
           </button>
         </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">FAQ</h2>
+          <p className="mt-1 text-sm text-muted">
+            Accordion below the brand brief on the homepage.
+          </p>
+        </div>
+        <Field label="Eyebrow" id="home-faq-eyebrow">
+          <TextInput
+            id="home-faq-eyebrow"
+            value={sections.faq.eyebrow}
+            onChange={(e) =>
+              patch("faq", { ...sections.faq, eyebrow: e.target.value })
+            }
+          />
+        </Field>
+        <Field label="Headline" id="home-faq-headline">
+          <TextInput
+            id="home-faq-headline"
+            value={sections.faq.headline}
+            onChange={(e) =>
+              patch("faq", { ...sections.faq, headline: e.target.value })
+            }
+          />
+        </Field>
+        <Field label="Subhead" id="home-faq-subhead">
+          <TextArea
+            id="home-faq-subhead"
+            rows={3}
+            value={sections.faq.subhead}
+            onChange={(e) =>
+              patch("faq", { ...sections.faq, subhead: e.target.value })
+            }
+          />
+        </Field>
+        {sections.faq.items.map((item, index) => (
+          <div
+            key={`home-faq-${index}`}
+            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-medium">Question {index + 1}</p>
+              <button
+                type="button"
+                onClick={() =>
+                  patch("faq", {
+                    ...sections.faq,
+                    items: sections.faq.items.filter((_, i) => i !== index),
+                  })
+                }
+                className="text-xs font-medium text-danger hover:underline"
+              >
+                Remove
+              </button>
+            </div>
+            <Field label="Question" id={`home-faq-q-${index}`}>
+              <TextInput
+                id={`home-faq-q-${index}`}
+                value={item.q}
+                onChange={(e) => {
+                  const items = sections.faq.items.map((row, i) =>
+                    i === index ? { ...row, q: e.target.value } : row,
+                  );
+                  patch("faq", { ...sections.faq, items });
+                }}
+              />
+            </Field>
+            <Field label="Answer" id={`home-faq-a-${index}`}>
+              <TextArea
+                id={`home-faq-a-${index}`}
+                rows={3}
+                value={item.a}
+                onChange={(e) => {
+                  const items = sections.faq.items.map((row, i) =>
+                    i === index ? { ...row, a: e.target.value } : row,
+                  );
+                  patch("faq", { ...sections.faq, items });
+                }}
+              />
+            </Field>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            patch("faq", {
+              ...sections.faq,
+              items: [...sections.faq.items, emptyHomeFaqItem()],
+            })
+          }
+          className="text-sm font-medium text-forest hover:text-forest-dark"
+        >
+          + Add question
+        </button>
       </section>
 
       <section className="space-y-4">

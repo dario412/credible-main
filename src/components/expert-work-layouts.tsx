@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight, CaretLeft, CaretRight } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 
-import { getCaseStudy } from "@/lib/case-studies";
+import { getCaseStudy, projectSlugFromHref } from "@/lib/case-studies";
 import type { ExpertRecentWork } from "@/lib/expert-profiles";
 import { coverAltFor } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
@@ -31,8 +31,8 @@ function workTypeLabel(meta: string) {
 
 function workCover(item: ExpertRecentWork): string | null {
   if (item.coverImage?.trim()) return item.coverImage.trim();
-  if (!item.href?.startsWith("/case-studies/")) return null;
-  const slug = item.href.replace(/^\/case-studies\//, "").replace(/\/$/, "");
+  const slug = projectSlugFromHref(item.href);
+  if (!slug) return null;
   return getCaseStudy(slug)?.coverImage ?? null;
 }
 

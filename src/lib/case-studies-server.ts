@@ -2,6 +2,7 @@ import {
   CASE_STUDIES,
   filterCaseStudies,
   normalizeCaseStudyPillars,
+  projectHref,
   type CaseStudyCard,
 } from "@/lib/case-studies";
 import { caseStudyToCard } from "@/lib/cms";
@@ -20,7 +21,7 @@ export function caseStudyToExpertWork(
     meta: pillars[0] ?? study.pillar,
     title: study.title,
     description: study.summary,
-    href: `/case-studies/${study.slug}`,
+    href: projectHref(study.slug),
     coverImage: study.coverImage || undefined,
     tone: WORK_TONES[index % WORK_TONES.length]!,
   };

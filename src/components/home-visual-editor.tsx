@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { BrandBrief } from "@/components/brand-brief";
 import { CaseStudyLinkField } from "@/components/case-study-link-field";
 import { EditableHit } from "@/components/editable-hit";
+import { FadeUp } from "@/components/fade-up";
 import { useHomeCms, useSiteChrome } from "@/components/home-cms-context";
 import {
   Home2Hero,
@@ -20,13 +21,18 @@ import {
   TextStyleControls,
 } from "@/components/home-style-controls";
 import { MediaField } from "@/components/media-library";
+import {
+  EYEBROW,
+  PAGE_SHELL,
+} from "@/components/inner-page";
 import { KeyStudy } from "@/components/key-study";
+import { RepresentationFaq } from "@/components/representation-faq";
 import type { RosterCardExpert } from "@/components/roster-card";
 import { RosterFeaturedSlotsField } from "@/components/roster-featured-slots-field";
 import { TrustedBy } from "@/components/trusted-by";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type { HomePageSections } from "@/lib/cms";
-import { DEFAULT_HOME_SECTIONS } from "@/lib/cms";
+import { DEFAULT_HOME_SECTIONS, emptyHomeFaqItem } from "@/lib/cms";
 import { selectRosterPreviewCards } from "@/lib/roster-preview";
 import type { SiteChromeSections } from "@/lib/site-chrome";
 import {
@@ -67,6 +73,8 @@ type EditTarget =
   | "creatorCta.subhead"
   | "creatorCta.stats"
   | "creatorCta.buttons"
+  | "faq"
+  | "trustedBy.introLine"
   | `trustedBy.client.${number}`
   | "footer.tagline"
   | "footer.companyLine"
@@ -101,6 +109,8 @@ function targetTitle(target: EditTarget): string {
     "creatorCta.subhead": "Creators supporting line",
     "creatorCta.stats": "Creators stats strip",
     "creatorCta.buttons": "Creators buttons",
+    faq: "FAQ",
+    "trustedBy.introLine": "Trusted by intro",
     "footer.tagline": "Footer tagline",
     "footer.companyLine": "Footer company line",
     "footer.email": "Footer email",
@@ -1157,6 +1167,113 @@ function EditorPopover({
           </>
         ) : null}
 
+        {target === "faq" ? (
+          <>
+            <Field label="Eyebrow" id="home-faq-eyebrow">
+              <TextInput
+                id="home-faq-eyebrow"
+                value={sections.faq.eyebrow}
+                onChange={(e) =>
+                  patch("faq", { ...sections.faq, eyebrow: e.target.value })
+                }
+              />
+            </Field>
+            <Field label="Headline" id="home-faq-headline">
+              <TextInput
+                id="home-faq-headline"
+                value={sections.faq.headline}
+                onChange={(e) =>
+                  patch("faq", { ...sections.faq, headline: e.target.value })
+                }
+              />
+            </Field>
+            <Field label="Subhead" id="home-faq-subhead">
+              <TextArea
+                id="home-faq-subhead"
+                rows={3}
+                value={sections.faq.subhead}
+                onChange={(e) =>
+                  patch("faq", { ...sections.faq, subhead: e.target.value })
+                }
+              />
+            </Field>
+            {sections.faq.items.map((item, index) => (
+              <div
+                key={`home-faq-${index}`}
+                className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium">Question {index + 1}</p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patch("faq", {
+                        ...sections.faq,
+                        items: sections.faq.items.filter((_, i) => i !== index),
+                      })
+                    }
+                    className="text-xs font-medium text-danger hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <Field label="Question" id={`home-faq-q-${index}`}>
+                  <TextInput
+                    id={`home-faq-q-${index}`}
+                    value={item.q}
+                    onChange={(e) => {
+                      const items = sections.faq.items.map((row, i) =>
+                        i === index ? { ...row, q: e.target.value } : row,
+                      );
+                      patch("faq", { ...sections.faq, items });
+                    }}
+                  />
+                </Field>
+                <Field label="Answer" id={`home-faq-a-${index}`}>
+                  <TextArea
+                    id={`home-faq-a-${index}`}
+                    rows={3}
+                    value={item.a}
+                    onChange={(e) => {
+                      const items = sections.faq.items.map((row, i) =>
+                        i === index ? { ...row, a: e.target.value } : row,
+                      );
+                      patch("faq", { ...sections.faq, items });
+                    }}
+                  />
+                </Field>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                patch("faq", {
+                  ...sections.faq,
+                  items: [...sections.faq.items, emptyHomeFaqItem()],
+                })
+              }
+              className="text-sm font-medium text-forest hover:text-forest-dark"
+            >
+              + Add question
+            </button>
+          </>
+        ) : null}
+
+        {target === "trustedBy.introLine" ? (
+          <Field label="Intro line" id="tb-intro">
+            <TextInput
+              id="tb-intro"
+              value={sections.trustedBy.introLine}
+              onChange={(e) =>
+                patch("trustedBy", {
+                  ...sections.trustedBy,
+                  introLine: e.target.value,
+                })
+              }
+            />
+          </Field>
+        ) : null}
+
         {trustedClientMatch ? (
           (() => {
             const i = Number(trustedClientMatch[1]);
@@ -1457,6 +1574,9 @@ export function HomeVisualEditor({
     () => rosterCards.slice(0, 4).map((card) => card.slug),
     [rosterCards],
   );
+  const faqItems = sections.faq.items.filter(
+    (item) => item.q.trim() || item.a.trim(),
+  );
 
   useEffect(() => {
     setCanEdit(canEdit);
@@ -1580,10 +1700,22 @@ export function HomeVisualEditor({
 
       <TrustedBy
         clients={trustedClients}
+        introLine={sections.trustedBy.introLine}
         disableStoryLinks={editing}
         editSlots={
           editing
             ? {
+                introLine: (node) =>
+                  hit(
+                    editing,
+                    "trustedBy.introLine",
+                    target,
+                    setTarget,
+                    "trusted by intro",
+                    node,
+                    true,
+                    "ring-offset-charcoal",
+                  ),
                 client: (index, node) =>
                   hit(
                     editing,
@@ -1895,6 +2027,43 @@ export function HomeVisualEditor({
             : undefined
         }
       />
+
+      {faqItems.length > 0 ? (
+        <section className="bg-cream px-6 pt-10 pb-10 md:px-10 md:pt-12 md:pb-12 lg:px-12 lg:pb-14">
+          <div className={PAGE_SHELL}>
+            <FadeUp>
+              {hit(
+                editing,
+                "faq",
+                target,
+                setTarget,
+                "FAQ",
+                <div className="mx-auto max-w-[52.5rem] text-center">
+                  <p className={EYEBROW}>{sections.faq.eyebrow}</p>
+                  <h2 className="mt-4 font-display text-[2rem] leading-[1.1] tracking-tight text-charcoal md:text-[3.25rem]">
+                    {sections.faq.headline}
+                  </h2>
+                  <p className="mx-auto mt-5 max-w-[32.5rem] text-[1.0625rem] leading-relaxed text-charcoal/70">
+                    {sections.faq.subhead}
+                  </p>
+                </div>,
+                true,
+              )}
+            </FadeUp>
+            <div className="mx-auto mt-14 max-w-[47.5rem]">
+              {hit(
+                editing,
+                "faq",
+                target,
+                setTarget,
+                "FAQ items",
+                <RepresentationFaq items={faqItems} />,
+                true,
+              )}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {canEdit ? (
         <div className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 flex-wrap items-center justify-center gap-2 rounded-sm border border-charcoal/10 bg-white/95 px-3 py-2 shadow-[0_12px_40px_rgba(28,26,23,0.14)] backdrop-blur">

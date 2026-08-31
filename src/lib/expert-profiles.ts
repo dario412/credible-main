@@ -346,7 +346,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
         { label: "Newsletter reach", value: "4M+" },
         { label: "Growth (90d)", value: "+18%", accent: "forest" },
       ],
-      featuredCaseStudyHref: "/case-studies/notion-founders-journal",
+      featuredCaseStudyHref: "/projects/notion-founders-journal",
       channels: [
         {
           icon: "linkedin",
@@ -443,7 +443,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Notion × Founder’s Journal",
           description:
             "A 12-episode series on how operators build companies — and the tools that keep them clear.",
-          href: "/case-studies/notion-founders-journal",
+          href: "/projects/notion-founders-journal",
           tone: "sage",
         },
         {
@@ -452,7 +452,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Ramp — Year of Founders",
           description:
             "Long-form brand partnership across editorial, podcast, and live stages.",
-          href: "/case-studies/ramp-summit-keynote",
+          href: "/projects/ramp-summit-keynote",
           tone: "forest",
         },
         {
@@ -461,7 +461,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "HubSpot — media company keynote",
           description:
             "“Why every SaaS company is now a media company.” Main-stage delivery.",
-          href: "/case-studies/hubspot-fintech-report",
+          href: "/projects/hubspot-fintech-report",
           tone: "rust",
         },
       ],
@@ -494,7 +494,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
         { label: "Keynote stages", value: "90+" },
         { label: "Growth (90d)", value: "+42%", accent: "forest" },
       ],
-      featuredCaseStudyHref: "/case-studies/notion-founders-journal",
+      featuredCaseStudyHref: "/projects/notion-founders-journal",
       channels: [
         {
           icon: "linkedin",
@@ -587,7 +587,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Notion × Operator Notes",
           description:
             "A 12-episode series exploring how founders scale culture without slowing the product.",
-          href: "/case-studies/notion-founders-journal",
+          href: "/projects/notion-founders-journal",
           tone: "sage",
         },
         {
@@ -596,7 +596,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "HubSpot — category keynote",
           description:
             "“Why every SaaS company is now a media company.” Main-stage delivery.",
-          href: "/case-studies/hubspot-fintech-report",
+          href: "/projects/hubspot-fintech-report",
           tone: "rust",
         },
         {
@@ -605,7 +605,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Ramp — Year of Founders",
           description:
             "12-month brand ambassadorship. Editorial, podcast, and event integration.",
-          href: "/case-studies/ramp-summit-keynote",
+          href: "/projects/ramp-summit-keynote",
           tone: "forest",
         },
       ],
@@ -722,7 +722,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "SaaStr Annual — main stage",
           description:
             "Closing talk on performance systems for revenue orgs.",
-          href: "/case-studies/hubspot-fintech-report",
+          href: "/projects/hubspot-fintech-report",
           tone: "rust",
         },
         {
@@ -731,7 +731,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Ramp revenue offsite",
           description:
             "Closed-door operating workshop for GTM leadership.",
-          href: "/case-studies/ramp-summit-keynote",
+          href: "/projects/ramp-summit-keynote",
           tone: "forest",
         },
         {
@@ -740,7 +740,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Founder's Journal guest arc",
           description:
             "Three-episode arc on building teams that ship under pressure.",
-          href: "/case-studies/notion-founders-journal",
+          href: "/projects/notion-founders-journal",
           tone: "sage",
         },
       ],
@@ -857,7 +857,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Partnership playbook series",
           description:
             "Editorial series on how B2B brands brief creators without killing the voice.",
-          href: "/case-studies/notion-founders-journal",
+          href: "/projects/notion-founders-journal",
           tone: "sage",
         },
         {
@@ -866,7 +866,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Ramp creator partnerships",
           description:
             "Year-long brand program spanning newsletter and events.",
-          href: "/case-studies/ramp-summit-keynote",
+          href: "/projects/ramp-summit-keynote",
           tone: "forest",
         },
         {
@@ -875,7 +875,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "SaaStr partner summit",
           description:
             "Moderated session on measuring creator partnerships beyond vanity metrics.",
-          href: "/case-studies/hubspot-fintech-report",
+          href: "/projects/hubspot-fintech-report",
           tone: "rust",
         },
       ],
@@ -992,7 +992,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Year of Operators",
           description:
             "Editorial and stage program for finance and ops leaders.",
-          href: "/case-studies/ramp-summit-keynote",
+          href: "/projects/ramp-summit-keynote",
           tone: "forest",
         },
         {
@@ -1001,7 +1001,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Ops systems series",
           description:
             "Multi-part series on decision hygiene inside growing teams.",
-          href: "/case-studies/notion-founders-journal",
+          href: "/projects/notion-founders-journal",
           tone: "sage",
         },
         {
@@ -1010,7 +1010,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "COO closed-door",
           description:
             "Facilitated operator session at SaaStr Annual.",
-          href: "/case-studies/hubspot-fintech-report",
+          href: "/projects/hubspot-fintech-report",
           tone: "rust",
         },
       ],
@@ -1127,7 +1127,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Founder's Journal host arc",
           description:
             "Hosted operator conversations with distribution across LinkedIn and YouTube.",
-          href: "/case-studies/notion-founders-journal",
+          href: "/projects/notion-founders-journal",
           tone: "sage",
         },
         {
@@ -1136,7 +1136,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "SaaStr main-stage panels",
           description:
             "Three moderated panels on AI, media, and founder trust.",
-          href: "/case-studies/hubspot-fintech-report",
+          href: "/projects/hubspot-fintech-report",
           tone: "rust",
         },
         {
@@ -1145,7 +1145,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Founder interview series",
           description:
             "Six-part interview series for finance operators.",
-          href: "/case-studies/ramp-summit-keynote",
+          href: "/projects/ramp-summit-keynote",
           tone: "forest",
         },
       ],
@@ -1178,7 +1178,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
         { label: "Podcast downloads", value: "2.1M" },
         { label: "Growth (90d)", value: "+37%", accent: "forest" },
       ],
-      featuredCaseStudyHref: "/case-studies/notion-founders-journal",
+      featuredCaseStudyHref: "/projects/notion-founders-journal",
       channels: [
         {
           icon: "linkedin",
@@ -1271,7 +1271,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Notion × Signal / Build",
           description:
             "A 12-episode series on how builders scale operating systems.",
-          href: "/case-studies/notion-founders-journal",
+          href: "/projects/notion-founders-journal",
           tone: "sage",
         },
         {
@@ -1280,7 +1280,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "SaaStr Annual — closing keynote",
           description:
             "“Attention is a byproduct of usefulness.” 12k in the room.",
-          href: "/case-studies/hubspot-fintech-report",
+          href: "/projects/hubspot-fintech-report",
           tone: "rust",
         },
         {
@@ -1289,7 +1289,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
           title: "Ramp — Year of Founders",
           description:
             "12-month brand ambassadorship across editorial, podcast, and events.",
-          href: "/case-studies/ramp-summit-keynote",
+          href: "/projects/ramp-summit-keynote",
           tone: "forest",
         },
       ],

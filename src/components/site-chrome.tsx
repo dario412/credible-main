@@ -57,7 +57,7 @@ export function SiteHeader() {
     isHome ||
     isHeroOverlayPage ||
     /^\/roster\/[^/]+\/?$/.test(pathname) ||
-    /^\/case-studies\/[^/]+\/?$/.test(pathname);
+    /^\/projects\/[^/]+\/?$/.test(pathname);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {

@@ -41,7 +41,7 @@ import {
   type ExpertRecentWork,
   type ExpertTopicShare,
 } from "@/lib/expert-profiles";
-import { getCaseStudy } from "@/lib/case-studies";
+import { getCaseStudy, projectSlugFromHref } from "@/lib/case-studies";
 import {
   applyProfileRailTemplate,
   type ProfileBodySectionId,
@@ -422,8 +422,8 @@ function workTypeLabel(meta: string) {
 
 function workCover(item: ExpertRecentWork): string | null {
   if (item.coverImage?.trim()) return item.coverImage.trim();
-  if (!item.href?.startsWith("/case-studies/")) return null;
-  const slug = item.href.replace(/^\/case-studies\//, "").replace(/\/$/, "");
+  const slug = projectSlugFromHref(item.href);
+  if (!slug) return null;
   return getCaseStudy(slug)?.coverImage ?? null;
 }
 

@@ -47,7 +47,7 @@ Open [http://localhost:3000](http://localhost:3000). Admin: [http://localhost:30
 | `/roster` | Experts with filters |
 | `/roster/[slug]` | Expert profile |
 | `/what-we-do` | Services |
-| `/case-studies`, `/case-studies/[slug]` | Case studies |
+| `/projects`, `/projects/[slug]` | Projects (case studies) |
 | `/insights`, `/insights/[slug]` | Insights |
 | `/about`, `/contact`, `/privacy`, `/terms` | Site pages |
 

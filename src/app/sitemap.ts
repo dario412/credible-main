@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { projectHref } from "@/lib/case-studies";
 import { prisma } from "@/lib/prisma";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -15,7 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "",
     "/roster",
     "/what-we-do",
-    "/case-studies",
+    "/projects",
     "/insights",
     "/about",
     "/contact",
@@ -38,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     })),
     ...studies.map((s) => ({
-      url: absoluteUrl(`/case-studies/${s.slug}`),
+      url: absoluteUrl(projectHref(s.slug)),
       lastModified: s.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.6,

@@ -21,7 +21,7 @@ const pages: {
     slug: "home",
     title: "Home",
     description:
-      "Hero, ways in, roster, impact stats, featured project, and brief. Logos live under Homepage logos.",
+      "Hero, ways in, roster, impact stats, featured project, brand brief, and FAQ. Logos live under Homepage logos.",
   },
   {
     slug: "profile",
@@ -50,7 +50,7 @@ const pages: {
     slug: "case-studies",
     title: "Projects",
     description:
-      "Intro and All stories heading on /case-studies.",
+      "Intro and All stories heading on /projects.",
   },
   {
     slug: "about",

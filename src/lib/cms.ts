@@ -9,6 +9,7 @@ import {
   CASE_STUDY_LOGO,
   DEFAULT_CASE_STUDY_PILLAR,
   normalizeCaseStudyPillars,
+  projectHref,
 } from "@/lib/case-studies";
 
 export const BRAND_COLORS = [
@@ -40,6 +41,11 @@ export type CtaStyle = {
   border: BrandColor | "none";
   size: TextSize;
   radius: Radius;
+};
+
+export type HomeFaqItem = {
+  q: string;
+  a: string;
 };
 
 export type HomePageSections = {
@@ -111,6 +117,15 @@ export type HomePageSections = {
     primaryCtaHref: string;
     secondaryCtaLabel: string;
     secondaryCtaHref: string;
+  };
+  faq: {
+    eyebrow: string;
+    headline: string;
+    subhead: string;
+    items: HomeFaqItem[];
+  };
+  trustedBy: {
+    introLine: string;
   };
   footer: {
     tagline: string;
@@ -199,7 +214,7 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
     ],
     showCta: true,
     ctaLabel: "Read the full project",
-    ctaHref: "/case-studies/notion-founders-journal",
+    ctaHref: projectHref("notion-founders-journal"),
     metrics: [
       {
         value: "12",
@@ -254,6 +269,41 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
     primaryCtaHref: "/apply-for-representation",
     secondaryCtaLabel: "What we offer creators",
     secondaryCtaHref: "/what-we-do",
+  },
+  faq: {
+    eyebrow: "FAQ",
+    headline: "Questions before you brief.",
+    subhead:
+      "How booking works, what to expect, and how we match creators to your brief.",
+    items: [
+      {
+        q: "What should I include in a brief?",
+        a: "Audience, goal, timing, and any creator or format preferences. We return a shortlist with reach data, past work, and scoped pricing — usually within 48 hours.",
+      },
+      {
+        q: "Do you work with agencies as well as brands?",
+        a: "Yes. In-house teams and agencies brief us the same way. We return named creators with reach, relevant work, and commercials in one document you can forward internally.",
+      },
+      {
+        q: "Can we combine more than one format?",
+        a: "Yes. Most engagements blend formats — for example editorial plus speaking, or a partnership supported by live sessions. We shape the mix around the outcome, not the menu.",
+      },
+      {
+        q: "How do you choose creators?",
+        a: "Fit to audience, category authority, format experience, and availability. You can name someone from the roster or ask us for a shortlist based on the business moment you are trying to solve.",
+      },
+      {
+        q: "What happens after we send a brief?",
+        a: "We acknowledge same day, return a shortlist within 48 hours when the roster fits, then scope delivery, approvals, and reporting in one managed plan.",
+      },
+      {
+        q: "How is pricing structured?",
+        a: "Format-level pricing scoped to the brief — not a generic rate card. We share numbers once we know audience, deliverables, and timing.",
+      },
+    ],
+  },
+  trustedBy: {
+    introLine: "Trusted by the world's leading SaaS companies",
   },
   footer: {
     tagline: "The talent agency for the expert economy.",
@@ -564,6 +614,51 @@ function mergeCreatorCta(raw: unknown): HomePageSections["creatorCta"] {
   };
 }
 
+function mergeHomeFaqItems(
+  raw: unknown,
+  defaults: HomeFaqItem[],
+): HomeFaqItem[] {
+  if (!Array.isArray(raw)) return defaults.map((item) => ({ ...item }));
+
+  const merged = raw
+    .map((item, i) => {
+      const row = (item && typeof item === "object" ? item : {}) as Partial<
+        HomeFaqItem
+      >;
+      const fallback = defaults[i] ?? { q: "", a: "" };
+      const q = asString(row.q, fallback.q);
+      const a = asString(row.a, fallback.a);
+      if (!q.trim() && !a.trim()) return null;
+      return { q, a };
+    })
+    .filter((item): item is HomeFaqItem => item !== null);
+
+  return merged.length > 0 ? merged : defaults.map((item) => ({ ...item }));
+}
+
+function mergeHomeFaq(raw: unknown): HomePageSections["faq"] {
+  const defaults = DEFAULT_HOME_SECTIONS.faq;
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    HomePageSections["faq"]
+  >;
+  return {
+    eyebrow: asString(data.eyebrow, defaults.eyebrow),
+    headline: asString(data.headline, defaults.headline),
+    subhead: asString(data.subhead, defaults.subhead),
+    items: mergeHomeFaqItems(data.items, defaults.items),
+  };
+}
+
+function mergeHomeTrustedBy(raw: unknown): HomePageSections["trustedBy"] {
+  const defaults = DEFAULT_HOME_SECTIONS.trustedBy;
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    HomePageSections["trustedBy"]
+  >;
+  return {
+    introLine: asString(data.introLine, defaults.introLine),
+  };
+}
+
 function mergeFooter(raw: unknown): HomePageSections["footer"] {
   const defaults = DEFAULT_HOME_SECTIONS.footer;
   const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
@@ -586,6 +681,8 @@ export function mergeHomeSections(raw: unknown): HomePageSections {
     keyStudy?: unknown;
     brandBrief?: unknown;
     creatorCta?: unknown;
+    faq?: unknown;
+    trustedBy?: unknown;
     footer?: unknown;
   };
   const hero = data.hero ?? {};
@@ -617,8 +714,14 @@ export function mergeHomeSections(raw: unknown): HomePageSections {
     keyStudy: mergeKeyStudy(data.keyStudy),
     brandBrief: mergeBrandBrief(data.brandBrief),
     creatorCta: mergeCreatorCta(data.creatorCta),
+    faq: mergeHomeFaq(data.faq),
+    trustedBy: mergeHomeTrustedBy(data.trustedBy),
     footer: mergeFooter(data.footer),
   };
+}
+
+export function emptyHomeFaqItem(): HomeFaqItem {
+  return { q: "", a: "" };
 }
 
 export function insightBlocksForSave(blocks: InsightBlock[]) {

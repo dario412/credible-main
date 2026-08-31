@@ -2,12 +2,11 @@ import Link from "next/link";
 
 import { CaseStudyClientMark } from "@/components/case-study-archive-card";
 import { SiteImage } from "@/components/site-image";
-import type { CaseStudyCard } from "@/lib/case-studies";
-import { formatCaseStudyPillars } from "@/lib/case-studies";
+import { formatCaseStudyPillars, projectHref, type CaseStudyCard } from "@/lib/case-studies";
 import { coverAltFor, resolveImageAlt } from "@/lib/image-alt";
 
 /**
- * Featured catalogue hero on /case-studies.
+ * Featured catalogue hero on /projects.
  * - "pair": two equal features (current — thin catalogue)
  * - "featured-rail": large sticky feature + 4 secondary cards (restore when ready)
  */
@@ -29,7 +28,7 @@ function FeaturedCoverCard({
 }) {
   return (
     <Link
-      href={`/case-studies/${study.slug}`}
+      href={projectHref(study.slug)}
       className={
         className ??
         "group relative block min-h-[28rem] overflow-hidden rounded-sm md:min-h-[34rem]"
@@ -69,7 +68,7 @@ function FeaturedCoverCard({
 function SecondaryCard({ study }: { study: CaseStudyCard }) {
   return (
     <Link
-      href={`/case-studies/${study.slug}`}
+      href={projectHref(study.slug)}
       className="group block cursor-pointer"
     >
       <div className="relative aspect-3/4 overflow-hidden rounded-sm bg-[#E4EBE6]">

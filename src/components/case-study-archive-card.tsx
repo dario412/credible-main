@@ -4,6 +4,7 @@ import { SiteImage } from "@/components/site-image";
 import {
   CASE_STUDY_LOGO,
   formatCaseStudyPillars,
+  projectHref,
   type CaseStudyCard,
 } from "@/lib/case-studies";
 import { logoAltFor, resolveImageAlt } from "@/lib/image-alt";
@@ -65,7 +66,7 @@ export function CaseStudyClientMark({
 export function CaseStudyArchiveCard({ study }: { study: CaseStudyCard }) {
   return (
     <Link
-      href={`/case-studies/${study.slug}`}
+      href={projectHref(study.slug)}
       className="group block cursor-pointer"
     >
       <div className="relative flex aspect-16/10 items-center justify-center overflow-hidden rounded-sm bg-[#4A6356]">
