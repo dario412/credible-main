@@ -381,7 +381,6 @@ export default async function ExpertPage({ params }: Props) {
           hasWork: recentWork.length > 0,
           hasTestimonials: testimonials.length > 0,
           hasFaq,
-          hasCta: true,
         }}
       >
         <ExpertProfileMain

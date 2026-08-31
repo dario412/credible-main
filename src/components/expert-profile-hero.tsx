@@ -44,7 +44,6 @@ export type ExpertProfileShellProps = {
     hasWork: boolean;
     hasTestimonials?: boolean;
     hasFaq?: boolean;
-    hasCta?: boolean;
   };
   children: ReactNode;
 };
@@ -91,10 +90,6 @@ export function ExpertProfileShell({
   const builtNav = navSections
     ? buildProfileNav(rail.nav, navSections, chrome.profileLayout.sectionOrder)
     : nav;
-  const profileCtaNav = builtNav.find((item) => item.href === "#profile-cta");
-  const profileSectionNav = builtNav.filter(
-    (item) => item.href !== "#profile-cta",
-  );
 
   return (
     <div className="bg-cream px-6 pt-8 pb-16 md:px-10 md:pt-12 md:pb-20 lg:px-12 lg:pt-14 lg:pb-24">
@@ -205,13 +200,13 @@ export function ExpertProfileShell({
             ) : null}
 
             {/* Dossier nav */}
-            {profileSectionNav.length > 0 ? (
+            {builtNav.length > 0 ? (
               <nav
                 aria-label="On this profile"
                 className="border-b border-charcoal/8 px-2 py-1.5"
               >
                 <ul>
-                  {profileSectionNav.map((item) => {
+                  {builtNav.map((item) => {
                     const navKey = profileNavKeyFromHref(item.href);
                     return (
                       <li key={item.href}>
@@ -262,22 +257,6 @@ export function ExpertProfileShell({
 
             {/* Pinned conversion — stays visible when the nav list scrolls */}
             <div className="shrink-0 border-t border-charcoal/8 bg-[#FBF8F5] px-4 py-4">
-              {profileCtaNav ? (
-                <ProfileEditHit
-                  field="profileRail.nav.cta"
-                  label="nav Send brief button"
-                  block
-                >
-                  <a
-                    href={profileCtaNav.href}
-                    className="flex w-full items-center justify-center rounded-sm border border-forest bg-forest px-3 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-forest-dark hover:bg-forest-dark"
-                  >
-                    {profileCtaNav.label}
-                  </a>
-                </ProfileEditHit>
-              ) : null}
-
-              <div className={profileCtaNav ? "mt-4" : undefined}>
               <ProfileEditHit
                 field="profileRail.workWith"
                 label="work-with block"
@@ -352,7 +331,6 @@ export function ExpertProfileShell({
                   </p>
                 </ProfileEditHit>
               ) : null}
-              </div>
             </div>
           </div>
         </aside>

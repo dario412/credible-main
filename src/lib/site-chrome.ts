@@ -779,7 +779,6 @@ export function buildProfileNav(
     hasWork: boolean;
     hasTestimonials?: boolean;
     hasFaq?: boolean;
-    hasCta?: boolean;
   },
   sectionOrder: ProfileBodySectionId[] = [...PROFILE_BODY_SECTION_IDS],
 ): NavLink[] {
@@ -808,9 +807,6 @@ export function buildProfileNav(
   }
   if (sections.hasFaq) {
     extraNav.push({ href: "#profile-faq", label: labels.faq });
-  }
-  if (sections.hasCta !== false) {
-    extraNav.push({ href: "#profile-cta", label: labels.cta });
   }
 
   return [...bodyNav, ...extraNav];
