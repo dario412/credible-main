@@ -25,6 +25,7 @@ const LOCAL_BRAND_LOGOS: Record<string, string> = {
   profound: "/brand/clients/profound-wordmark-white.svg",
   polyai: "/brand/clients/polyai-wordmark-white.svg",
   intuit: "/brand/clients/intuit-wordmark-white.svg",
+  turbotax: "/brand/clients/intuit-wordmark-white.svg",
   justworks: "/brand/clients/justworks-wordmark-white.svg",
   hcltech: "/brand/clients/hcltech-wordmark-white.svg",
   "general catalyst": "/brand/clients/general-catalyst-wordmark-white.svg",

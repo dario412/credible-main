@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { SiteImage } from "@/components/site-image";
 import {
   caseStudyLogoNeedsInvert,
   resolveCaseStudyClientLogo,
@@ -13,22 +12,19 @@ export type CaseStudyClientMarkSize = "sm" | "md" | "lg";
 
 const CLIENT_MARK_SIZES: Record<
   CaseStudyClientMarkSize,
-  { box: string; width: number; height: number }
+  { box: string; img: string }
 > = {
   sm: {
     box: "h-10 max-w-[9rem] md:h-11 md:max-w-[10rem]",
-    width: 160,
-    height: 56,
+    img: "h-10 w-auto max-w-full md:h-11",
   },
   md: {
     box: "h-14 max-w-[11rem] md:h-16 md:max-w-[12rem]",
-    width: 192,
-    height: 72,
+    img: "h-14 w-auto max-w-full md:h-16",
   },
   lg: {
     box: "h-14 max-w-[12rem] sm:h-16 sm:max-w-[14rem] md:h-[4.5rem] md:max-w-[16rem] lg:h-20 lg:max-w-[18rem]",
-    width: 288,
-    height: 104,
+    img: "h-14 w-auto max-w-full sm:h-16 md:h-[4.5rem] lg:h-20",
   },
 };
 
@@ -54,17 +50,19 @@ export function CaseStudyClientMark({
 
   return (
     <div
-      className={cn("flex shrink-0 items-center justify-start", preset.box, className)}
+      className={cn("flex shrink-0 items-center justify-center", preset.box, className)}
     >
-      <SiteImage
+      {/* Native img — CMS SVG/PNG logos render reliably on dark cards (next/image does not). */}
+      <img
         src={src}
         alt={resolveImageAlt(logoAlt, logoAltFor(client))}
-        width={preset.width}
-        height={preset.height}
         className={cn(
-          "max-h-full w-auto max-w-full object-contain object-left drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]",
+          preset.img,
+          "object-contain object-center drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]",
           invert && "brightness-0 invert",
         )}
+        loading="lazy"
+        decoding="async"
       />
     </div>
   );
@@ -79,11 +77,11 @@ export function CaseStudyArchiveCard({ study }: { study: CaseStudyCard }) {
       <div className="relative flex aspect-16/10 items-center justify-center overflow-hidden rounded-sm bg-[#4A6356]">
         <div
           aria-hidden
-          className="absolute inset-0 bg-linear-to-b from-[#6B8575] to-[#3D5248] transition-opacity duration-500 group-hover:opacity-90"
+          className="absolute inset-0 z-0 bg-linear-to-b from-[#6B8575] to-[#3D5248] transition-opacity duration-500 group-hover:opacity-90"
         />
         <div
           aria-hidden
-          className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          className="absolute inset-0 z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
           style={{
             background:
               "radial-gradient(circle at 50% 45%, rgba(249,243,239,0.18), transparent 55%)",
@@ -95,7 +93,7 @@ export function CaseStudyArchiveCard({ study }: { study: CaseStudyCard }) {
           logoAlt={study.logoAlt}
           size="md"
           tone="dark"
-          className="relative z-2 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
+          className="relative z-10 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
         />
       </div>
 
