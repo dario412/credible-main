@@ -16,10 +16,12 @@ import {
 import { MediaField } from "@/components/media-library";
 import { PatternField } from "@/components/pattern-field";
 import { ProcessTimeline } from "@/components/process-timeline";
+import { RepresentationFaq } from "@/components/representation-faq";
 import { SiteImage } from "@/components/site-image";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import { WhatWeDoServices } from "@/components/what-we-do-services";
 import {
+  emptyWhatWeDoFaqItem,
   emptyWhatWeDoMatrixRow,
   emptyWhatWeDoMoment,
   emptyWhatWeDoProof,
@@ -39,7 +41,8 @@ type EditTarget =
   | "process"
   | "chooseHeader"
   | `choose.${number}`
-  | "cta";
+  | "cta"
+  | "faq";
 
 function targetTitle(target: EditTarget): string {
   if (target.startsWith("service.")) {
@@ -56,6 +59,7 @@ function targetTitle(target: EditTarget): string {
     process: "Process",
     chooseHeader: "How to choose",
     cta: "Closing CTA",
+    faq: "FAQ",
   };
   return map[target] ?? "Edit";
 }
@@ -1043,6 +1047,120 @@ function EditorPopover({
             </Field>
           </>
         ) : null}
+
+        {target === "faq" ? (
+          <>
+            <Field label="Eyebrow" id="ve-wwd-faq-eyebrow">
+              <TextInput
+                id="ve-wwd-faq-eyebrow"
+                value={sections.faq.eyebrow}
+                onChange={(e) =>
+                  onChange({
+                    ...sections,
+                    faq: { ...sections.faq, eyebrow: e.target.value },
+                  })
+                }
+              />
+            </Field>
+            <Field label="Headline" id="ve-wwd-faq-headline">
+              <TextArea
+                id="ve-wwd-faq-headline"
+                rows={2}
+                value={sections.faq.headline}
+                onChange={(e) =>
+                  onChange({
+                    ...sections,
+                    faq: { ...sections.faq, headline: e.target.value },
+                  })
+                }
+              />
+            </Field>
+            <Field label="Subhead" id="ve-wwd-faq-subhead">
+              <TextArea
+                id="ve-wwd-faq-subhead"
+                rows={3}
+                value={sections.faq.subhead}
+                onChange={(e) =>
+                  onChange({
+                    ...sections,
+                    faq: { ...sections.faq, subhead: e.target.value },
+                  })
+                }
+              />
+            </Field>
+            {sections.faq.items.map((item, index) => (
+              <div
+                key={`ve-wwd-faq-${index}`}
+                className="space-y-3 rounded-sm border border-charcoal/10 p-3"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium">Question {index + 1}</p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onChange({
+                        ...sections,
+                        faq: {
+                          ...sections.faq,
+                          items: sections.faq.items.filter((_, i) => i !== index),
+                        },
+                      })
+                    }
+                    className="text-xs font-medium text-danger hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <Field label="Question" id={`ve-wwd-faq-q-${index}`}>
+                  <TextInput
+                    id={`ve-wwd-faq-q-${index}`}
+                    value={item.q}
+                    onChange={(e) => {
+                      const items = sections.faq.items.map((row, i) =>
+                        i === index ? { ...row, q: e.target.value } : row,
+                      );
+                      onChange({
+                        ...sections,
+                        faq: { ...sections.faq, items },
+                      });
+                    }}
+                  />
+                </Field>
+                <Field label="Answer" id={`ve-wwd-faq-a-${index}`}>
+                  <TextArea
+                    id={`ve-wwd-faq-a-${index}`}
+                    rows={4}
+                    value={item.a}
+                    onChange={(e) => {
+                      const items = sections.faq.items.map((row, i) =>
+                        i === index ? { ...row, a: e.target.value } : row,
+                      );
+                      onChange({
+                        ...sections,
+                        faq: { ...sections.faq, items },
+                      });
+                    }}
+                  />
+                </Field>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  ...sections,
+                  faq: {
+                    ...sections.faq,
+                    items: [...sections.faq.items, emptyWhatWeDoFaqItem()],
+                  },
+                })
+              }
+              className="text-sm font-medium text-forest hover:text-forest-dark"
+            >
+              + Add question
+            </button>
+          </>
+        ) : null}
       </div>
     </div>
   );
@@ -1062,6 +1180,9 @@ function WhatWeDoView({
   const showHowToChoose = false;
   const laneCount = Math.max(sections.choose.laneLabels.length, 1);
   const matrixTemplate = `14rem minmax(0,1fr) repeat(${laneCount}, 5.5rem)`;
+  const faqItems = sections.faq.items.filter(
+    (item) => item.q.trim() || item.a.trim(),
+  );
 
   return (
     <>
@@ -1394,7 +1515,7 @@ function WhatWeDoView({
       </section>
       ) : null}
 
-      <section className="px-6 pt-16 pb-0 md:px-10 md:pt-20 lg:px-12 lg:pt-24">
+      <section className="px-6 pt-10 pb-0 md:px-10 md:pt-12 lg:px-12 lg:pt-14">
         <div className={PAGE_SHELL}>
           <FadeUp>
             {hit(
@@ -1445,6 +1566,43 @@ function WhatWeDoView({
           </FadeUp>
         </div>
       </section>
+
+      {faqItems.length > 0 ? (
+        <section className="bg-cream px-6 pt-16 pb-10 md:px-10 md:pt-20 md:pb-12 lg:px-12 lg:pb-14">
+          <div className={PAGE_SHELL}>
+            <FadeUp>
+              {hit(
+                editing,
+                "faq",
+                selected,
+                onSelect,
+                "FAQ",
+                <div className="mx-auto max-w-[52.5rem] text-center">
+                  <p className={EYEBROW}>{sections.faq.eyebrow}</p>
+                  <h2 className="mt-4 font-display text-[2rem] leading-[1.1] tracking-tight text-charcoal md:text-[3.25rem]">
+                    {sections.faq.headline}
+                  </h2>
+                  <p className="mx-auto mt-5 max-w-[32.5rem] text-[1.0625rem] leading-relaxed text-charcoal/70">
+                    {sections.faq.subhead}
+                  </p>
+                </div>,
+                { block: true },
+              )}
+            </FadeUp>
+            <div className="mx-auto mt-14 max-w-[47.5rem]">
+              {hit(
+                editing,
+                "faq",
+                selected,
+                onSelect,
+                "FAQ items",
+                <RepresentationFaq items={faqItems} />,
+                { block: true },
+              )}
+            </div>
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }

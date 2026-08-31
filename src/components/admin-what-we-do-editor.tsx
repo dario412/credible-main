@@ -5,6 +5,7 @@ import { useState } from "react";
 import { MediaField } from "@/components/media-library";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
+  emptyWhatWeDoFaqItem,
   emptyWhatWeDoMatrixRow,
   emptyWhatWeDoMoment,
   emptyWhatWeDoProof,
@@ -1007,6 +1008,126 @@ export function WhatWeDoPageEditorForm({
             />
           </Field>
         </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">FAQ</h2>
+          <p className="mt-1 text-sm text-muted">
+            Accordion below the closing CTA on /what-we-do.
+          </p>
+        </div>
+        <Field label="Eyebrow" id="wwd-faq-eyebrow">
+          <TextInput
+            id="wwd-faq-eyebrow"
+            value={sections.faq.eyebrow}
+            onChange={(e) =>
+              setSections({
+                ...sections,
+                faq: { ...sections.faq, eyebrow: e.target.value },
+              })
+            }
+          />
+        </Field>
+        <Field label="Headline" id="wwd-faq-headline">
+          <TextArea
+            id="wwd-faq-headline"
+            rows={2}
+            value={sections.faq.headline}
+            onChange={(e) =>
+              setSections({
+                ...sections,
+                faq: { ...sections.faq, headline: e.target.value },
+              })
+            }
+          />
+        </Field>
+        <Field label="Subhead" id="wwd-faq-subhead">
+          <TextArea
+            id="wwd-faq-subhead"
+            rows={3}
+            value={sections.faq.subhead}
+            onChange={(e) =>
+              setSections({
+                ...sections,
+                faq: { ...sections.faq, subhead: e.target.value },
+              })
+            }
+          />
+        </Field>
+        {sections.faq.items.map((item, index) => (
+          <div
+            key={`wwd-faq-${index}`}
+            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-medium text-charcoal">
+                Question {index + 1}
+              </p>
+              <button
+                type="button"
+                onClick={() =>
+                  setSections({
+                    ...sections,
+                    faq: {
+                      ...sections.faq,
+                      items: sections.faq.items.filter((_, i) => i !== index),
+                    },
+                  })
+                }
+                className="text-xs font-medium text-danger hover:underline"
+              >
+                Remove
+              </button>
+            </div>
+            <Field label="Question" id={`wwd-faq-q-${index}`}>
+              <TextInput
+                id={`wwd-faq-q-${index}`}
+                value={item.q}
+                onChange={(e) => {
+                  const items = sections.faq.items.map((row, i) =>
+                    i === index ? { ...row, q: e.target.value } : row,
+                  );
+                  setSections({
+                    ...sections,
+                    faq: { ...sections.faq, items },
+                  });
+                }}
+              />
+            </Field>
+            <Field label="Answer" id={`wwd-faq-a-${index}`}>
+              <TextArea
+                id={`wwd-faq-a-${index}`}
+                rows={4}
+                value={item.a}
+                onChange={(e) => {
+                  const items = sections.faq.items.map((row, i) =>
+                    i === index ? { ...row, a: e.target.value } : row,
+                  );
+                  setSections({
+                    ...sections,
+                    faq: { ...sections.faq, items },
+                  });
+                }}
+              />
+            </Field>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setSections({
+              ...sections,
+              faq: {
+                ...sections.faq,
+                items: [...sections.faq.items, emptyWhatWeDoFaqItem()],
+              },
+            })
+          }
+          className="text-sm font-medium text-forest hover:text-forest-dark"
+        >
+          + Add question
+        </button>
       </section>
 
       <div className="flex flex-wrap items-center gap-3 border-t border-charcoal/10 pt-6">

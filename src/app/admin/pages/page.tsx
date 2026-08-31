@@ -50,7 +50,7 @@ const pages: {
     slug: "case-studies",
     title: "Projects",
     description:
-      "Intro, All stories heading, and FAQ accordion on /case-studies.",
+      "Intro and All stories heading on /case-studies.",
   },
   {
     slug: "about",
@@ -62,7 +62,7 @@ const pages: {
     slug: "what-we-do",
     title: "What we do",
     description:
-      "Hero, service system, business moments, service cards, process, how to choose, and closing CTA.",
+      "Hero, service system, business moments, service cards, process, how to choose, closing CTA, and FAQ.",
   },
   {
     slug: "apply-for-representation",

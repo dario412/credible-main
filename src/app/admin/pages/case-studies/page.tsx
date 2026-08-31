@@ -34,7 +34,7 @@ export default async function AdminCaseStudiesPageEditor() {
         </Link>
         <h1 className="mt-3 font-display text-3xl">Projects</h1>
         <p className="mt-2 text-sm text-muted">
-          Intro, All stories heading, and FAQ on{" "}
+          Intro and All stories heading on{" "}
           <a
             href="/case-studies"
             className="font-medium text-forest hover:text-forest-dark"

@@ -37,6 +37,11 @@ export type WhatWeDoMatrixRow = {
   lanes: boolean[];
 };
 
+export type WhatWeDoFaqItem = {
+  q: string;
+  a: string;
+};
+
 export type WhatWeDoPageSections = {
   hero: {
     eyebrow: string;
@@ -93,6 +98,12 @@ export type WhatWeDoPageSections = {
     primaryHref: string;
     secondaryCta: string;
     secondaryHref: string;
+  };
+  faq: {
+    eyebrow: string;
+    headline: string;
+    subhead: string;
+    items: WhatWeDoFaqItem[];
   };
 };
 
@@ -302,6 +313,38 @@ export const DEFAULT_WHAT_WE_DO_SECTIONS: WhatWeDoPageSections = {
     primaryHref: "/contact",
     secondaryCta: "Explore the roster",
     secondaryHref: "/roster",
+  },
+  faq: {
+    eyebrow: "FAQ",
+    headline: "Questions before you brief.",
+    subhead:
+      "How services fit together, what to expect from a brief, and how we scope work.",
+    items: [
+      {
+        q: "Do I need to know which service to pick?",
+        a: "No. Send the business moment — launch, category push, buying committee education, or repeat program — and we recommend the right mix of content, partnerships, speaking, and live work.",
+      },
+      {
+        q: "What should I include in a brief?",
+        a: "Audience, goal, timing, and any creator or format preferences. We return a shortlist with reach data, past work, and scoped pricing — usually within 48 hours.",
+      },
+      {
+        q: "Can we combine more than one service?",
+        a: "Yes. Most engagements blend formats — for example editorial plus speaking, or a partnership supported by live sessions. We shape the mix around the outcome, not the menu.",
+      },
+      {
+        q: "Do you work with agencies as well as brands?",
+        a: "Yes. In-house teams and agencies brief us the same way. We return named creators with reach, relevant work, and commercials in one document you can forward internally.",
+      },
+      {
+        q: "How do you choose creators?",
+        a: "Fit to audience, category authority, format experience, and availability. You can name someone from the roster or ask us for a shortlist based on the moment you are trying to solve.",
+      },
+      {
+        q: "What happens after we send a brief?",
+        a: "We acknowledge same day, return a shortlist within 48 hours when the roster fits, then scope delivery, approvals, and reporting in one managed plan.",
+      },
+    ],
   },
 };
 
@@ -513,6 +556,28 @@ function mergeMatrixRows(
       }));
 }
 
+function mergeFaqItems(
+  raw: unknown,
+  defaults: WhatWeDoFaqItem[],
+): WhatWeDoFaqItem[] {
+  if (!Array.isArray(raw)) return defaults.map((item) => ({ ...item }));
+
+  const merged = raw
+    .map((item, i) => {
+      const row = (item && typeof item === "object" ? item : {}) as Partial<
+        WhatWeDoFaqItem
+      >;
+      const fallback = defaults[i] ?? { q: "", a: "" };
+      const q = asString(row.q, fallback.q);
+      const a = asString(row.a, fallback.a);
+      if (!q.trim() && !a.trim()) return null;
+      return { q, a };
+    })
+    .filter((item): item is WhatWeDoFaqItem => item !== null);
+
+  return merged.length > 0 ? merged : defaults.map((item) => ({ ...item }));
+}
+
 export function mergeWhatWeDoSections(raw: unknown): WhatWeDoPageSections {
   const data = (raw && typeof raw === "object" ? raw : {}) as {
     hero?: Partial<WhatWeDoPageSections["hero"]> & {
@@ -529,6 +594,7 @@ export function mergeWhatWeDoSections(raw: unknown): WhatWeDoPageSections {
       rows?: unknown;
     };
     cta?: Partial<WhatWeDoPageSections["cta"]>;
+    faq?: Partial<WhatWeDoPageSections["faq"]> & { items?: unknown };
   };
   const defaults = DEFAULT_WHAT_WE_DO_SECTIONS;
   const hero = data.hero ?? {};
@@ -538,6 +604,7 @@ export function mergeWhatWeDoSections(raw: unknown): WhatWeDoPageSections {
   const process = data.process ?? {};
   const choose = data.choose ?? {};
   const cta = data.cta ?? {};
+  const faq = data.faq ?? {};
   const laneLabels = mergeLaneLabels(choose.laneLabels, defaults.choose.laneLabels);
 
   return {
@@ -597,6 +664,12 @@ export function mergeWhatWeDoSections(raw: unknown): WhatWeDoPageSections {
       secondaryCta: asString(cta.secondaryCta, defaults.cta.secondaryCta),
       secondaryHref: asString(cta.secondaryHref, defaults.cta.secondaryHref),
     },
+    faq: {
+      eyebrow: asString(faq.eyebrow, defaults.faq.eyebrow),
+      headline: asString(faq.headline, defaults.faq.headline),
+      subhead: asString(faq.subhead, defaults.faq.subhead),
+      items: mergeFaqItems(faq.items, defaults.faq.items),
+    },
   };
 }
 
@@ -627,6 +700,10 @@ export function emptyWhatWeDoMatrixRow(laneCount = 4): WhatWeDoMatrixRow {
     becomes: "",
     lanes: Array.from({ length: laneCount }, () => false),
   };
+}
+
+export function emptyWhatWeDoFaqItem(): WhatWeDoFaqItem {
+  return { q: "", a: "" };
 }
 
 export function formatsToText(formats: string[]) {

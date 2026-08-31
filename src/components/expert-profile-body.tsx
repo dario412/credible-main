@@ -24,7 +24,10 @@ import { ExpertInterestCta } from "@/components/expert-interest-cta";
 import { ExpertProfileSimilarIntro } from "@/components/expert-profile-similar-intro";
 import { ExpertQuoteCard } from "@/components/expert-quote-card";
 import { FeaturedCaseStudyCard } from "@/components/expert-work-layouts";
+import { FadeUp } from "@/components/fade-up";
+import { EYEBROW } from "@/components/inner-page";
 import { PatternField } from "@/components/pattern-field";
+import { RepresentationFaq } from "@/components/representation-faq";
 import type { RosterCardExpert } from "@/components/roster-card";
 import { SimilarCreatorsGrid } from "@/components/similar-creators-grid";
 import { StatCounter } from "@/components/stat-counter";
@@ -624,8 +627,13 @@ export function ExpertProfileFooter({
   slug: string;
   similar: RosterCardExpert[];
 }) {
-  const { chrome } = useSiteChrome();
+  const { chrome, editing, canEdit } = useSiteChrome();
   const footerOrder = chrome.profileLayout.footerOrder;
+  const faqItems = chrome.profileFaq.items.filter(
+    (item) => item.q.trim() && item.a.trim(),
+  );
+  const showFaq =
+    faqItems.length > 0 || (editing && canEdit);
 
   const blocks: Record<ProfileFooterBlockId, ReactNode> = {
     interestCta: (
@@ -661,6 +669,40 @@ export function ExpertProfileFooter({
           </div>
         </section>
       ) : null,
+    faq: showFaq ? (
+      <section
+        key="faq"
+        id="profile-faq"
+        className="scroll-mt-8 bg-cream px-6 pt-0 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24"
+      >
+        <div className="mx-auto max-w-352">
+          <FadeUp>
+            <ProfileEditHit field="profileFaq" label="FAQ" block>
+              <div className="mx-auto max-w-[52.5rem] text-center">
+                <p className={EYEBROW}>{chrome.profileFaq.eyebrow}</p>
+                <h2 className="mt-4 font-display text-[2rem] leading-[1.1] tracking-tight text-charcoal md:text-[3.25rem]">
+                  {chrome.profileFaq.headline}
+                </h2>
+                <p className="mx-auto mt-5 max-w-[32.5rem] text-[1.0625rem] leading-relaxed text-charcoal/70">
+                  {chrome.profileFaq.subhead}
+                </p>
+              </div>
+            </ProfileEditHit>
+          </FadeUp>
+          <div className="mx-auto mt-14 max-w-[47.5rem]">
+            <ProfileEditHit field="profileFaq" label="FAQ items" block>
+              {faqItems.length > 0 ? (
+                <RepresentationFaq items={faqItems} />
+              ) : (
+                <p className="text-center text-sm text-charcoal/45">
+                  Add FAQ questions in the profile template editor…
+                </p>
+              )}
+            </ProfileEditHit>
+          </div>
+        </div>
+      </section>
+    ) : null,
   };
 
   return <>{footerOrder.map((id) => blocks[id])}</>;

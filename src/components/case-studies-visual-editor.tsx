@@ -4,22 +4,15 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
 import { EditableHit } from "@/components/editable-hit";
-import { FadeUp } from "@/components/fade-up";
-import { EYEBROW } from "@/components/inner-page";
-import { RepresentationFaq } from "@/components/representation-faq";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
-import {
-  emptyCaseStudiesFaqItem,
-  type CaseStudiesPageSections,
-} from "@/lib/case-studies-page";
+import type { CaseStudiesPageSections } from "@/lib/case-studies-page";
 
-type CaseStudiesEditTarget = "hero" | "archive" | "faq";
+type CaseStudiesEditTarget = "hero" | "archive";
 
 function targetTitle(target: CaseStudiesEditTarget): string {
   const map: Record<CaseStudiesEditTarget, string> = {
     hero: "Page intro",
     archive: "All stories",
-    faq: "FAQ",
   };
   return map[target];
 }
@@ -109,90 +102,6 @@ function CaseStudiesArchiveHeading({
           (editing ? "All stories" : null)}
       </h2>
     </EditableHit>
-  );
-}
-
-function CaseStudiesFaqBlock({
-  sections,
-  editing,
-  selected,
-  onSelect,
-}: {
-  sections: CaseStudiesPageSections;
-  editing: boolean;
-  selected: CaseStudiesEditTarget | null;
-  onSelect: (target: CaseStudiesEditTarget) => void;
-}) {
-  const faqItems = sections.faq.items.filter(
-    (item) => item.q.trim() && item.a.trim(),
-  );
-  const showFaq =
-    editing ||
-    sections.faq.eyebrow.trim() ||
-    sections.faq.headline.trim() ||
-    sections.faq.subhead.trim() ||
-    faqItems.length > 0;
-
-  if (!showFaq) return null;
-
-  return (
-    <section
-      id="case-studies-faq"
-      className="scroll-mt-8 bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24"
-    >
-      <div className="mx-auto max-w-352">
-        <FadeUp>
-          <EditableHit
-            active={editing}
-            selected={selected === "faq"}
-            onSelect={() => onSelect("faq")}
-            label="FAQ"
-            block
-            ringOffset="ring-offset-cream"
-          >
-            <div className="mx-auto max-w-[52.5rem] text-center">
-              {sections.faq.eyebrow.trim() || editing ? (
-                <p className={EYEBROW}>
-                  {sections.faq.eyebrow.trim() || (editing ? "FAQ" : null)}
-                </p>
-              ) : null}
-              {sections.faq.headline.trim() || editing ? (
-                <h2 className="mt-4 font-display text-[2rem] leading-[1.1] tracking-tight text-charcoal md:text-[3.25rem]">
-                  {sections.faq.headline.trim() ||
-                    (editing ? "FAQ headline" : null)}
-                </h2>
-              ) : null}
-              {sections.faq.subhead.trim() || editing ? (
-                <p className="mx-auto mt-5 max-w-[32.5rem] text-[1.0625rem] leading-relaxed text-charcoal/70">
-                  {sections.faq.subhead.trim() ||
-                    (editing ? "FAQ supporting line…" : null)}
-                </p>
-              ) : null}
-            </div>
-          </EditableHit>
-        </FadeUp>
-        {faqItems.length > 0 || editing ? (
-          <div className="mx-auto mt-14 max-w-[47.5rem]">
-            <EditableHit
-              active={editing}
-              selected={selected === "faq"}
-              onSelect={() => onSelect("faq")}
-              label="FAQ items"
-              block
-              ringOffset="ring-offset-cream"
-            >
-              {faqItems.length > 0 ? (
-                <RepresentationFaq items={faqItems} />
-              ) : (
-                <p className="text-center text-sm text-charcoal/45">
-                  Add FAQ questions in the editor…
-                </p>
-              )}
-            </EditableHit>
-          </div>
-        ) : null}
-      </div>
-    </section>
   );
 }
 
@@ -376,125 +285,6 @@ function EditorPopover({
             </Field>
           </>
         ) : null}
-
-        {target === "faq" ? (
-          <>
-            <Field label="Eyebrow" id="ve-cs-faq-eyebrow">
-              <TextInput
-                id="ve-cs-faq-eyebrow"
-                value={sections.faq.eyebrow}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    faq: { ...sections.faq, eyebrow: e.target.value },
-                  })
-                }
-              />
-            </Field>
-            <Field label="Headline" id="ve-cs-faq-headline">
-              <TextArea
-                id="ve-cs-faq-headline"
-                rows={2}
-                value={sections.faq.headline}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    faq: { ...sections.faq, headline: e.target.value },
-                  })
-                }
-              />
-            </Field>
-            <Field label="Subhead" id="ve-cs-faq-subhead">
-              <TextArea
-                id="ve-cs-faq-subhead"
-                rows={3}
-                value={sections.faq.subhead}
-                onChange={(e) =>
-                  onChange({
-                    ...sections,
-                    faq: { ...sections.faq, subhead: e.target.value },
-                  })
-                }
-              />
-            </Field>
-            {sections.faq.items.map((item, index) => (
-              <div
-                key={`ve-cs-faq-${index}`}
-                className="space-y-3 rounded-sm border border-charcoal/10 p-3"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium">Question {index + 1}</p>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onChange({
-                        ...sections,
-                        faq: {
-                          ...sections.faq,
-                          items: sections.faq.items.filter(
-                            (_, i) => i !== index,
-                          ),
-                        },
-                      })
-                    }
-                    className="text-xs font-medium text-danger hover:underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-                <Field label="Question" id={`ve-cs-faq-q-${index}`}>
-                  <TextInput
-                    id={`ve-cs-faq-q-${index}`}
-                    value={item.q}
-                    onChange={(e) => {
-                      const items = sections.faq.items.map((row, i) =>
-                        i === index ? { ...row, q: e.target.value } : row,
-                      );
-                      onChange({
-                        ...sections,
-                        faq: { ...sections.faq, items },
-                      });
-                    }}
-                  />
-                </Field>
-                <Field label="Answer" id={`ve-cs-faq-a-${index}`}>
-                  <TextArea
-                    id={`ve-cs-faq-a-${index}`}
-                    rows={3}
-                    value={item.a}
-                    onChange={(e) => {
-                      const items = sections.faq.items.map((row, i) =>
-                        i === index ? { ...row, a: e.target.value } : row,
-                      );
-                      onChange({
-                        ...sections,
-                        faq: { ...sections.faq, items },
-                      });
-                    }}
-                  />
-                </Field>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
-                onChange({
-                  ...sections,
-                  faq: {
-                    ...sections.faq,
-                    items: [
-                      ...sections.faq.items,
-                      emptyCaseStudiesFaqItem(),
-                    ],
-                  },
-                })
-              }
-              className="text-sm font-medium text-forest hover:text-forest-dark"
-            >
-              + Add question
-            </button>
-          </>
-        ) : null}
       </div>
     </div>
   );
@@ -588,13 +378,6 @@ export function CaseStudiesVisualEditor({
           )}
         </div>
       </section>
-
-      <CaseStudiesFaqBlock
-        sections={sections}
-        editing={editing && canEdit}
-        selected={target}
-        onSelect={setTarget}
-      />
 
       {canEdit ? (
         <div className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 flex-wrap items-center justify-center gap-2 rounded-sm border border-charcoal/10 bg-white/95 px-3 py-2 shadow-[0_12px_40px_rgba(28,26,23,0.14)] backdrop-blur">

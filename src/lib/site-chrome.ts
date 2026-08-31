@@ -34,7 +34,7 @@ export const PROFILE_BODY_SECTION_IDS = [
 
 export type ProfileBodySectionId = (typeof PROFILE_BODY_SECTION_IDS)[number];
 
-export const PROFILE_FOOTER_BLOCK_IDS = ["interestCta", "similar"] as const;
+export const PROFILE_FOOTER_BLOCK_IDS = ["interestCta", "similar", "faq"] as const;
 
 export type ProfileFooterBlockId = (typeof PROFILE_FOOTER_BLOCK_IDS)[number];
 
@@ -51,7 +51,20 @@ export const PROFILE_FOOTER_BLOCK_LABELS: Record<ProfileFooterBlockId, string> =
   {
     interestCta: "Interest CTA",
     similar: "Similar creators",
+    faq: "FAQ",
   };
+
+export type ProfileFaqItem = {
+  q: string;
+  a: string;
+};
+
+export type ProfileFaqSections = {
+  eyebrow: string;
+  headline: string;
+  subhead: string;
+  items: ProfileFaqItem[];
+};
 
 export type ProfileLayoutSections = {
   /** Order of body sections on every roster profile. */
@@ -180,6 +193,7 @@ export type SiteChromeSections = {
   profileRail: ProfileRailSections;
   profileCta: ProfileCtaSections;
   profileFormats: ProfileFormatsSections;
+  profileFaq: ProfileFaqSections;
   profileLayout: ProfileLayoutSections;
   insightsPromo: InsightsPromoSections;
   articleSidebarCta: ArticleSidebarCtaSections;
@@ -305,6 +319,38 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
     similarHeadline: "Similar creators.",
     similarLinkLabel: "View roster",
     similarLinkHref: "/roster",
+  },
+  profileFaq: {
+    eyebrow: "FAQ",
+    headline: "Questions before you brief.",
+    subhead:
+      "How booking works, what to expect, and how we scope work with creators on the roster.",
+    items: [
+      {
+        q: "Can we book this creator directly?",
+        a: "Yes. Send a brief naming them, or ask for a shortlist of operators with a similar profile. We confirm availability, pricing, and scope — usually within 48 hours.",
+      },
+      {
+        q: "What should we include in a brief?",
+        a: "Audience, goal, timing, and any format preferences. The more context on the business moment, the faster we can recommend the right mix of content, partnerships, speaking, or live work.",
+      },
+      {
+        q: "What formats are available?",
+        a: "Brand partnerships, speaking, live events, and ambassador programs — often combined. Formats on each profile reflect what that creator typically delivers.",
+      },
+      {
+        q: "Do you work with agencies as well as brands?",
+        a: "Yes. In-house teams and agencies brief us the same way. We return reach data, relevant work, and commercials in one document you can forward internally.",
+      },
+      {
+        q: "How is pricing structured?",
+        a: "Format-level pricing scoped to the brief — not a generic rate card. We share numbers once we know audience, deliverables, and timing.",
+      },
+      {
+        q: "How quickly can we start?",
+        a: "Same-day acknowledgement on briefs. Shortlist within 48 hours when the roster fits. Live dates and longer programs depend on creator availability.",
+      },
+    ],
   },
   profileFormats: {
     brandPartnerships: {
@@ -742,6 +788,43 @@ function mergeOrderedIds<T extends string>(
   return ordered;
 }
 
+function mergeProfileFaq(raw: unknown): ProfileFaqSections {
+  const defaults = DEFAULT_SITE_CHROME.profileFaq;
+  const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
+    ProfileFaqSections
+  > & { items?: unknown };
+
+  if (!Array.isArray(data.items)) {
+    return {
+      eyebrow: asString(data.eyebrow, defaults.eyebrow),
+      headline: asString(data.headline, defaults.headline),
+      subhead: asString(data.subhead, defaults.subhead),
+      items: defaults.items.map((item) => ({ ...item })),
+    };
+  }
+
+  const merged = data.items
+    .map((item, i) => {
+      const row = (item && typeof item === "object" ? item : {}) as Partial<
+        ProfileFaqItem
+      >;
+      const fallback = defaults.items[i] ?? { q: "", a: "" };
+      const q = asString(row.q, fallback.q);
+      const a = asString(row.a, fallback.a);
+      if (!q.trim() && !a.trim()) return null;
+      return { q, a };
+    })
+    .filter((item): item is ProfileFaqItem => item !== null);
+
+  return {
+    eyebrow: asString(data.eyebrow, defaults.eyebrow),
+    headline: asString(data.headline, defaults.headline),
+    subhead: asString(data.subhead, defaults.subhead),
+    items:
+      merged.length > 0 ? merged : defaults.items.map((item) => ({ ...item })),
+  };
+}
+
 function mergeProfileLayout(raw: unknown): ProfileLayoutSections {
   const defaults = DEFAULT_SITE_CHROME.profileLayout;
   const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
@@ -788,6 +871,7 @@ export function mergeSiteChrome(raw: unknown): SiteChromeSections {
     profileRail?: unknown;
     profileCta?: unknown;
     profileFormats?: unknown;
+    profileFaq?: unknown;
     profileLayout?: unknown;
     insightsPromo?: unknown;
     articleSidebarCta?: unknown;
@@ -841,6 +925,7 @@ export function mergeSiteChrome(raw: unknown): SiteChromeSections {
     profileRail: mergeProfileRail(data.profileRail),
     profileCta: mergeProfileCta(data.profileCta),
     profileFormats: mergeProfileFormats(data.profileFormats),
+    profileFaq: mergeProfileFaq(data.profileFaq),
     profileLayout: mergeProfileLayout(data.profileLayout),
     insightsPromo: mergeInsightsPromo(data.insightsPromo),
     articleSidebarCta: mergeArticleSidebarCta(data.articleSidebarCta),
@@ -858,4 +943,8 @@ export function emptyFooterColumn(): FooterColumn {
 
 export function emptySocialLink(): SocialLink {
   return { network: "linkedin", label: "LinkedIn", href: "https://" };
+}
+
+export function emptyProfileFaqItem(): ProfileFaqItem {
+  return { q: "", a: "" };
 }

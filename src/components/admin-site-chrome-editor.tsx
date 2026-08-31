@@ -6,6 +6,7 @@ import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
   emptyFooterColumn,
   emptyNavLink,
+  emptyProfileFaqItem,
   emptySocialLink,
   PROFILE_BODY_SECTION_LABELS,
   PROFILE_FOOTER_BLOCK_LABELS,
@@ -172,6 +173,10 @@ export function SiteChromeEditorForm({
     profileFormats: SiteChromeSections["profileFormats"],
   ) {
     setSections({ ...sections, profileFormats });
+  }
+
+  function setProfileFaq(profileFaq: SiteChromeSections["profileFaq"]) {
+    setSections({ ...sections, profileFaq });
   }
 
   function setInsightsPromo(
@@ -734,6 +739,116 @@ export function SiteChromeEditorForm({
             </Field>
           </div>
         </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-xl">FAQ</h2>
+          <p className="mt-1 text-sm text-muted">
+            Accordion below similar creators on every roster profile.
+          </p>
+        </div>
+        <Field label="Eyebrow" id="pf-faq-eyebrow">
+          <TextInput
+            id="pf-faq-eyebrow"
+            value={sections.profileFaq.eyebrow}
+            onChange={(e) =>
+              setProfileFaq({
+                ...sections.profileFaq,
+                eyebrow: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Headline" id="pf-faq-headline">
+          <TextInput
+            id="pf-faq-headline"
+            value={sections.profileFaq.headline}
+            onChange={(e) =>
+              setProfileFaq({
+                ...sections.profileFaq,
+                headline: e.target.value,
+              })
+            }
+          />
+        </Field>
+        <Field label="Subhead" id="pf-faq-subhead">
+          <TextArea
+            id="pf-faq-subhead"
+            rows={3}
+            value={sections.profileFaq.subhead}
+            onChange={(e) =>
+              setProfileFaq({
+                ...sections.profileFaq,
+                subhead: e.target.value,
+              })
+            }
+          />
+        </Field>
+        {sections.profileFaq.items.map((item, index) => (
+          <div
+            key={`pf-faq-${index}`}
+            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-medium">Question {index + 1}</p>
+              <button
+                type="button"
+                onClick={() =>
+                  setProfileFaq({
+                    ...sections.profileFaq,
+                    items: sections.profileFaq.items.filter(
+                      (_, i) => i !== index,
+                    ),
+                  })
+                }
+                className="text-xs font-medium text-danger hover:underline"
+              >
+                Remove
+              </button>
+            </div>
+            <Field label="Question" id={`pf-faq-q-${index}`}>
+              <TextInput
+                id={`pf-faq-q-${index}`}
+                value={item.q}
+                onChange={(e) => {
+                  const items = sections.profileFaq.items.map((row, i) =>
+                    i === index ? { ...row, q: e.target.value } : row,
+                  );
+                  setProfileFaq({ ...sections.profileFaq, items });
+                }}
+              />
+            </Field>
+            <Field label="Answer" id={`pf-faq-a-${index}`}>
+              <TextArea
+                id={`pf-faq-a-${index}`}
+                rows={3}
+                value={item.a}
+                onChange={(e) => {
+                  const items = sections.profileFaq.items.map((row, i) =>
+                    i === index ? { ...row, a: e.target.value } : row,
+                  );
+                  setProfileFaq({ ...sections.profileFaq, items });
+                }}
+              />
+            </Field>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setProfileFaq({
+              ...sections.profileFaq,
+              items: [
+                ...sections.profileFaq.items,
+                emptyProfileFaqItem(),
+              ],
+            })
+          }
+          className="text-sm font-medium text-forest hover:text-forest-dark"
+        >
+          + Add question
+        </button>
       </section>
 
       {!profileOnly ? (

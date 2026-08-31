@@ -10,7 +10,10 @@ import type {
   ProfileRailNavLabels,
   SiteChromeSections,
 } from "@/lib/site-chrome";
-import { PROFILE_FORMAT_KINDS } from "@/lib/site-chrome";
+import {
+  emptyProfileFaqItem,
+  PROFILE_FORMAT_KINDS,
+} from "@/lib/site-chrome";
 
 type ProfileEditTarget =
   | "profileRail.availabilityLabel"
@@ -26,6 +29,7 @@ type ProfileEditTarget =
   | "profileCta.primaryCta"
   | "profileCta.secondaryCta"
   | "profileCta.similar"
+  | "profileFaq"
   | `profileFormats.${ProfileFormatKind}`
   | "profileLayout.heroBriefCtaLabel"
   | "profileLayout.trustedByLabel"
@@ -63,6 +67,7 @@ function targetTitle(target: ProfileEditTarget): string {
     "profileCta.primaryCta": "Footer primary button",
     "profileCta.secondaryCta": "Footer secondary button",
     "profileCta.similar": "Similar creators strip",
+    profileFaq: "FAQ",
     "profileLayout.heroBriefCtaLabel": "Hero brief CTA",
     "profileLayout.trustedByLabel": "Trusted by label",
     "profileLayout.headings.overview": "Overview heading",
@@ -89,6 +94,7 @@ function profileSnapshot(chrome: SiteChromeSections) {
     profileRail: chrome.profileRail,
     profileCta: chrome.profileCta,
     profileFormats: chrome.profileFormats,
+    profileFaq: chrome.profileFaq,
     profileLayout: chrome.profileLayout,
   };
 }
@@ -140,6 +146,10 @@ function EditorPopover({
     onChange({ ...chrome, profileFormats });
   }
 
+  function setFaq(profileFaq: SiteChromeSections["profileFaq"]) {
+    onChange({ ...chrome, profileFaq });
+  }
+
   function setLayout(profileLayout: SiteChromeSections["profileLayout"]) {
     onChange({ ...chrome, profileLayout });
   }
@@ -149,6 +159,7 @@ function EditorPopover({
   );
   const navKey = navMatch?.[1] as keyof ProfileRailNavLabels | undefined;
   const layout = chrome.profileLayout;
+  const faq = chrome.profileFaq;
 
   return (
     <div
@@ -407,6 +418,99 @@ function EditorPopover({
           </>
         ) : null}
 
+        {target === "profileFaq" ? (
+          <>
+            <Field label="Eyebrow" id="pf-faq-eyebrow">
+              <TextInput
+                id="pf-faq-eyebrow"
+                value={faq.eyebrow}
+                onChange={(e) =>
+                  setFaq({ ...faq, eyebrow: e.target.value })
+                }
+              />
+            </Field>
+            <Field label="Headline" id="pf-faq-headline">
+              <TextArea
+                id="pf-faq-headline"
+                rows={2}
+                value={faq.headline}
+                onChange={(e) =>
+                  setFaq({ ...faq, headline: e.target.value })
+                }
+              />
+            </Field>
+            <Field label="Subhead" id="pf-faq-subhead">
+              <TextArea
+                id="pf-faq-subhead"
+                rows={3}
+                value={faq.subhead}
+                onChange={(e) =>
+                  setFaq({ ...faq, subhead: e.target.value })
+                }
+              />
+            </Field>
+            {faq.items.map((item, index) => (
+              <div
+                key={`pf-faq-${index}`}
+                className="space-y-3 rounded-sm border border-charcoal/10 p-3"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium">Question {index + 1}</p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFaq({
+                        ...faq,
+                        items: faq.items.filter((_, i) => i !== index),
+                      })
+                    }
+                    className="text-xs font-medium text-danger hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <Field label="Question" id={`pf-faq-q-${index}`}>
+                  <TextInput
+                    id={`pf-faq-q-${index}`}
+                    value={item.q}
+                    onChange={(e) => {
+                      const items = faq.items.map((row, i) =>
+                        i === index ? { ...row, q: e.target.value } : row,
+                      );
+                      setFaq({ ...faq, items });
+                    }}
+                  />
+                </Field>
+                <Field label="Answer" id={`pf-faq-a-${index}`}>
+                  <TextArea
+                    id={`pf-faq-a-${index}`}
+                    rows={3}
+                    value={item.a}
+                    onChange={(e) => {
+                      const items = faq.items.map((row, i) =>
+                        i === index ? { ...row, a: e.target.value } : row,
+                      );
+                      setFaq({ ...faq, items });
+                    }}
+                  />
+                </Field>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                setFaq({
+                  ...faq,
+                  items: [...faq.items, emptyProfileFaqItem()],
+                })
+              }
+              className="text-sm font-medium text-forest hover:text-forest-dark"
+            >
+              + Add question
+            </button>
+          </>
+        ) : null}
+
         {PROFILE_FORMAT_KINDS.map(({ key }) =>
           target === `profileFormats.${key}` ? (
             <div key={key} className="space-y-4">
@@ -642,6 +746,7 @@ export function ProfileVisualEditor({
       profileRail: baseline.profileRail,
       profileCta: baseline.profileCta,
       profileFormats: baseline.profileFormats,
+      profileFaq: baseline.profileFaq,
       profileLayout: baseline.profileLayout,
     });
     setSelected(null);

@@ -29,15 +29,11 @@ export type RosterCardExpert = {
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 
-/** Brand washes: color varies per card; geometry stays identical. */
+/** Warm neutral washes only — client-approved roster backdrop set. */
 const BACKDROP_PALETTE = [
-  { base: "#E8EFEA", stroke: "#345B47" }, // forest
-  { base: "#E4EBE6", stroke: "#2A4939" }, // forest-dark
   { base: "#F3E8E1", stroke: "#935B3B" }, // rust
-  { base: "#EFE3DA", stroke: "#7A4A30" }, // rust-dark
-  { base: "#F0EBE6", stroke: "#8A827A" }, // taupe
   { base: "#ECEAE8", stroke: "#6B6560" }, // muted
-  { base: "#E7EEEA", stroke: "#5F7368" }, // sage
+  { base: "#F0EBE6", stroke: "#8A827A" }, // taupe
 ] as const;
 
 /** Fixed line layout — same spacing / kinks on every card. */
