@@ -170,6 +170,61 @@ export async function ensureInsightBlocks(id: string) {
   return ensureBlockIds([{ type: "p", text: "" }]);
 }
 
+type CaseStudyRowPayload = ReturnType<typeof caseStudyCardToRow>;
+
+/** Keep sidebar CTA aligned with the Speakers field (relatedExperts). */
+async function syncCaseStudySpeakers(
+  row: CaseStudyRowPayload,
+): Promise<CaseStudyRowPayload> {
+  const data = row.data as Partial<CaseStudyCard>;
+  const speakers = row.relatedExperts;
+
+  if (speakers.length === 0) {
+    return {
+      ...row,
+      data: {
+        ...row.data,
+        ctaCreator: undefined,
+      },
+    };
+  }
+
+  const primarySlug = speakers[0]!;
+  const existing = data.ctaCreator;
+  if (existing?.slug === primarySlug) {
+    return row;
+  }
+
+  const expert = await prisma.expert.findUnique({
+    where: { slug: primarySlug },
+  });
+  if (!expert) {
+    return row;
+  }
+
+  return {
+    ...row,
+    data: {
+      ...row.data,
+      ctaCreator: {
+        slug: expert.slug,
+        name: expert.name,
+        shortBio: expert.shortBio?.trim() || expert.bio,
+        image: expert.image || "",
+        role: expert.title,
+        topics: expert.topics,
+        combinedReach: expert.combinedReach || "",
+        growth90d: expert.growth90d || "",
+        audienceWho: expert.audienceWho || "",
+        audienceWhere: expert.audienceWhere || "",
+        channels: Array.isArray(expert.channels)
+          ? (expert.channels as NonNullable<CaseStudyCard["ctaCreator"]>["channels"])
+          : [],
+      },
+    },
+  };
+}
+
 export async function saveCaseStudy(
   card: CaseStudyCard,
   options?: { previousSlug?: string },
@@ -197,10 +252,11 @@ export async function saveCaseStudy(
     return { ok: false as const, message: "Slug must include letters or numbers." };
   }
 
-  const row = caseStudyCardToRow({
+  let row = caseStudyCardToRow({
     ...card,
     slug,
   });
+  row = await syncCaseStudySpeakers(row);
   const previousSlug = options?.previousSlug
     ? slugify(options.previousSlug)
     : "";

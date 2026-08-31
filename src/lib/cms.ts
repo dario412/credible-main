@@ -845,8 +845,7 @@ export function caseStudyCardToRow(card: CaseStudyCard) {
     ...new Set(
       (relatedExperts ?? [])
         .map((item) => item.trim())
-        .filter(Boolean)
-        .concat(rest.ctaCreator?.slug ? [rest.ctaCreator.slug] : []),
+        .filter(Boolean),
     ),
   ];
 
