@@ -50,6 +50,7 @@ function FeaturedCoverCard({
           logo={study.logo}
           logoAlt={study.logoAlt}
           size="lg"
+          tone="dark"
         />
 
         <div>
@@ -85,6 +86,7 @@ function SecondaryCard({ study }: { study: CaseStudyCard }) {
             logo={study.logo}
             logoAlt={study.logoAlt}
             size="sm"
+            tone="light"
           />
         </div>
       </div>

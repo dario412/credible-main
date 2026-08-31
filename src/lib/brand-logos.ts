@@ -39,6 +39,49 @@ const LOCAL_BRAND_LOGOS: Record<string, string> = {
   "poly ai": "/brand/clients/polyai-wordmark-white.svg",
 };
 
+/** Legacy dev placeholder — dark mark, invisible on dark project cards. */
+export const LEGACY_CASE_STUDY_LOGO = "/brand/notion-logo.png";
+
+function isLegacyCaseStudyPlaceholder(logo?: string | null) {
+  const value = logo?.trim();
+  return !value || value === LEGACY_CASE_STUDY_LOGO;
+}
+
+function isLightLogoAsset(src: string) {
+  return /-white\.(svg|png|webp)$/i.test(src) || src.includes("-wordmark-white");
+}
+
+/** Logo for project cards and heroes — white wordmarks on dark, stored assets on light. */
+export function resolveCaseStudyClientLogo(
+  client: string,
+  logo?: string | null,
+  options?: { tone?: "dark" | "light" },
+): string {
+  const tone = options?.tone ?? "dark";
+  const trimmed = logo?.trim();
+
+  if (tone === "dark") {
+    if (trimmed && !isLegacyCaseStudyPlaceholder(trimmed)) {
+      if (isLightLogoAsset(trimmed) || /^https?:\/\//i.test(trimmed)) {
+        return trimmed;
+      }
+    }
+    return (
+      resolveBrandLogo(client) ?? "/brand/clients/notion-wordmark-white.svg"
+    );
+  }
+
+  if (trimmed && !isLegacyCaseStudyPlaceholder(trimmed)) {
+    return trimmed;
+  }
+  return "/brand/clients/notion-wordmark.png";
+}
+
+export function caseStudyLogoNeedsInvert(src: string) {
+  if (/^https?:\/\//i.test(src)) return true;
+  return !isLightLogoAsset(src);
+}
+
 export type TrustedBrand = {
   name: string;
   logo?: string;

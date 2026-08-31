@@ -8,12 +8,16 @@ import { ImageAltEditorPopover } from "@/components/image-alt-editor-popover";
 import { PageContentEditBar } from "@/components/page-content-edit-bar";
 import { SiteImage } from "@/components/site-image";
 import {
-  CASE_STUDY_LOGO,
+  caseStudyLogoNeedsInvert,
+  resolveCaseStudyClientLogo,
+} from "@/lib/brand-logos";
+import {
   caseStudyHero,
   type CaseStudyCard,
 } from "@/lib/case-studies";
 import type { CaseStudyBlock } from "@/lib/case-study-content";
 import { coverAltFor, logoAltFor, resolveImageAlt } from "@/lib/image-alt";
+import { cn } from "@/lib/utils";
 
 type EditTarget = "cover" | "logo";
 
@@ -39,7 +43,10 @@ export function CaseStudyHeroEditable({
 
   const dirty = JSON.stringify(card) !== JSON.stringify(baseline);
   const hero = caseStudyHero(card);
-  const logo = card.logo ?? CASE_STUDY_LOGO;
+  const logo = resolveCaseStudyClientLogo(card.client, card.logo, {
+    tone: "dark",
+  });
+  const invertLogo = caseStudyLogoNeedsInvert(logo);
   const active = editing && canEdit;
 
   useEffect(() => {
@@ -124,7 +131,10 @@ export function CaseStudyHeroEditable({
                   alt={resolveImageAlt(card.logoAlt, logoAltFor(card.client))}
                   width={96}
                   height={96}
-                  className="size-16 object-contain brightness-0 invert md:size-20"
+                  className={cn(
+                    "size-16 object-contain md:size-20",
+                    invertLogo && "brightness-0 invert",
+                  )}
                   priority
                 />
               </EditableHit>

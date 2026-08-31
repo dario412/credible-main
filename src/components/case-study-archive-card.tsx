@@ -2,11 +2,10 @@ import Link from "next/link";
 
 import { SiteImage } from "@/components/site-image";
 import {
-  CASE_STUDY_LOGO,
-  formatCaseStudyPillars,
-  projectHref,
-  type CaseStudyCard,
-} from "@/lib/case-studies";
+  caseStudyLogoNeedsInvert,
+  resolveCaseStudyClientLogo,
+} from "@/lib/brand-logos";
+import { formatCaseStudyPillars, projectHref, type CaseStudyCard } from "@/lib/case-studies";
 import { logoAltFor, resolveImageAlt } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
 
@@ -38,26 +37,34 @@ export function CaseStudyClientMark({
   logo,
   logoAlt,
   size = "sm",
+  tone = "dark",
   className,
 }: {
   client: string;
   logo?: string | null;
   logoAlt?: string | null;
   size?: CaseStudyClientMarkSize;
+  /** Dark = white wordmark on forest cards; light = stored mark on pale surfaces. */
+  tone?: "dark" | "light";
   className?: string;
 }) {
   const preset = CLIENT_MARK_SIZES[size];
+  const src = resolveCaseStudyClientLogo(client, logo, { tone });
+  const invert = tone === "dark" && caseStudyLogoNeedsInvert(src);
 
   return (
     <div
       className={cn("flex shrink-0 items-center justify-start", preset.box, className)}
     >
       <SiteImage
-        src={logo?.trim() || CASE_STUDY_LOGO}
+        src={src}
         alt={resolveImageAlt(logoAlt, logoAltFor(client))}
         width={preset.width}
         height={preset.height}
-        className="max-h-full w-auto max-w-full object-contain object-left drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]"
+        className={cn(
+          "max-h-full w-auto max-w-full object-contain object-left drop-shadow-[0_4px_12px_rgba(0,0,0,0.35)]",
+          invert && "brightness-0 invert",
+        )}
       />
     </div>
   );
@@ -87,6 +94,7 @@ export function CaseStudyArchiveCard({ study }: { study: CaseStudyCard }) {
           logo={study.logo}
           logoAlt={study.logoAlt}
           size="md"
+          tone="dark"
           className="relative z-2 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
         />
       </div>
