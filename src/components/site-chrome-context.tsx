@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -51,6 +52,12 @@ export function SiteChromeProvider({
   const [onSelectFooterField, setOnSelectFooterFieldState] = useState<
     ((field: FooterField) => void) | null
   >(null);
+
+  useEffect(() => {
+    if (!editing) {
+      setChromeState(initialChrome);
+    }
+  }, [initialChrome, editing]);
 
   const setChrome = useCallback((next: SiteChromeSections) => {
     setChromeState(next);

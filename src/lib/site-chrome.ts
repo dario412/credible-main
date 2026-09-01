@@ -87,8 +87,6 @@ export type ProfileLayoutSections = {
 
 export type ProfileRailSections = {
   availabilityLabel: string;
-  signedBadgeLabel: string;
-  openBadgeLabel: string;
   focusLabel: string;
   workWithTitle: string;
   workWithDescription: string;
@@ -278,8 +276,6 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
   },
   profileRail: {
     availabilityLabel: "Available to book",
-    signedBadgeLabel: "Signed",
-    openBadgeLabel: "Open",
     focusLabel: "Focus",
     workWithTitle: "Work with {first}",
     workWithDescription: "Briefs go to {first}'s manager at Credible.",
@@ -565,8 +561,6 @@ function mergeProfileRail(raw: unknown): ProfileRailSections {
       data.availabilityLabel,
       defaults.availabilityLabel,
     ),
-    signedBadgeLabel: asString(data.signedBadgeLabel, defaults.signedBadgeLabel),
-    openBadgeLabel: asString(data.openBadgeLabel, defaults.openBadgeLabel),
     focusLabel: asString(data.focusLabel, defaults.focusLabel),
     workWithTitle: asString(data.workWithTitle, defaults.workWithTitle),
     workWithDescription: asString(

@@ -374,10 +374,6 @@ export default async function ExpertPage({ params }: Props) {
         topics={expert.topics ?? []}
         based={enrichment.based}
         languages={enrichment.languages}
-        representationStatus={
-          enrichment.representationStatus ??
-          (extras.exclusive ? "SIGNED" : "AVAILABLE")
-        }
         stats={heroStats}
         navSections={{
           hasChannels: Boolean(content.channels?.length),

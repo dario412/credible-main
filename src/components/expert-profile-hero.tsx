@@ -34,7 +34,6 @@ export type ExpertProfileShellProps = {
   topics: string[];
   based?: string;
   languages?: string[];
-  representationStatus?: "SIGNED" | "AVAILABLE";
   stats: ExpertProfileStat[];
   nav?: ExpertProfileNavItem[];
   navSections?: {
@@ -56,7 +55,6 @@ export function ExpertProfileShell({
   archetype,
   topics,
   based,
-  representationStatus = "SIGNED",
   stats,
   nav = [],
   navSections,
@@ -137,28 +135,9 @@ export function ExpertProfileShell({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate font-display text-[1.25rem] leading-none tracking-tight text-charcoal">
-                      {name}
-                    </p>
-                    <ProfileEditHit
-                      field="profileRail.badges"
-                      label="signed and open badges"
-                    >
-                      <span
-                        className={cn(
-                          "shrink-0 rounded-sm px-1.5 py-0.5 text-[0.5rem] font-medium tracking-[0.1em] uppercase",
-                          representationStatus === "SIGNED"
-                            ? "bg-charcoal text-cream"
-                            : "bg-forest/10 text-forest",
-                        )}
-                      >
-                        {representationStatus === "SIGNED"
-                          ? rail.signedBadgeLabel
-                          : rail.openBadgeLabel}
-                      </span>
-                    </ProfileEditHit>
-                  </div>
+                  <p className="truncate font-display text-[1.25rem] leading-none tracking-tight text-charcoal">
+                    {name}
+                  </p>
                   <p className="mt-1.5 truncate text-[0.75rem] leading-none text-charcoal/70">
                     {[archetype ?? title, based].filter(Boolean).join(" · ")}
                   </p>

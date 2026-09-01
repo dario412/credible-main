@@ -899,13 +899,14 @@ function ApplyView({
         className="scroll-mt-24 bg-cream px-6 pt-8 pb-12 md:px-10 md:pt-10 md:pb-16 lg:px-12 lg:pt-12 lg:pb-20"
       >
         <div
-          className={`${PAGE_SHELL} grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start lg:gap-10`}
+          className={`${PAGE_SHELL} grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-stretch lg:gap-10`}
         >
           <FadeUp
             y={18}
             duration={1000}
             threshold={0.05}
             rootMargin="0px"
+            className="h-full"
           >
             {hit(
               editing,
@@ -913,7 +914,7 @@ function ApplyView({
               selected,
               onSelect,
               "apply intro",
-              <div className="flex flex-col rounded-sm border border-charcoal/10 bg-white p-5 shadow-[0_12px_40px_rgba(28,26,23,0.06)] md:p-6">
+              <div className="flex h-full flex-col rounded-sm border border-charcoal/10 bg-white p-5 shadow-[0_12px_40px_rgba(28,26,23,0.06)] md:p-6">
                 <div>
                   {sections.hero.badge.trim() ? (
                     <p className="inline-flex items-center gap-2 rounded-full border border-charcoal/20 px-3 py-1 text-[0.6875rem] font-medium text-charcoal">
@@ -947,7 +948,7 @@ function ApplyView({
                 </div>
 
                 {nextItems.length > 0 ? (
-                  <div className="mt-6 border-t border-charcoal/10 pt-5">
+                  <div className="mt-auto border-t border-charcoal/10 pt-5">
                     <p className={EYEBROW_MUTED}>{sections.hero.nextEyebrow}</p>
                     <ol className="mt-3 space-y-2">
                       {nextItems.map((item, i) => (
@@ -977,6 +978,7 @@ function ApplyView({
             duration={1000}
             threshold={0.05}
             rootMargin="0px"
+            className="h-full"
           >
             <RepresentationApplicationForm />
           </FadeUp>

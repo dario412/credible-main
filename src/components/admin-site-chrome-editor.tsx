@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
@@ -138,6 +139,7 @@ export function SiteChromeEditorForm({
   /** "profile" shows only creator-profile template fields. */
   focus?: "all" | "profile";
 }) {
+  const router = useRouter();
   const [sections, setSections] = useState(initial);
   const [message, setMessage] = useState("");
   const [ok, setOk] = useState(false);
@@ -151,6 +153,12 @@ export function SiteChromeEditorForm({
     setOk(result.ok);
     setMessage(result.message);
     setPending(false);
+    if (result.ok) {
+      if ("sections" in result && result.sections) {
+        setSections(result.sections);
+      }
+      router.refresh();
+    }
   }
 
   function setHeader(header: SiteChromeSections["header"]) {
@@ -289,32 +297,6 @@ export function SiteChromeEditorForm({
             }
           />
         </Field>
-        <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Signed badge" id="pr-signed">
-            <TextInput
-              id="pr-signed"
-              value={sections.profileRail.signedBadgeLabel}
-              onChange={(e) =>
-                setProfileRail({
-                  ...sections.profileRail,
-                  signedBadgeLabel: e.target.value,
-                })
-              }
-            />
-          </Field>
-          <Field label="Open badge" id="pr-open">
-            <TextInput
-              id="pr-open"
-              value={sections.profileRail.openBadgeLabel}
-              onChange={(e) =>
-                setProfileRail({
-                  ...sections.profileRail,
-                  openBadgeLabel: e.target.value,
-                })
-              }
-            />
-          </Field>
-        </div>
         <Field label="Focus label (when nav is hidden)" id="pr-focus">
           <TextInput
             id="pr-focus"

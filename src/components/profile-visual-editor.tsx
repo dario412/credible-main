@@ -17,7 +17,6 @@ import {
 
 type ProfileEditTarget =
   | "profileRail.availabilityLabel"
-  | "profileRail.badges"
   | "profileRail.focusLabel"
   | `profileRail.nav.${keyof ProfileRailNavLabels}`
   | "profileRail.workWith"
@@ -59,7 +58,6 @@ const FORMAT_LABEL_HINTS = Object.fromEntries(
 function targetTitle(target: ProfileEditTarget): string {
   const map: Partial<Record<ProfileEditTarget, string>> = {
     "profileRail.availabilityLabel": "Availability label",
-    "profileRail.badges": "Signed / Open badges",
     "profileRail.focusLabel": "Focus label",
     "profileRail.workWith": "Work-with block",
     "profileRail.primaryCta": "Get Rates button",
@@ -195,29 +193,6 @@ function EditorPopover({
               }
             />
           </Field>
-        ) : null}
-
-        {target === "profileRail.badges" ? (
-          <div className="grid gap-4">
-            <Field label="Signed badge" id="pr-signed">
-              <TextInput
-                id="pr-signed"
-                value={rail.signedBadgeLabel}
-                onChange={(e) =>
-                  setRail({ ...rail, signedBadgeLabel: e.target.value })
-                }
-              />
-            </Field>
-            <Field label="Open badge" id="pr-open">
-              <TextInput
-                id="pr-open"
-                value={rail.openBadgeLabel}
-                onChange={(e) =>
-                  setRail({ ...rail, openBadgeLabel: e.target.value })
-                }
-              />
-            </Field>
-          </div>
         ) : null}
 
         {target === "profileRail.focusLabel" ? (
@@ -739,6 +714,9 @@ export function ProfileVisualEditor({
     setPending(false);
     if (result.ok) {
       setBaseline(profileSnapshot(chrome));
+      if ("sections" in result && result.sections) {
+        setChrome(result.sections);
+      }
       router.refresh();
     }
   }

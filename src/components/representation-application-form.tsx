@@ -165,7 +165,7 @@ export function RepresentationApplicationForm() {
 
   if (state.ok) {
     return (
-      <div className="rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-6 md:p-7">
+      <div className="h-full rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-6 md:p-7">
         <span className="inline-flex size-9 items-center justify-center rounded-full bg-forest/10 text-forest">
           <Check weight="bold" className="size-4" aria-hidden />
         </span>
@@ -200,7 +200,7 @@ export function RepresentationApplicationForm() {
       ref={formRef}
       action={action}
       onSubmit={handleFormSubmit}
-      className="rounded-sm border border-charcoal/10 bg-white p-5 shadow-[0_12px_40px_rgba(28,26,23,0.06)] md:p-6"
+      className="flex h-full flex-col rounded-sm border border-charcoal/10 bg-white p-5 shadow-[0_12px_40px_rgba(28,26,23,0.06)] md:p-6"
     >
       <StepIndicator step={step} />
 
@@ -213,7 +213,8 @@ export function RepresentationApplicationForm() {
         </p>
       </div>
 
-      <div className={step === 1 ? "mt-4 grid gap-3" : "sr-only"} aria-hidden={step !== 1}>
+      <div className="mt-4 flex min-h-0 flex-1 flex-col">
+        <div className={step === 1 ? "grid gap-3" : "sr-only"} aria-hidden={step !== 1}>
         <Field
           id={`${id}-name`}
           name="name"
@@ -275,14 +276,10 @@ export function RepresentationApplicationForm() {
               placeholder="https://"
             />
           </div>
-          <p className="mt-2.5 text-[0.75rem] leading-relaxed text-charcoal/50">
-            Step 2 covers TikTok, podcast, newsletter, X, and more if you use
-            them.
-          </p>
         </div>
-      </div>
+        </div>
 
-      <div className={step === 2 ? "mt-4 grid gap-3" : "hidden"} aria-hidden={step !== 2}>
+        <div className={step === 2 ? "grid gap-3" : "hidden"} aria-hidden={step !== 2}>
           <Field
             id={`${id}-tiktok`}
             name="tiktokUrl"
@@ -331,6 +328,26 @@ export function RepresentationApplicationForm() {
             type="url"
             placeholder="https://"
           />
+        </div>
+
+        {step === 1 ? (
+          <div className="mt-auto pt-3">
+            <div className="rounded-sm border border-charcoal/8 bg-cream px-3.5 py-3">
+              <p className="text-[0.6875rem] font-medium tracking-[0.08em] text-charcoal/45 uppercase">
+                Up next
+              </p>
+              <p className="mt-1 text-[0.8125rem] leading-relaxed text-charcoal/60">
+                Step 2 covers TikTok, podcast, newsletter, X, and more if you
+                use them. All optional.
+              </p>
+              <p className="mt-2.5 text-[0.6875rem] leading-relaxed text-charcoal/45">
+                By continuing, you agree we may contact you about
+                representation. We don&apos;t share your details with brands
+                without consent.
+              </p>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {state.message && !state.ok ? (
@@ -339,7 +356,8 @@ export function RepresentationApplicationForm() {
         </p>
       ) : null}
 
-      <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
+      <div className="mt-4 shrink-0">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
         {step === 2 ? (
           <button
             type="button"
@@ -370,15 +388,16 @@ export function RepresentationApplicationForm() {
             {pending ? "Submitting…" : "Submit application"}
             <ArrowRight weight="bold" className="size-3.5" aria-hidden />
           </button>
-        )}
-      </div>
+          )}
+        </div>
 
-      {step === 2 ? (
-        <p className="mt-2.5 text-[0.6875rem] leading-relaxed text-charcoal/45">
-          By submitting, you agree we may contact you about representation. We
-          don&apos;t share your details with brands without consent.
-        </p>
-      ) : null}
+        {step === 2 ? (
+          <p className="mt-2.5 text-[0.6875rem] leading-relaxed text-charcoal/45">
+            By submitting, you agree we may contact you about representation. We
+            don&apos;t share your details with brands without consent.
+          </p>
+        ) : null}
+      </div>
     </form>
   );
 }

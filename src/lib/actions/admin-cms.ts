@@ -442,10 +442,12 @@ export async function saveSiteChrome(sections: SiteChromeSections) {
   });
 
   revalidatePath("/", "layout");
+  revalidatePath("/roster", "layout");
   revalidatePath("/insights");
   revalidatePath("/admin/pages");
   revalidatePath("/admin/pages/site");
-  return { ok: true as const, message: "Header & footer saved." };
+  revalidatePath("/admin/pages/profile");
+  return { ok: true as const, message: "Header & footer saved.", sections: merged };
 }
 
 export async function getContactPageSections(): Promise<ContactPageSections> {
