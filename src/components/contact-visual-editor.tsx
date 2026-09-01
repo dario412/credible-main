@@ -264,6 +264,7 @@ function ContactNextSteps({
             {sections.nextSteps.footnote.trim() ||
             sections.nextSteps.browseLabel.trim() ||
             sections.nextSteps.emailLabel.trim() ||
+            sections.nextSteps.email.trim() ||
             editing ? (
               <p
                 className={`mt-auto border-t border-charcoal/8 pt-5 text-[0.8125rem] leading-relaxed text-charcoal/60 ${
@@ -292,20 +293,24 @@ function ContactNextSteps({
                   )
                 ) : null}
                 {sections.nextSteps.browseLabel.trim() &&
-                sections.nextSteps.emailLabel.trim()
+                (sections.nextSteps.emailLabel.trim() ||
+                  sections.nextSteps.email.trim())
                   ? " · "
                   : null}
-                {sections.nextSteps.emailLabel.trim() ? (
+                {sections.nextSteps.emailLabel.trim() ||
+                sections.nextSteps.email.trim() ? (
                   editing ? (
                     <span className="font-medium text-forest">
-                      {sections.nextSteps.emailLabel}
+                      {sections.nextSteps.email.trim() ||
+                        sections.nextSteps.emailLabel}
                     </span>
                   ) : (
                     <a
                       href={`mailto:${sections.nextSteps.email.trim() || "hello@crediblecreators.com"}`}
                       className="font-medium text-forest transition-colors hover:text-forest-dark"
                     >
-                      {sections.nextSteps.emailLabel}
+                      {sections.nextSteps.email.trim() ||
+                        "hello@crediblecreators.com"}
                     </a>
                   )
                 ) : null}

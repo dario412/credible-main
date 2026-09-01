@@ -9,7 +9,6 @@ import {
 
 import { ChannelBrandIcon } from "@/components/channel-brand-icon";
 
-import { ChannelSparkline } from "@/components/channel-sparkline";
 import {
   AudienceShareList,
   TopicMixPie,
@@ -239,13 +238,11 @@ function ChannelsSection({
           <table className="w-full min-w-[24rem] border-collapse text-left">
             <thead>
               <tr className="border-b border-charcoal/10 bg-cream">
-                {["", "Platform", "Followers", "90d trend"].map((label) => (
+                {["", "Platform", "Followers"].map((label) => (
                   <th
                     key={label || "icon"}
                     className={cn(
                       "px-3 py-2 text-[0.65rem] font-medium tracking-[0.14em] text-charcoal/45 uppercase first:w-14 first:pl-4 md:px-4",
-                      label === "90d trend" &&
-                        "w-[11.5rem] border-l border-charcoal/10 bg-cream/80 pr-4",
                       label === "Followers" &&
                         "border-l border-charcoal/10 bg-cream/80 pr-2",
                     )}
@@ -294,9 +291,6 @@ function ChannelsSection({
                     </td>
                     <td className="border-l border-charcoal/10 bg-cream/25 px-3 py-2 text-[0.9375rem] font-medium tabular-nums tracking-tight text-charcoal md:px-4 md:py-2.5 md:text-[1rem]">
                       <StatCounter value={channel.followers} />
-                    </td>
-                    <td className="border-l border-charcoal/10 bg-cream/25 px-3 py-2 pr-4 md:px-4 md:py-2.5">
-                      <ChannelSparkline channel={channel} />
                     </td>
                   </tr>
                 );
