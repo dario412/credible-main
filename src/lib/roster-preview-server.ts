@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { RosterCardExpert } from "@/components/roster-card";
+import type { RosterFormOption } from "@/lib/roster-form-options";
 import type { HeroCastMember } from "@/components/home-2/hero-cast";
 import { parseExpertChannels } from "@/lib/expert-channels";
 import { isLinkedInTopVoice } from "@/lib/expert-profiles";
@@ -39,6 +40,20 @@ function toRosterCard(expert: {
     channels: parseExpertChannels(expert.channels),
     linkedinTopVoice: isLinkedInTopVoice(expert.slug),
   };
+}
+
+/** Slug + name pairs for brief-form creator pickers. */
+export async function loadRosterFormOptions(): Promise<RosterFormOption[]> {
+  const experts = await prisma.expert.findMany({
+    orderBy: { name: "asc" },
+    select: { slug: true, name: true, image: true, categories: true },
+  });
+  return experts.map((expert) => ({
+    slug: expert.slug,
+    name: expert.name,
+    image: expert.image,
+    role: expert.categories[0] ?? null,
+  }));
 }
 
 /** Full roster as cards, A–Z — used for homepage preview + editor picker. */

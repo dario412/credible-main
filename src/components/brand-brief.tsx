@@ -14,6 +14,7 @@ import {
   DEFAULT_HOME_SECTIONS,
   type HomePageSections,
 } from "@/lib/cms";
+import type { RosterFormOption } from "@/lib/roster-form-options";
 import { cn } from "@/lib/utils";
 
 const CREAM_RGB = { r: 249, g: 243, b: 239 };
@@ -165,8 +166,10 @@ function CreatorCta({
 
 function BriefBody({
   formInCard = false,
+  rosterOptions = [],
 }: {
   formInCard?: boolean;
+  rosterOptions?: RosterFormOption[];
 }) {
   return (
     <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-16 xl:gap-20">
@@ -195,10 +198,10 @@ function BriefBody({
 
       {formInCard ? (
         <div className="rounded-sm bg-cream px-5 py-6 sm:px-7 sm:py-8 md:px-8 md:py-9">
-          <BriefForm surface="light" />
+          <BriefForm surface="light" rosterOptions={rosterOptions} />
         </div>
       ) : (
-        <BriefForm surface="dark" />
+        <BriefForm surface="dark" rosterOptions={rosterOptions} />
       )}
     </div>
   );
@@ -207,6 +210,7 @@ function BriefBody({
 function BoxedBrief({
   content,
   editSlots,
+  rosterOptions = [],
 }: {
   content: HomePageSections["brandBrief"];
   editSlots?: {
@@ -217,6 +221,7 @@ function BoxedBrief({
     formTitle?: (node: ReactNode) => ReactNode;
     formFootnote?: (node: ReactNode) => ReactNode;
   };
+  rosterOptions?: RosterFormOption[];
 }) {
   const eyebrowNode = <SectionEyebrow>{content.eyebrow}</SectionEyebrow>;
   const headlineNode = (
@@ -320,7 +325,11 @@ function BoxedBrief({
               {editSlots?.formTitle
                 ? editSlots.formTitle(formTitleNode)
                 : formTitleNode}
-              <BriefForm surface="light" omitFootnote />
+              <BriefForm
+                surface="light"
+                omitFootnote
+                rosterOptions={rosterOptions}
+              />
               {editSlots?.formFootnote && formFootnoteNode
                 ? editSlots.formFootnote(formFootnoteNode)
                 : content.formFootnote.trim()
@@ -340,10 +349,12 @@ export function BrandBrief({
   creatorCta,
   editSlots,
   creatorCtaEditSlots,
+  rosterOptions = [],
 }: {
   variant?: "full" | "boxed";
   content?: HomePageSections["brandBrief"];
   creatorCta?: HomePageSections["creatorCta"];
+  rosterOptions?: RosterFormOption[];
   editSlots?: {
     eyebrow?: (node: ReactNode) => ReactNode;
     headline?: (node: ReactNode) => ReactNode;
@@ -365,6 +376,7 @@ export function BrandBrief({
       <BoxedBrief
         content={content ?? DEFAULT_HOME_SECTIONS.brandBrief}
         editSlots={editSlots}
+        rosterOptions={rosterOptions}
       />
     );
   }
@@ -372,7 +384,7 @@ export function BrandBrief({
   return (
     <section className="bg-charcoal px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
       <div className="mx-auto max-w-352">
-        <BriefBody />
+        <BriefBody rosterOptions={rosterOptions} />
         <CreatorCta
           className="mt-14 md:mt-16"
           content={creatorCta ?? DEFAULT_HOME_SECTIONS.creatorCta}

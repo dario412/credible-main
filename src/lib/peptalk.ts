@@ -105,6 +105,7 @@ export type HomeBriefPeptalkInput = {
   phone: string;
   company: string;
   role?: string;
+  creators?: string;
   brief: string;
   deliverables?: string;
 };
@@ -213,6 +214,17 @@ export function buildHomeBriefPeptalkPayload(
   tracking: PeptalkTracking,
   context: PeptalkContext,
 ): PeptalkPayload {
+  const details = [
+    line("Website", PEPTALK_WEBSITE),
+    line("Company", input.company),
+    line("Role", input.role),
+    line("Creators", input.creators),
+    block("Brief", input.brief),
+    block("Deliverables", input.deliverables),
+  ]
+    .filter((item): item is string => Boolean(item))
+    .join("\n\n");
+
   return {
     contact: {
       name: input.name.trim(),
@@ -222,14 +234,14 @@ export function buildHomeBriefPeptalkPayload(
     tracking: { ...EMPTY_PEPTALK_TRACKING, ...tracking },
     context: { ...EMPTY_PEPTALK_CONTEXT, ...context },
     formData: {
-      topic: "",
+      topic: input.brief.trim(),
       date: "",
       dateUnsure: true,
       eventType: "Not sure",
       location: "",
       budget: "Not set yet",
       budgetCurrency: "USD",
-      details: input.deliverables?.trim() || "",
+      details,
       website: PEPTALK_WEBSITE,
     },
   };

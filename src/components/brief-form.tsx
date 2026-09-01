@@ -1,13 +1,16 @@
 "use client";
 
 import { ArrowRight } from "@phosphor-icons/react/ssr";
-import { useActionState, useId, useRef } from "react";
+import { useActionState, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import {
   getPeptalkContext,
   getPeptalkTracking,
 } from "@/components/peptalk-tracking";
+import { RosterCreatorMultiSelect } from "@/components/roster-creator-multi-select";
 import { submitBrief, type FormState } from "@/lib/actions/leads";
+import type { RosterFormOption } from "@/lib/roster-form-options";
+import { useShortlist } from "@/lib/shortlist";
 import { cn } from "@/lib/utils";
 
 const initial: FormState = { ok: false, message: "" };
@@ -22,6 +25,9 @@ export function BriefForm({
   omitFootnote = false,
   fillHeight = false,
   spacious = false,
+  rosterOptions = [],
+  initialCreatorSlugs = [],
+  prefillShortlist = false,
 }: {
   surface?: "dark" | "light";
   formFootnote?: string;
@@ -29,12 +35,36 @@ export function BriefForm({
   fillHeight?: boolean;
   /** Extra room between fields — used on /contact. */
   spacious?: boolean;
+  rosterOptions?: RosterFormOption[];
+  initialCreatorSlugs?: string[];
+  /** When true, merge the visitor's shortlist into the initial creator selection. */
+  prefillShortlist?: boolean;
 }) {
   const [state, action, pending] = useActionState(submitBrief, initial);
+  const shortlist = useShortlist();
+  const [selectedCreatorSlugs, setSelectedCreatorSlugs] = useState<string[]>(
+    [],
+  );
+  const [prefillReady, setPrefillReady] = useState(false);
   const light = surface === "light";
   const id = useId();
   const trackingRef = useRef<HTMLInputElement>(null);
   const contextRef = useRef<HTMLInputElement>(null);
+
+  const prefillSlugs = useMemo(() => {
+    const shortlistSlugs = prefillShortlist
+      ? shortlist.map((entry) => entry.slug)
+      : [];
+    return [...new Set([...initialCreatorSlugs, ...shortlistSlugs])].filter(
+      (slug) => rosterOptions.some((option) => option.slug === slug),
+    );
+  }, [initialCreatorSlugs, prefillShortlist, rosterOptions, shortlist]);
+
+  useEffect(() => {
+    if (prefillReady || prefillSlugs.length === 0) return;
+    setSelectedCreatorSlugs(prefillSlugs);
+    setPrefillReady(true);
+  }, [prefillReady, prefillSlugs]);
 
   function stampPeptalkFields() {
     if (trackingRef.current) {
@@ -155,6 +185,24 @@ export function BriefForm({
             className={inputClass}
           />
         </div>
+        {rosterOptions.length > 0 ? (
+          <div className={cn(fieldClass, "sm:col-span-2")}>
+            <label htmlFor={`${id}-creators`} className={labelClass}>
+              Creators you&apos;re interested in{" "}
+              <span className={cn("font-normal", optionalClass)}>
+                (Optional)
+              </span>
+            </label>
+            <RosterCreatorMultiSelect
+              id={`${id}-creators`}
+              options={rosterOptions}
+              selectedSlugs={selectedCreatorSlugs}
+              onSelectedChange={setSelectedCreatorSlugs}
+              surface={surface}
+              spacious={spacious}
+            />
+          </div>
+        ) : null}
         <div className={cn(fieldClass, "sm:col-span-2")}>
           <label htmlFor={`${id}-message`} className={labelClass}>
             Brief

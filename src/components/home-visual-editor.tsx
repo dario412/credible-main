@@ -1595,7 +1595,13 @@ export function HomeVisualEditor({
     [rosterCards, sections.roster.featuredSlugs],
   );
   const rosterOptions = useMemo(
-    () => rosterCards.map((card) => ({ slug: card.slug, name: card.name })),
+    () =>
+      rosterCards.map((card) => ({
+        slug: card.slug,
+        name: card.name,
+        image: card.image,
+        role: card.role,
+      })),
     [rosterCards],
   );
   const rosterFallbackSlugs = useMemo(
@@ -1924,6 +1930,7 @@ export function HomeVisualEditor({
         variant="boxed"
         content={sections.brandBrief}
         creatorCta={sections.creatorCta}
+        rosterOptions={rosterOptions}
         editSlots={
           editing
             ? {

@@ -54,6 +54,7 @@ const briefSchema = z.object({
   company: z.string().min(1).max(120),
   phone: z.string().min(1).max(40),
   role: z.string().max(120).optional(),
+  creators: z.string().max(2000).optional(),
   brief: z.string().min(1).max(5000),
   deliverables: z.string().max(5000).optional(),
 });
@@ -68,6 +69,7 @@ export async function submitBrief(
     company: formData.get("company"),
     phone: formData.get("phone"),
     role: formData.get("role") || undefined,
+    creators: formData.get("creators") || undefined,
     brief: formData.get("brief"),
     deliverables: formData.get("deliverables") || undefined,
   });
@@ -109,6 +111,7 @@ export async function submitBrief(
   const message = [
     parsed.data.phone ? `Phone: ${parsed.data.phone}` : null,
     parsed.data.role ? `Role: ${parsed.data.role}` : null,
+    parsed.data.creators ? `Creators: ${parsed.data.creators}` : null,
     parsed.data.brief,
     parsed.data.deliverables
       ? `Deliverables:\n${parsed.data.deliverables}`

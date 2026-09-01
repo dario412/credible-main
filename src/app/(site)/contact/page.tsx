@@ -6,6 +6,8 @@ import {
 } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import { hasPermission } from "@/lib/permissions";
+import { parseCreatorSlugsFromQuery } from "@/lib/roster-form-options";
+import { loadRosterFormOptions } from "@/lib/roster-preview-server";
 import { createMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -17,14 +19,26 @@ export const metadata = createMetadata({
   path: "/contact",
 });
 
-export default async function ContactPage() {
-  const [content, session] = await Promise.all([
+type SearchParams = Promise<{
+  expert?: string;
+  experts?: string;
+}>;
+
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const [content, session, rosterOptions, params] = await Promise.all([
     getContactPageSections(),
     auth(),
+    loadRosterFormOptions(),
+    searchParams,
   ]);
   const canEdit = Boolean(
     session?.user && hasPermission(session.user.role, "MANAGE_CONTENT"),
   );
+  const initialCreatorSlugs = parseCreatorSlugsFromQuery(params);
 
   return (
     <div className="px-6 py-14 md:px-10 md:py-18 lg:px-12 lg:py-20">
@@ -39,6 +53,9 @@ export default async function ContactPage() {
                 surface="light"
                 fillHeight
                 spacious
+                rosterOptions={rosterOptions}
+                initialCreatorSlugs={initialCreatorSlugs}
+                prefillShortlist
                 formFootnote="Same-day acknowledgement · shortlist within 48 hours · no pitch deck required"
               />
             </div>
