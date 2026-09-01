@@ -323,35 +323,60 @@ export async function submitContact(
   return { ok: true, message: "Thanks — we received your message." };
 }
 
+const optionalUrl = z
+  .string()
+  .max(500)
+  .optional()
+  .transform((value) => {
+    const trimmed = value?.trim();
+    return trimmed ? trimmed : undefined;
+  });
+
 const representationSchema = z.object({
   name: z.string().min(1).max(120),
   email: z.string().email(),
-  location: z.string().max(120).optional(),
-  platform: z.string().min(1).max(60),
-  profileUrl: z.string().min(1).max(500),
-  audience: z.string().max(120).optional(),
-  topics: z.string().min(1).max(2000),
-  formats: z.string().min(1).max(400),
-  pitch: z.string().min(1).max(5000),
-  workLinks: z.string().max(2000).optional(),
+  phone: z.string().max(60).optional(),
+  linkedinUrl: z
+    .string()
+    .trim()
+    .min(1, "LinkedIn URL is required")
+    .max(500)
+    .refine(
+      (value) => /linkedin\.com/i.test(value),
+      "Enter a LinkedIn profile URL",
+    ),
+  instagramUrl: optionalUrl,
+  tiktokUrl: optionalUrl,
+  youtubeUrl: optionalUrl,
+  podcastUrl: optionalUrl,
+  newsletterUrl: optionalUrl,
+  xUrl: optionalUrl,
+  facebookUrl: optionalUrl,
+  websiteUrl: optionalUrl,
 });
 
 export async function submitRepresentationApplication(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const formats = formData.getAll("formats").join(", ");
+  const asOptional = (key: string) => {
+    const value = String(formData.get(key) ?? "").trim();
+    return value || undefined;
+  };
+
   const parsed = representationSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
-    location: formData.get("location") || undefined,
-    platform: formData.get("platform"),
-    profileUrl: formData.get("profileUrl"),
-    audience: formData.get("audience") || undefined,
-    topics: formData.get("topics"),
-    formats,
-    pitch: formData.get("pitch"),
-    workLinks: formData.get("workLinks") || undefined,
+    phone: asOptional("phone"),
+    linkedinUrl: formData.get("linkedinUrl"),
+    instagramUrl: asOptional("instagramUrl"),
+    tiktokUrl: asOptional("tiktokUrl"),
+    youtubeUrl: asOptional("youtubeUrl"),
+    podcastUrl: asOptional("podcastUrl"),
+    newsletterUrl: asOptional("newsletterUrl"),
+    xUrl: asOptional("xUrl"),
+    facebookUrl: asOptional("facebookUrl"),
+    websiteUrl: asOptional("websiteUrl"),
   });
 
   if (!parsed.success) {
@@ -362,23 +387,28 @@ export async function submitRepresentationApplication(
   }
 
   const data = parsed.data;
+  const channels = [
+    ["LinkedIn", data.linkedinUrl],
+    ["Instagram", data.instagramUrl],
+    ["TikTok", data.tiktokUrl],
+    ["YouTube", data.youtubeUrl],
+    ["Podcast", data.podcastUrl],
+    ["Newsletter", data.newsletterUrl],
+    ["X.com", data.xUrl],
+    ["Facebook", data.facebookUrl],
+    ["Website", data.websiteUrl],
+  ]
+    .filter((entry): entry is [string, string] => Boolean(entry[1]))
+    .map(([label, url]) => `${label}: ${url}`)
+    .join("\n");
+
   const message = [
     "Representation application",
     "",
-    `Platform: ${data.platform}`,
-    data.audience ? `Audience: ${data.audience}` : null,
-    data.location ? `Location: ${data.location}` : null,
-    `Profile: ${data.profileUrl}`,
-    `Formats: ${data.formats}`,
+    data.phone ? `Phone: ${data.phone}` : null,
     "",
-    "Topics & expertise:",
-    data.topics,
-    "",
-    "Why apply:",
-    data.pitch,
-    data.workLinks
-      ? `\nRecent work:\n${data.workLinks}`
-      : null,
+    "Channels:",
+    channels,
   ]
     .filter((line): line is string => line !== null)
     .join("\n");

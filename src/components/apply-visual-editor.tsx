@@ -899,65 +899,75 @@ function ApplyView({
         className="scroll-mt-24 bg-cream px-6 pt-8 pb-12 md:px-10 md:pt-10 md:pb-16 lg:px-12 lg:pt-12 lg:pb-20"
       >
         <div
-          className={`${PAGE_SHELL} grid items-start gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-10`}
+          className={`${PAGE_SHELL} grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start lg:gap-10`}
         >
-          <FadeUp y={18} duration={1000} threshold={0.05} rootMargin="0px">
+          <FadeUp
+            y={18}
+            duration={1000}
+            threshold={0.05}
+            rootMargin="0px"
+          >
             {hit(
               editing,
               "hero",
               selected,
               onSelect,
               "apply intro",
-              <div>
-                {sections.hero.badge.trim() ? (
-                  <p className="inline-flex items-center gap-2 rounded-full border border-charcoal/20 px-3.5 py-1.5 text-[0.75rem] font-medium text-charcoal">
-                    <span
-                      className="size-1.5 rounded-full bg-forest"
-                      aria-hidden
-                    />
-                    {sections.hero.badge}
+              <div className="flex flex-col rounded-sm border border-charcoal/10 bg-white p-5 shadow-[0_12px_40px_rgba(28,26,23,0.06)] md:p-6">
+                <div>
+                  {sections.hero.badge.trim() ? (
+                    <p className="inline-flex items-center gap-2 rounded-full border border-charcoal/20 px-3 py-1 text-[0.6875rem] font-medium text-charcoal">
+                      <span
+                        className="size-1.5 rounded-full bg-forest"
+                        aria-hidden
+                      />
+                      {sections.hero.badge}
+                    </p>
+                  ) : null}
+                  <MultilineText
+                    as="h1"
+                    text={sections.hero.headline}
+                    className="mt-4 max-w-[15ch] font-display text-[1.85rem] leading-[1.08] tracking-tight text-charcoal sm:text-[2.15rem] md:text-[2.35rem]"
+                  />
+                  <p className="mt-3 max-w-[32rem] text-[0.9375rem] leading-relaxed text-charcoal/65">
+                    {sections.hero.subhead}
                   </p>
-                ) : null}
-                <MultilineText
-                  as="h1"
-                  text={sections.hero.headline}
-                  className="mt-5 max-w-[14ch] font-display text-[2.25rem] leading-[1.05] tracking-tight text-charcoal sm:text-[2.85rem] md:text-[3.15rem]"
-                />
-                <p className="mt-4 max-w-[34rem] text-[1rem] leading-relaxed text-charcoal/65">
-                  {sections.hero.subhead}
-                </p>
-                {assurances.length > 0 ? (
-                  <p className="mt-7 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.8125rem] text-charcoal/55">
-                    {assurances.map((item, index) => (
-                      <span key={`${item}-${index}`} className="contents">
-                        {index > 0 ? (
-                          <span
-                            className="hidden h-3 w-px bg-charcoal/20 sm:block"
-                            aria-hidden
-                          />
-                        ) : null}
-                        <span>{item}</span>
-                      </span>
-                    ))}
-                  </p>
-                ) : null}
-                <div className="mt-8 border-t border-charcoal/15 pt-5">
-                  <p className={EYEBROW_MUTED}>{sections.hero.nextEyebrow}</p>
-                  <ol className="mt-4 space-y-2.5">
-                    {nextItems.map((item, i) => (
-                      <li key={`${item}-${i}`} className="flex items-start gap-4">
-                        <span className="w-6 shrink-0 text-[0.75rem] font-medium tracking-[0.1em] text-forest">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        <span className="text-[0.9375rem] leading-relaxed text-charcoal/65">
+                  {assurances.length > 0 ? (
+                    <ul className="mt-5 flex flex-wrap gap-2">
+                      {assurances.map((item, index) => (
+                        <li
+                          key={`${item}-${index}`}
+                          className="rounded-full bg-cream px-2.5 py-1 text-[0.6875rem] font-medium text-charcoal/60"
+                        >
                           {item}
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </div>
+
+                {nextItems.length > 0 ? (
+                  <div className="mt-6 border-t border-charcoal/10 pt-5">
+                    <p className={EYEBROW_MUTED}>{sections.hero.nextEyebrow}</p>
+                    <ol className="mt-3 space-y-2">
+                      {nextItems.map((item, i) => (
+                        <li
+                          key={`${item}-${i}`}
+                          className="flex items-start gap-3"
+                        >
+                          <span className="w-5 shrink-0 pt-px text-[0.6875rem] font-medium tracking-[0.1em] text-forest">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <span className="text-[0.8125rem] leading-snug text-charcoal/65">
+                            {item}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ) : null}
               </div>,
-              { block: true, ringOffset: "ring-offset-cream-dark" },
+              { block: true, ringOffset: "ring-offset-white" },
             )}
           </FadeUp>
 
@@ -1242,7 +1252,7 @@ function ApplyView({
         </div>
       </section>
 
-      <section className="bg-white px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
+      <section className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
         <div className={PAGE_SHELL}>
           <FadeUp>
             {hit(
