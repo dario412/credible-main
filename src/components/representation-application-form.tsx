@@ -156,6 +156,13 @@ export function RepresentationApplicationForm() {
     }
   }
 
+  function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    if (step !== 2) {
+      event.preventDefault();
+      handleContinue();
+    }
+  }
+
   if (state.ok) {
     return (
       <div className="rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-6 md:p-7">
@@ -192,6 +199,7 @@ export function RepresentationApplicationForm() {
     <form
       ref={formRef}
       action={action}
+      onSubmit={handleFormSubmit}
       className="rounded-sm border border-charcoal/10 bg-white p-5 shadow-[0_12px_40px_rgba(28,26,23,0.06)] md:p-6"
     >
       <StepIndicator step={step} />
