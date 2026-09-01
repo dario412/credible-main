@@ -92,7 +92,7 @@ export function ExpertFormatsGrid({
   formats: ExpertFormatOffering[];
   name: string;
 }) {
-  const { chrome } = useSiteChrome();
+  const { chrome, editing: templateEditing } = useSiteChrome();
   const vars = { first: firstName(name), name };
 
   return (
@@ -103,14 +103,16 @@ export function ExpertFormatsGrid({
           kind != null
             ? chrome.profileFormats[kind]
             : { title: format.title, description: format.description };
-        const title = applyProfileRailTemplate(
-          format.title.trim() || chromeCopy.title,
-          vars,
-        );
-        const description = applyProfileRailTemplate(
-          format.description.trim() || chromeCopy.description,
-          vars,
-        );
+        const titleSource =
+          templateEditing && kind != null
+            ? chromeCopy.title
+            : format.title.trim() || chromeCopy.title;
+        const descriptionSource =
+          templateEditing && kind != null
+            ? chromeCopy.description
+            : format.description.trim() || chromeCopy.description;
+        const title = applyProfileRailTemplate(titleSource, vars);
+        const description = applyProfileRailTemplate(descriptionSource, vars);
 
         return (
           <li key={kind ?? `${format.category}-${format.title}`}>

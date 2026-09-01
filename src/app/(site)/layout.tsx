@@ -6,6 +6,8 @@ import { getSiteChrome } from "@/lib/actions/admin-cms";
 import { loadFooterRosterNavLinks } from "@/lib/footer-roster-links";
 import { loadCreatorMarqueeFaces } from "@/lib/roster-preview-server";
 
+export const dynamic = "force-dynamic";
+
 export default async function SiteLayout({
   children,
 }: {

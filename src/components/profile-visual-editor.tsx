@@ -108,7 +108,11 @@ function EditorPopover({
 }: {
   target: ProfileEditTarget;
   chrome: SiteChromeSections;
-  onChange: (next: SiteChromeSections) => void;
+  onChange: (
+    next:
+      | SiteChromeSections
+      | ((prev: SiteChromeSections) => SiteChromeSections),
+  ) => void;
   onClose: () => void;
 }) {
   const titleId = useId();
@@ -136,23 +140,23 @@ function EditorPopover({
   }, [onClose]);
 
   function setRail(profileRail: SiteChromeSections["profileRail"]) {
-    onChange({ ...chrome, profileRail });
+    onChange((prev) => ({ ...prev, profileRail }));
   }
 
   function setCta(profileCta: SiteChromeSections["profileCta"]) {
-    onChange({ ...chrome, profileCta });
+    onChange((prev) => ({ ...prev, profileCta }));
   }
 
   function setFormats(profileFormats: SiteChromeSections["profileFormats"]) {
-    onChange({ ...chrome, profileFormats });
+    onChange((prev) => ({ ...prev, profileFormats }));
   }
 
   function setFaq(profileFaq: SiteChromeSections["profileFaq"]) {
-    onChange({ ...chrome, profileFaq });
+    onChange((prev) => ({ ...prev, profileFaq }));
   }
 
   function setLayout(profileLayout: SiteChromeSections["profileLayout"]) {
-    onChange({ ...chrome, profileLayout });
+    onChange((prev) => ({ ...prev, profileLayout }));
   }
 
   const navMatch = target.match(
@@ -713,10 +717,10 @@ export function ProfileVisualEditor({
     setMessage(result.ok ? "Profile template saved." : result.message);
     setPending(false);
     if (result.ok) {
-      setBaseline(profileSnapshot(chrome));
-      if ("sections" in result && result.sections) {
-        setChrome(result.sections);
-      }
+      const saved =
+        "sections" in result && result.sections ? result.sections : chrome;
+      setBaseline(profileSnapshot(saved));
+      setChrome(saved);
       router.refresh();
     }
   }

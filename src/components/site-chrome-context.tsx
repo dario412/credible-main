@@ -24,7 +24,11 @@ type FooterField =
 
 type SiteChromeContextValue = {
   chrome: SiteChromeSections;
-  setChrome: (chrome: SiteChromeSections) => void;
+  setChrome: (
+    next:
+      | SiteChromeSections
+      | ((prev: SiteChromeSections) => SiteChromeSections),
+  ) => void;
   patchFooter: (patch: Partial<SiteChromeSections["footer"]>) => void;
   editing: boolean;
   setEditing: (editing: boolean) => void;
@@ -54,14 +58,21 @@ export function SiteChromeProvider({
   >(null);
 
   useEffect(() => {
-    if (!editing) {
-      setChromeState(initialChrome);
-    }
-  }, [initialChrome, editing]);
+    setChromeState(initialChrome);
+  }, [initialChrome]);
 
-  const setChrome = useCallback((next: SiteChromeSections) => {
-    setChromeState(next);
-  }, []);
+  const setChrome = useCallback(
+    (
+      next:
+        | SiteChromeSections
+        | ((prev: SiteChromeSections) => SiteChromeSections),
+    ) => {
+      setChromeState((prev) =>
+        typeof next === "function" ? next(prev) : next,
+      );
+    },
+    [],
+  );
 
   const patchFooter = useCallback(
     (patch: Partial<SiteChromeSections["footer"]>) => {
