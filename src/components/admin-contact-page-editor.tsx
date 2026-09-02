@@ -7,8 +7,8 @@ import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
   emptyContactChannel,
   emptyContactLogo,
-  emptyContactSocial,
   emptyContactStep,
+  primaryContactEmail,
   type ContactPageSections,
 } from "@/lib/contact-page";
 import { TRUSTED_BY_LOGO_HINT } from "@/lib/trusted-by";
@@ -323,385 +323,175 @@ export function ContactPageEditorForm({
 
       <section className="space-y-4">
         <div>
-          <h2 className="font-display text-xl">Email channels</h2>
+          <h2 className="font-display text-xl">Contact footer</h2>
           <p className="mt-1 text-sm text-muted">
-            Three mailto cards below the form on /contact.
+            Three cards below the form on /contact.
           </p>
         </div>
-        {sections.footer.channels.map((channel, index) => (
-          <div
-            key={`ct-channel-${index}`}
-            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium">Channel {index + 1}</p>
-              <button
-                type="button"
-                onClick={() =>
-                  setFooter({
-                    ...sections.footer,
-                    channels: sections.footer.channels.filter(
-                      (_, i) => i !== index,
-                    ),
-                  })
-                }
-                className="text-xs font-medium text-danger hover:underline"
-              >
-                Remove
-              </button>
-            </div>
-            <Field label="Label" id={`ct-channel-label-${index}`}>
-              <TextInput
-                id={`ct-channel-label-${index}`}
-                value={channel.label}
-                onChange={(e) => {
-                  const channels = sections.footer.channels.map((row, i) =>
-                    i === index ? { ...row, label: e.target.value } : row,
-                  );
-                  setFooter({ ...sections.footer, channels });
-                }}
-              />
-            </Field>
-            <Field label="Email address" id={`ct-channel-address-${index}`}>
-              <TextInput
-                id={`ct-channel-address-${index}`}
-                value={channel.address}
-                onChange={(e) => {
-                  const channels = sections.footer.channels.map((row, i) =>
-                    i === index ? { ...row, address: e.target.value } : row,
-                  );
-                  setFooter({ ...sections.footer, channels });
-                }}
-              />
-            </Field>
-            <Field label="Description" id={`ct-channel-body-${index}`}>
-              <TextArea
-                id={`ct-channel-body-${index}`}
-                rows={2}
-                value={channel.body}
-                onChange={(e) => {
-                  const channels = sections.footer.channels.map((row, i) =>
-                    i === index ? { ...row, body: e.target.value } : row,
-                  );
-                  setFooter({ ...sections.footer, channels });
-                }}
-              />
-            </Field>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() =>
-            setFooter({
-              ...sections.footer,
-              channels: [...sections.footer.channels, emptyContactChannel()],
-            })
-          }
-          className="text-sm font-medium text-forest hover:text-forest-dark"
-        >
-          + Add channel
-        </button>
-      </section>
 
-      <section className="space-y-4">
-        <div>
-          <h2 className="font-display text-xl">Offices</h2>
+        <div className="space-y-4 rounded-sm border border-charcoal/10 p-4">
+          <p className="text-sm font-medium">Direct email</p>
+          <Field label="Label" id="ct-direct-email-label">
+            <TextInput
+              id="ct-direct-email-label"
+              value={primaryContactEmail(sections.footer).label}
+              onChange={(e) => {
+                const channels = [...sections.footer.channels];
+                const current = channels[0] ?? emptyContactChannel();
+                channels[0] = { ...current, label: e.target.value };
+                setFooter({ ...sections.footer, channels });
+              }}
+            />
+          </Field>
+          <Field label="Email address" id="ct-direct-email-address">
+            <TextInput
+              id="ct-direct-email-address"
+              value={primaryContactEmail(sections.footer).address}
+              onChange={(e) => {
+                const channels = [...sections.footer.channels];
+                const current = channels[0] ?? emptyContactChannel();
+                channels[0] = { ...current, address: e.target.value };
+                setFooter({ ...sections.footer, channels });
+              }}
+            />
+          </Field>
+          <Field label="Description" id="ct-direct-email-body">
+            <TextArea
+              id="ct-direct-email-body"
+              rows={2}
+              value={primaryContactEmail(sections.footer).body}
+              onChange={(e) => {
+                const channels = [...sections.footer.channels];
+                const current = channels[0] ?? emptyContactChannel();
+                channels[0] = { ...current, body: e.target.value };
+                setFooter({ ...sections.footer, channels });
+              }}
+            />
+          </Field>
         </div>
-        <Field label="London eyebrow" id="ct-office-eyebrow">
-          <TextInput
-            id="ct-office-eyebrow"
-            value={sections.footer.office.eyebrow}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                office: { ...sections.footer.office, eyebrow: e.target.value },
-              })
-            }
-          />
-        </Field>
-        <Field label="Title" id="ct-office-title">
-          <TextInput
-            id="ct-office-title"
-            value={sections.footer.office.title}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                office: { ...sections.footer.office, title: e.target.value },
-              })
-            }
-          />
-        </Field>
-        <Field label="London address" id="ct-office-body">
-          <TextArea
-            id="ct-office-body"
-            rows={2}
-            value={sections.footer.office.body}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                office: { ...sections.footer.office, body: e.target.value },
-              })
-            }
-          />
-        </Field>
-        <Field label="US eyebrow" id="ct-office-us-eyebrow">
-          <TextInput
-            id="ct-office-us-eyebrow"
-            value={sections.footer.office.usEyebrow}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                office: {
-                  ...sections.footer.office,
-                  usEyebrow: e.target.value,
-                },
-              })
-            }
-          />
-        </Field>
-        <Field label="US title" id="ct-office-us-title">
-          <TextInput
-            id="ct-office-us-title"
-            value={sections.footer.office.usTitle}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                office: {
-                  ...sections.footer.office,
-                  usTitle: e.target.value,
-                },
-              })
-            }
-          />
-        </Field>
-        <Field label="US address" id="ct-office-us-body">
-          <TextArea
-            id="ct-office-us-body"
-            rows={2}
-            value={sections.footer.office.usBody}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                office: {
-                  ...sections.footer.office,
-                  usBody: e.target.value,
-                },
-              })
-            }
-          />
-        </Field>
-      </section>
 
-      <section className="space-y-4">
-        <div>
-          <h2 className="font-display text-xl">By phone</h2>
-        </div>
-        <Field label="Eyebrow" id="ct-phone-eyebrow">
-          <TextInput
-            id="ct-phone-eyebrow"
-            value={sections.footer.phone.eyebrow}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                phone: { ...sections.footer.phone, eyebrow: e.target.value },
-              })
-            }
-          />
-        </Field>
-        <Field label="UK display number" id="ct-phone-number">
-          <TextInput
-            id="ct-phone-number"
-            value={sections.footer.phone.number}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                phone: { ...sections.footer.phone, number: e.target.value },
-              })
-            }
-          />
-        </Field>
-        <Field
-          label="UK tel link"
-          id="ct-phone-tel"
-          hint="Digits only, e.g. +442079460018"
-        >
-          <TextInput
+        <div className="space-y-4 rounded-sm border border-charcoal/10 p-4">
+          <p className="text-sm font-medium">London office</p>
+          <Field label="Eyebrow" id="ct-office-eyebrow">
+            <TextInput
+              id="ct-office-eyebrow"
+              value={sections.footer.office.eyebrow}
+              onChange={(e) =>
+                setFooter({
+                  ...sections.footer,
+                  office: { ...sections.footer.office, eyebrow: e.target.value },
+                })
+              }
+            />
+          </Field>
+          <Field label="Phone" id="ct-phone-number">
+            <TextInput
+              id="ct-phone-number"
+              value={sections.footer.phone.number}
+              onChange={(e) =>
+                setFooter({
+                  ...sections.footer,
+                  phone: { ...sections.footer.phone, number: e.target.value },
+                })
+              }
+            />
+          </Field>
+          <Field
+            label="Tel link"
             id="ct-phone-tel"
-            value={sections.footer.phone.tel}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                phone: { ...sections.footer.phone, tel: e.target.value },
-              })
-            }
-          />
-        </Field>
-        <Field label="UK hours / note" id="ct-phone-body">
-          <TextArea
-            id="ct-phone-body"
-            rows={2}
-            value={sections.footer.phone.body}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                phone: { ...sections.footer.phone, body: e.target.value },
-              })
-            }
-          />
-        </Field>
-        <Field label="US display number" id="ct-phone-us-number">
-          <TextInput
-            id="ct-phone-us-number"
-            value={sections.footer.phone.usNumber}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                phone: {
-                  ...sections.footer.phone,
-                  usNumber: e.target.value,
-                },
-              })
-            }
-          />
-        </Field>
-        <Field
-          label="US tel link"
-          id="ct-phone-us-tel"
-          hint="Digits only, e.g. +16467946018"
-        >
-          <TextInput
-            id="ct-phone-us-tel"
-            value={sections.footer.phone.usTel}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                phone: { ...sections.footer.phone, usTel: e.target.value },
-              })
-            }
-          />
-        </Field>
-        <Field label="US hours / note" id="ct-phone-us-body">
-          <TextArea
-            id="ct-phone-us-body"
-            rows={2}
-            value={sections.footer.phone.usBody}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                phone: { ...sections.footer.phone, usBody: e.target.value },
-              })
-            }
-          />
-        </Field>
-      </section>
-
-      <section className="space-y-4">
-        <div>
-          <h2 className="font-display text-xl">Follow along</h2>
-        </div>
-        <Field label="Eyebrow" id="ct-socials-eyebrow">
-          <TextInput
-            id="ct-socials-eyebrow"
-            value={sections.footer.socials.eyebrow}
-            onChange={(e) =>
-              setFooter({
-                ...sections.footer,
-                socials: {
-                  ...sections.footer.socials,
-                  eyebrow: e.target.value,
-                },
-              })
-            }
-          />
-        </Field>
-        {sections.footer.socials.items.map((social, index) => (
-          <div
-            key={`ct-social-${index}`}
-            className="space-y-3 rounded-sm border border-charcoal/10 p-4"
+            hint="Digits only, e.g. +442079460018"
           >
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium">Link {index + 1}</p>
-              <button
-                type="button"
-                onClick={() =>
-                  setFooter({
-                    ...sections.footer,
-                    socials: {
-                      ...sections.footer.socials,
-                      items: sections.footer.socials.items.filter(
-                        (_, i) => i !== index,
-                      ),
-                    },
-                  })
-                }
-                className="text-xs font-medium text-danger hover:underline"
-              >
-                Remove
-              </button>
-            </div>
-            <Field label="Network" id={`ct-social-label-${index}`}>
-              <TextInput
-                id={`ct-social-label-${index}`}
-                value={social.label}
-                onChange={(e) => {
-                  const items = sections.footer.socials.items.map((row, i) =>
-                    i === index ? { ...row, label: e.target.value } : row,
-                  );
-                  setFooter({
-                    ...sections.footer,
-                    socials: { ...sections.footer.socials, items },
-                  });
-                }}
-              />
-            </Field>
-            <Field label="Handle" id={`ct-social-handle-${index}`}>
-              <TextInput
-                id={`ct-social-handle-${index}`}
-                value={social.handle}
-                onChange={(e) => {
-                  const items = sections.footer.socials.items.map((row, i) =>
-                    i === index ? { ...row, handle: e.target.value } : row,
-                  );
-                  setFooter({
-                    ...sections.footer,
-                    socials: { ...sections.footer.socials, items },
-                  });
-                }}
-              />
-            </Field>
-            <Field label="URL" id={`ct-social-href-${index}`}>
-              <TextInput
-                id={`ct-social-href-${index}`}
-                value={social.href}
-                onChange={(e) => {
-                  const items = sections.footer.socials.items.map((row, i) =>
-                    i === index ? { ...row, href: e.target.value } : row,
-                  );
-                  setFooter({
-                    ...sections.footer,
-                    socials: { ...sections.footer.socials, items },
-                  });
-                }}
-                placeholder="https://…"
-              />
-            </Field>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() =>
-            setFooter({
-              ...sections.footer,
-              socials: {
-                ...sections.footer.socials,
-                items: [...sections.footer.socials.items, emptyContactSocial()],
-              },
-            })
-          }
-          className="text-sm font-medium text-forest hover:text-forest-dark"
-        >
-          + Add link
-        </button>
+            <TextInput
+              id="ct-phone-tel"
+              value={sections.footer.phone.tel}
+              onChange={(e) =>
+                setFooter({
+                  ...sections.footer,
+                  phone: { ...sections.footer.phone, tel: e.target.value },
+                })
+              }
+            />
+          </Field>
+          <Field label="Address" id="ct-office-body">
+            <TextArea
+              id="ct-office-body"
+              rows={2}
+              value={sections.footer.office.body}
+              onChange={(e) =>
+                setFooter({
+                  ...sections.footer,
+                  office: { ...sections.footer.office, body: e.target.value },
+                })
+              }
+            />
+          </Field>
+        </div>
+
+        <div className="space-y-4 rounded-sm border border-charcoal/10 p-4">
+          <p className="text-sm font-medium">NY office</p>
+          <Field label="Eyebrow" id="ct-office-us-eyebrow">
+            <TextInput
+              id="ct-office-us-eyebrow"
+              value={sections.footer.office.usEyebrow}
+              onChange={(e) =>
+                setFooter({
+                  ...sections.footer,
+                  office: {
+                    ...sections.footer.office,
+                    usEyebrow: e.target.value,
+                  },
+                })
+              }
+            />
+          </Field>
+          <Field label="Phone" id="ct-phone-us-number">
+            <TextInput
+              id="ct-phone-us-number"
+              value={sections.footer.phone.usNumber}
+              onChange={(e) =>
+                setFooter({
+                  ...sections.footer,
+                  phone: {
+                    ...sections.footer.phone,
+                    usNumber: e.target.value,
+                  },
+                })
+              }
+            />
+          </Field>
+          <Field
+            label="Tel link"
+            id="ct-phone-us-tel"
+            hint="Digits only, e.g. +16467946018"
+          >
+            <TextInput
+              id="ct-phone-us-tel"
+              value={sections.footer.phone.usTel}
+              onChange={(e) =>
+                setFooter({
+                  ...sections.footer,
+                  phone: { ...sections.footer.phone, usTel: e.target.value },
+                })
+              }
+            />
+          </Field>
+          <Field label="Address" id="ct-office-us-body">
+            <TextArea
+              id="ct-office-us-body"
+              rows={2}
+              value={sections.footer.office.usBody}
+              onChange={(e) =>
+                setFooter({
+                  ...sections.footer,
+                  office: {
+                    ...sections.footer.office,
+                    usBody: e.target.value,
+                  },
+                })
+              }
+            />
+          </Field>
+        </div>
       </section>
 
       <div className="flex flex-wrap items-center gap-3 border-t border-charcoal/10 pt-6">

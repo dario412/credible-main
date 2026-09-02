@@ -11,8 +11,8 @@ import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
   emptyContactChannel,
   emptyContactLogo,
-  emptyContactSocial,
   emptyContactStep,
+  primaryContactEmail,
   type ContactPageSections,
 } from "@/lib/contact-page";
 import { TRUSTED_BY_LOGO_HINT } from "@/lib/trusted-by";
@@ -24,26 +24,120 @@ type ContactEditTarget =
   | "hero"
   | "briefedBy"
   | "nextSteps"
-  | "channels"
-  | "office"
-  | "usOffice"
-  | "phone"
-  | "usPhone"
-  | "socials";
+  | "directEmail"
+  | "londonOffice"
+  | "nyOffice";
 
 function targetTitle(target: ContactEditTarget): string {
   const map: Record<ContactEditTarget, string> = {
     hero: "Page intro",
     briefedBy: "Briefed-by logos",
     nextSteps: "What happens next",
-    channels: "Email channels",
-    office: "London office",
-    usOffice: "US office",
-    phone: "UK phone",
-    usPhone: "US phone",
-    socials: "Follow along",
+    directEmail: "Direct email",
+    londonOffice: "London office",
+    nyOffice: "NY office",
   };
   return map[target];
+}
+
+function telHref(number: string, tel: string) {
+  return `tel:${tel.trim() || number.replace(/\s/g, "")}`;
+}
+
+function FooterContactCard({
+  eyebrow,
+  value,
+  body,
+  href,
+  editing,
+  selected,
+  onSelect,
+  editLabel,
+  placeholderEyebrow,
+  placeholderValue,
+  placeholderBody,
+}: {
+  eyebrow: string;
+  value: string;
+  body: string;
+  href?: string;
+  editing: boolean;
+  selected: boolean;
+  onSelect: () => void;
+  editLabel: string;
+  placeholderEyebrow: string;
+  placeholderValue: string;
+  placeholderBody: string;
+}) {
+  const cardClass =
+    "flex h-full flex-col rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-5 md:p-6";
+  const valueClass =
+    "mt-4 font-display text-[1.15rem] leading-tight tracking-tight text-charcoal md:text-[1.25rem]";
+
+  const inner = (
+    <>
+      {eyebrow.trim() ? (
+        <span className={EYEBROW}>{eyebrow}</span>
+      ) : editing ? (
+        <span className={`${EYEBROW} text-charcoal/30`}>{placeholderEyebrow}</span>
+      ) : null}
+      {value.trim() ? (
+        <span className={valueClass}>{value}</span>
+      ) : editing ? (
+        <span className={`${valueClass} text-charcoal/35`}>{placeholderValue}</span>
+      ) : null}
+      {body.trim() ? (
+        <span className="mt-2.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
+          {body}
+        </span>
+      ) : editing ? (
+        <span className="mt-2.5 text-[0.8125rem] text-charcoal/35">
+          {placeholderBody}
+        </span>
+      ) : null}
+    </>
+  );
+
+  return (
+    <EditableHit
+      active={editing}
+      selected={selected}
+      onSelect={onSelect}
+      label={editLabel}
+      block
+      ringOffset="ring-offset-cream"
+    >
+      {editing || !href ? (
+        <div className={cardClass}>{inner}</div>
+      ) : (
+        <a
+          href={href}
+          className={`group ${cardClass} transition-colors hover:border-forest/45`}
+        >
+          <span className="flex items-center justify-between gap-3">
+            {eyebrow.trim() ? (
+              <span className={EYEBROW}>{eyebrow}</span>
+            ) : null}
+            <ArrowUpRight
+              weight="bold"
+              aria-hidden
+              className="size-3 shrink-0 text-charcoal/25 transition-colors group-hover:text-forest"
+            />
+          </span>
+          <span
+            className={`${valueClass} transition-colors group-hover:text-forest`}
+          >
+            {value}
+          </span>
+          {body.trim() ? (
+            <span className="mt-2.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
+              {body}
+            </span>
+          ) : null}
+        </a>
+      )}
+    </EditableHit>
+  );
 }
 
 function ContactHero({
@@ -337,349 +431,71 @@ function ContactFooter({
   onSelect: (target: ContactEditTarget) => void;
 }) {
   const { footer } = sections;
-  const channels = footer.channels.filter(
-    (channel) =>
-      channel.label.trim() || channel.address.trim() || channel.body.trim(),
-  );
-  const socials = footer.socials.items.filter(
-    (item) => item.label.trim() || item.handle.trim() || item.href.trim(),
-  );
-  const showLondonOffice =
-    editing ||
-    footer.office.eyebrow.trim() ||
-    footer.office.title.trim() ||
-    footer.office.body.trim();
-  const showUsOffice =
-    editing ||
-    footer.office.usEyebrow.trim() ||
-    footer.office.usTitle.trim() ||
-    footer.office.usBody.trim();
-  const showOffice = showLondonOffice || showUsOffice;
-  const showUkPhone =
-    editing ||
-    footer.phone.eyebrow.trim() ||
-    footer.phone.number.trim() ||
-    footer.phone.body.trim();
-  const showUsPhone =
-    editing || footer.phone.usNumber.trim() || footer.phone.usBody.trim();
-  const showPhone = showUkPhone || showUsPhone;
-  const showSocials =
-    editing || footer.socials.eyebrow.trim() || socials.length > 0;
-  const showChannels = editing || channels.length > 0;
+  const email = primaryContactEmail(footer);
   const showFooter =
-    showChannels || showOffice || showPhone || showSocials;
+    editing ||
+    email.label.trim() ||
+    email.address.trim() ||
+    footer.office.eyebrow.trim() ||
+    footer.phone.number.trim() ||
+    footer.office.body.trim() ||
+    footer.office.usEyebrow.trim() ||
+    footer.phone.usNumber.trim() ||
+    footer.office.usBody.trim();
 
   if (!showFooter) return null;
 
   return (
     <section className="mt-16 border-t border-charcoal/10 pt-12 md:mt-20 md:pt-14">
-      {showChannels ? (
-        <EditableHit
-          active={editing}
-          selected={selected === "channels"}
-          onSelect={() => onSelect("channels")}
-          label="Email channels"
-          block
-          ringOffset="ring-offset-cream"
-        >
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {channels.map((channel, index) =>
-              editing ? (
-                <div
-                  key={`channel-${index}-${channel.address}`}
-                  className="flex flex-col rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-5 md:p-6"
-                >
-                  {channel.label.trim() ? (
-                    <span className={EYEBROW}>{channel.label}</span>
-                  ) : (
-                    <span className={`${EYEBROW} text-charcoal/30`}>
-                      Channel label
-                    </span>
-                  )}
-                  <span className="mt-4 font-display text-[1.15rem] leading-tight tracking-tight text-charcoal md:text-[1.25rem]">
-                    {channel.address.trim() || "email@company.com"}
-                  </span>
-                  {channel.body.trim() ? (
-                    <span className="mt-2.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-                      {channel.body}
-                    </span>
-                  ) : null}
-                </div>
-              ) : (
-                <a
-                  key={`channel-${index}-${channel.address}`}
-                  href={`mailto:${channel.address}`}
-                  className="group flex flex-col rounded-sm border border-charcoal/10 bg-[#FBF8F5] p-5 transition-colors hover:border-forest/45 md:p-6"
-                >
-                  <span className="flex items-center justify-between gap-3">
-                    <span className={EYEBROW}>{channel.label}</span>
-                    <ArrowUpRight
-                      weight="bold"
-                      aria-hidden
-                      className="size-3 shrink-0 text-charcoal/25 transition-colors group-hover:text-forest"
-                    />
-                  </span>
-                  <span className="mt-4 font-display text-[1.15rem] leading-tight tracking-tight text-charcoal transition-colors group-hover:text-forest md:text-[1.25rem]">
-                    {channel.address}
-                  </span>
-                  <span className="mt-2.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-                    {channel.body}
-                  </span>
-                </a>
-              ),
-            )}
-            {editing && channels.length === 0 ? (
-              <p className="rounded-sm border border-dashed border-charcoal/20 px-4 py-6 text-sm text-charcoal/45">
-                Add email channels in the editor…
-              </p>
-            ) : null}
-          </div>
-        </EditableHit>
-      ) : null}
-
-      {showOffice || showPhone || showSocials ? (
-        <div
-          className={
-            showChannels
-              ? "mt-4 grid items-stretch gap-4 lg:grid-cols-3"
-              : "grid items-stretch gap-4 lg:grid-cols-3"
+      <div className="grid items-stretch gap-4 lg:grid-cols-3">
+        <FooterContactCard
+          eyebrow={email.label}
+          value={email.address}
+          body={email.body}
+          href={email.address.trim() ? `mailto:${email.address}` : undefined}
+          editing={editing}
+          selected={selected === "directEmail"}
+          onSelect={() => onSelect("directEmail")}
+          editLabel="Direct email"
+          placeholderEyebrow="Direct email"
+          placeholderValue="hello@crediblecreators.com"
+          placeholderBody="Short description"
+        />
+        <FooterContactCard
+          eyebrow={footer.office.eyebrow}
+          value={footer.phone.number}
+          body={footer.office.body}
+          href={
+            footer.phone.number.trim()
+              ? telHref(footer.phone.number, footer.phone.tel)
+              : undefined
           }
-        >
-          {showOffice ? (
-            <div className="flex h-full flex-col rounded-sm border border-charcoal/10 p-5 md:p-6">
-              {showLondonOffice ? (
-                <EditableHit
-                  active={editing}
-                  selected={selected === "office"}
-                  onSelect={() => onSelect("office")}
-                  label="London office"
-                  block
-                  ringOffset="ring-offset-cream"
-                >
-                  <div>
-                    {footer.office.eyebrow.trim() ? (
-                      <p className={EYEBROW}>{footer.office.eyebrow}</p>
-                    ) : editing ? (
-                      <p className={`${EYEBROW} text-charcoal/30`}>
-                        Office eyebrow
-                      </p>
-                    ) : null}
-                    {footer.office.title.trim() ? (
-                      <p className="mt-4 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
-                        {footer.office.title}
-                      </p>
-                    ) : editing ? (
-                      <p className="mt-4 font-display text-[1.15rem] text-charcoal/35">
-                        Company name
-                      </p>
-                    ) : null}
-                    {footer.office.body.trim() ? (
-                      <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-                        {footer.office.body}
-                      </p>
-                    ) : editing ? (
-                      <p className="mt-1.5 text-[0.8125rem] text-charcoal/35">
-                        Address
-                      </p>
-                    ) : null}
-                  </div>
-                </EditableHit>
-              ) : null}
-
-              {showUsOffice ? (
-                <EditableHit
-                  active={editing}
-                  selected={selected === "usOffice"}
-                  onSelect={() => onSelect("usOffice")}
-                  label="US office"
-                  block
-                  ringOffset="ring-offset-cream"
-                  className={showLondonOffice ? "mt-4 border-t border-charcoal/10 pt-4" : undefined}
-                >
-                  <div>
-                    {footer.office.usEyebrow.trim() ? (
-                      <p className={EYEBROW}>{footer.office.usEyebrow}</p>
-                    ) : editing ? (
-                      <p className={`${EYEBROW} text-charcoal/30`}>
-                        US office eyebrow
-                      </p>
-                    ) : null}
-                    {footer.office.usTitle.trim() ? (
-                      <p className="mt-4 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
-                        {footer.office.usTitle}
-                      </p>
-                    ) : editing ? (
-                      <p className="mt-4 font-display text-[1.15rem] text-charcoal/35">
-                        US company name
-                      </p>
-                    ) : null}
-                    {footer.office.usBody.trim() ? (
-                      <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-                        {footer.office.usBody}
-                      </p>
-                    ) : editing ? (
-                      <p className="mt-1.5 text-[0.8125rem] text-charcoal/35">
-                        US address
-                      </p>
-                    ) : null}
-                  </div>
-                </EditableHit>
-              ) : null}
-            </div>
-          ) : null}
-
-          {showPhone ? (
-            <div className="flex h-full flex-col rounded-sm border border-charcoal/10 p-5 md:p-6">
-              {showUkPhone ? (
-                <EditableHit
-                  active={editing}
-                  selected={selected === "phone"}
-                  onSelect={() => onSelect("phone")}
-                  label="UK phone"
-                  block
-                  ringOffset="ring-offset-cream"
-                >
-                  <div>
-                    {footer.phone.eyebrow.trim() ? (
-                      <p className={EYEBROW}>{footer.phone.eyebrow}</p>
-                    ) : editing ? (
-                      <p className={`${EYEBROW} text-charcoal/30`}>
-                        Phone eyebrow
-                      </p>
-                    ) : null}
-                    {footer.phone.number.trim() ? (
-                      editing ? (
-                        <p className="mt-4 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
-                          {footer.phone.number}
-                        </p>
-                      ) : (
-                        <a
-                          href={`tel:${footer.phone.tel.trim() || footer.phone.number.replace(/\s/g, "")}`}
-                          className="mt-4 inline-block font-display text-[1.15rem] leading-snug tracking-tight text-charcoal transition-colors hover:text-forest"
-                        >
-                          {footer.phone.number}
-                        </a>
-                      )
-                    ) : editing ? (
-                      <p className="mt-4 font-display text-[1.15rem] text-charcoal/35">
-                        UK phone number
-                      </p>
-                    ) : null}
-                    {footer.phone.body.trim() ? (
-                      <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-                        {footer.phone.body}
-                      </p>
-                    ) : editing ? (
-                      <p className="mt-1.5 text-[0.8125rem] text-charcoal/35">
-                        UK hours
-                      </p>
-                    ) : null}
-                  </div>
-                </EditableHit>
-              ) : null}
-
-              {showUsPhone ? (
-                <EditableHit
-                  active={editing}
-                  selected={selected === "usPhone"}
-                  onSelect={() => onSelect("usPhone")}
-                  label="US phone"
-                  block
-                  ringOffset="ring-offset-cream"
-                  className={showUkPhone ? "mt-4 border-t border-charcoal/10 pt-4" : undefined}
-                >
-                  <div>
-                    {footer.phone.usNumber.trim() ? (
-                      editing ? (
-                        <p className="font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
-                          {footer.phone.usNumber}
-                        </p>
-                      ) : (
-                        <a
-                          href={`tel:${footer.phone.usTel.trim() || footer.phone.usNumber.replace(/\s/g, "")}`}
-                          className="inline-block font-display text-[1.15rem] leading-snug tracking-tight text-charcoal transition-colors hover:text-forest"
-                        >
-                          {footer.phone.usNumber}
-                        </a>
-                      )
-                    ) : editing ? (
-                      <p className="font-display text-[1.15rem] text-charcoal/35">
-                        US phone number
-                      </p>
-                    ) : null}
-                    {footer.phone.usBody.trim() ? (
-                      <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-                        {footer.phone.usBody}
-                      </p>
-                    ) : editing ? (
-                      <p className="mt-1.5 text-[0.8125rem] text-charcoal/35">
-                        US hours
-                      </p>
-                    ) : null}
-                  </div>
-                </EditableHit>
-              ) : null}
-            </div>
-          ) : null}
-
-          {showSocials ? (
-            <EditableHit
-              active={editing}
-              selected={selected === "socials"}
-              onSelect={() => onSelect("socials")}
-              label="Follow along"
-              block
-              ringOffset="ring-offset-cream"
-            >
-              <div className="flex h-full flex-col rounded-sm border border-charcoal/10 p-5 md:p-6">
-                {footer.socials.eyebrow.trim() ? (
-                  <p className={EYEBROW}>{footer.socials.eyebrow}</p>
-                ) : editing ? (
-                  <p className={`${EYEBROW} text-charcoal/30`}>
-                    Socials eyebrow
-                  </p>
-                ) : null}
-                {socials.length > 0 ? (
-                  <ul className="mt-4 space-y-2">
-                    {socials.map((social, index) => (
-                      <li key={`${social.label}-${index}`}>
-                        {editing ? (
-                          <div className="flex items-center justify-between gap-3 rounded-sm border border-charcoal/12 px-3.5 py-2.5">
-                            <span className="text-[0.8125rem] font-medium text-charcoal">
-                              {social.label.trim() || "Network"}
-                            </span>
-                            <span className="text-[0.6875rem] text-charcoal/40">
-                              {social.handle.trim() || "Handle"}
-                            </span>
-                          </div>
-                        ) : (
-                          <a
-                            href={social.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group flex items-center justify-between gap-3 rounded-sm border border-charcoal/12 px-3.5 py-2.5 transition-colors hover:border-charcoal hover:bg-charcoal"
-                          >
-                            <span className="text-[0.8125rem] font-medium text-charcoal transition-colors group-hover:text-cream">
-                              {social.label}
-                            </span>
-                            <span className="text-[0.6875rem] text-charcoal/40 transition-colors group-hover:text-cream/70">
-                              {social.handle}
-                            </span>
-                          </a>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                ) : editing ? (
-                  <p className="mt-4 text-[0.8125rem] text-charcoal/45">
-                    Add social links in the editor…
-                  </p>
-                ) : null}
-              </div>
-            </EditableHit>
-          ) : null}
-        </div>
-      ) : null}
+          editing={editing}
+          selected={selected === "londonOffice"}
+          onSelect={() => onSelect("londonOffice")}
+          editLabel="London office"
+          placeholderEyebrow="London office"
+          placeholderValue="+44 20 7946 0018"
+          placeholderBody="Office address"
+        />
+        <FooterContactCard
+          eyebrow={footer.office.usEyebrow}
+          value={footer.phone.usNumber}
+          body={footer.office.usBody}
+          href={
+            footer.phone.usNumber.trim()
+              ? telHref(footer.phone.usNumber, footer.phone.usTel)
+              : undefined
+          }
+          editing={editing}
+          selected={selected === "nyOffice"}
+          onSelect={() => onSelect("nyOffice")}
+          editLabel="NY office"
+          placeholderEyebrow="NY office"
+          placeholderValue="+1 646 794 6018"
+          placeholderBody="Office address"
+        />
+      </div>
     </section>
   );
 }
@@ -1021,88 +837,49 @@ function EditorPopover({
           </>
         ) : null}
 
-        {target === "channels" ? (
+        {target === "directEmail" ? (
           <>
-            {sections.footer.channels.map((channel, index) => (
-              <div
-                key={`ve-ct-channel-${index}`}
-                className="space-y-3 rounded-sm border border-charcoal/10 p-3"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium">Channel {index + 1}</p>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFooter({
-                        ...sections.footer,
-                        channels: sections.footer.channels.filter(
-                          (_, i) => i !== index,
-                        ),
-                      })
-                    }
-                    className="text-xs font-medium text-danger hover:underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-                <Field label="Label" id={`ve-ct-channel-label-${index}`}>
-                  <TextInput
-                    id={`ve-ct-channel-label-${index}`}
-                    value={channel.label}
-                    onChange={(e) => {
-                      const channels = sections.footer.channels.map((row, i) =>
-                        i === index ? { ...row, label: e.target.value } : row,
-                      );
-                      setFooter({ ...sections.footer, channels });
-                    }}
-                  />
-                </Field>
-                <Field label="Email address" id={`ve-ct-channel-address-${index}`}>
-                  <TextInput
-                    id={`ve-ct-channel-address-${index}`}
-                    value={channel.address}
-                    onChange={(e) => {
-                      const channels = sections.footer.channels.map((row, i) =>
-                        i === index ? { ...row, address: e.target.value } : row,
-                      );
-                      setFooter({ ...sections.footer, channels });
-                    }}
-                  />
-                </Field>
-                <Field label="Description" id={`ve-ct-channel-body-${index}`}>
-                  <TextArea
-                    id={`ve-ct-channel-body-${index}`}
-                    rows={2}
-                    value={channel.body}
-                    onChange={(e) => {
-                      const channels = sections.footer.channels.map((row, i) =>
-                        i === index ? { ...row, body: e.target.value } : row,
-                      );
-                      setFooter({ ...sections.footer, channels });
-                    }}
-                  />
-                </Field>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
-                setFooter({
-                  ...sections.footer,
-                  channels: [
-                    ...sections.footer.channels,
-                    emptyContactChannel(),
-                  ],
-                })
-              }
-              className="text-sm font-medium text-forest hover:text-forest-dark"
-            >
-              + Add channel
-            </button>
+            <Field label="Label" id="ve-ct-direct-email-label">
+              <TextInput
+                id="ve-ct-direct-email-label"
+                value={primaryContactEmail(sections.footer).label}
+                onChange={(e) => {
+                  const channels = [...sections.footer.channels];
+                  const current = channels[0] ?? emptyContactChannel();
+                  channels[0] = { ...current, label: e.target.value };
+                  setFooter({ ...sections.footer, channels });
+                }}
+              />
+            </Field>
+            <Field label="Email address" id="ve-ct-direct-email-address">
+              <TextInput
+                id="ve-ct-direct-email-address"
+                value={primaryContactEmail(sections.footer).address}
+                onChange={(e) => {
+                  const channels = [...sections.footer.channels];
+                  const current = channels[0] ?? emptyContactChannel();
+                  channels[0] = { ...current, address: e.target.value };
+                  setFooter({ ...sections.footer, channels });
+                }}
+              />
+            </Field>
+            <Field label="Description" id="ve-ct-direct-email-body">
+              <TextArea
+                id="ve-ct-direct-email-body"
+                rows={2}
+                value={primaryContactEmail(sections.footer).body}
+                onChange={(e) => {
+                  const channels = [...sections.footer.channels];
+                  const current = channels[0] ?? emptyContactChannel();
+                  channels[0] = { ...current, body: e.target.value };
+                  setFooter({ ...sections.footer, channels });
+                }}
+              />
+            </Field>
           </>
         ) : null}
 
-        {target === "office" ? (
+        {target === "londonOffice" ? (
           <>
             <Field label="London eyebrow" id="ve-ct-office-eyebrow">
               <TextInput
@@ -1119,17 +896,33 @@ function EditorPopover({
                 }
               />
             </Field>
-            <Field label="London title" id="ve-ct-office-title">
+            <Field label="London phone" id="ve-ct-phone-number">
               <TextInput
-                id="ve-ct-office-title"
-                value={sections.footer.office.title}
+                id="ve-ct-phone-number"
+                value={sections.footer.phone.number}
                 onChange={(e) =>
                   setFooter({
                     ...sections.footer,
-                    office: {
-                      ...sections.footer.office,
-                      title: e.target.value,
+                    phone: {
+                      ...sections.footer.phone,
+                      number: e.target.value,
                     },
+                  })
+                }
+              />
+            </Field>
+            <Field
+              label="London tel link"
+              id="ve-ct-phone-tel"
+              hint="Digits only, e.g. +442079460018"
+            >
+              <TextInput
+                id="ve-ct-phone-tel"
+                value={sections.footer.phone.tel}
+                onChange={(e) =>
+                  setFooter({
+                    ...sections.footer,
+                    phone: { ...sections.footer.phone, tel: e.target.value },
                   })
                 }
               />
@@ -1153,9 +946,9 @@ function EditorPopover({
           </>
         ) : null}
 
-        {target === "usOffice" ? (
+        {target === "nyOffice" ? (
           <>
-            <Field label="US eyebrow" id="ve-ct-office-us-eyebrow">
+            <Field label="NY eyebrow" id="ve-ct-office-us-eyebrow">
               <TextInput
                 id="ve-ct-office-us-eyebrow"
                 value={sections.footer.office.usEyebrow}
@@ -1170,107 +963,7 @@ function EditorPopover({
                 }
               />
             </Field>
-            <Field label="US title" id="ve-ct-office-us-title">
-              <TextInput
-                id="ve-ct-office-us-title"
-                value={sections.footer.office.usTitle}
-                onChange={(e) =>
-                  setFooter({
-                    ...sections.footer,
-                    office: {
-                      ...sections.footer.office,
-                      usTitle: e.target.value,
-                    },
-                  })
-                }
-              />
-            </Field>
-            <Field label="US address" id="ve-ct-office-us-body">
-              <TextArea
-                id="ve-ct-office-us-body"
-                rows={2}
-                value={sections.footer.office.usBody}
-                onChange={(e) =>
-                  setFooter({
-                    ...sections.footer,
-                    office: {
-                      ...sections.footer.office,
-                      usBody: e.target.value,
-                    },
-                  })
-                }
-              />
-            </Field>
-          </>
-        ) : null}
-
-        {target === "phone" ? (
-          <>
-            <Field label="Section eyebrow" id="ve-ct-phone-eyebrow">
-              <TextInput
-                id="ve-ct-phone-eyebrow"
-                value={sections.footer.phone.eyebrow}
-                onChange={(e) =>
-                  setFooter({
-                    ...sections.footer,
-                    phone: {
-                      ...sections.footer.phone,
-                      eyebrow: e.target.value,
-                    },
-                  })
-                }
-              />
-            </Field>
-            <Field label="UK display number" id="ve-ct-phone-number">
-              <TextInput
-                id="ve-ct-phone-number"
-                value={sections.footer.phone.number}
-                onChange={(e) =>
-                  setFooter({
-                    ...sections.footer,
-                    phone: {
-                      ...sections.footer.phone,
-                      number: e.target.value,
-                    },
-                  })
-                }
-              />
-            </Field>
-            <Field
-              label="UK tel link"
-              id="ve-ct-phone-tel"
-              hint="Digits only, e.g. +442079460018"
-            >
-              <TextInput
-                id="ve-ct-phone-tel"
-                value={sections.footer.phone.tel}
-                onChange={(e) =>
-                  setFooter({
-                    ...sections.footer,
-                    phone: { ...sections.footer.phone, tel: e.target.value },
-                  })
-                }
-              />
-            </Field>
-            <Field label="UK hours / note" id="ve-ct-phone-body">
-              <TextArea
-                id="ve-ct-phone-body"
-                rows={2}
-                value={sections.footer.phone.body}
-                onChange={(e) =>
-                  setFooter({
-                    ...sections.footer,
-                    phone: { ...sections.footer.phone, body: e.target.value },
-                  })
-                }
-              />
-            </Field>
-          </>
-        ) : null}
-
-        {target === "usPhone" ? (
-          <>
-            <Field label="US display number" id="ve-ct-phone-us-number">
+            <Field label="NY phone" id="ve-ct-phone-us-number">
               <TextInput
                 id="ve-ct-phone-us-number"
                 value={sections.footer.phone.usNumber}
@@ -1286,7 +979,7 @@ function EditorPopover({
               />
             </Field>
             <Field
-              label="US tel link"
+              label="NY tel link"
               id="ve-ct-phone-us-tel"
               hint="Digits only, e.g. +16467946018"
             >
@@ -1304,136 +997,22 @@ function EditorPopover({
                 }
               />
             </Field>
-            <Field label="US hours / note" id="ve-ct-phone-us-body">
+            <Field label="NY address" id="ve-ct-office-us-body">
               <TextArea
-                id="ve-ct-phone-us-body"
+                id="ve-ct-office-us-body"
                 rows={2}
-                value={sections.footer.phone.usBody}
+                value={sections.footer.office.usBody}
                 onChange={(e) =>
                   setFooter({
                     ...sections.footer,
-                    phone: {
-                      ...sections.footer.phone,
+                    office: {
+                      ...sections.footer.office,
                       usBody: e.target.value,
                     },
                   })
                 }
               />
             </Field>
-          </>
-        ) : null}
-
-        {target === "socials" ? (
-          <>
-            <Field label="Eyebrow" id="ve-ct-socials-eyebrow">
-              <TextInput
-                id="ve-ct-socials-eyebrow"
-                value={sections.footer.socials.eyebrow}
-                onChange={(e) =>
-                  setFooter({
-                    ...sections.footer,
-                    socials: {
-                      ...sections.footer.socials,
-                      eyebrow: e.target.value,
-                    },
-                  })
-                }
-              />
-            </Field>
-            {sections.footer.socials.items.map((social, index) => (
-              <div
-                key={`ve-ct-social-${index}`}
-                className="space-y-3 rounded-sm border border-charcoal/10 p-3"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium">Link {index + 1}</p>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setFooter({
-                        ...sections.footer,
-                        socials: {
-                          ...sections.footer.socials,
-                          items: sections.footer.socials.items.filter(
-                            (_, i) => i !== index,
-                          ),
-                        },
-                      })
-                    }
-                    className="text-xs font-medium text-danger hover:underline"
-                  >
-                    Remove
-                  </button>
-                </div>
-                <Field label="Network" id={`ve-ct-social-label-${index}`}>
-                  <TextInput
-                    id={`ve-ct-social-label-${index}`}
-                    value={social.label}
-                    onChange={(e) => {
-                      const items = sections.footer.socials.items.map(
-                        (row, i) =>
-                          i === index ? { ...row, label: e.target.value } : row,
-                      );
-                      setFooter({
-                        ...sections.footer,
-                        socials: { ...sections.footer.socials, items },
-                      });
-                    }}
-                  />
-                </Field>
-                <Field label="Handle" id={`ve-ct-social-handle-${index}`}>
-                  <TextInput
-                    id={`ve-ct-social-handle-${index}`}
-                    value={social.handle}
-                    onChange={(e) => {
-                      const items = sections.footer.socials.items.map(
-                        (row, i) =>
-                          i === index ? { ...row, handle: e.target.value } : row,
-                      );
-                      setFooter({
-                        ...sections.footer,
-                        socials: { ...sections.footer.socials, items },
-                      });
-                    }}
-                  />
-                </Field>
-                <Field label="URL" id={`ve-ct-social-href-${index}`}>
-                  <TextInput
-                    id={`ve-ct-social-href-${index}`}
-                    value={social.href}
-                    onChange={(e) => {
-                      const items = sections.footer.socials.items.map(
-                        (row, i) =>
-                          i === index ? { ...row, href: e.target.value } : row,
-                      );
-                      setFooter({
-                        ...sections.footer,
-                        socials: { ...sections.footer.socials, items },
-                      });
-                    }}
-                    placeholder="https://…"
-                  />
-                </Field>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
-                setFooter({
-                  ...sections.footer,
-                  socials: {
-                    ...sections.footer.socials,
-                    items: [
-                      ...sections.footer.socials.items,
-                      emptyContactSocial(),
-                    ],
-                  },
-                })
-              }
-              className="text-sm font-medium text-forest hover:text-forest-dark"
-            >
-              + Add link
-            </button>
           </>
         ) : null}
       </div>

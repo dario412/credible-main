@@ -115,8 +115,8 @@ function targetTitle(target: EditTarget): string {
     "trustedBy.introLine": "Trusted by intro",
     "footer.tagline": "Footer tagline",
     "footer.companyLine": "Footer company line",
-    "footer.companyLineHref": "Footer PepTalk link URL",
-    "footer.companyLineLinkLabel": "Footer PepTalk link label",
+    "footer.companyLineHref": "Footer company link URL",
+    "footer.companyLineLinkLabel": "Footer company linked word",
     "footer.email": "Footer email",
   };
   if (target.startsWith("waysIn.item.")) {
@@ -1461,38 +1461,42 @@ function EditorPopover({
           </Field>
         ) : null}
 
-        {target === "footer.companyLine" ? (
-          <Field label="Company line" id="ft-company">
-            <TextInput
-              id="ft-company"
-              value={footer.companyLine}
-              onChange={(e) => onFooterChange({ companyLine: e.target.value })}
-            />
-          </Field>
-        ) : null}
-
-        {target === "footer.companyLineHref" ? (
-          <Field label="Company link URL" id="ft-company-href">
-            <TextInput
-              id="ft-company-href"
-              value={footer.companyLineHref}
-              onChange={(e) =>
-                onFooterChange({ companyLineHref: e.target.value })
-              }
-            />
-          </Field>
-        ) : null}
-
-        {target === "footer.companyLineLinkLabel" ? (
-          <Field label="Company link label" id="ft-company-link-label">
-            <TextInput
+        {target === "footer.companyLine" ||
+        target === "footer.companyLineHref" ||
+        target === "footer.companyLineLinkLabel" ? (
+          <>
+            <Field label="Company line" id="ft-company">
+              <TextInput
+                id="ft-company"
+                value={footer.companyLine}
+                onChange={(e) =>
+                  onFooterChange({ companyLine: e.target.value })
+                }
+              />
+            </Field>
+            <Field label="Company link URL" id="ft-company-href">
+              <TextInput
+                id="ft-company-href"
+                value={footer.companyLineHref}
+                onChange={(e) =>
+                  onFooterChange({ companyLineHref: e.target.value })
+                }
+              />
+            </Field>
+            <Field
+              label="Linked word"
               id="ft-company-link-label"
-              value={footer.companyLineLinkLabel}
-              onChange={(e) =>
-                onFooterChange({ companyLineLinkLabel: e.target.value })
-              }
-            />
-          </Field>
+              hint='Word in the company line that becomes the link (e.g. "PepTalk").'
+            >
+              <TextInput
+                id="ft-company-link-label"
+                value={footer.companyLineLinkLabel}
+                onChange={(e) =>
+                  onFooterChange({ companyLineLinkLabel: e.target.value })
+                }
+              />
+            </Field>
+          </>
         ) : null}
 
         {target === "footer.email" ? (

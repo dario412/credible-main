@@ -1248,7 +1248,7 @@ export function SiteChromeEditorForm({
         <Field
           label="Company link URL"
           id="ft-company-href"
-          hint="External link shown under the company line (e.g. PepTalk)."
+          hint="URL for the linked word in the company line."
         >
           <TextInput
             id="ft-company-href"
@@ -1258,7 +1258,11 @@ export function SiteChromeEditorForm({
             }
           />
         </Field>
-        <Field label="Company link label" id="ft-company-link-label">
+        <Field
+          label="Linked word"
+          id="ft-company-link-label"
+          hint='Word in the company line that becomes the link (e.g. "PepTalk").'
+        >
           <TextInput
             id="ft-company-link-label"
             value={sections.footer.companyLineLinkLabel}

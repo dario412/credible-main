@@ -227,7 +227,7 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
     tagline: "The talent agency for the expert economy.",
     companyLine: "A PepTalk company.",
     companyLineHref: "https://www.getapeptalk.com",
-    companyLineLinkLabel: "getapeptalk.com",
+    companyLineLinkLabel: "PepTalk",
     email: "hello@crediblecreators.com",
     copyright: "Credible Talent Ltd. All rights reserved.",
     socials: [
@@ -892,6 +892,24 @@ function mergeProfileLayout(raw: unknown): ProfileLayoutSections {
   };
 }
 
+function normalizeCompanyLineLinkLabel(
+  linkLabel: string,
+  companyLine: string,
+): string {
+  const legacyStandaloneLabels = new Set([
+    "getapeptalk.com",
+    "www.getapeptalk.com",
+    "https://www.getapeptalk.com",
+  ]);
+  if (
+    legacyStandaloneLabels.has(linkLabel.trim().toLowerCase()) &&
+    companyLine.includes("PepTalk")
+  ) {
+    return "PepTalk";
+  }
+  return linkLabel;
+}
+
 export function mergeSiteChrome(raw: unknown): SiteChromeSections {
   const data = (raw && typeof raw === "object" ? raw : {}) as {
     header?: Partial<SiteChromeSections["header"]>;
@@ -939,9 +957,12 @@ export function mergeSiteChrome(raw: unknown): SiteChromeSections {
         footer.companyLineHref,
         defaults.footer.companyLineHref,
       ),
-      companyLineLinkLabel: asString(
-        footer.companyLineLinkLabel,
-        defaults.footer.companyLineLinkLabel,
+      companyLineLinkLabel: normalizeCompanyLineLinkLabel(
+        asString(
+          footer.companyLineLinkLabel,
+          defaults.footer.companyLineLinkLabel,
+        ),
+        asString(footer.companyLine, defaults.footer.companyLine),
       ),
       email: asString(footer.email, defaults.footer.email),
       copyright: asString(footer.copyright, defaults.footer.copyright),

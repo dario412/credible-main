@@ -113,48 +113,27 @@ export const DEFAULT_CONTACT_SECTIONS: ContactPageSections = {
         address: "hello@crediblecreators.com",
         body: "General enquiries and anything that doesn’t fit a box.",
       },
-      {
-        label: "Speaking & events",
-        address: "bookings@crediblecreators.com",
-        body: "Keynotes, firesides, panels and live programming.",
-      },
-      {
-        label: "Brand partnerships",
-        address: "partnerships@crediblecreators.com",
-        body: "Content series, newsletters and ambassador terms.",
-      },
     ],
     office: {
       eyebrow: "London office",
-      title: "Credible Talent Ltd",
+      title: "",
       body: "Somers Town, London NW1",
-      usEyebrow: "US office",
-      usTitle: "Credible Talent LLC",
+      usEyebrow: "NY office",
+      usTitle: "",
       usBody: "New York, NY",
     },
     phone: {
-      eyebrow: "By phone",
+      eyebrow: "",
       number: "+44 20 7946 0018",
       tel: "+442079460018",
-      body: "Weekdays, 9am–6pm GMT",
+      body: "",
       usNumber: "+1 646 794 6018",
       usTel: "+16467946018",
-      usBody: "Weekdays, 9am–6pm ET",
+      usBody: "",
     },
     socials: {
-      eyebrow: "Follow along",
-      items: [
-        {
-          label: "LinkedIn",
-          handle: "/credible-talent",
-          href: "https://www.linkedin.com/",
-        },
-        {
-          label: "Substack",
-          handle: "The Credible Brief",
-          href: "https://substack.com/",
-        },
-      ],
+      eyebrow: "",
+      items: [],
     },
   },
 };
@@ -226,6 +205,21 @@ function mergeChannels(
     .filter((item): item is ContactChannel => item !== null);
 
   return merged.length > 0 ? merged : defaults.map((channel) => ({ ...channel }));
+}
+
+function mergePrimaryChannel(
+  raw: unknown,
+  defaults: ContactChannel[],
+): ContactChannel[] {
+  const merged = mergeChannels(raw, defaults);
+  const primary = merged[0] ?? defaults[0] ?? emptyContactChannel();
+  return [{ ...primary }];
+}
+
+export function primaryContactEmail(
+  footer: ContactPageSections["footer"],
+): ContactChannel {
+  return footer.channels[0] ?? DEFAULT_CONTACT_SECTIONS.footer.channels[0]!;
 }
 
 function mergeSocials(raw: unknown, defaults: ContactSocial[]): ContactSocial[] {
@@ -302,7 +296,10 @@ export function mergeContactSections(raw: unknown): ContactPageSections {
       email: asString(nextSteps.email, defaults.nextSteps.email),
     },
     footer: {
-      channels: mergeChannels(footer.channels, defaults.footer.channels),
+      channels: mergePrimaryChannel(
+        footer.channels,
+        defaults.footer.channels,
+      ),
       office: {
         eyebrow: asString(office.eyebrow, defaults.footer.office.eyebrow),
         title: asString(office.title, defaults.footer.office.title),

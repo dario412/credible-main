@@ -17,6 +17,51 @@ import {
 
 const FOOTER_PATTERN_COLOR = { r: 249, g: 243, b: 239 };
 
+function FooterCompanyLine({
+  line,
+  href,
+  linkText,
+  editing,
+}: {
+  line: string;
+  href: string;
+  linkText: string;
+  editing?: boolean;
+}) {
+  const trimmedHref = href.trim();
+  const trimmedLinkText = linkText.trim();
+
+  if (!trimmedHref || !trimmedLinkText) {
+    return <>{line}</>;
+  }
+
+  const index = line.indexOf(trimmedLinkText);
+  if (index === -1) {
+    return <>{line}</>;
+  }
+
+  const before = line.slice(0, index);
+  const after = line.slice(index + trimmedLinkText.length);
+
+  return (
+    <>
+      {before}
+      <a
+        href={trimmedHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-cream/70 underline decoration-cream/25 underline-offset-[0.2em] transition-colors hover:text-cream hover:decoration-cream/60"
+        onClick={(e) => {
+          if (editing) e.preventDefault();
+        }}
+      >
+        {trimmedLinkText}
+      </a>
+      {after}
+    </>
+  );
+}
+
 function SocialIcon({ network }: { network: SocialNetwork }) {
   const className = "size-[22px]";
   if (network === "linkedin") {
@@ -256,32 +301,14 @@ export function SiteFooter({ rosterNavLinks }: { rosterNavLinks?: NavLink[] }) {
               onSelect={() => onSelectFooterField?.("companyLine")}
             >
               <p className="mt-1.5 text-sm text-cream/50">
-                {footer.companyLine}
+                <FooterCompanyLine
+                  line={footer.companyLine}
+                  href={footer.companyLineHref}
+                  linkText={footer.companyLineLinkLabel}
+                  editing={editing}
+                />
               </p>
             </EditableHit>
-
-            {footer.companyLineHref ? (
-              <EditableHit
-                active={editing && canEdit}
-                selected={selected === "footer.companyLineLinkLabel"}
-                label="footer PepTalk link label"
-                block
-                ringOffset="ring-offset-charcoal"
-                onSelect={() => onSelectFooterField?.("companyLineLinkLabel")}
-              >
-                <a
-                  href={footer.companyLineHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-2.5 block w-fit text-sm font-medium text-cream/90 underline decoration-cream/25 underline-offset-[0.2em] transition-colors hover:text-cream hover:decoration-cream/60"
-                  onClick={(e) => {
-                    if (editing) e.preventDefault();
-                  }}
-                >
-                  {footer.companyLineLinkLabel}
-                </a>
-              </EditableHit>
-            ) : null}
 
             <div className="mt-10 flex items-center gap-5">
               {footer.socials.map((social) => (
