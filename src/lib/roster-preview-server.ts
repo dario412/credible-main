@@ -4,7 +4,7 @@ import type { RosterCardExpert } from "@/components/roster-card";
 import type { RosterFormOption } from "@/lib/roster-form-options";
 import type { HeroCastMember } from "@/components/home-2/hero-cast";
 import { parseExpertChannels } from "@/lib/expert-channels";
-import { isLinkedInTopVoice } from "@/lib/expert-profiles";
+import { linkedinTopVoiceFromExtras } from "@/lib/airtable/map-profile-sections";
 import { prisma } from "@/lib/prisma";
 import { selectRosterPreviewCards } from "@/lib/roster-preview";
 
@@ -24,6 +24,7 @@ function toRosterCard(expert: {
   audienceWho: string | null;
   audienceWhere: string | null;
   channels: unknown;
+  profileExtras?: unknown;
 }): RosterCardExpert {
   return {
     id: expert.id,
@@ -38,7 +39,7 @@ function toRosterCard(expert: {
     audienceWho: expert.audienceWho,
     audienceWhere: expert.audienceWhere,
     channels: parseExpertChannels(expert.channels),
-    linkedinTopVoice: isLinkedInTopVoice(expert.slug),
+    linkedinTopVoice: linkedinTopVoiceFromExtras(expert.profileExtras),
   };
 }
 

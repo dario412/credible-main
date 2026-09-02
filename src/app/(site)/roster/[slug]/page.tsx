@@ -14,7 +14,10 @@ import {
   type TrustedBrand,
 } from "@/lib/brand-logos";
 import { parseHighlightStat, isCombinedReachLabel } from "@/lib/airtable/map-expert";
-import type { AirtableProfileSections } from "@/lib/airtable/map-profile-sections";
+import {
+  linkedinTopVoiceFromExtras,
+  type AirtableProfileSections,
+} from "@/lib/airtable/map-profile-sections";
 import {
   enrichChannelsWithFollowerHistory,
   type ChannelFollowerHistory,
@@ -26,7 +29,6 @@ import {
 import { parseExpertChannels } from "@/lib/expert-channels";
 import {
   getExpertProfileEnrichment,
-  isLinkedInTopVoice,
   mergeAudience,
   mergeFormats,
   resolveFormatKind,
@@ -146,9 +148,7 @@ function mergeProfileContent(
     topicShares,
     audience,
     formats,
-    linkedinTopVoice:
-      Boolean(sections?.linkedinTopVoice) ||
-      Boolean(enrichment.linkedinTopVoice),
+    linkedinTopVoice: Boolean(sections?.linkedinTopVoice),
   };
 }
 
@@ -315,6 +315,7 @@ function toRosterCard(expert: {
   audienceWho: string | null;
   audienceWhere: string | null;
   channels: unknown;
+  profileExtras?: unknown;
 }): RosterCardExpert {
   return {
     id: expert.id,
@@ -329,7 +330,7 @@ function toRosterCard(expert: {
     audienceWho: expert.audienceWho,
     audienceWhere: expert.audienceWhere,
     channels: parseExpertChannels(expert.channels),
-    linkedinTopVoice: isLinkedInTopVoice(expert.slug),
+    linkedinTopVoice: linkedinTopVoiceFromExtras(expert.profileExtras),
   };
 }
 

@@ -7,10 +7,10 @@ import {
 } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
 import { parseExpertChannels } from "@/lib/expert-channels";
-import { isLinkedInTopVoice } from "@/lib/expert-profiles";
 import { hasPermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { buildRosterFilterOptions } from "@/lib/roster-filter-options";
+import { linkedinTopVoiceFromExtras } from "@/lib/airtable/map-profile-sections";
 import { loadWebsiteCategoryChoices } from "@/lib/airtable/website-categories";
 import { createMetadata } from "@/lib/seo";
 
@@ -119,7 +119,7 @@ export default async function RosterPage({
     audienceWho: expert.audienceWho,
     audienceWhere: expert.audienceWhere,
     channels: parseExpertChannels(expert.channels),
-    linkedinTopVoice: isLinkedInTopVoice(expert.slug),
+    linkedinTopVoice: linkedinTopVoiceFromExtras(expert.profileExtras),
   }));
 
   return (

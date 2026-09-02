@@ -28,6 +28,14 @@ function field(fields: Record<string, unknown>, ...aliases: string[]): unknown {
   return undefined;
 }
 
+function asBoolean(value: unknown): boolean {
+  if (value === true || value === 1 || value === "1") return true;
+  if (typeof value === "string" && /^(yes|true|checked)$/i.test(value.trim())) {
+    return true;
+  }
+  return false;
+}
+
 function asString(value: unknown): string | null {
   if (typeof value === "string" && value.trim()) return value.trim();
   if (typeof value === "number" && Number.isFinite(value)) return String(value);
@@ -490,7 +498,33 @@ export function mapAirtableProfileSections(
     topicShares: buildTopicShares(fields),
     audience: buildAudience(fields),
     formats: buildFormats(fields),
-    linkedinTopVoice:
-      field(fields, "Channel | LinkedIn | Top Voice") === true,
+    linkedinTopVoice: asBoolean(
+      field(
+        fields,
+        // fldaqAr8Ss77Sb1Kg — Channel | LinkedIn | Top Voice
+        "Channel | LinkedIn | Top Voice",
+        "LinkedIn | Top Voice",
+        "LinkedIn Top Voice",
+        "Top Voice",
+      ),
+    ),
   };
+}
+
+/** Read synced Top Voice flag from Expert.profileExtras JSON. */
+export function linkedinTopVoiceFromExtras(profileExtras: unknown): boolean {
+  if (!profileExtras || typeof profileExtras !== "object") return false;
+  const extras = profileExtras as {
+    linkedinTopVoice?: unknown;
+    profileSections?: { linkedinTopVoice?: unknown };
+  };
+  if (typeof extras.profileSections?.linkedinTopVoice === "boolean") {
+    return extras.profileSections.linkedinTopVoice;
+  }
+  if (typeof extras.linkedinTopVoice === "boolean") {
+    return extras.linkedinTopVoice;
+  }
+  return asBoolean(
+    extras.profileSections?.linkedinTopVoice ?? extras.linkedinTopVoice,
+  );
 }
