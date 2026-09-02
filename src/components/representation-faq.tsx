@@ -15,7 +15,7 @@ export function RepresentationFaq({
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <dl className="flex flex-col gap-3">
+    <dl className="grid grid-cols-1 items-start gap-3 md:grid-cols-2 md:gap-4">
       {items.map((item, index) => {
         const open = openIndex === index;
         const panelId = `${baseId}-panel-${index}`;
@@ -24,7 +24,7 @@ export function RepresentationFaq({
         return (
           <FadeUp key={item.q} delay={index * 70} y={16} threshold={0.12}>
             <div
-              className="cursor-pointer rounded-sm bg-cream-dark px-6 py-7 md:px-10 md:py-8"
+              className="cursor-pointer rounded-sm bg-cream-dark px-5 py-6 md:px-7 md:py-7"
               onClick={() => setOpenIndex(open ? null : index)}
             >
             <dt>
@@ -37,12 +37,12 @@ export function RepresentationFaq({
                   e.stopPropagation();
                   setOpenIndex(open ? null : index);
                 }}
-                className="flex w-full cursor-pointer items-center justify-between gap-6 text-left"
+                className="flex w-full cursor-pointer items-center justify-between gap-4 text-left md:gap-5"
               >
-                <span className="min-w-0 flex-1 font-display text-[1.25rem] leading-[1.3] tracking-tight text-charcoal md:text-[1.5rem]">
+                <span className="min-w-0 flex-1 font-display text-[1.15rem] leading-[1.3] tracking-tight text-charcoal md:text-[1.3rem]">
                   {item.q}
                 </span>
-                <span className="flex size-10 shrink-0 items-center justify-center text-charcoal">
+                <span className="flex size-9 shrink-0 items-center justify-center text-charcoal md:size-10">
                   {open ? (
                     <Minus weight="bold" className="size-4.5" aria-hidden />
                   ) : (
@@ -61,7 +61,7 @@ export function RepresentationFaq({
               )}
             >
               <div className="overflow-hidden">
-                <p className="max-w-[37.5rem] pt-4 text-[1.0625rem] leading-[1.68] text-charcoal/70">
+                <p className="pt-4 text-[1rem] leading-[1.68] text-charcoal/70 md:text-[1.0625rem]">
                   {item.a}
                 </p>
               </div>

@@ -1589,7 +1589,7 @@ function WhatWeDoView({
                 { block: true },
               )}
             </FadeUp>
-            <div className="mx-auto mt-14 max-w-[47.5rem]">
+            <div className="mt-14">
               {hit(
                 editing,
                 "faq",

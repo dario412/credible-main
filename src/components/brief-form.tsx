@@ -181,7 +181,7 @@ export function BriefForm({
             id={`${id}-role`}
             name="role"
             autoComplete="organization-title"
-            placeholder="Head of Brand"
+            placeholder="Creator Partnerships Manager"
             className={inputClass}
           />
         </div>

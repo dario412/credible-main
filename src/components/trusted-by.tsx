@@ -9,23 +9,55 @@ import {
 } from "@/lib/trusted-by";
 import { logoAltFor, portraitAltFor } from "@/lib/image-alt";
 import { projectHref } from "@/lib/case-studies";
+import { cn } from "@/lib/utils";
 
-const LOGO_CLASS =
-  "h-full w-auto max-w-full object-contain object-center brightness-0 invert transition-opacity duration-200";
+/** Pick a column count that fits the logo set evenly (no empty trailing slots). */
+function trustedByGridClass(count: number): string {
+  const base = "grid gap-x-6 gap-y-10 md:gap-x-8 md:gap-y-14";
 
-function BrandMark({ client }: { client: TrustedByClient }) {
+  if (count <= 1) return `${base} grid-cols-1 justify-items-center`;
+  if (count === 2) return `${base} grid-cols-2`;
+  if (count === 3) return `${base} grid-cols-2 sm:grid-cols-3`;
+  if (count === 4) return `${base} grid-cols-2 sm:grid-cols-4`;
+  if (count === 5) return `${base} grid-cols-2 sm:grid-cols-3 md:grid-cols-5`;
+  if (count === 6) return `${base} grid-cols-2 sm:grid-cols-3 md:grid-cols-6`;
+  if (count === 7 || count === 8) {
+    return `${base} grid-cols-2 sm:grid-cols-4`;
+  }
+  if (count === 9) return `${base} grid-cols-3`;
+  if (count === 10) return `${base} grid-cols-2 sm:grid-cols-5`;
+
+  // 11+: cap at 5 columns so logos stay readable
+  return `${base} grid-cols-2 sm:grid-cols-3 md:grid-cols-5`;
+}
+
+function BrandMark({
+  client,
+  tone,
+}: {
+  client: TrustedByClient;
+  tone: "light" | "dark";
+}) {
   if (client.logoSrc) {
     return (
       <img
         src={client.logoSrc}
         alt={logoAltFor(client.name)}
-        className={LOGO_CLASS}
+        className={cn(
+          "h-full w-auto max-w-full object-contain object-center transition-opacity duration-200",
+          tone === "dark" ? "brightness-0 invert" : "brightness-0",
+        )}
       />
     );
   }
 
   return (
-    <span className="font-display text-[1.35rem] leading-none tracking-tight md:text-[1.55rem]">
+    <span
+      className={cn(
+        "font-display text-[1.35rem] leading-none tracking-tight md:text-[1.55rem]",
+        tone === "dark" ? "text-cream" : "text-charcoal",
+      )}
+    >
       {client.name || "Client"}
     </span>
   );
@@ -50,6 +82,7 @@ export function TrustedBy({
   introLine,
   editSlots,
   disableStoryLinks = false,
+  tone = "light",
 }: {
   clients?: TrustedByClient[];
   introLine?: string;
@@ -58,16 +91,32 @@ export function TrustedBy({
     client?: (index: number, node: ReactNode) => ReactNode;
   };
   disableStoryLinks?: boolean;
+  /** light = white box + black logos; dark = charcoal box + white logos */
+  tone?: "light" | "dark";
 }) {
+  const isDark = tone === "dark";
+
   const introNode = introLine?.trim() ? (
-    <p className="text-center text-[0.7rem] font-medium tracking-[0.16em] text-cream/70 uppercase">
+    <p
+      className={cn(
+        "text-center text-[0.7rem] font-medium tracking-[0.16em] uppercase",
+        isDark ? "text-cream/70" : "text-charcoal/55",
+      )}
+    >
       {introLine}
     </p>
   ) : null;
 
   return (
     <section className="bg-cream px-6 py-8 md:px-10 md:py-10 lg:px-12">
-      <div className="mx-auto max-w-352 overflow-visible rounded-sm bg-charcoal px-6 py-6 md:px-10 md:py-10 lg:px-12 lg:py-12">
+      <div
+        className={cn(
+          "mx-auto max-w-352 overflow-visible rounded-sm px-6 py-6 md:px-10 md:py-10 lg:px-12 lg:py-12",
+          isDark
+            ? "bg-charcoal"
+            : "border border-charcoal/8 bg-white shadow-[0_10px_28px_rgba(28,26,23,0.05)]",
+        )}
+      >
         {introNode ? (
           editSlots?.introLine ? (
             editSlots.introLine(
@@ -77,7 +126,7 @@ export function TrustedBy({
             <div className="mb-8 md:mb-10">{introNode}</div>
           )
         ) : null}
-        <ul className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:grid-cols-5 md:gap-x-8 md:gap-y-14">
+        <ul className={trustedByGridClass(clients.length)}>
           {clients.map((client, index) => {
             const hasTestimonial = hasTrustedByStory(client);
             const testimonial = client.testimonial;
@@ -88,7 +137,7 @@ export function TrustedBy({
             const showStoryPill = Boolean(storyHref);
             const logo = (
               <span className="flex h-6 w-full max-w-[9.5rem] items-center justify-center md:h-7">
-                <BrandMark client={client} />
+                <BrandMark client={client} tone={tone} />
               </span>
             );
 
@@ -144,7 +193,7 @@ export function TrustedBy({
                     className="flex h-6 w-full max-w-[9.5rem] items-center justify-center transition-opacity hover:opacity-80 md:h-7"
                     aria-label={`${client.name} project`}
                   >
-                    <BrandMark client={client} />
+                    <BrandMark client={client} tone={tone} />
                   </Link>
                 ) : (
                   logo
@@ -154,7 +203,12 @@ export function TrustedBy({
                   storyHref && !disableStoryLinks ? (
                     <Link
                       href={storyHref}
-                      className="inline-flex items-center overflow-hidden rounded-full bg-cream/10 px-2.5 py-1 text-[10px] font-medium tracking-wide text-cream/80 transition-colors duration-200 hover:bg-cream/16 hover:text-cream focus-visible:bg-cream/16 focus-visible:text-cream focus-visible:outline-none"
+                      className={cn(
+                        "inline-flex items-center overflow-hidden rounded-full px-2.5 py-1 text-[10px] font-medium tracking-wide transition-colors duration-200 focus-visible:outline-none",
+                        isDark
+                          ? "bg-cream/10 text-cream/80 hover:bg-cream/16 hover:text-cream focus-visible:bg-cream/16 focus-visible:text-cream"
+                          : "bg-charcoal/6 text-charcoal/65 hover:bg-charcoal/10 hover:text-charcoal focus-visible:bg-charcoal/10 focus-visible:text-charcoal",
+                      )}
                     >
                       <span className="relative inline-grid grid-cols-1 grid-rows-1 items-center justify-items-center">
                         <span className="col-start-1 row-start-1 inline-flex items-center gap-1 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1.5 group-hover:opacity-0">
@@ -168,7 +222,14 @@ export function TrustedBy({
                       </span>
                     </Link>
                   ) : (
-                    <span className="inline-flex items-center rounded-full bg-cream/10 px-2.5 py-1 text-[10px] font-medium tracking-wide text-cream/80">
+                    <span
+                      className={cn(
+                        "inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-medium tracking-wide",
+                        isDark
+                          ? "bg-cream/10 text-cream/80"
+                          : "bg-charcoal/6 text-charcoal/65",
+                      )}
+                    >
                       Customer story
                     </span>
                   )

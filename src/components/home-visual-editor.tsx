@@ -1784,6 +1784,7 @@ export function HomeVisualEditor({
       />
 
       <TrustedBy
+        tone="light"
         clients={trustedClients}
         introLine={sections.trustedBy.introLine}
         disableStoryLinks={editing}
@@ -1799,7 +1800,7 @@ export function HomeVisualEditor({
                     "trusted by intro",
                     node,
                     true,
-                    "ring-offset-charcoal",
+                    "ring-offset-white",
                   ),
                 client: (index, node) =>
                   hit(
@@ -1810,11 +1811,18 @@ export function HomeVisualEditor({
                     `trusted by logo ${index + 1}`,
                     node,
                     true,
-                    "ring-offset-charcoal",
+                    "ring-offset-white",
                   ),
               }
             : undefined
         }
+      />
+
+      <TrustedBy
+        tone="dark"
+        clients={trustedClients}
+        introLine={sections.trustedBy.introLine}
+        disableStoryLinks={editing}
       />
 
       <WaysInAccordion
@@ -2136,7 +2144,7 @@ export function HomeVisualEditor({
                 true,
               )}
             </FadeUp>
-            <div className="mx-auto mt-14 max-w-[47.5rem]">
+            <div className="mt-14">
               {hit(
                 editing,
                 "faq",
