@@ -92,7 +92,7 @@ export function ExpertFormatsGrid({
   formats: ExpertFormatOffering[];
   name: string;
 }) {
-  const { chrome, editing: templateEditing } = useSiteChrome();
+  const { chrome } = useSiteChrome();
   const vars = { first: firstName(name), name };
 
   return (
@@ -103,12 +103,14 @@ export function ExpertFormatsGrid({
           kind != null
             ? chrome.profileFormats[kind]
             : { title: format.title, description: format.description };
+        // Site-wide profile template owns title/description for known kinds.
+        // Per-expert Airtable copy only fills unknown/custom format cards.
         const titleSource =
-          templateEditing && kind != null
+          kind != null
             ? chromeCopy.title
             : format.title.trim() || chromeCopy.title;
         const descriptionSource =
-          templateEditing && kind != null
+          kind != null
             ? chromeCopy.description
             : format.description.trim() || chromeCopy.description;
         const title = applyProfileRailTemplate(titleSource, vars);
