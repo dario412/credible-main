@@ -13,7 +13,7 @@ import {
   withResolvedLogos,
   type TrustedBrand,
 } from "@/lib/brand-logos";
-import { parseHighlightStat } from "@/lib/airtable/map-expert";
+import { parseHighlightStat, isCombinedReachLabel } from "@/lib/airtable/map-expert";
 import type { AirtableProfileSections } from "@/lib/airtable/map-profile-sections";
 import {
   enrichChannelsWithFollowerHistory,
@@ -167,10 +167,6 @@ export async function generateMetadata({ params }: Props) {
   });
 }
 
-function isCombinedReachLabel(label: string) {
-  return /reach|followers|subscribers/i.test(label);
-}
-
 /** Prefer live channel sum, then synced Expert.combinedReach. */
 function resolveCombinedReach(
   expert: { combinedReach: string | null },
@@ -195,20 +191,50 @@ function resolveCombinedReach(
   return synced || null;
 }
 
+function channelFollowersForLabel(
+  label: string,
+  channels?: ExpertChannelPresence[],
+): string | null {
+  if (!channels?.length) return null;
+  const lower = label.toLowerCase();
+
+  const match = channels.find((channel) => {
+    const platform = channel.platform.toLowerCase();
+    if (/linkedin/.test(lower)) return platform.includes("linkedin");
+    if (/youtube/.test(lower)) return platform.includes("youtube");
+    if (/newsletter/.test(lower)) return platform.includes("newsletter");
+    if (/instagram/.test(lower)) return platform.includes("instagram");
+    if (/tiktok/.test(lower)) return platform.includes("tiktok");
+    if (/facebook/.test(lower)) return platform.includes("facebook");
+    if (/podcast/.test(lower)) return platform.includes("podcast");
+    if (/\btwitter\b|(^|[\s/])x([\s/]|$)/.test(lower)) {
+      return platform.includes("x") || platform.includes("twitter");
+    }
+    return false;
+  });
+
+  return match?.followers?.trim() || null;
+}
+
 function withSyncedCombinedReach(
   stats: ExpertProfileStat[],
   combinedReach: string | null,
+  channels?: ExpertChannelPresence[],
 ): ExpertProfileStat[] {
-  if (!combinedReach) return stats.slice(0, 4);
-
   let replaced = false;
   const next = stats.map((stat) => {
-    if (!isCombinedReachLabel(stat.label)) return stat;
-    replaced = true;
-    return { ...stat, value: combinedReach };
+    if (isCombinedReachLabel(stat.label)) {
+      if (!combinedReach) return stat;
+      replaced = true;
+      return { ...stat, value: combinedReach };
+    }
+
+    const fromChannel = channelFollowersForLabel(stat.label, channels);
+    if (fromChannel) return { ...stat, value: fromChannel };
+    return stat;
   });
 
-  if (!replaced) {
+  if (combinedReach && !replaced) {
     next.unshift({
       label: "Combined reach",
       value: combinedReach,
@@ -244,10 +270,10 @@ function buildStats(
     }));
 
   if (fromAirtable.length > 0) {
-    return withSyncedCombinedReach(fromAirtable, combinedReach);
+    return withSyncedCombinedReach(fromAirtable, combinedReach, channels);
   }
   if (enrichmentStats?.length) {
-    return withSyncedCombinedReach(enrichmentStats, combinedReach);
+    return withSyncedCombinedReach(enrichmentStats, combinedReach, channels);
   }
 
   const stats: ExpertProfileStat[] = [];

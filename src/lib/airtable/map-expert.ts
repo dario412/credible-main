@@ -162,7 +162,16 @@ export function parseHighlightStat(
 }
 
 function isCombinedReachLabel(label: string) {
-  return /reach|followers|subscribers/i.test(label);
+  const lower = label.toLowerCase();
+  // Do not rewrite platform-specific stats like "LinkedIn Followers".
+  if (
+    /linkedin|youtube|newsletter|instagram|tiktok|facebook|podcast|\btwitter\b|(^|[\s/])x([\s/]|$)/.test(
+      lower,
+    )
+  ) {
+    return false;
+  }
+  return /\bcombined\b/.test(lower) || /^reach$/.test(lower.trim());
 }
 
 /** Keep reach highlights aligned with the summed channel follower total. */
@@ -175,6 +184,8 @@ export function withSyncedReachHighlight(
   if (!parsed?.label || !isCombinedReachLabel(parsed.label)) return raw;
   return `${combinedReach} ${parsed.label}`;
 }
+
+export { isCombinedReachLabel };
 
 function highlightField(
   fields: Record<string, unknown>,
