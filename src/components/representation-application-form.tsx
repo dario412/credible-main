@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check } from "@phosphor-icons/react";
-import { useActionState, useId, useRef, useState } from "react";
+import { ArrowRight, Check } from "@phosphor-icons/react";
+import { useActionState, useId, useRef } from "react";
 
 import {
   submitRepresentationApplication,
@@ -10,11 +10,6 @@ import {
 } from "@/lib/actions/leads";
 
 const initial: FormState = { ok: false, message: "" };
-
-const STEPS = [
-  { title: "About you", description: "Contact details and main channels" },
-  { title: "More channels", description: "Anywhere else you publish" },
-] as const;
 
 const inputClass =
   "w-full rounded-sm border border-charcoal/15 bg-cream px-3 py-2 text-[0.8125rem] leading-snug text-charcoal outline-none transition-colors placeholder:text-charcoal/35 focus:border-forest focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-forest";
@@ -26,7 +21,6 @@ function Field({
   name,
   label,
   required,
-  step,
   type = "text",
   autoComplete,
   placeholder,
@@ -36,14 +30,13 @@ function Field({
   name: string;
   label: string;
   required?: boolean;
-  step: 1 | 2;
   type?: string;
   autoComplete?: string;
   placeholder?: string;
   className?: string;
 }) {
   return (
-    <div className={className} data-step={step}>
+    <div className={className}>
       <label htmlFor={id} className={labelClass}>
         {label}
         {required ? " *" : ""}
@@ -61,105 +54,26 @@ function Field({
   );
 }
 
-function StepIndicator({ step }: { step: 1 | 2 }) {
-  return (
-    <div className="flex items-center gap-2">
-      {STEPS.map((item, index) => {
-        const stepNumber = (index + 1) as 1 | 2;
-        const isActive = stepNumber === step;
-        const isComplete = stepNumber < step;
-
-        return (
-          <div key={item.title} className="flex flex-1 items-center gap-2">
-            <span
-              className={`inline-flex size-6 shrink-0 items-center justify-center rounded-full text-[0.6875rem] font-medium transition-colors ${
-                isActive
-                  ? "bg-forest text-cream"
-                  : isComplete
-                    ? "bg-forest/15 text-forest"
-                    : "bg-charcoal/8 text-charcoal/40"
-              }`}
-              aria-hidden
-            >
-              {isComplete ? (
-                <Check weight="bold" className="size-3" />
-              ) : (
-                stepNumber
-              )}
-            </span>
-            <div className="min-w-0">
-              <p
-                className={`truncate text-[0.6875rem] font-medium tracking-[0.08em] uppercase ${
-                  isActive ? "text-charcoal" : "text-charcoal/45"
-                }`}
-              >
-                {item.title}
-              </p>
-            </div>
-            {index < STEPS.length - 1 ? (
-              <span
-                className={`mx-1 hidden h-px flex-1 sm:block ${
-                  isComplete ? "bg-forest/30" : "bg-charcoal/10"
-                }`}
-                aria-hidden
-              />
-            ) : null}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 export function RepresentationApplicationForm() {
   const [state, action, pending] = useActionState(
     submitRepresentationApplication,
     initial,
   );
-  const [step, setStep] = useState<1 | 2>(1);
   const formRef = useRef<HTMLFormElement>(null);
   const id = useId();
 
-  function validateStep(targetStep: 1 | 2) {
-    const form = formRef.current;
-    if (!form) return false;
-
-    const inputs = form.querySelectorAll<HTMLInputElement>(
-      `[data-step="${targetStep}"] input`,
-    );
-
-    for (const input of inputs) {
-      if (!input.checkValidity()) {
-        input.reportValidity();
-        return false;
-      }
-    }
-
-    if (targetStep === 1) {
-      const linkedin = form.querySelector<HTMLInputElement>(
-        'input[name="linkedinUrl"]',
-      );
-      if (linkedin && !/linkedin\.com/i.test(linkedin.value.trim())) {
-        linkedin.setCustomValidity("Enter a LinkedIn profile URL");
-        linkedin.reportValidity();
-        linkedin.setCustomValidity("");
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  function handleContinue() {
-    if (validateStep(1)) {
-      setStep(2);
-    }
-  }
-
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
-    if (step !== 2) {
+    const form = formRef.current;
+    if (!form) return;
+
+    const linkedin = form.querySelector<HTMLInputElement>(
+      'input[name="linkedinUrl"]',
+    );
+    if (linkedin && !/linkedin\.com/i.test(linkedin.value.trim())) {
       event.preventDefault();
-      handleContinue();
+      linkedin.setCustomValidity("Enter a LinkedIn profile URL");
+      linkedin.reportValidity();
+      linkedin.setCustomValidity("");
     }
   }
 
@@ -202,24 +116,20 @@ export function RepresentationApplicationForm() {
       onSubmit={handleFormSubmit}
       className="flex h-full flex-col rounded-sm border border-charcoal/10 bg-white p-5 shadow-[0_12px_40px_rgba(28,26,23,0.06)] md:p-6"
     >
-      <StepIndicator step={step} />
-
-      <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <p className="text-[0.68rem] font-medium tracking-[0.16em] text-charcoal/45 uppercase">
-          Step {step} of {STEPS.length} · {STEPS[step - 1].title}
+          Apply for representation
         </p>
         <p className="text-[0.75rem] text-charcoal/50">
-          {step === 1 ? "Fields marked * are required." : "All fields optional."}
+          Fields marked * are required.
         </p>
       </div>
 
-      <div className="mt-4 flex min-h-0 flex-1 flex-col">
-        <div className={step === 1 ? "grid gap-3" : "sr-only"} aria-hidden={step !== 1}>
+      <div className="mt-4 grid flex-1 gap-3 content-start">
         <Field
           id={`${id}-name`}
           name="name"
           label="Full name"
-          step={1}
           required
           autoComplete="name"
         />
@@ -229,7 +139,6 @@ export function RepresentationApplicationForm() {
             id={`${id}-email`}
             name="email"
             label="Email address"
-            step={1}
             type="email"
             required
             autoComplete="email"
@@ -238,7 +147,6 @@ export function RepresentationApplicationForm() {
             id={`${id}-phone`}
             name="phone"
             label="Phone number"
-            step={1}
             type="tel"
             autoComplete="tel"
           />
@@ -248,7 +156,6 @@ export function RepresentationApplicationForm() {
           id={`${id}-linkedin`}
           name="linkedinUrl"
           label="LinkedIn URL"
-          step={1}
           type="url"
           required
           placeholder="https://www.linkedin.com/in/…"
@@ -263,7 +170,6 @@ export function RepresentationApplicationForm() {
               id={`${id}-instagram`}
               name="instagramUrl"
               label="Instagram URL"
-              step={1}
               type="url"
               placeholder="https://"
             />
@@ -271,83 +177,53 @@ export function RepresentationApplicationForm() {
               id={`${id}-youtube`}
               name="youtubeUrl"
               label="YouTube URL"
-              step={1}
+              type="url"
+              placeholder="https://"
+            />
+            <Field
+              id={`${id}-tiktok`}
+              name="tiktokUrl"
+              label="TikTok URL"
+              type="url"
+              placeholder="https://"
+            />
+            <Field
+              id={`${id}-podcast`}
+              name="podcastUrl"
+              label="Podcast URL"
+              type="url"
+              placeholder="https://"
+            />
+            <Field
+              id={`${id}-newsletter`}
+              name="newsletterUrl"
+              label="Substack / Newsletter URL"
+              type="url"
+              placeholder="https://"
+            />
+            <Field
+              id={`${id}-x`}
+              name="xUrl"
+              label="X.com URL"
+              type="url"
+              placeholder="https://"
+            />
+            <Field
+              id={`${id}-facebook`}
+              name="facebookUrl"
+              label="Facebook URL"
+              type="url"
+              placeholder="https://"
+            />
+            <Field
+              id={`${id}-website`}
+              name="websiteUrl"
+              label="Personal or Business website URL"
               type="url"
               placeholder="https://"
             />
           </div>
         </div>
-        </div>
-
-        <div className={step === 2 ? "grid gap-3" : "hidden"} aria-hidden={step !== 2}>
-          <Field
-            id={`${id}-tiktok`}
-            name="tiktokUrl"
-            label="TikTok URL"
-            step={2}
-            type="url"
-            placeholder="https://"
-          />
-          <Field
-            id={`${id}-podcast`}
-            name="podcastUrl"
-            label="Podcast URL"
-            step={2}
-            type="url"
-            placeholder="https://"
-          />
-          <Field
-            id={`${id}-newsletter`}
-            name="newsletterUrl"
-            label="Substack / Newsletter URL"
-            step={2}
-            type="url"
-            placeholder="https://"
-          />
-          <Field
-            id={`${id}-x`}
-            name="xUrl"
-            label="X.com URL"
-            step={2}
-            type="url"
-            placeholder="https://"
-          />
-          <Field
-            id={`${id}-facebook`}
-            name="facebookUrl"
-            label="Facebook URL"
-            step={2}
-            type="url"
-            placeholder="https://"
-          />
-          <Field
-            id={`${id}-website`}
-            name="websiteUrl"
-            label="Personal or Business website URL"
-            step={2}
-            type="url"
-            placeholder="https://"
-          />
-        </div>
-
-        {step === 1 ? (
-          <div className="mt-auto pt-3">
-            <div className="rounded-sm border border-charcoal/8 bg-cream px-3.5 py-3">
-              <p className="text-[0.6875rem] font-medium tracking-[0.08em] text-charcoal/45 uppercase">
-                Up next
-              </p>
-              <p className="mt-1 text-[0.8125rem] leading-relaxed text-charcoal/60">
-                Step 2 covers TikTok, podcast, newsletter, X, and more if you
-                use them. All optional.
-              </p>
-              <p className="mt-2.5 text-[0.6875rem] leading-relaxed text-charcoal/45">
-                By continuing, you agree we may contact you about
-                representation. We don&apos;t share your details with brands
-                without consent.
-              </p>
-            </div>
-          </div>
-        ) : null}
       </div>
 
       {state.message && !state.ok ? (
@@ -357,46 +233,18 @@ export function RepresentationApplicationForm() {
       ) : null}
 
       <div className="mt-4 shrink-0">
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
-        {step === 2 ? (
-          <button
-            type="button"
-            onClick={() => setStep(1)}
-            disabled={pending}
-            className="inline-flex items-center justify-center gap-2 rounded-sm border border-charcoal/15 px-5 py-2.5 text-[0.8125rem] font-medium text-charcoal transition-colors hover:border-charcoal/30 disabled:opacity-60"
-          >
-            <ArrowLeft weight="bold" className="size-3.5" aria-hidden />
-            Back
-          </button>
-        ) : null}
-
-        {step === 1 ? (
-          <button
-            type="button"
-            onClick={handleContinue}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-charcoal px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:bg-charcoal/90 sm:ml-auto sm:w-auto"
-          >
-            Continue
-            <ArrowRight weight="bold" className="size-3.5" aria-hidden />
-          </button>
-        ) : (
-          <button
-            type="submit"
-            disabled={pending}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-charcoal px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:bg-charcoal/90 disabled:opacity-60 sm:ml-auto sm:w-auto"
-          >
-            {pending ? "Submitting…" : "Submit application"}
-            <ArrowRight weight="bold" className="size-3.5" aria-hidden />
-          </button>
-          )}
-        </div>
-
-        {step === 2 ? (
-          <p className="mt-2.5 text-[0.6875rem] leading-relaxed text-charcoal/45">
-            By submitting, you agree we may contact you about representation. We
-            don&apos;t share your details with brands without consent.
-          </p>
-        ) : null}
+        <button
+          type="submit"
+          disabled={pending}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-charcoal px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:bg-charcoal/90 disabled:opacity-60 sm:ml-auto sm:w-auto"
+        >
+          {pending ? "Submitting…" : "Submit application"}
+          <ArrowRight weight="bold" className="size-3.5" aria-hidden />
+        </button>
+        <p className="mt-2.5 text-[0.6875rem] leading-relaxed text-charcoal/45">
+          By submitting, you agree we may contact you about representation. We
+          don&apos;t share your details with brands without consent.
+        </p>
       </div>
     </form>
   );
