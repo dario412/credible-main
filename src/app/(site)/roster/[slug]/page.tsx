@@ -19,7 +19,10 @@ import {
   enrichChannelsWithFollowerHistory,
   type ChannelFollowerHistory,
 } from "@/lib/channel-follower-history";
-import { meetsMinimumChannelFollowers } from "@/lib/channel-sparkline";
+import {
+  meetsMinimumChannelFollowers,
+  sumChannelFollowers,
+} from "@/lib/channel-sparkline";
 import { parseExpertChannels } from "@/lib/expert-channels";
 import {
   getExpertProfileEnrichment,
@@ -164,6 +167,57 @@ export async function generateMetadata({ params }: Props) {
   });
 }
 
+function isCombinedReachLabel(label: string) {
+  return /reach|followers|subscribers/i.test(label);
+}
+
+/** Prefer live channel sum, then synced Expert.combinedReach. */
+function resolveCombinedReach(
+  expert: { combinedReach: string | null },
+  extras: ProfileExtras,
+  channels?: ExpertChannelPresence[],
+): string | null {
+  const fromVisibleChannels = sumChannelFollowers(
+    (channels ?? []).filter((channel) =>
+      meetsMinimumChannelFollowers(channel.followers),
+    ),
+  );
+  if (fromVisibleChannels) return fromVisibleChannels;
+
+  const fromStoredChannels = sumChannelFollowers(
+    (extras.profileSections?.channels ?? []).filter((channel) =>
+      meetsMinimumChannelFollowers(channel.followers),
+    ),
+  );
+  if (fromStoredChannels) return fromStoredChannels;
+
+  const synced = expert.combinedReach?.trim();
+  return synced || null;
+}
+
+function withSyncedCombinedReach(
+  stats: ExpertProfileStat[],
+  combinedReach: string | null,
+): ExpertProfileStat[] {
+  if (!combinedReach) return stats.slice(0, 4);
+
+  let replaced = false;
+  const next = stats.map((stat) => {
+    if (!isCombinedReachLabel(stat.label)) return stat;
+    replaced = true;
+    return { ...stat, value: combinedReach };
+  });
+
+  if (!replaced) {
+    next.unshift({
+      label: "Combined reach",
+      value: combinedReach,
+    });
+  }
+
+  return next.slice(0, 4);
+}
+
 function buildStats(
   expert: {
     combinedReach: string | null;
@@ -171,7 +225,10 @@ function buildStats(
   },
   extras: ProfileExtras,
   enrichmentStats?: ExpertProfileStat[],
+  channels?: ExpertChannelPresence[],
 ): ExpertProfileStat[] {
+  const combinedReach = resolveCombinedReach(expert, extras, channels);
+
   const fromAirtable = [
     extras.highlight1,
     extras.highlight2,
@@ -186,12 +243,16 @@ function buildStats(
       accent: /growth/i.test(stat.label) ? ("forest" as const) : undefined,
     }));
 
-  if (fromAirtable.length > 0) return fromAirtable.slice(0, 4);
-  if (enrichmentStats?.length) return enrichmentStats;
+  if (fromAirtable.length > 0) {
+    return withSyncedCombinedReach(fromAirtable, combinedReach);
+  }
+  if (enrichmentStats?.length) {
+    return withSyncedCombinedReach(enrichmentStats, combinedReach);
+  }
 
   const stats: ExpertProfileStat[] = [];
-  if (expert.combinedReach) {
-    stats.push({ label: "Combined reach", value: expert.combinedReach });
+  if (combinedReach) {
+    stats.push({ label: "Combined reach", value: combinedReach });
   }
   if (expert.growth90d) {
     stats.push({
@@ -330,7 +391,12 @@ export default async function ExpertPage({ params }: Props) {
     (item) => item.q.trim() && item.a.trim(),
   );
 
-  const heroStats = buildStats(expert, extras, enrichment.stats);
+  const heroStats = buildStats(
+    expert,
+    extras,
+    enrichment.stats,
+    content.channels,
+  );
   const heroProof =
     extras.websiteSubtitle?.trim() ||
     (expert.shortBio && expert.shortBio.trim().length <= 180

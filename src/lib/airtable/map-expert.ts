@@ -161,6 +161,21 @@ export function parseHighlightStat(
   return { value: value || text, label };
 }
 
+function isCombinedReachLabel(label: string) {
+  return /reach|followers|subscribers/i.test(label);
+}
+
+/** Keep reach highlights aligned with the summed channel follower total. */
+export function withSyncedReachHighlight(
+  raw: string | null,
+  combinedReach: string | null,
+): string | null {
+  if (!raw || !combinedReach) return raw;
+  const parsed = parseHighlightStat(raw);
+  if (!parsed?.label || !isCombinedReachLabel(parsed.label)) return raw;
+  return `${combinedReach} ${parsed.label}`;
+}
+
 function highlightField(
   fields: Record<string, unknown>,
   n: 1 | 2 | 3 | 4,
@@ -381,6 +396,11 @@ export function mapAirtableRecordToExpert(
     asReachMetric(followersHeadline);
   const growth90d = growthStat?.value ?? null;
 
+  const syncedHighlight1 = withSyncedReachHighlight(highlight1, combinedReach);
+  const syncedHighlight2 = withSyncedReachHighlight(highlight2, combinedReach);
+  const syncedHighlight3 = withSyncedReachHighlight(highlight3, combinedReach);
+  const syncedHighlight4 = withSyncedReachHighlight(highlight4, combinedReach);
+
   const exclusiveRaw = field(
     fields,
     "Creator | Exclusivity",
@@ -433,10 +453,10 @@ export function mapAirtableRecordToExpert(
     topics,
     formats: [],
     combinedReach,
-    highlight1,
-    highlight2,
-    highlight3,
-    highlight4,
+    highlight1: syncedHighlight1,
+    highlight2: syncedHighlight2,
+    highlight3: syncedHighlight3,
+    highlight4: syncedHighlight4,
     growth90d,
     audienceWho: asString(
       field(fields, "Creator | Profile | Audience", "Audience"),
