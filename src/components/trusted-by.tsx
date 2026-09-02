@@ -11,24 +11,47 @@ import { logoAltFor, portraitAltFor } from "@/lib/image-alt";
 import { projectHref } from "@/lib/case-studies";
 import { cn } from "@/lib/utils";
 
-/** Pick a column count that fits the logo set evenly (no empty trailing slots). */
-function trustedByGridClass(count: number): string {
-  const base = "grid gap-x-6 gap-y-10 md:gap-x-8 md:gap-y-14";
+/**
+ * Prefer a column count that divides evenly (3–5). When it can't,
+ * keep a dense 5-col desktop row and let flex + justify-center
+ * center the leftover logos on the last row.
+ */
+function trustedByColumns(count: number): number {
+  if (count <= 1) return 1;
+  if (count === 2) return 2;
 
-  if (count <= 1) return `${base} grid-cols-1 justify-items-center`;
-  if (count === 2) return `${base} grid-cols-2`;
-  if (count === 3) return `${base} grid-cols-2 sm:grid-cols-3`;
-  if (count === 4) return `${base} grid-cols-2 sm:grid-cols-4`;
-  if (count === 5) return `${base} grid-cols-2 sm:grid-cols-3 md:grid-cols-5`;
-  if (count === 6) return `${base} grid-cols-2 sm:grid-cols-3 md:grid-cols-6`;
-  if (count === 7 || count === 8) {
-    return `${base} grid-cols-2 sm:grid-cols-4`;
+  for (const cols of [5, 4, 3] as const) {
+    if (count >= cols && count % cols === 0) return cols;
   }
-  if (count === 9) return `${base} grid-cols-3`;
-  if (count === 10) return `${base} grid-cols-2 sm:grid-cols-5`;
 
-  // 11+: cap at 5 columns so logos stay readable
-  return `${base} grid-cols-2 sm:grid-cols-3 md:grid-cols-5`;
+  // Avoid a single orphan when a denser leftover looks better.
+  if (count > 5) {
+    const rem5 = count % 5;
+    if (rem5 === 1 && count % 4 !== 1) return 4;
+    return 5;
+  }
+
+  return count;
+}
+
+function trustedByItemClass(cols: number): string {
+  // Widths leave room for gap-x-6 (1.5rem) / md:gap-x-8 (2rem) so full
+  // rows fill the row and incomplete last rows can center as a group.
+  switch (cols) {
+    case 1:
+      return "w-full max-w-[9.5rem]";
+    case 2:
+      return "w-[calc(50%-0.75rem)]";
+    case 3:
+      return "w-[calc(50%-0.75rem)] sm:w-[calc(33.333%-1rem)]";
+    case 4:
+      return "w-[calc(50%-0.75rem)] sm:w-[calc(25%-1.125rem)] md:w-[calc(25%-1.5rem)]";
+    case 6:
+      return "w-[calc(50%-0.75rem)] sm:w-[calc(33.333%-1rem)] md:w-[calc(16.666%-1.666rem)]";
+    case 5:
+    default:
+      return "w-[calc(50%-0.75rem)] sm:w-[calc(33.333%-1rem)] md:w-[calc(20%-1.6rem)]";
+  }
 }
 
 function BrandMark({
@@ -95,6 +118,8 @@ export function TrustedBy({
   tone?: "light" | "dark";
 }) {
   const isDark = tone === "dark";
+  const columns = trustedByColumns(clients.length);
+  const itemClass = trustedByItemClass(columns);
 
   const introNode = introLine?.trim() ? (
     <p
@@ -126,7 +151,7 @@ export function TrustedBy({
             <div className="mb-8 md:mb-10">{introNode}</div>
           )
         ) : null}
-        <ul className={trustedByGridClass(clients.length)}>
+        <ul className="flex flex-wrap justify-center gap-x-6 gap-y-10 md:gap-x-8 md:gap-y-14">
           {clients.map((client, index) => {
             const hasTestimonial = hasTrustedByStory(client);
             const testimonial = client.testimonial;
@@ -142,7 +167,7 @@ export function TrustedBy({
             );
 
             const item = (
-              <li className="group relative flex flex-col items-center gap-3">
+              <li className="group relative flex w-full flex-col items-center gap-3">
                 {hasTestimonial && testimonial ? (
                   <div
                     className="pointer-events-none absolute bottom-[calc(100%+0.75rem)] left-1/2 z-20 w-[min(18.5rem,calc(100vw-3rem))] -translate-x-1/2 scale-[0.96] opacity-0 transition-all duration-300 ease-out group-hover:pointer-events-auto group-hover:scale-100 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:scale-100 group-focus-within:opacity-100"
@@ -238,7 +263,10 @@ export function TrustedBy({
             );
 
             return (
-              <div key={client.id ?? `${client.name || "client"}-${index}`}>
+              <div
+                key={client.id ?? `${client.name || "client"}-${index}`}
+                className={cn(itemClass, "flex justify-center")}
+              >
                 {editSlots?.client ? editSlots.client(index, item) : item}
               </div>
             );

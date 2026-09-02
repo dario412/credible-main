@@ -88,6 +88,31 @@ function SocialIcon({ network }: { network: SocialNetwork }) {
   );
 }
 
+function HamburgerIcon({ open }: { open: boolean }) {
+  return (
+    <span className="relative block size-4" aria-hidden>
+      <span
+        className={cn(
+          "absolute left-0 block h-[1.5px] w-4 origin-center rounded-full bg-current transition-[transform,top,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          open ? "top-[7.25px] rotate-45" : "top-[3px] rotate-0",
+        )}
+      />
+      <span
+        className={cn(
+          "absolute top-[7.25px] left-0 block h-[1.5px] w-4 rounded-full bg-current transition-opacity duration-200",
+          open ? "opacity-0" : "opacity-100",
+        )}
+      />
+      <span
+        className={cn(
+          "absolute left-0 block h-[1.5px] w-4 origin-center rounded-full bg-current transition-[transform,top,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          open ? "top-[7.25px] -rotate-45" : "top-[11.5px] rotate-0",
+        )}
+      />
+    </span>
+  );
+}
+
 export function SiteHeader() {
   const pathname = usePathname();
   const { chrome } = useSiteChrome();
@@ -104,6 +129,7 @@ export function SiteHeader() {
     /^\/roster\/[^/]+\/?$/.test(pathname) ||
     /^\/projects\/[^/]+\/?$/.test(pathname);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
@@ -133,6 +159,35 @@ export function SiteHeader() {
       window.removeEventListener("resize", onScroll);
     };
   }, [overlay, isHome, isHeroOverlayPage]);
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = () => {
+      if (mq.matches) setMobileOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setMobileOpen(false);
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [mobileOpen]);
 
   const pageSurface = insightArticle ? "bg-cream-dark" : "bg-cream";
   // Hero overlay pages: cream pill + dark type until scroll, then charcoal bar.
@@ -169,75 +224,161 @@ export function SiteHeader() {
         }}
       />
 
-      <div className="mx-auto flex w-full max-w-352 items-stretch gap-1">
-        <div
-          className={cn(
-            "flex flex-1 items-center gap-3 rounded-sm p-3 shadow-[0_10px_40px_rgba(28,26,23,0.12)] transition-[background-color,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:gap-8 md:p-3.5",
-            onDarkHero ? "bg-cream" : "bg-charcoal",
-          )}
-        >
-          <Link href="/" className="shrink-0 transition-opacity hover:opacity-80">
-            <img
-              src={
-                onDarkHero
-                  ? "/brand/credible-wordmark.svg"
-                  : "/brand/credible-wordmark-cream.svg"
-              }
-              alt="Credible"
-              width={253}
-              height={50}
-              className="h-5 w-auto md:h-6"
-            />
-          </Link>
-
-          <nav
-            className="hidden flex-1 items-center justify-center gap-6 md:flex lg:gap-9"
-            aria-label="Primary"
-          >
-            {links.map((link) => (
-              <Link
-                key={`${link.href}-${link.label}`}
-                href={link.href}
-                className={cn(
-                  "text-[0.8125rem] transition-colors duration-300",
-                  onDarkHero
-                    ? "text-charcoal/70 hover:text-charcoal"
-                    : "text-cream/85 hover:text-cream",
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-
-        <Link
-          href={chrome.header.ctaHref}
-          className="inline-flex shrink-0 items-center justify-center rounded-sm bg-forest px-5 text-[0.8125rem] font-medium text-cream shadow-[0_10px_40px_rgba(28,26,23,0.12)] transition-colors hover:bg-forest-dark md:px-6"
-        >
-          {chrome.header.ctaLabel}
-        </Link>
-
-        <ShortlistMenu />
-      </div>
-
-      <nav
-        className="mt-3 flex gap-5 overflow-x-auto px-1 pb-1 md:hidden"
-        aria-label="Mobile"
-      >
-        {links.map((link) => (
-          <Link
-            key={`m-${link.href}-${link.label}`}
-            href={link.href}
+      <div className="relative mx-auto w-full max-w-352">
+        <div className="relative z-50 flex w-full items-stretch gap-1">
+          <div
             className={cn(
-              "whitespace-nowrap text-sm transition-colors duration-300",
-              onDarkHero ? "text-cream/85" : "text-charcoal/75",
+              "flex flex-1 items-center gap-3 rounded-sm p-3 shadow-[0_10px_40px_rgba(28,26,23,0.12)] transition-[background-color,box-shadow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] md:gap-8 md:p-3.5",
+              onDarkHero ? "bg-cream" : "bg-charcoal",
             )}
           >
-            {link.label}
+            <Link
+              href="/"
+              className="shrink-0 transition-opacity hover:opacity-80"
+              onClick={() => setMobileOpen(false)}
+            >
+              <img
+                src={
+                  onDarkHero
+                    ? "/brand/credible-wordmark.svg"
+                    : "/brand/credible-wordmark-cream.svg"
+                }
+                alt="Credible"
+                width={253}
+                height={50}
+                className="h-5 w-auto md:h-6"
+              />
+            </Link>
+
+            <nav
+              className="hidden flex-1 items-center justify-center gap-6 md:flex lg:gap-9"
+              aria-label="Primary"
+            >
+              {links.map((link) => (
+                <Link
+                  key={`${link.href}-${link.label}`}
+                  href={link.href}
+                  className={cn(
+                    "text-[0.8125rem] transition-colors duration-300",
+                    onDarkHero
+                      ? "text-charcoal/70 hover:text-charcoal"
+                      : "text-cream/85 hover:text-cream",
+                  )}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            <button
+              type="button"
+              className={cn(
+                "ml-auto inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-sm transition-colors md:hidden",
+                onDarkHero
+                  ? "text-charcoal hover:bg-charcoal/6"
+                  : "text-cream hover:bg-cream/10",
+              )}
+              aria-expanded={mobileOpen}
+              aria-controls="site-mobile-nav"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMobileOpen((open) => !open)}
+            >
+              <HamburgerIcon open={mobileOpen} />
+            </button>
+          </div>
+
+          <Link
+            href={chrome.header.ctaHref}
+            className="inline-flex shrink-0 items-center justify-center rounded-sm bg-forest px-5 text-[0.8125rem] font-medium text-cream shadow-[0_10px_40px_rgba(28,26,23,0.12)] transition-colors hover:bg-forest-dark md:px-6"
+            onClick={() => setMobileOpen(false)}
+          >
+            {chrome.header.ctaLabel}
           </Link>
-        ))}
-      </nav>
+
+          <ShortlistMenu />
+        </div>
+
+        <div
+          className={cn(
+            "md:hidden",
+            mobileOpen
+              ? "pointer-events-auto"
+              : "pointer-events-none",
+          )}
+        >
+          <button
+            type="button"
+            aria-label="Close menu"
+            tabIndex={mobileOpen ? 0 : -1}
+            className={cn(
+              "fixed inset-0 z-40 bg-charcoal/35 transition-opacity duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+              mobileOpen ? "opacity-100" : "opacity-0",
+            )}
+            onClick={() => setMobileOpen(false)}
+          />
+
+          <nav
+            id="site-mobile-nav"
+            aria-label="Mobile"
+            aria-hidden={!mobileOpen}
+            className={cn(
+              "relative z-50 mt-2 origin-top overflow-hidden rounded-sm shadow-[0_18px_44px_rgba(28,26,23,0.18)] transition-[opacity,transform,max-height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+              onDarkHero ? "bg-cream" : "bg-charcoal",
+              mobileOpen
+                ? "max-h-[min(28rem,calc(100dvh-6rem))] translate-y-0 opacity-100"
+                : "max-h-0 -translate-y-1 opacity-0",
+            )}
+          >
+            <ul className="flex flex-col px-2 py-2">
+              {links.map((link) => {
+                const active =
+                  link.href === "/"
+                    ? pathname === "/"
+                    : pathname === link.href ||
+                      pathname.startsWith(`${link.href}/`);
+
+                return (
+                  <li key={`m-${link.href}-${link.label}`}>
+                    <Link
+                      href={link.href}
+                      tabIndex={mobileOpen ? 0 : -1}
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(
+                        "flex items-center justify-between rounded-sm px-3 py-3 text-[0.95rem] transition-colors",
+                        onDarkHero
+                          ? active
+                            ? "bg-charcoal/6 text-charcoal"
+                            : "text-charcoal/75 hover:bg-charcoal/5 hover:text-charcoal"
+                          : active
+                            ? "bg-cream/10 text-cream"
+                            : "text-cream/80 hover:bg-cream/8 hover:text-cream",
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div
+              className={cn(
+                "border-t px-3 py-3",
+                onDarkHero ? "border-charcoal/10" : "border-cream/10",
+              )}
+            >
+              <Link
+                href={chrome.header.ctaHref}
+                tabIndex={mobileOpen ? 0 : -1}
+                onClick={() => setMobileOpen(false)}
+                className="inline-flex w-full items-center justify-center rounded-sm bg-forest px-5 py-3 text-[0.8125rem] font-medium text-cream transition-colors hover:bg-forest-dark"
+              >
+                {chrome.header.ctaLabel}
+              </Link>
+            </div>
+          </nav>
+        </div>
+      </div>
     </header>
   );
 }
