@@ -5,22 +5,28 @@ import { useRouter } from "next/navigation";
 
 import { EditableHit } from "@/components/editable-hit";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
-import type { RosterPageSections } from "@/lib/roster-page";
+import {
+  formatRosterHeadline,
+  type RosterPageSections,
+} from "@/lib/roster-page";
 
 type RosterEditTarget = "hero";
 
 function RosterHero({
   sections,
+  rosterCount,
   editing,
   selected,
   onSelect,
 }: {
   sections: RosterPageSections;
+  rosterCount: number;
   editing: boolean;
   selected: RosterEditTarget | null;
   onSelect: (target: RosterEditTarget) => void;
 }) {
   const { headline, headlineAccent, subhead } = sections.hero;
+  const displayHeadline = formatRosterHeadline(headline, rosterCount);
 
   return (
     <div className="mx-auto max-w-3xl text-center">
@@ -33,9 +39,9 @@ function RosterHero({
         ringOffset="ring-offset-cream"
       >
         <h1 className="font-display text-[2.6rem] leading-[1.08] tracking-tight text-charcoal sm:text-[3.15rem] md:text-[3.65rem]">
-          {headline.trim() ? (
+          {displayHeadline.trim() ? (
             <>
-              {headline}
+              {displayHeadline}
               {headlineAccent.trim() ? (
                 <>
                   <br />
@@ -117,7 +123,7 @@ function EditorPopover({
         <Field
           label="Headline"
           id="ve-roster-headline"
-          hint="First line, before the accent."
+          hint="First line, before the accent. Use {count} for the live roster total."
         >
           <TextInput
             id="ve-roster-headline"
@@ -159,11 +165,13 @@ export function RosterVisualEditor({
   initial,
   canEdit,
   saveAction,
+  rosterCount,
   children,
 }: {
   initial: RosterPageSections;
   canEdit: boolean;
   saveAction: typeof import("@/lib/actions/admin-cms").saveRosterPage;
+  rosterCount: number;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -204,6 +212,7 @@ export function RosterVisualEditor({
     <>
       <RosterHero
         sections={sections}
+        rosterCount={rosterCount}
         editing={editing && canEdit}
         selected={target}
         onSelect={setTarget}

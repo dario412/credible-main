@@ -16,12 +16,14 @@ import { createMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = createMetadata({
-  title: "Roster",
-  description:
-    "Twenty-four B2B expert creators ready to brief — filter by role, category or channel.",
-  path: "/roster",
-});
+export async function generateMetadata() {
+  const count = await prisma.expert.count();
+  return createMetadata({
+    title: "Roster",
+    description: `${count} B2B expert creators ready to brief — filter by role, category or channel.`,
+    path: "/roster",
+  });
+}
 
 type SearchParams = Promise<{
   archetype?: string;
@@ -127,6 +129,7 @@ export default async function RosterPage({
           initial={sections}
           canEdit={canEdit}
           saveAction={saveRosterPage}
+          rosterCount={all.length}
         >
           <StickyRosterFilters
             archetypeOptions={archetypeOptions}

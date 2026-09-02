@@ -46,12 +46,18 @@ export type ContactPageSections = {
       eyebrow: string;
       title: string;
       body: string;
+      usEyebrow: string;
+      usTitle: string;
+      usBody: string;
     };
     phone: {
       eyebrow: string;
       number: string;
       tel: string;
       body: string;
+      usNumber: string;
+      usTel: string;
+      usBody: string;
     };
     socials: {
       eyebrow: string;
@@ -122,12 +128,18 @@ export const DEFAULT_CONTACT_SECTIONS: ContactPageSections = {
       eyebrow: "London office",
       title: "Credible Talent Ltd",
       body: "Somers Town, London NW1",
+      usEyebrow: "US office",
+      usTitle: "Credible Talent LLC",
+      usBody: "New York, NY",
     },
     phone: {
       eyebrow: "By phone",
       number: "+44 20 7946 0018",
       tel: "+442079460018",
       body: "Weekdays, 9am–6pm GMT",
+      usNumber: "+1 646 794 6018",
+      usTel: "+16467946018",
+      usBody: "Weekdays, 9am–6pm ET",
     },
     socials: {
       eyebrow: "Follow along",
@@ -295,12 +307,18 @@ export function mergeContactSections(raw: unknown): ContactPageSections {
         eyebrow: asString(office.eyebrow, defaults.footer.office.eyebrow),
         title: asString(office.title, defaults.footer.office.title),
         body: asString(office.body, defaults.footer.office.body),
+        usEyebrow: asString(office.usEyebrow, defaults.footer.office.usEyebrow),
+        usTitle: asString(office.usTitle, defaults.footer.office.usTitle),
+        usBody: asString(office.usBody, defaults.footer.office.usBody),
       },
       phone: {
         eyebrow: asString(phone.eyebrow, defaults.footer.phone.eyebrow),
         number: asString(phone.number, defaults.footer.phone.number),
         tel: asString(phone.tel, defaults.footer.phone.tel),
         body: asString(phone.body, defaults.footer.phone.body),
+        usNumber: asString(phone.usNumber, defaults.footer.phone.usNumber),
+        usTel: asString(phone.usTel, defaults.footer.phone.usTel),
+        usBody: asString(phone.usBody, defaults.footer.phone.usBody),
       },
       socials: {
         eyebrow: asString(socials.eyebrow, defaults.footer.socials.eyebrow),

@@ -405,9 +405,9 @@ export function ContactPageEditorForm({
 
       <section className="space-y-4">
         <div>
-          <h2 className="font-display text-xl">London office</h2>
+          <h2 className="font-display text-xl">Offices</h2>
         </div>
-        <Field label="Eyebrow" id="ct-office-eyebrow">
+        <Field label="London eyebrow" id="ct-office-eyebrow">
           <TextInput
             id="ct-office-eyebrow"
             value={sections.footer.office.eyebrow}
@@ -431,7 +431,7 @@ export function ContactPageEditorForm({
             }
           />
         </Field>
-        <Field label="Address" id="ct-office-body">
+        <Field label="London address" id="ct-office-body">
           <TextArea
             id="ct-office-body"
             rows={2}
@@ -440,6 +440,52 @@ export function ContactPageEditorForm({
               setFooter({
                 ...sections.footer,
                 office: { ...sections.footer.office, body: e.target.value },
+              })
+            }
+          />
+        </Field>
+        <Field label="US eyebrow" id="ct-office-us-eyebrow">
+          <TextInput
+            id="ct-office-us-eyebrow"
+            value={sections.footer.office.usEyebrow}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                office: {
+                  ...sections.footer.office,
+                  usEyebrow: e.target.value,
+                },
+              })
+            }
+          />
+        </Field>
+        <Field label="US title" id="ct-office-us-title">
+          <TextInput
+            id="ct-office-us-title"
+            value={sections.footer.office.usTitle}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                office: {
+                  ...sections.footer.office,
+                  usTitle: e.target.value,
+                },
+              })
+            }
+          />
+        </Field>
+        <Field label="US address" id="ct-office-us-body">
+          <TextArea
+            id="ct-office-us-body"
+            rows={2}
+            value={sections.footer.office.usBody}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                office: {
+                  ...sections.footer.office,
+                  usBody: e.target.value,
+                },
               })
             }
           />
@@ -462,7 +508,7 @@ export function ContactPageEditorForm({
             }
           />
         </Field>
-        <Field label="Display number" id="ct-phone-number">
+        <Field label="UK display number" id="ct-phone-number">
           <TextInput
             id="ct-phone-number"
             value={sections.footer.phone.number}
@@ -475,7 +521,7 @@ export function ContactPageEditorForm({
           />
         </Field>
         <Field
-          label="Tel link"
+          label="UK tel link"
           id="ct-phone-tel"
           hint="Digits only, e.g. +442079460018"
         >
@@ -490,7 +536,7 @@ export function ContactPageEditorForm({
             }
           />
         </Field>
-        <Field label="Hours / note" id="ct-phone-body">
+        <Field label="UK hours / note" id="ct-phone-body">
           <TextArea
             id="ct-phone-body"
             rows={2}
@@ -499,6 +545,50 @@ export function ContactPageEditorForm({
               setFooter({
                 ...sections.footer,
                 phone: { ...sections.footer.phone, body: e.target.value },
+              })
+            }
+          />
+        </Field>
+        <Field label="US display number" id="ct-phone-us-number">
+          <TextInput
+            id="ct-phone-us-number"
+            value={sections.footer.phone.usNumber}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                phone: {
+                  ...sections.footer.phone,
+                  usNumber: e.target.value,
+                },
+              })
+            }
+          />
+        </Field>
+        <Field
+          label="US tel link"
+          id="ct-phone-us-tel"
+          hint="Digits only, e.g. +16467946018"
+        >
+          <TextInput
+            id="ct-phone-us-tel"
+            value={sections.footer.phone.usTel}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                phone: { ...sections.footer.phone, usTel: e.target.value },
+              })
+            }
+          />
+        </Field>
+        <Field label="US hours / note" id="ct-phone-us-body">
+          <TextArea
+            id="ct-phone-us-body"
+            rows={2}
+            value={sections.footer.phone.usBody}
+            onChange={(e) =>
+              setFooter({
+                ...sections.footer,
+                phone: { ...sections.footer.phone, usBody: e.target.value },
               })
             }
           />

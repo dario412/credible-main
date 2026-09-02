@@ -49,7 +49,7 @@ export function RosterPageEditorForm({
         <Field
           label="Headline"
           id="roster-headline"
-          hint="First line, before the accent."
+          hint="First line, before the accent. Use {count} for the live roster total."
         >
           <TextInput
             id="roster-headline"

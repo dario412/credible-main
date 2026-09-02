@@ -26,7 +26,9 @@ type ContactEditTarget =
   | "nextSteps"
   | "channels"
   | "office"
+  | "usOffice"
   | "phone"
+  | "usPhone"
   | "socials";
 
 function targetTitle(target: ContactEditTarget): string {
@@ -36,7 +38,9 @@ function targetTitle(target: ContactEditTarget): string {
     nextSteps: "What happens next",
     channels: "Email channels",
     office: "London office",
-    phone: "By phone",
+    usOffice: "US office",
+    phone: "UK phone",
+    usPhone: "US phone",
     socials: "Follow along",
   };
   return map[target];
@@ -340,16 +344,25 @@ function ContactFooter({
   const socials = footer.socials.items.filter(
     (item) => item.label.trim() || item.handle.trim() || item.href.trim(),
   );
-  const showOffice =
+  const showLondonOffice =
     editing ||
     footer.office.eyebrow.trim() ||
     footer.office.title.trim() ||
     footer.office.body.trim();
-  const showPhone =
+  const showUsOffice =
+    editing ||
+    footer.office.usEyebrow.trim() ||
+    footer.office.usTitle.trim() ||
+    footer.office.usBody.trim();
+  const showOffice = showLondonOffice || showUsOffice;
+  const showUkPhone =
     editing ||
     footer.phone.eyebrow.trim() ||
     footer.phone.number.trim() ||
     footer.phone.body.trim();
+  const showUsPhone =
+    editing || footer.phone.usNumber.trim() || footer.phone.usBody.trim();
+  const showPhone = showUkPhone || showUsPhone;
   const showSocials =
     editing || footer.socials.eyebrow.trim() || socials.length > 0;
   const showChannels = editing || channels.length > 0;
@@ -433,86 +446,180 @@ function ContactFooter({
           }
         >
           {showOffice ? (
-            <EditableHit
-              active={editing}
-              selected={selected === "office"}
-              onSelect={() => onSelect("office")}
-              label="London office"
-              block
-              ringOffset="ring-offset-cream"
-            >
-              <div className="flex h-full flex-col rounded-sm border border-charcoal/10 p-5 md:p-6">
-                {footer.office.eyebrow.trim() ? (
-                  <p className={EYEBROW}>{footer.office.eyebrow}</p>
-                ) : editing ? (
-                  <p className={`${EYEBROW} text-charcoal/30`}>Office eyebrow</p>
-                ) : null}
-                {footer.office.title.trim() ? (
-                  <p className="mt-4 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
-                    {footer.office.title}
-                  </p>
-                ) : editing ? (
-                  <p className="mt-4 font-display text-[1.15rem] text-charcoal/35">
-                    Company name
-                  </p>
-                ) : null}
-                {footer.office.body.trim() ? (
-                  <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-                    {footer.office.body}
-                  </p>
-                ) : editing ? (
-                  <p className="mt-1.5 text-[0.8125rem] text-charcoal/35">
-                    Address
-                  </p>
-                ) : null}
-              </div>
-            </EditableHit>
+            <div className="flex h-full flex-col rounded-sm border border-charcoal/10 p-5 md:p-6">
+              {showLondonOffice ? (
+                <EditableHit
+                  active={editing}
+                  selected={selected === "office"}
+                  onSelect={() => onSelect("office")}
+                  label="London office"
+                  block
+                  ringOffset="ring-offset-cream"
+                >
+                  <div>
+                    {footer.office.eyebrow.trim() ? (
+                      <p className={EYEBROW}>{footer.office.eyebrow}</p>
+                    ) : editing ? (
+                      <p className={`${EYEBROW} text-charcoal/30`}>
+                        Office eyebrow
+                      </p>
+                    ) : null}
+                    {footer.office.title.trim() ? (
+                      <p className="mt-4 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
+                        {footer.office.title}
+                      </p>
+                    ) : editing ? (
+                      <p className="mt-4 font-display text-[1.15rem] text-charcoal/35">
+                        Company name
+                      </p>
+                    ) : null}
+                    {footer.office.body.trim() ? (
+                      <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
+                        {footer.office.body}
+                      </p>
+                    ) : editing ? (
+                      <p className="mt-1.5 text-[0.8125rem] text-charcoal/35">
+                        Address
+                      </p>
+                    ) : null}
+                  </div>
+                </EditableHit>
+              ) : null}
+
+              {showUsOffice ? (
+                <EditableHit
+                  active={editing}
+                  selected={selected === "usOffice"}
+                  onSelect={() => onSelect("usOffice")}
+                  label="US office"
+                  block
+                  ringOffset="ring-offset-cream"
+                  className={showLondonOffice ? "mt-4 border-t border-charcoal/10 pt-4" : undefined}
+                >
+                  <div>
+                    {footer.office.usEyebrow.trim() ? (
+                      <p className={EYEBROW}>{footer.office.usEyebrow}</p>
+                    ) : editing ? (
+                      <p className={`${EYEBROW} text-charcoal/30`}>
+                        US office eyebrow
+                      </p>
+                    ) : null}
+                    {footer.office.usTitle.trim() ? (
+                      <p className="mt-4 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
+                        {footer.office.usTitle}
+                      </p>
+                    ) : editing ? (
+                      <p className="mt-4 font-display text-[1.15rem] text-charcoal/35">
+                        US company name
+                      </p>
+                    ) : null}
+                    {footer.office.usBody.trim() ? (
+                      <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
+                        {footer.office.usBody}
+                      </p>
+                    ) : editing ? (
+                      <p className="mt-1.5 text-[0.8125rem] text-charcoal/35">
+                        US address
+                      </p>
+                    ) : null}
+                  </div>
+                </EditableHit>
+              ) : null}
+            </div>
           ) : null}
 
           {showPhone ? (
-            <EditableHit
-              active={editing}
-              selected={selected === "phone"}
-              onSelect={() => onSelect("phone")}
-              label="By phone"
-              block
-              ringOffset="ring-offset-cream"
-            >
-              <div className="flex h-full flex-col rounded-sm border border-charcoal/10 p-5 md:p-6">
-                {footer.phone.eyebrow.trim() ? (
-                  <p className={EYEBROW}>{footer.phone.eyebrow}</p>
-                ) : editing ? (
-                  <p className={`${EYEBROW} text-charcoal/30`}>Phone eyebrow</p>
-                ) : null}
-                {footer.phone.number.trim() ? (
-                  editing ? (
-                    <p className="mt-4 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
-                      {footer.phone.number}
-                    </p>
-                  ) : (
-                    <a
-                      href={`tel:${footer.phone.tel.trim() || footer.phone.number.replace(/\s/g, "")}`}
-                      className="mt-4 inline-block font-display text-[1.15rem] leading-snug tracking-tight text-charcoal transition-colors hover:text-forest"
-                    >
-                      {footer.phone.number}
-                    </a>
-                  )
-                ) : editing ? (
-                  <p className="mt-4 font-display text-[1.15rem] text-charcoal/35">
-                    Phone number
-                  </p>
-                ) : null}
-                {footer.phone.body.trim() ? (
-                  <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
-                    {footer.phone.body}
-                  </p>
-                ) : editing ? (
-                  <p className="mt-1.5 text-[0.8125rem] text-charcoal/35">
-                    Hours
-                  </p>
-                ) : null}
-              </div>
-            </EditableHit>
+            <div className="flex h-full flex-col rounded-sm border border-charcoal/10 p-5 md:p-6">
+              {showUkPhone ? (
+                <EditableHit
+                  active={editing}
+                  selected={selected === "phone"}
+                  onSelect={() => onSelect("phone")}
+                  label="UK phone"
+                  block
+                  ringOffset="ring-offset-cream"
+                >
+                  <div>
+                    {footer.phone.eyebrow.trim() ? (
+                      <p className={EYEBROW}>{footer.phone.eyebrow}</p>
+                    ) : editing ? (
+                      <p className={`${EYEBROW} text-charcoal/30`}>
+                        Phone eyebrow
+                      </p>
+                    ) : null}
+                    {footer.phone.number.trim() ? (
+                      editing ? (
+                        <p className="mt-4 font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
+                          {footer.phone.number}
+                        </p>
+                      ) : (
+                        <a
+                          href={`tel:${footer.phone.tel.trim() || footer.phone.number.replace(/\s/g, "")}`}
+                          className="mt-4 inline-block font-display text-[1.15rem] leading-snug tracking-tight text-charcoal transition-colors hover:text-forest"
+                        >
+                          {footer.phone.number}
+                        </a>
+                      )
+                    ) : editing ? (
+                      <p className="mt-4 font-display text-[1.15rem] text-charcoal/35">
+                        UK phone number
+                      </p>
+                    ) : null}
+                    {footer.phone.body.trim() ? (
+                      <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
+                        {footer.phone.body}
+                      </p>
+                    ) : editing ? (
+                      <p className="mt-1.5 text-[0.8125rem] text-charcoal/35">
+                        UK hours
+                      </p>
+                    ) : null}
+                  </div>
+                </EditableHit>
+              ) : null}
+
+              {showUsPhone ? (
+                <EditableHit
+                  active={editing}
+                  selected={selected === "usPhone"}
+                  onSelect={() => onSelect("usPhone")}
+                  label="US phone"
+                  block
+                  ringOffset="ring-offset-cream"
+                  className={showUkPhone ? "mt-4 border-t border-charcoal/10 pt-4" : undefined}
+                >
+                  <div>
+                    {footer.phone.usNumber.trim() ? (
+                      editing ? (
+                        <p className="font-display text-[1.15rem] leading-snug tracking-tight text-charcoal">
+                          {footer.phone.usNumber}
+                        </p>
+                      ) : (
+                        <a
+                          href={`tel:${footer.phone.usTel.trim() || footer.phone.usNumber.replace(/\s/g, "")}`}
+                          className="inline-block font-display text-[1.15rem] leading-snug tracking-tight text-charcoal transition-colors hover:text-forest"
+                        >
+                          {footer.phone.usNumber}
+                        </a>
+                      )
+                    ) : editing ? (
+                      <p className="font-display text-[1.15rem] text-charcoal/35">
+                        US phone number
+                      </p>
+                    ) : null}
+                    {footer.phone.usBody.trim() ? (
+                      <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-charcoal/55">
+                        {footer.phone.usBody}
+                      </p>
+                    ) : editing ? (
+                      <p className="mt-1.5 text-[0.8125rem] text-charcoal/35">
+                        US hours
+                      </p>
+                    ) : null}
+                  </div>
+                </EditableHit>
+              ) : null}
+            </div>
           ) : null}
 
           {showSocials ? (
@@ -997,7 +1104,7 @@ function EditorPopover({
 
         {target === "office" ? (
           <>
-            <Field label="Eyebrow" id="ve-ct-office-eyebrow">
+            <Field label="London eyebrow" id="ve-ct-office-eyebrow">
               <TextInput
                 id="ve-ct-office-eyebrow"
                 value={sections.footer.office.eyebrow}
@@ -1012,7 +1119,7 @@ function EditorPopover({
                 }
               />
             </Field>
-            <Field label="Title" id="ve-ct-office-title">
+            <Field label="London title" id="ve-ct-office-title">
               <TextInput
                 id="ve-ct-office-title"
                 value={sections.footer.office.title}
@@ -1027,7 +1134,7 @@ function EditorPopover({
                 }
               />
             </Field>
-            <Field label="Address" id="ve-ct-office-body">
+            <Field label="London address" id="ve-ct-office-body">
               <TextArea
                 id="ve-ct-office-body"
                 rows={2}
@@ -1046,9 +1153,60 @@ function EditorPopover({
           </>
         ) : null}
 
+        {target === "usOffice" ? (
+          <>
+            <Field label="US eyebrow" id="ve-ct-office-us-eyebrow">
+              <TextInput
+                id="ve-ct-office-us-eyebrow"
+                value={sections.footer.office.usEyebrow}
+                onChange={(e) =>
+                  setFooter({
+                    ...sections.footer,
+                    office: {
+                      ...sections.footer.office,
+                      usEyebrow: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+            <Field label="US title" id="ve-ct-office-us-title">
+              <TextInput
+                id="ve-ct-office-us-title"
+                value={sections.footer.office.usTitle}
+                onChange={(e) =>
+                  setFooter({
+                    ...sections.footer,
+                    office: {
+                      ...sections.footer.office,
+                      usTitle: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+            <Field label="US address" id="ve-ct-office-us-body">
+              <TextArea
+                id="ve-ct-office-us-body"
+                rows={2}
+                value={sections.footer.office.usBody}
+                onChange={(e) =>
+                  setFooter({
+                    ...sections.footer,
+                    office: {
+                      ...sections.footer.office,
+                      usBody: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+          </>
+        ) : null}
+
         {target === "phone" ? (
           <>
-            <Field label="Eyebrow" id="ve-ct-phone-eyebrow">
+            <Field label="Section eyebrow" id="ve-ct-phone-eyebrow">
               <TextInput
                 id="ve-ct-phone-eyebrow"
                 value={sections.footer.phone.eyebrow}
@@ -1063,7 +1221,7 @@ function EditorPopover({
                 }
               />
             </Field>
-            <Field label="Display number" id="ve-ct-phone-number">
+            <Field label="UK display number" id="ve-ct-phone-number">
               <TextInput
                 id="ve-ct-phone-number"
                 value={sections.footer.phone.number}
@@ -1079,7 +1237,7 @@ function EditorPopover({
               />
             </Field>
             <Field
-              label="Tel link"
+              label="UK tel link"
               id="ve-ct-phone-tel"
               hint="Digits only, e.g. +442079460018"
             >
@@ -1094,7 +1252,7 @@ function EditorPopover({
                 }
               />
             </Field>
-            <Field label="Hours / note" id="ve-ct-phone-body">
+            <Field label="UK hours / note" id="ve-ct-phone-body">
               <TextArea
                 id="ve-ct-phone-body"
                 rows={2}
@@ -1103,6 +1261,61 @@ function EditorPopover({
                   setFooter({
                     ...sections.footer,
                     phone: { ...sections.footer.phone, body: e.target.value },
+                  })
+                }
+              />
+            </Field>
+          </>
+        ) : null}
+
+        {target === "usPhone" ? (
+          <>
+            <Field label="US display number" id="ve-ct-phone-us-number">
+              <TextInput
+                id="ve-ct-phone-us-number"
+                value={sections.footer.phone.usNumber}
+                onChange={(e) =>
+                  setFooter({
+                    ...sections.footer,
+                    phone: {
+                      ...sections.footer.phone,
+                      usNumber: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+            <Field
+              label="US tel link"
+              id="ve-ct-phone-us-tel"
+              hint="Digits only, e.g. +16467946018"
+            >
+              <TextInput
+                id="ve-ct-phone-us-tel"
+                value={sections.footer.phone.usTel}
+                onChange={(e) =>
+                  setFooter({
+                    ...sections.footer,
+                    phone: {
+                      ...sections.footer.phone,
+                      usTel: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Field>
+            <Field label="US hours / note" id="ve-ct-phone-us-body">
+              <TextArea
+                id="ve-ct-phone-us-body"
+                rows={2}
+                value={sections.footer.phone.usBody}
+                onChange={(e) =>
+                  setFooter({
+                    ...sections.footer,
+                    phone: {
+                      ...sections.footer.phone,
+                      usBody: e.target.value,
+                    },
                   })
                 }
               />
