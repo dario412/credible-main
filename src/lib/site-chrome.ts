@@ -245,7 +245,25 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
     columns: [
       {
         title: "Roster",
-        links: [{ href: "/roster", label: "All creators" }],
+        links: [
+          { href: "/roster", label: "All creators" },
+          {
+            href: "/roster?topic=AI%20Engineering",
+            label: "AI Engineering",
+          },
+          {
+            href: "/roster?topic=Go-to-Market%20%26%20Revenue",
+            label: "Go-to-Market & Revenue",
+          },
+          { href: "/roster?topic=Sales", label: "Sales" },
+          { href: "/roster?topic=Marketing", label: "Marketing" },
+          { href: "/roster?topic=Branding", label: "Branding" },
+          { href: "/roster?topic=Leadership", label: "Leadership" },
+          {
+            href: "/roster?topic=Entrepreneurship",
+            label: "Entrepreneurship",
+          },
+        ],
       },
       {
         title: "What we do",
@@ -527,7 +545,15 @@ function mergeFooterColumn(
   }
   const data = raw as Partial<FooterColumn>;
   const title = asString(data.title, fallback?.title ?? "");
-  const links = mergeNavLinks(data.links, fallback?.links ?? []);
+  let links = mergeNavLinks(data.links, fallback?.links ?? []);
+  const isRosterColumn = title.trim().toLowerCase() === "roster";
+  const isStubRosterColumn =
+    isRosterColumn &&
+    links.length === 1 &&
+    links[0]?.href.replace(/\/$/, "") === "/roster";
+  if (isStubRosterColumn && fallback && fallback.links.length > 1) {
+    links = fallback.links.map((link) => ({ ...link }));
+  }
   if (!title.trim() && links.length === 0) return null;
   return { title, links };
 }

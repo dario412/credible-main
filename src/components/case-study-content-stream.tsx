@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 
 import { SiteImage } from "@/components/site-image";
+import { RichTextContent } from "@/components/rich-text-field";
 import { StatCounter } from "@/components/stat-counter";
 import { logoAltFor } from "@/lib/image-alt";
 import type {
@@ -220,6 +221,16 @@ function ColumnBlock({
         >
           {block.text}
         </p>
+      );
+    case "richtext":
+      return (
+        <RichTextContent
+          html={block.html}
+          className={cn(
+            "text-[0.98rem] leading-relaxed text-charcoal/65 md:text-[1.02rem]",
+            isFirst ? undefined : "mt-5",
+          )}
+        />
       );
     case "quoteInline":
       return (

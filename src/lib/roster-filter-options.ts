@@ -1,60 +1,9 @@
 import type { NavLink } from "@/lib/site-chrome";
 
-export const FOOTER_ROSTER_LINKS_PER_COLUMN = 7;
-
-export function buildFooterRosterNavLinks(
-  categoryLabels: string[],
-  allCreatorsLabel = "All creators",
-): NavLink[] {
-  return [
-    { href: "/roster", label: allCreatorsLabel },
-    ...categoryLabels.map((label) => ({
-      href: `/roster?topic=${encodeURIComponent(label)}`,
-      label,
-    })),
-  ];
-}
-
-/** Split a long roster link list into even columns for the footer nav. */
-export function splitFooterNavLinks(
-  links: NavLink[],
-  maxPerColumn = FOOTER_ROSTER_LINKS_PER_COLUMN,
-): NavLink[][] {
-  if (links.length <= maxPerColumn) return [links];
-
-  const columnCount = Math.ceil(links.length / maxPerColumn);
-  const chunkSize = Math.ceil(links.length / columnCount);
-  const columns: NavLink[][] = [];
-
-  for (let index = 0; index < links.length; index += chunkSize) {
-    columns.push(links.slice(index, index + chunkSize));
-  }
-
-  return columns;
-}
-
 export function expandFooterNavLists(
   columns: Array<{ title: string; links: NavLink[] }>,
-  rosterNavLinks?: NavLink[],
 ): NavLink[][] {
-  const lists: NavLink[][] = [];
-
-  for (const column of columns) {
-    const isRoster = column.title.trim().toLowerCase() === "roster";
-    const links =
-      isRoster && rosterNavLinks && rosterNavLinks.length > 0
-        ? rosterNavLinks
-        : column.links;
-
-    if (isRoster && links.length > FOOTER_ROSTER_LINKS_PER_COLUMN) {
-      lists.push(...splitFooterNavLinks(links));
-      continue;
-    }
-
-    lists.push(links);
-  }
-
-  return lists;
+  return columns.map((column) => column.links);
 }
 
 function footerNavGridClass(columnCount: number): string {

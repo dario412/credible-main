@@ -20,7 +20,8 @@ type FooterField =
   | "companyLine"
   | "companyLineHref"
   | "companyLineLinkLabel"
-  | "email";
+  | "email"
+  | `columns.${number}`;
 
 type SiteChromeContextValue = {
   chrome: SiteChromeSections;

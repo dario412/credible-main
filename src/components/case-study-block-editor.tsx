@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { MediaField } from "@/components/media-library";
+import { RichTextEditor } from "@/components/rich-text-field";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
   emptyDeliverableItem,
@@ -15,6 +16,7 @@ type BlockType = CaseStudyBlock["type"];
 
 const ADD_OPTIONS: { type: BlockType; label: string }[] = [
   { type: "p", label: "Paragraph" },
+  { type: "richtext", label: "Rich text" },
   { type: "h2", label: "Heading 2" },
   { type: "h3", label: "Heading 3" },
   { type: "quoteInline", label: "Inline quote" },
@@ -129,6 +131,14 @@ export function CaseStudyBlockEditor({
                 </button>
               </div>
             </div>
+
+            {block.type === "richtext" ? (
+              <RichTextEditor
+                value={block.html}
+                onChange={(html) => updateAt(index, { ...block, html })}
+                placeholder="Write rich text with links, bold, and italic…"
+              />
+            ) : null}
 
             {block.type === "p" || block.type === "h2" || block.type === "h3" ? (
               <TextArea

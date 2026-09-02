@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { BrandBrief } from "@/components/brand-brief";
 import { CaseStudyLinkField } from "@/components/case-study-link-field";
 import { EditableHit } from "@/components/editable-hit";
+import { FooterNavLinkRows } from "@/components/footer-nav-link-rows";
 import { FadeUp } from "@/components/fade-up";
 import { useHomeCms, useSiteChrome } from "@/components/home-cms-context";
 import {
@@ -80,7 +81,8 @@ type EditTarget =
   | "footer.companyLine"
   | "footer.companyLineHref"
   | "footer.companyLineLinkLabel"
-  | "footer.email";
+  | "footer.email"
+  | `footer.columns.${number}`;
 
 function targetTitle(target: EditTarget): string {
   const map: Record<string, string> = {
@@ -130,6 +132,9 @@ function targetTitle(target: EditTarget): string {
   }
   if (target.startsWith("trustedBy.client.")) {
     return `Homepage logo ${Number(target.split(".")[2]) + 1}`;
+  }
+  if (target.startsWith("footer.columns.")) {
+    return `Footer link column ${Number(target.split(".")[2]) + 1}`;
   }
   return map[target] ?? "Edit";
 }
@@ -1507,6 +1512,48 @@ function EditorPopover({
               onChange={(e) => onFooterChange({ email: e.target.value })}
             />
           </Field>
+        ) : null}
+
+        {target.startsWith("footer.columns.") ? (
+          (() => {
+            const columnIndex = Number(target.split(".")[2]);
+            const column = footer.columns[columnIndex];
+            if (!column) return null;
+            return (
+              <div className="space-y-4">
+                <Field
+                  label="Column title (admin only)"
+                  id={`footer-col-title-${columnIndex}`}
+                >
+                  <TextInput
+                    id={`footer-col-title-${columnIndex}`}
+                    value={column.title}
+                    onChange={(e) =>
+                      onFooterChange({
+                        columns: footer.columns.map((entry, index) =>
+                          index === columnIndex
+                            ? { ...entry, title: e.target.value }
+                            : entry,
+                        ),
+                      })
+                    }
+                  />
+                </Field>
+                <FooterNavLinkRows
+                  compact
+                  idPrefix={`footer-col-${columnIndex}`}
+                  links={column.links}
+                  onChange={(links) =>
+                    onFooterChange({
+                      columns: footer.columns.map((entry, index) =>
+                        index === columnIndex ? { ...entry, links } : entry,
+                      ),
+                    })
+                  }
+                />
+              </div>
+            );
+          })()
         ) : null}
 
         {target.startsWith("footer.") ? (

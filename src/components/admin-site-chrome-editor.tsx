@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
+import { FooterNavLinkRows } from "@/components/footer-nav-link-rows";
 import {
   emptyFooterColumn,
   emptyNavLink,
@@ -51,79 +52,6 @@ function MoveButtons({
         aria-label="Move down"
       >
         ↓
-      </button>
-    </div>
-  );
-}
-
-function NavLinkRows({
-  links,
-  onChange,
-  idPrefix,
-}: {
-  links: NavLink[];
-  onChange: (links: NavLink[]) => void;
-  idPrefix: string;
-}) {
-  function move(from: number, to: number) {
-    if (to < 0 || to >= links.length) return;
-    const next = [...links];
-    const [item] = next.splice(from, 1);
-    next.splice(to, 0, item);
-    onChange(next);
-  }
-
-  return (
-    <div className="space-y-3">
-      {links.map((link, index) => (
-        <div
-          key={`${idPrefix}-${index}`}
-          className="flex flex-col gap-2 rounded-sm border border-charcoal/10 bg-cream/40 p-3 sm:flex-row sm:items-end"
-        >
-          <div className="flex-1">
-            <Field label="Label" id={`${idPrefix}-label-${index}`}>
-              <TextInput
-                id={`${idPrefix}-label-${index}`}
-                value={link.label}
-                onChange={(e) => {
-                  const next = [...links];
-                  next[index] = { ...link, label: e.target.value };
-                  onChange(next);
-                }}
-              />
-            </Field>
-          </div>
-          <div className="flex-[1.4]">
-            <Field label="URL" id={`${idPrefix}-href-${index}`}>
-              <TextInput
-                id={`${idPrefix}-href-${index}`}
-                value={link.href}
-                onChange={(e) => {
-                  const next = [...links];
-                  next[index] = { ...link, href: e.target.value };
-                  onChange(next);
-                }}
-              />
-            </Field>
-          </div>
-          <div className="flex items-center gap-2 pb-0.5">
-            <MoveButtons index={index} total={links.length} onMove={move} />
-            <button
-              type="button"
-              onClick={() => onChange(links.filter((_, i) => i !== index))}
-              className="text-xs font-medium text-danger hover:underline"
-            >
-              Remove
-            </button>
-          </div>
-        </div>
-      ))}
-      <button
-        type="button"
-        onClick={() => onChange([...links, emptyNavLink()])}
-        className="text-sm font-medium text-forest hover:text-forest-dark"
-      >
-        + Add link
       </button>
     </div>
   );
@@ -247,7 +175,7 @@ export function SiteChromeEditorForm({
             Primary nav links and the green CTA. Add or remove links as needed.
           </p>
         </div>
-        <NavLinkRows
+        <FooterNavLinkRows
           idPrefix="nav"
           links={sections.header.links}
           onChange={(links) => setHeader({ ...sections.header, links })}
@@ -1443,7 +1371,7 @@ export function SiteChromeEditorForm({
                 </button>
               </div>
             </div>
-            <NavLinkRows
+            <FooterNavLinkRows
               idPrefix={`col-${columnIndex}`}
               links={column.links}
               onChange={(links) =>
@@ -1473,7 +1401,7 @@ export function SiteChromeEditorForm({
             Bottom-bar links next to the copyright line.
           </p>
         </div>
-        <NavLinkRows
+        <FooterNavLinkRows
           idPrefix="legal"
           links={sections.footer.legalLinks}
           onChange={(legalLinks) =>

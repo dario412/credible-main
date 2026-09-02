@@ -1,4 +1,5 @@
 import { coverAltFor, resolveImageAlt } from "@/lib/image-alt";
+import { richTextToPlainText, sanitizeRichTextHtml } from "@/lib/rich-text";
 
 export const INSIGHT_COVER_BY_SLUG: Record<string, string> = {
   "why-creator-label-doesnt-fit-b2b": "/images/insights/operator-creator.jpg",
@@ -48,6 +49,7 @@ export function readingTimeFromBlocks(blocks: InsightBlock[]) {
 
 export type InsightBlock =
   | { type: "p"; text: string }
+  | { type: "richtext"; html: string }
   | { type: "h2"; text: string; id: string }
   | { type: "h3"; text: string; id: string }
   | { type: "quote"; text: string; attribution?: string }
@@ -81,6 +83,8 @@ export function blocksToPlainText(blocks: InsightBlock[]): string {
           return `${block.label ?? ""} ${block.text}`;
         case "hr":
           return "";
+        case "richtext":
+          return richTextToPlainText(block.html);
         default:
           return "text" in block ? block.text : "";
       }
@@ -116,6 +120,8 @@ export function blocksToMarkdown(blocks: InsightBlock[]): string {
             : `> ${block.text}`;
         case "hr":
           return "---";
+        case "richtext":
+          return richTextToPlainText(block.html);
         case "p":
         default:
           return "text" in block ? block.text : "";
@@ -156,6 +162,11 @@ export function parseInsightBlocks(raw: unknown): InsightBlock[] | null {
     const type = block.type;
     if (type === "p" && typeof block.text === "string") {
       blocks.push({ type: "p", text: block.text });
+    } else if (type === "richtext" && typeof block.html === "string") {
+      blocks.push({
+        type: "richtext",
+        html: sanitizeRichTextHtml(block.html),
+      });
     } else if (
       (type === "h2" || type === "h3") &&
       typeof block.text === "string"

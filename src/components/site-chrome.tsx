@@ -10,10 +10,6 @@ import { useSiteChrome } from "@/components/site-chrome-context";
 import { ShortlistMenu } from "@/components/shortlist-menu";
 import type { NavLink, SocialNetwork } from "@/lib/site-chrome";
 import { cn } from "@/lib/utils";
-import {
-  expandFooterNavLists,
-  footerNavGridClasses,
-} from "@/lib/roster-filter-options";
 
 const FOOTER_PATTERN_COLOR = { r: 249, g: 243, b: 239 };
 
@@ -246,7 +242,7 @@ export function SiteHeader() {
   );
 }
 
-export function SiteFooter({ rosterNavLinks }: { rosterNavLinks?: NavLink[] }) {
+export function SiteFooter() {
   const year = new Date().getFullYear();
   const {
     chrome,
@@ -256,7 +252,6 @@ export function SiteFooter({ rosterNavLinks }: { rosterNavLinks?: NavLink[] }) {
     onSelectFooterField,
   } = useSiteChrome();
   const footer = chrome.footer;
-  const footerNavLists = expandFooterNavLists(footer.columns, rosterNavLinks);
 
   return (
     <footer className="mt-auto bg-cream px-6 py-8 md:px-10 md:py-10 lg:px-12">
@@ -267,9 +262,9 @@ export function SiteFooter({ rosterNavLinks }: { rosterNavLinks?: NavLink[] }) {
           mask="radial-gradient(130% 95% at 100% 0%, black 0%, rgba(0,0,0,0.5) 42%, transparent 76%)"
         />
 
-        {/* Top: logo + contact on the left, link columns on the right */}
-        <div className="relative z-2 flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
-          <div className="max-w-xs shrink-0">
+        {/* Top: logo + tagline on the left, link columns grouped on the right */}
+        <div className="relative z-2 flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-16 xl:gap-24">
+          <div className="shrink-0 lg:max-w-[19rem]">
             <Link href="/" className="inline-block transition-opacity hover:opacity-70">
               <img
                 src="/brand/credible-wordmark-cream.svg"
@@ -330,31 +325,37 @@ export function SiteFooter({ rosterNavLinks }: { rosterNavLinks?: NavLink[] }) {
           </div>
 
           <nav
-            className={cn(
-              footerNavGridClasses(footerNavLists.length),
-              "min-w-0 flex-1 lg:justify-end",
-            )}
+            className="flex flex-wrap gap-x-10 gap-y-8 sm:gap-x-12 lg:ml-auto lg:shrink-0 lg:flex-nowrap lg:justify-end lg:gap-x-12 xl:gap-x-14"
             aria-label="Footer"
           >
-            {footerNavLists.map((links, columnIndex) => (
-              <ul
-                key={`footer-nav-${columnIndex}-${links[0]?.href ?? "empty"}`}
-                className="space-y-3.5"
+            {footer.columns.map((column, columnIndex) => (
+              <EditableHit
+                key={`footer-nav-${columnIndex}-${column.title}`}
+                active={editing && canEdit}
+                selected={selected === `footer.columns.${columnIndex}`}
+                label={`footer link column ${columnIndex + 1}`}
+                block
+                ringOffset="ring-offset-charcoal"
+                onSelect={() =>
+                  onSelectFooterField?.(`columns.${columnIndex}`)
+                }
               >
-                {links.map((link, linkIndex) => (
-                  <li key={`${columnIndex}-${linkIndex}-${link.label}`}>
-                    <Link
-                      href={link.href}
-                      className="text-sm font-medium text-cream/90 transition-colors hover:text-cream"
-                      onClick={(e) => {
-                        if (editing) e.preventDefault();
-                      }}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+                <ul className="w-max min-w-[8.5rem] space-y-3.5">
+                  {column.links.map((link, linkIndex) => (
+                    <li key={`${columnIndex}-${linkIndex}-${link.label}`}>
+                      <Link
+                        href={link.href}
+                        className="text-sm font-medium text-cream/90 transition-colors hover:text-cream"
+                        onClick={(e) => {
+                          if (editing) e.preventDefault();
+                        }}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </EditableHit>
             ))}
           </nav>
         </div>

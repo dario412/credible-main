@@ -7,6 +7,7 @@ import { InsightArticleCta } from "@/components/insight-article-cta";
 import { InsightHeroCoverEditable } from "@/components/insight-hero-cover-editable";
 import { InsightShare } from "@/components/insight-share";
 import { RelatedInsightsGrid } from "@/components/related-insights-grid";
+import { RichTextContent } from "@/components/rich-text-field";
 import { SiteImage } from "@/components/site-image";
 import { ViewMoreLink } from "@/components/view-more-link";
 import {
@@ -400,6 +401,13 @@ function InsightBlockView({ block }: { block: InsightBlock }) {
         <p className="mb-[1em] text-[0.95rem] leading-[1.65] text-charcoal md:text-[0.98rem]">
           {block.text}
         </p>
+      );
+    case "richtext":
+      return (
+        <RichTextContent
+          html={block.html}
+          className="mb-[1em] text-[0.95rem] leading-[1.65] text-charcoal md:text-[0.98rem]"
+        />
       );
   }
 }

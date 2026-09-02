@@ -6,6 +6,7 @@ import type {
   CaseStudyStory,
 } from "@/lib/case-studies";
 import { CASE_STUDY_LOGO } from "@/lib/case-studies";
+import { sanitizeRichTextHtml } from "@/lib/rich-text";
 
 export type CaseStudyStatsItem = {
   value: string;
@@ -15,6 +16,7 @@ export type CaseStudyStatsItem = {
 
 export type CaseStudyBlock =
   | { type: "p"; text: string }
+  | { type: "richtext"; html: string }
   | { type: "h2"; text: string; id: string }
   | { type: "h3"; text: string; id: string }
   | { type: "quoteInline"; text: string; attribution?: string }
@@ -120,6 +122,11 @@ export function parseCaseStudyBlocks(raw: unknown): CaseStudyBlock[] | null {
 
     if (type === "p" && typeof block.text === "string") {
       blocks.push({ type: "p", text: block.text });
+    } else if (type === "richtext" && typeof block.html === "string") {
+      blocks.push({
+        type: "richtext",
+        html: sanitizeRichTextHtml(block.html),
+      });
     } else if (
       (type === "h2" || type === "h3") &&
       typeof block.text === "string"
@@ -290,6 +297,8 @@ export function newCaseStudyBlock(
       };
     case "ul":
       return { type: "ul", items: [""] };
+    case "richtext":
+      return { type: "richtext", html: "" };
     case "p":
     default:
       return { type: "p", text: "" };
