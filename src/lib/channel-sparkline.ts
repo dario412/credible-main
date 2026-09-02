@@ -2,6 +2,8 @@ import type { ExpertChannelPresence } from "@/lib/expert-profiles";
 
 const SPARKLINE_POINTS = 12;
 
+export const MIN_CHANNEL_FOLLOWERS = 5_000;
+
 function hashString(input: string): number {
   let hash = 0;
   for (let index = 0; index < input.length; index += 1) {
@@ -29,6 +31,42 @@ export function parseFollowerMetric(value: string): number | null {
   else if (suffix === "b") amount *= 1_000_000_000;
 
   return amount;
+}
+
+export function meetsMinimumChannelFollowers(followers: string): boolean {
+  const parsed = parseFollowerMetric(followers);
+  return parsed != null && parsed >= MIN_CHANNEL_FOLLOWERS;
+}
+
+export function formatFollowerCount(count: number): string {
+  if (!Number.isFinite(count) || count <= 0) return "0";
+  if (count >= 1_000_000) {
+    const millions = count / 1_000_000;
+    return `${millions >= 10 ? Math.round(millions) : millions.toFixed(1).replace(/\.0$/, "")}M`;
+  }
+  if (count >= 1_000) {
+    const thousands = count / 1_000;
+    return `${thousands >= 100 ? Math.round(thousands) : thousands.toFixed(thousands >= 10 ? 0 : 1).replace(/\.0$/, "")}k`;
+  }
+  return String(Math.round(count));
+}
+
+/** Sum parsed follower strings from profile channel rows (Airtable sync). */
+export function sumChannelFollowers(
+  channels: Array<{ followers: string }>,
+): string | null {
+  let total = 0;
+  let counted = 0;
+
+  for (const channel of channels) {
+    const parsed = parseFollowerMetric(channel.followers);
+    if (parsed == null) continue;
+    total += parsed;
+    counted += 1;
+  }
+
+  if (counted === 0) return null;
+  return formatFollowerCount(total);
 }
 
 export function parseGrowthPercent(value: string): number | null {

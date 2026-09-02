@@ -9,6 +9,7 @@ import {
   growthDisplayFromFields,
   parseChannelFollowerHistory,
 } from "@/lib/channel-follower-history";
+import { meetsMinimumChannelFollowers } from "@/lib/channel-sparkline";
 import type { AirtableRecord } from "./client";
 
 function field(fields: Record<string, unknown>, ...aliases: string[]): unknown {
@@ -273,7 +274,7 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
     const url =
       rawUrl && urlMatchesPlatform(rawUrl, def.platform) ? rawUrl : null;
     const followers = followerDisplay(field(fields, ...def.followerAliases));
-    if (!followers) continue;
+    if (!followers || !meetsMinimumChannelFollowers(followers)) continue;
 
     const growthRaw = asString(
       field(

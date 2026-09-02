@@ -1,4 +1,5 @@
 import type { ExpertChannel } from "@/lib/expert-channels";
+import { sumChannelFollowers } from "@/lib/channel-sparkline";
 import type { AirtableAttachment, AirtableRecord } from "./client";
 import {
   mapAirtableProfileSections,
@@ -347,6 +348,8 @@ export function mapAirtableRecordToExpert(
 
   const topics = websiteCategoriesFromFields(fields).slice(0, 6);
 
+  const profileSections = mapAirtableProfileSections(record);
+
   const highlight1 = highlightField(fields, 1);
   const highlight2 = highlightField(fields, 2);
   const highlight3 = highlightField(fields, 3);
@@ -369,8 +372,13 @@ export function mapAirtableRecordToExpert(
     parsedHighlights[0];
   const growthStat = parsedHighlights.find((stat) => /growth/i.test(stat.label));
 
+  const combinedReachFromChannels = sumChannelFollowers(
+    profileSections.channels,
+  );
   const combinedReach =
-    reachStat?.value ?? asReachMetric(followersHeadline);
+    combinedReachFromChannels ??
+    reachStat?.value ??
+    asReachMetric(followersHeadline);
   const growth90d = growthStat?.value ?? null;
 
   const exclusiveRaw = field(
@@ -407,7 +415,6 @@ export function mapAirtableRecordToExpert(
     if (channel) channels.push(channel);
   }
 
-  const profileSections = mapAirtableProfileSections(record);
   const quote = profileSections.quote;
   const quoteSource = profileSections.quoteAttribution;
 

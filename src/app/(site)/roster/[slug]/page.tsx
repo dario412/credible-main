@@ -19,6 +19,7 @@ import {
   enrichChannelsWithFollowerHistory,
   type ChannelFollowerHistory,
 } from "@/lib/channel-follower-history";
+import { meetsMinimumChannelFollowers } from "@/lib/channel-sparkline";
 import { parseExpertChannels } from "@/lib/expert-channels";
 import {
   getExpertProfileEnrichment,
@@ -90,13 +91,6 @@ function applyAirtableFormatDescriptions(
   });
 }
 
-function hasFollowerCount(value?: string | null): boolean {
-  const t = value?.trim();
-  if (!t || t === "—" || t === "-" || /^n\/?a$/i.test(t)) return false;
-  const numeric = Number(t.replace(/,/g, "").replace(/[kmb+%]/gi, ""));
-  if (Number.isFinite(numeric) && numeric <= 0) return false;
-  return /\d/.test(t);
-}
 
 function mergeProfileContent(
   extras: ProfileExtras,
@@ -121,7 +115,7 @@ function mergeProfileContent(
       ) {
         return false;
       }
-      return hasFollowerCount(channel.followers);
+      return meetsMinimumChannelFollowers(channel.followers);
     }) ?? [],
     extras.channelFollowerHistory,
   );
