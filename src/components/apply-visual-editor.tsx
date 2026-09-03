@@ -884,7 +884,6 @@ function ApplyView({
   selected: EditTarget | null;
   onSelect: (target: EditTarget) => void;
 }) {
-  const assurances = sections.hero.assurances.filter((item) => item.trim());
   const nextItems = sections.hero.next.filter((item) => item.trim());
   const fitItems = sections.qualify.fit.filter((item) => item.trim());
   const notFitItems = sections.qualify.notFit.filter((item) => item.trim());
@@ -899,7 +898,7 @@ function ApplyView({
         className="scroll-mt-24 bg-cream px-6 pt-8 pb-12 md:px-10 md:pt-10 md:pb-16 lg:px-12 lg:pt-12 lg:pb-20"
       >
         <div
-          className={`${PAGE_SHELL} grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-stretch lg:gap-10`}
+          className={`${PAGE_SHELL} grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-stretch lg:gap-8`}
         >
           <FadeUp
             y={18}
@@ -933,22 +932,10 @@ function ApplyView({
                   <p className="mt-3 max-w-[32rem] text-[0.9375rem] leading-relaxed text-charcoal/65">
                     {sections.hero.subhead}
                   </p>
-                  {assurances.length > 0 ? (
-                    <ul className="mt-5 flex flex-wrap gap-2">
-                      {assurances.map((item, index) => (
-                        <li
-                          key={`${item}-${index}`}
-                          className="rounded-full bg-cream px-2.5 py-1 text-[0.6875rem] font-medium text-charcoal/60"
-                        >
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
                 </div>
 
                 {nextItems.length > 0 ? (
-                  <div className="mt-auto border-t border-charcoal/10 pt-5">
+                  <div className="mt-5 border-t border-charcoal/10 pt-4">
                     <p className={EYEBROW_MUTED}>{sections.hero.nextEyebrow}</p>
                     <ol className="mt-3 space-y-2">
                       {nextItems.map((item, i) => (
