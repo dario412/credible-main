@@ -349,6 +349,17 @@ function ratePositive(fields: Record<string, unknown>, ...aliases: string[]) {
   return n != null && n > 0;
 }
 
+/**
+ * Brand partnership channel rows on profile Formats panels.
+ * A platform appears when any matching Creator | Rate | … Gross/Internal
+ * field is > 0:
+ * - LinkedIn — LinkedIn Video Post, LinkedIn Image Post
+ * - X — x.com post
+ * - Instagram — Instagram Static Post, Reel, Story Set
+ * - TikTok — TikTok video
+ * - Newsletter — Owned newsletter dedicated / mention
+ * - YouTube — YouTube video / short
+ */
 function buildBrandPartnershipChannels(
   fields: Record<string, unknown>,
 ): ExpertFormatChannel[] {

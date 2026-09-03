@@ -12,14 +12,9 @@ import {
 } from "react";
 
 import { cn } from "@/lib/utils";
+import { BRAND_PARTNERSHIP_CHANNEL_FILTER_OPTIONS } from "@/lib/expert-channels";
 
-export const CHANNEL_FILTER_OPTIONS = [
-  { label: "LinkedIn", value: "linkedin" },
-  { label: "X", value: "x" },
-  { label: "TikTok", value: "tiktok" },
-  { label: "YouTube", value: "youtube" },
-  { label: "Podcast", value: "podcast" },
-] as const;
+export const CHANNEL_FILTER_OPTIONS = BRAND_PARTNERSHIP_CHANNEL_FILTER_OPTIONS;
 
 type FilterPatch = {
   archetype?: string;

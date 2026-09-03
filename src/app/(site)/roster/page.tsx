@@ -6,7 +6,7 @@ import {
   saveRosterPage,
 } from "@/lib/actions/admin-cms";
 import { auth } from "@/lib/auth";
-import { parseExpertChannels } from "@/lib/expert-channels";
+import { parseExpertChannels, partnershipChannelTypesFromProfileExtras } from "@/lib/expert-channels";
 import { hasPermission } from "@/lib/permissions";
 import { prisma } from "@/lib/prisma";
 import { buildRosterFilterOptions } from "@/lib/roster-filter-options";
@@ -73,9 +73,16 @@ export default async function RosterPage({
   const experts = all.filter((expert) => {
     const categories = expert.categories ?? [];
     const topics = expert.topics ?? [];
-    const expertChannelTypes = parseExpertChannels(expert.channels).map(
-      (channel) => channel.type,
+    // Prefer Brand partnerships format channels (same rate-backed rows as the
+    // profile Formats panel). Fall back to Channel | … | URL presence for
+    // experts that have not been re-synced with format rows yet.
+    const formatChannelTypes = partnershipChannelTypesFromProfileExtras(
+      expert.profileExtras,
     );
+    const expertChannelTypes =
+      formatChannelTypes.length > 0
+        ? formatChannelTypes
+        : parseExpertChannels(expert.channels).map((channel) => channel.type);
 
     if (
       archetype &&
