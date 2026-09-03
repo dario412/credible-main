@@ -64,7 +64,17 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/v2-what-we-do",
-        destination: "/what-we-do",
+        destination: "/how-we-work",
+        permanent: true,
+      },
+      {
+        source: "/what-we-do",
+        destination: "/how-we-work",
+        permanent: true,
+      },
+      {
+        source: "/what-we-do/:path*",
+        destination: "/how-we-work/:path*",
         permanent: true,
       },
       {

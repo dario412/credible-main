@@ -59,8 +59,8 @@ const pages: {
       "Hero, thesis, why we exist, operating model, how we work, roster rail, and two ways in.",
   },
   {
-    slug: "what-we-do",
-    title: "What we do",
+    slug: "how-we-work",
+    title: "How we work",
     description:
       "Hero, service system, business moments, service cards, process, how to choose, closing CTA, and FAQ.",
   },

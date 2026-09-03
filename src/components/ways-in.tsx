@@ -233,7 +233,7 @@ export function WaysIn() {
               ambassador, a private dinner — the same team handles it end-to-end.
             </p>
             <Link
-              href="/what-we-do"
+              href="/how-we-work"
               className="mt-6 inline-flex items-center justify-center rounded-sm border border-charcoal/25 px-5 py-2.5 text-[0.8125rem] font-medium text-charcoal transition-colors hover:border-forest hover:bg-forest hover:text-cream"
             >
               Explore the model
@@ -248,7 +248,7 @@ export function WaysIn() {
             return (
               <li key={way.index} className={way.span}>
                 <Link
-                  href="/what-we-do"
+                  href="/how-we-work"
                   className="group flex h-full min-h-64 flex-col justify-between gap-8 rounded-sm border border-charcoal/15 bg-transparent px-7 pb-8 pt-8 transition-colors duration-300 hover:border-forest/40 md:px-8 md:pb-9 md:pt-9 lg:min-h-74"
                 >
                   <div className={`${way.visualClass} self-end`}>

@@ -268,7 +268,7 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
     primaryCtaLabel: "Apply for representation",
     primaryCtaHref: "/apply-for-representation",
     secondaryCtaLabel: "What we offer creators",
-    secondaryCtaHref: "/what-we-do",
+    secondaryCtaHref: "/how-we-work",
   },
   faq: {
     eyebrow: "FAQ",

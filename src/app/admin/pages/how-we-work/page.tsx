@@ -11,12 +11,12 @@ import { hasPermission } from "@/lib/permissions";
 import { createMetadata } from "@/lib/seo";
 
 export const metadata = createMetadata({
-  title: "Edit What we do",
-  path: "/admin/pages/what-we-do",
+  title: "Edit How we work",
+  path: "/admin/pages/how-we-work",
   noIndex: true,
 });
 
-export default async function AdminWhatWeDoPageEditor() {
+export default async function AdminHowWeWorkPageEditor() {
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
   if (!hasPermission(session.user.role, "MANAGE_CONTENT")) redirect("/admin");
@@ -32,18 +32,18 @@ export default async function AdminWhatWeDoPageEditor() {
         >
           ← Pages
         </Link>
-        <h1 className="mt-3 font-display text-3xl">What we do</h1>
+        <h1 className="mt-3 font-display text-3xl">How we work</h1>
         <p className="mt-2 text-sm text-muted">
           All copy on{" "}
           <a
-            href="/what-we-do"
+            href="/how-we-work"
             className="font-medium text-forest hover:text-forest-dark"
           >
-            /what-we-do
+            /how-we-work
           </a>
           . Or edit live with{" "}
           <a
-            href="/what-we-do"
+            href="/how-we-work"
             className="font-medium text-forest hover:text-forest-dark"
           >
             Edit page

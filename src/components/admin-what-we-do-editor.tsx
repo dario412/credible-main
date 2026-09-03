@@ -1014,7 +1014,7 @@ export function WhatWeDoPageEditorForm({
         <div>
           <h2 className="font-display text-xl">FAQ</h2>
           <p className="mt-1 text-sm text-muted">
-            Accordion below the closing CTA on /what-we-do.
+            Accordion below the closing CTA on /how-we-work.
           </p>
         </div>
         <Field label="Eyebrow" id="wwd-faq-eyebrow">
@@ -1132,7 +1132,7 @@ export function WhatWeDoPageEditorForm({
 
       <div className="flex flex-wrap items-center gap-3 border-t border-charcoal/10 pt-6">
         <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save What we do"}
+          {pending ? "Saving…" : "Save How we work"}
         </Button>
         {message ? (
           <p className={`text-sm ${ok ? "text-forest" : "text-danger"}`}>

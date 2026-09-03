@@ -188,7 +188,7 @@ function BriefBody({
         </p>
 
         <Link
-          href="/what-we-do"
+          href="/how-we-work"
           className="mt-8 inline-flex items-center gap-2 rounded-sm border border-cream/30 px-5 py-2.5 text-[0.8125rem] font-medium text-cream transition-colors hover:border-cream hover:bg-cream hover:text-charcoal"
         >
           How we work with brands

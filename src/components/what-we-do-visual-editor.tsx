@@ -1636,7 +1636,7 @@ export function WhatWeDoVisualEditor({
     setPending(true);
     const result = await saveAction(sections);
     setOk(result.ok);
-    setMessage(result.ok ? "What we do page saved." : result.message);
+    setMessage(result.ok ? "How we work page saved." : result.message);
     setPending(false);
     if (result.ok) {
       setBaseline(sections);
@@ -1729,7 +1729,7 @@ export function WhatWeDoVisualEditor({
                 Add moment
               </button>
               <a
-                href="/admin/pages/what-we-do"
+                href="/admin/pages/how-we-work"
                 className="px-2 text-xs font-medium text-charcoal/55 hover:text-charcoal"
               >
                 Admin form

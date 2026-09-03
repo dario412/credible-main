@@ -70,7 +70,7 @@ export function WaysInAccordion({
                 <div className="min-w-0 flex-1">
                   <h3 className="font-display text-[1.4rem] leading-tight tracking-tight md:text-[1.75rem]">
                     <Link
-                      href="/what-we-do"
+                      href="/how-we-work"
                       className="group inline-flex items-center gap-2.5 text-charcoal transition-colors hover:text-forest"
                     >
                       {item.title}

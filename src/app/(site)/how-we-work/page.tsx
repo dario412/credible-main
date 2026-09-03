@@ -10,13 +10,13 @@ import { createMetadata } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata = createMetadata({
-  title: "What we do",
+  title: "How we work",
   description:
     "Four ways to put an expert voice behind your brand — content, brand partnerships, speaking, and live events.",
-  path: "/what-we-do",
+  path: "/how-we-work",
 });
 
-export default async function WhatWeDoPage() {
+export default async function HowWeWorkPage() {
   const [sections, session] = await Promise.all([
     getWhatWeDoSections(),
     auth(),

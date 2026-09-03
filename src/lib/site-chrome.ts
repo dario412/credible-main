@@ -215,7 +215,7 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
   header: {
     links: [
       { href: "/roster", label: "Roster" },
-      { href: "/what-we-do", label: "What we do" },
+      { href: "/how-we-work", label: "How we work" },
       { href: "/projects", label: "Projects" },
       { href: "/insights", label: "Insights" },
       { href: "/about", label: "About" },
@@ -266,9 +266,9 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
         ],
       },
       {
-        title: "What we do",
-        links: [
-          { href: "/what-we-do", label: "What we do" },
+        title: "How we work",
+          links: [
+            { href: "/how-we-work", label: "How we work" },
           { href: "/contact", label: "For Brands" },
           { href: "/apply-for-representation", label: "For Creators" },
         ],

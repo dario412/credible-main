@@ -508,10 +508,10 @@ export async function saveWhatWeDoPage(sections: WhatWeDoPageSections) {
     },
   });
 
-  revalidatePath("/what-we-do");
+  revalidatePath("/how-we-work");
   revalidatePath("/admin/pages");
-  revalidatePath("/admin/pages/what-we-do");
-  return { ok: true as const, message: "What we do page saved." };
+  revalidatePath("/admin/pages/how-we-work");
+  return { ok: true as const, message: "How we work page saved." };
 }
 
 export async function getAboutPageSections(): Promise<AboutPageSections> {
