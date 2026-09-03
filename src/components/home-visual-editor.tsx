@@ -1784,7 +1784,7 @@ export function HomeVisualEditor({
       />
 
       <TrustedBy
-        tone="light"
+        tone="dark"
         clients={trustedClients}
         introLine={sections.trustedBy.introLine}
         disableStoryLinks={editing}
@@ -1800,7 +1800,7 @@ export function HomeVisualEditor({
                     "trusted by intro",
                     node,
                     true,
-                    "ring-offset-white",
+                    "ring-offset-charcoal",
                   ),
                 client: (index, node) =>
                   hit(
@@ -1811,18 +1811,11 @@ export function HomeVisualEditor({
                     `trusted by logo ${index + 1}`,
                     node,
                     true,
-                    "ring-offset-white",
+                    "ring-offset-charcoal",
                   ),
               }
             : undefined
         }
-      />
-
-      <TrustedBy
-        tone="dark"
-        clients={trustedClients}
-        introLine={sections.trustedBy.introLine}
-        disableStoryLinks={editing}
       />
 
       <WaysInAccordion
