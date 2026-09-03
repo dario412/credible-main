@@ -658,7 +658,8 @@ export function SiteChromeEditorForm({
         <div>
           <h2 className="font-display text-xl">FAQ</h2>
           <p className="mt-1 text-sm text-muted">
-            Accordion below similar creators on every roster profile.
+            Accordion on every roster profile. Use {"{first}"}, {"{name}"}, or{" "}
+            {"{possessive}"} in questions and answers.
           </p>
         </div>
         <Field label="Eyebrow" id="pf-faq-eyebrow">
@@ -720,7 +721,7 @@ export function SiteChromeEditorForm({
                 Remove
               </button>
             </div>
-            <Field label="Question" id={`pf-faq-q-${index}`}>
+            <Field label="Question ({first}, {name}, {possessive})" id={`pf-faq-q-${index}`}>
               <TextInput
                 id={`pf-faq-q-${index}`}
                 value={item.q}
@@ -732,7 +733,7 @@ export function SiteChromeEditorForm({
                 }}
               />
             </Field>
-            <Field label="Answer" id={`pf-faq-a-${index}`}>
+            <Field label="Answer ({first}, {name}, {possessive})" id={`pf-faq-a-${index}`}>
               <TextArea
                 id={`pf-faq-a-${index}`}
                 rows={3}

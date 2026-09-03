@@ -411,7 +411,7 @@ function EditorPopover({
                 }
               />
             </Field>
-            <Field label="Headline" id="pf-faq-headline">
+            <Field label="Headline ({first}, {name})" id="pf-faq-headline">
               <TextArea
                 id="pf-faq-headline"
                 rows={2}
@@ -421,7 +421,7 @@ function EditorPopover({
                 }
               />
             </Field>
-            <Field label="Subhead" id="pf-faq-subhead">
+            <Field label="Subhead ({first}, {name})" id="pf-faq-subhead">
               <TextArea
                 id="pf-faq-subhead"
                 rows={3}
@@ -451,7 +451,10 @@ function EditorPopover({
                     Remove
                   </button>
                 </div>
-                <Field label="Question" id={`pf-faq-q-${index}`}>
+                <Field
+                  label="Question ({first}, {name}, {possessive})"
+                  id={`pf-faq-q-${index}`}
+                >
                   <TextInput
                     id={`pf-faq-q-${index}`}
                     value={item.q}
@@ -463,7 +466,10 @@ function EditorPopover({
                     }}
                   />
                 </Field>
-                <Field label="Answer" id={`pf-faq-a-${index}`}>
+                <Field
+                  label="Answer ({first}, {name}, {possessive})"
+                  id={`pf-faq-a-${index}`}
+                >
                   <TextArea
                     id={`pf-faq-a-${index}`}
                     rows={3}

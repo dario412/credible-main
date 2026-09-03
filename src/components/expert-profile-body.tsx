@@ -517,11 +517,16 @@ function TestimonialsSection({
   );
 }
 
-function ProfileFaqSection() {
+function ProfileFaqSection({ name }: { name: string }) {
   const { chrome, editing, canEdit } = useSiteChrome();
-  const faqItems = chrome.profileFaq.items.filter(
-    (item) => item.q.trim() && item.a.trim(),
-  );
+  const vars = { first: firstName(name), name };
+  const faq = chrome.profileFaq;
+  const faqItems = faq.items
+    .filter((item) => item.q.trim() && item.a.trim())
+    .map((item) => ({
+      q: applyProfileRailTemplate(item.q, vars),
+      a: applyProfileRailTemplate(item.a, vars),
+    }));
   const showFaq = faqItems.length > 0 || (editing && canEdit);
 
   if (!showFaq) return null;
@@ -529,12 +534,14 @@ function ProfileFaqSection() {
   return (
     <section id="profile-faq" className="scroll-mt-28">
       <ProfileEditHit field="profileFaq" label="FAQ" block>
-        <p className={EYEBROW}>{chrome.profileFaq.eyebrow}</p>
+        <p className={EYEBROW}>
+          {applyProfileRailTemplate(faq.eyebrow, vars)}
+        </p>
         <SectionHeading className="mt-4 max-w-[22ch]">
-          {chrome.profileFaq.headline}
+          {applyProfileRailTemplate(faq.headline, vars)}
         </SectionHeading>
         <p className="mt-5 max-w-xl text-[0.9375rem] leading-relaxed text-charcoal/65 md:text-[1rem]">
-          {chrome.profileFaq.subhead}
+          {applyProfileRailTemplate(faq.subhead, vars)}
         </p>
       </ProfileEditHit>
       <div className="mt-10">
@@ -669,7 +676,7 @@ export function ExpertProfileMain({
           />
         </div>
       ) : null}
-      <ProfileFaqSection />
+      <ProfileFaqSection name={name} />
       <ProfileInterestCtaSection name={name} slug={slug} />
     </div>
   );

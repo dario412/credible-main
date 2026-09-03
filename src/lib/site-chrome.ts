@@ -326,21 +326,21 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
   },
   profileFaq: {
     eyebrow: "FAQ",
-    headline: "Questions before you brief.",
+    headline: "Questions before you brief {first}.",
     subhead:
-      "How booking works, what to expect, and how we scope work with creators on the roster.",
+      "How booking works, what to expect, and how we scope work with {first}.",
     items: [
       {
-        q: "Can we book this creator directly?",
-        a: "Yes. Send a brief naming them, or ask for a shortlist of operators with a similar profile. We confirm availability, pricing, and scope — usually within 48 hours.",
+        q: "Can we book {first} directly?",
+        a: "Yes. Send a brief naming {first}, or ask for a shortlist of operators with a similar profile. We confirm availability, pricing, and scope — usually within 48 hours.",
       },
       {
         q: "What should we include in a brief?",
-        a: "Audience, goal, timing, and any format preferences. The more context on the business moment, the faster we can recommend the right mix of content, partnerships, speaking, or live work.",
+        a: "Audience, goal, timing, and any format preferences. The more context on the business moment, the faster we can recommend the right mix of content, partnerships, speaking, or live work with {first}.",
       },
       {
         q: "What formats are available?",
-        a: "Brand partnerships, speaking, live events, and ambassador programs — often combined. Formats on each profile reflect what that creator typically delivers.",
+        a: "Brand partnerships, speaking, live events, and ambassador programs — often combined. Formats on this profile reflect what {first} typically delivers.",
       },
       {
         q: "Do you work with agencies as well as brands?",
@@ -352,7 +352,7 @@ export const DEFAULT_SITE_CHROME: SiteChromeSections = {
       },
       {
         q: "How quickly can we start?",
-        a: "Same-day acknowledgement on briefs. Shortlist within 48 hours when the roster fits. Live dates and longer programs depend on creator availability.",
+        a: "Same-day acknowledgement on briefs. Shortlist within 48 hours when the roster fits. Live dates and longer programs depend on {possessive} availability.",
       },
     ],
   },
@@ -842,6 +842,26 @@ function mergeOrderedIds<T extends string>(
   return ordered;
 }
 
+/** Upgrade older generic FAQ copy so profile tokens apply without a CMS re-save. */
+const LEGACY_PROFILE_FAQ_COPY: Record<string, string> = {
+  "Questions before you brief.": "Questions before you brief {first}.",
+  "How booking works, what to expect, and how we scope work with creators on the roster.":
+    "How booking works, what to expect, and how we scope work with {first}.",
+  "Can we book this creator directly?": "Can we book {first} directly?",
+  "Yes. Send a brief naming them, or ask for a shortlist of operators with a similar profile. We confirm availability, pricing, and scope — usually within 48 hours.":
+    "Yes. Send a brief naming {first}, or ask for a shortlist of operators with a similar profile. We confirm availability, pricing, and scope — usually within 48 hours.",
+  "Audience, goal, timing, and any format preferences. The more context on the business moment, the faster we can recommend the right mix of content, partnerships, speaking, or live work.":
+    "Audience, goal, timing, and any format preferences. The more context on the business moment, the faster we can recommend the right mix of content, partnerships, speaking, or live work with {first}.",
+  "Brand partnerships, speaking, live events, and ambassador programs — often combined. Formats on each profile reflect what that creator typically delivers.":
+    "Brand partnerships, speaking, live events, and ambassador programs — often combined. Formats on this profile reflect what {first} typically delivers.",
+  "Same-day acknowledgement on briefs. Shortlist within 48 hours when the roster fits. Live dates and longer programs depend on creator availability.":
+    "Same-day acknowledgement on briefs. Shortlist within 48 hours when the roster fits. Live dates and longer programs depend on {possessive} availability.",
+};
+
+function withProfileFaqTokens(value: string) {
+  return LEGACY_PROFILE_FAQ_COPY[value] ?? value;
+}
+
 function mergeProfileFaq(raw: unknown): ProfileFaqSections {
   const defaults = DEFAULT_SITE_CHROME.profileFaq;
   const data = (raw && typeof raw === "object" ? raw : {}) as Partial<
@@ -850,9 +870,9 @@ function mergeProfileFaq(raw: unknown): ProfileFaqSections {
 
   if (!Array.isArray(data.items)) {
     return {
-      eyebrow: asString(data.eyebrow, defaults.eyebrow),
-      headline: asString(data.headline, defaults.headline),
-      subhead: asString(data.subhead, defaults.subhead),
+      eyebrow: withProfileFaqTokens(asString(data.eyebrow, defaults.eyebrow)),
+      headline: withProfileFaqTokens(asString(data.headline, defaults.headline)),
+      subhead: withProfileFaqTokens(asString(data.subhead, defaults.subhead)),
       items: defaults.items.map((item) => ({ ...item })),
     };
   }
@@ -863,17 +883,17 @@ function mergeProfileFaq(raw: unknown): ProfileFaqSections {
         ProfileFaqItem
       >;
       const fallback = defaults.items[i] ?? { q: "", a: "" };
-      const q = asString(row.q, fallback.q);
-      const a = asString(row.a, fallback.a);
+      const q = withProfileFaqTokens(asString(row.q, fallback.q));
+      const a = withProfileFaqTokens(asString(row.a, fallback.a));
       if (!q.trim() && !a.trim()) return null;
       return { q, a };
     })
     .filter((item): item is ProfileFaqItem => item !== null);
 
   return {
-    eyebrow: asString(data.eyebrow, defaults.eyebrow),
-    headline: asString(data.headline, defaults.headline),
-    subhead: asString(data.subhead, defaults.subhead),
+    eyebrow: withProfileFaqTokens(asString(data.eyebrow, defaults.eyebrow)),
+    headline: withProfileFaqTokens(asString(data.headline, defaults.headline)),
+    subhead: withProfileFaqTokens(asString(data.subhead, defaults.subhead)),
     items:
       merged.length > 0 ? merged : defaults.items.map((item) => ({ ...item })),
   };
