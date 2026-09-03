@@ -11,61 +11,21 @@ type CardSize = {
   name: string;
 };
 
-/** About page — clearer skyline range. */
+/** About page — uniform size (client request: all cards same height/width). */
 const CARD_SIZES_SKYLINE: readonly CardSize[] = [
   {
-    frame: "w-[13.5rem] md:w-[15.75rem]",
-    height: "h-[17.5rem] md:h-[22.5rem]",
-    name: "text-[1.0625rem] md:text-[1.125rem]",
-  },
-  {
-    frame: "w-[18.5rem] md:w-[22.5rem]",
-    height: "h-[23.5rem] md:h-[32.5rem]",
-    name: "text-[1.25rem]",
-  },
-  {
-    frame: "w-[12.25rem] md:w-[14.25rem]",
-    height: "h-[15.75rem] md:h-[19.75rem]",
-    name: "text-[1.0625rem]",
-  },
-  {
-    frame: "w-[16.5rem] md:w-[19.5rem]",
-    height: "h-[21rem] md:h-[28rem]",
-    name: "text-[1.1875rem]",
-  },
-  {
-    frame: "w-[14rem] md:w-[16.25rem]",
-    height: "h-[18.25rem] md:h-[24rem]",
-    name: "text-[1.125rem]",
+    frame: "w-[12rem] md:w-[14.5rem]",
+    height: "h-[16rem] md:h-[20rem]",
+    name: "text-[1rem] md:text-[1.0625rem]",
   },
 ];
 
-/** Homepage hero — same language, softer height swings. */
+/** Homepage hero — uniform size to match skyline. */
 const CARD_SIZES_SUBTLE: readonly CardSize[] = [
   {
-    frame: "w-[12rem] md:w-[13.5rem]",
-    height: "h-[16rem] md:h-[18.75rem]",
+    frame: "w-[12rem] md:w-[14.5rem]",
+    height: "h-[16rem] md:h-[20rem]",
     name: "text-[1rem] md:text-[1.0625rem]",
-  },
-  {
-    frame: "w-[14.25rem] md:w-[16rem]",
-    height: "h-[18.75rem] md:h-[22.25rem]",
-    name: "text-[1.0625rem] md:text-[1.125rem]",
-  },
-  {
-    frame: "w-[11.25rem] md:w-[12.5rem]",
-    height: "h-[14.75rem] md:h-[17.25rem]",
-    name: "text-[0.975rem] md:text-[1.0625rem]",
-  },
-  {
-    frame: "w-[13.25rem] md:w-[14.75rem]",
-    height: "h-[17.5rem] md:h-[20.5rem]",
-    name: "text-[1.0625rem]",
-  },
-  {
-    frame: "w-[15rem] md:w-[16.75rem]",
-    height: "h-[19.5rem] md:h-[23.5rem]",
-    name: "text-[1.125rem]",
   },
 ];
 
@@ -116,7 +76,7 @@ export function AboutRosterRail({
       />
       <ul
         className={cn(
-          "flex w-max items-end gap-3 md:gap-4",
+          "flex w-max items-stretch gap-3 md:gap-4",
           trackClass,
         )}
       >

@@ -418,7 +418,7 @@ function FilterSegment({
           id={listId}
           role="listbox"
           aria-label={label}
-          className="absolute top-[calc(100%+0.4rem)] right-0 left-0 z-30 overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] py-1.5 shadow-[0_16px_36px_rgba(28,26,23,0.12)]"
+          className="absolute top-[calc(100%+0.4rem)] left-0 z-30 min-w-full overflow-hidden rounded-sm border border-charcoal/10 bg-[#FBF8F5] py-1.5 shadow-[0_16px_36px_rgba(28,26,23,0.12)] w-max max-w-[16rem]"
         >
           <li role="option" aria-selected={!value}>
             <button

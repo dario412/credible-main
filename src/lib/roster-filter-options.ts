@@ -123,7 +123,7 @@ export function buildRosterFilterOptions(
       : [...topicSet].sort((a, b) => a.localeCompare(b));
 
   return {
-    archetypeOptions: sortByArchetypeOrder([...archetypeSet]),
+    archetypeOptions: [...archetypeSet].sort((a, b) => a.localeCompare(b)),
     topicOptions,
   };
 }
