@@ -52,7 +52,8 @@ export function ExpertProfileStageHero({
   // Tall Trusted-by hero only when we have real logos; otherwise compact new-creator layout
   const logoBrands = brandsWithLogos(trustedBy).slice(0, 8);
   const showTrustedBy = logoBrands.length > 0;
-  const fillTrustedByRow = logoBrands.length === 8;
+  /** 5–8 logos span the full row; fewer stay left-aligned. */
+  const stretchTrustedByRow = logoBrands.length >= 5;
 
   return (
     <section
@@ -160,25 +161,22 @@ export function ExpertProfileStageHero({
               </ProfileEditHit>
               <ul
                 className={cn(
-                  "mt-5 w-full items-center gap-y-5",
-                  fillTrustedByRow
-                    ? "grid grid-cols-4 gap-x-4 sm:grid-cols-8 md:gap-x-6"
-                    : "flex flex-wrap justify-start gap-x-6 md:gap-x-8",
+                  "mt-5 flex w-full flex-wrap items-center gap-y-5",
+                  stretchTrustedByRow
+                    ? "justify-between gap-x-3 md:gap-x-5"
+                    : "justify-start gap-x-6 md:gap-x-8",
                 )}
               >
-                {logoBrands.map((brand) => (
+                {logoBrands.map((brand, index) => (
                   <li
-                    key={brand.name}
-                    className={cn(
-                      "flex h-6 items-center md:h-7",
-                      fillTrustedByRow && "min-w-0 justify-center",
-                    )}
+                    key={`${brand.name}-${index}`}
+                    className="flex h-6 shrink-0 items-center md:h-7"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={brand.logo}
                       alt={logoAltFor(brand.name)}
-                      className="h-5 w-auto max-w-full object-contain brightness-0 invert md:h-6"
+                      className="h-5 w-auto max-w-[7.5rem] object-contain brightness-0 invert md:h-6 md:max-w-[9rem]"
                     />
                   </li>
                 ))}
