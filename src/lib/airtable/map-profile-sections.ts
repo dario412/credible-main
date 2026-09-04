@@ -536,13 +536,20 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
   const liveCopy = asString(
     field(fields, "Creator | Website | Live events copy", "Live events copy"),
   );
-  if (liveCopy) {
+  // fldwloIeUK9OtFR1U — Live events? (Yes/No)
+  if (asBoolean(field(fields, "Live events?"))) {
     formats.push({
       kind: "liveEvents",
       category: String(formats.length + 1).padStart(2, "0"),
       title: "Live events",
       description: liveCopy ?? "",
-      formats: ["Panel", "Retreat / Summit", "Roundtable"],
+      formats: [
+        "Event Facilitation",
+        "Attendance & content",
+        "Hosting & moderation",
+        "Retreats & summits",
+        "Executive engagement",
+      ],
     });
   }
 
@@ -553,13 +560,14 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
       "Ambassador program copy",
     ),
   );
-  if (ambassadorCopy) {
+  // fldN79WnckfXBHiXI — Brand ambassador? (Yes/No)
+  if (asBoolean(field(fields, "Brand ambassador?"))) {
     formats.push({
       kind: "ambassador",
       category: String(formats.length + 1).padStart(2, "0"),
       title: "Ambassador program",
       description: ambassadorCopy ?? "",
-      formats: ["Brand Ambassador", "Category Ambassador"],
+      formats: ["Brand ambassador"],
     });
   }
 

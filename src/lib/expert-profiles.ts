@@ -156,13 +156,14 @@ const SPEAKING_FORMATS = [
 ];
 
 const LIVE_EVENT_FORMATS = [
-  "Hackathon",
-  "Panel",
-  "Retreat / Summit",
-  "Roundtable",
+  "Event Facilitation",
+  "Attendance & content",
+  "Hosting & moderation",
+  "Retreats & summits",
+  "Executive engagement",
 ];
 
-const AMBASSADOR_FORMATS = ["Brand Ambassador", "Category Ambassador"];
+const AMBASSADOR_FORMATS = ["Brand ambassador"];
 
 /** Shared format offerings — left-side copy lives in site chrome CMS. */
 function expertFormats(copy?: {
@@ -239,14 +240,11 @@ export function resolveFormatKind(
   return null;
 }
 
-/** Keep Airtable channel/format panels; fill missing slots from enrichment / demo. */
+/** Keep Airtable format panels; fill missing kinds from enrichment only (not demo). */
 export function mergeFormats(
   primary: ExpertFormatOffering[] | null | undefined,
   fallback: ExpertFormatOffering[] | null | undefined,
 ): ExpertFormatOffering[] {
-  const demoByKind = new Map(
-    DEMO_FORMATS.map((item) => [item.kind!, item] as const),
-  );
   const fallbackByKind = new Map<FormatKind, ExpertFormatOffering>();
   for (const item of fallback ?? []) {
     const kind = resolveFormatKind(item);
@@ -258,27 +256,26 @@ export function mergeFormats(
     if (kind) primaryByKind.set(kind, item);
   }
 
-  return FORMAT_KIND_ORDER.map((kind, index) => {
+  const hasPrimary = primaryByKind.size > 0;
+  const kinds = FORMAT_KIND_ORDER.filter((kind) =>
+    hasPrimary ? primaryByKind.has(kind) : fallbackByKind.has(kind),
+  );
+
+  return kinds.map((kind, index) => {
     const live = primaryByKind.get(kind);
     const enriched = fallbackByKind.get(kind);
-    const demo = demoByKind.get(kind)!;
-    const source = live ?? enriched ?? demo;
+    const source = live ?? enriched!;
     return {
-      ...demo,
       ...source,
       kind,
       category: String(index + 1).padStart(2, "0"),
-      channels: source.channels?.length
-        ? source.channels
-        : demo.channels,
+      channels: source.channels?.length ? source.channels : undefined,
       formats: source.channels?.length
         ? undefined
         : source.formats?.length
           ? source.formats
-          : demo.formats,
-      description:
-        live?.description?.trim() ||
-        "",
+          : undefined,
+      description: live?.description?.trim() || "",
     };
   });
 }
