@@ -465,7 +465,9 @@ export default async function ExpertPage({ params }: Props) {
         navSections={{
           hasChannels: Boolean(content.channels?.length),
           hasTopics: Boolean(
-            content.topicShares?.length && content.audience,
+            content.topicShares?.length ||
+              content.audience?.seniority.length ||
+              content.audience?.industry.length,
           ),
           hasFormats: Boolean(content.formats?.length),
           hasWork: recentWork.length > 0,
