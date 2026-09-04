@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Check } from "@phosphor-icons/react";
 import { useActionState, useId, useRef } from "react";
 
+import { PhoneField } from "@/components/phone-field";
 import {
   submitRepresentationApplication,
   type FormState,
@@ -15,24 +16,6 @@ const inputClass =
   "w-full rounded-sm border border-charcoal/15 bg-cream px-3 py-2 text-[0.8125rem] leading-snug text-charcoal outline-none transition-colors placeholder:text-charcoal/35 focus:border-forest focus:outline focus:outline-2 focus:outline-offset-[-2px] focus:outline-forest";
 const labelClass =
   "block text-[0.625rem] font-medium tracking-[0.12em] text-charcoal/50 uppercase";
-
-const PHONE_COUNTRY_CODES = [
-  { code: "+44", label: "UK +44" },
-  { code: "+1", label: "US +1" },
-  { code: "+353", label: "IE +353" },
-  { code: "+61", label: "AU +61" },
-  { code: "+49", label: "DE +49" },
-  { code: "+33", label: "FR +33" },
-  { code: "+34", label: "ES +34" },
-  { code: "+39", label: "IT +39" },
-  { code: "+31", label: "NL +31" },
-  { code: "+46", label: "SE +46" },
-  { code: "+41", label: "CH +41" },
-  { code: "+971", label: "AE +971" },
-  { code: "+91", label: "IN +91" },
-  { code: "+65", label: "SG +65" },
-  { code: "+852", label: "HK +852" },
-] as const;
 
 function Field({
   id,
@@ -161,34 +144,7 @@ export function RepresentationApplicationForm() {
             required
             autoComplete="email"
           />
-          <div>
-            <label htmlFor={`${id}-phone`} className={labelClass}>
-              Phone number
-            </label>
-            <div className="mt-1 flex">
-              <select
-                id={`${id}-phone-code`}
-                name="phoneCountryCode"
-                defaultValue="+44"
-                aria-label="Country code"
-                className={`${inputClass} w-[5.75rem] shrink-0 rounded-r-none border-r-0 pr-1 pl-2`}
-              >
-                {PHONE_COUNTRY_CODES.map(({ code, label }) => (
-                  <option key={code} value={code}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-              <input
-                id={`${id}-phone`}
-                name="phone"
-                type="tel"
-                autoComplete="tel-national"
-                placeholder="7700 900123"
-                className={`${inputClass} min-w-0 flex-1 rounded-l-none`}
-              />
-            </div>
-          </div>
+          <PhoneField id={id} />
         </div>
 
         <Field

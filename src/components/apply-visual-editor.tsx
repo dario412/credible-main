@@ -935,7 +935,7 @@ function ApplyView({
                 </div>
 
                 {nextItems.length > 0 ? (
-                  <div className="mt-5 border-t border-charcoal/10 pt-4">
+                  <div className="mt-auto border-t border-charcoal/10 pt-4">
                     <p className={EYEBROW_MUTED}>{sections.hero.nextEyebrow}</p>
                     <ol className="mt-3 space-y-2">
                       {nextItems.map((item, i) => (
@@ -972,7 +972,7 @@ function ApplyView({
         </div>
       </section>
 
-      <section className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
+      <section className="bg-cream px-6 pt-0 pb-16 md:px-10 md:pb-20 lg:px-12 lg:pb-24">
         <div className={PAGE_SHELL}>
           <FadeUp>
             {hit(
@@ -1206,7 +1206,7 @@ function ApplyView({
         </div>
       </section>
 
-      <section className="bg-cream px-6 py-16 md:px-10 md:py-20 lg:px-12 lg:py-24">
+      <section className="bg-cream px-6 pt-16 pb-8 md:px-10 md:pt-20 md:pb-10 lg:px-12 lg:pt-24 lg:pb-12">
         <div className={PAGE_SHELL}>
           <FadeUp>
             {hit(

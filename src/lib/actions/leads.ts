@@ -63,11 +63,19 @@ export async function submitBrief(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  const phoneNumber = String(formData.get("phone") ?? "").trim();
+  const phoneCountryCode = String(
+    formData.get("phoneCountryCode") ?? "+44",
+  ).trim();
+  const phone = phoneNumber
+    ? `${phoneCountryCode} ${phoneNumber}`.trim()
+    : phoneNumber;
+
   const parsed = briefSchema.safeParse({
     email: formData.get("email"),
     name: formData.get("name"),
     company: formData.get("company"),
-    phone: formData.get("phone"),
+    phone,
     role: formData.get("role") || undefined,
     creators: formData.get("creators") || undefined,
     brief: formData.get("brief"),

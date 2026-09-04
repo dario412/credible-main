@@ -8,6 +8,7 @@ import {
   getPeptalkTracking,
 } from "@/components/peptalk-tracking";
 import { RosterCreatorMultiSelect } from "@/components/roster-creator-multi-select";
+import { PhoneField } from "@/components/phone-field";
 import { submitBrief, type FormState } from "@/lib/actions/leads";
 import type { RosterFormOption } from "@/lib/roster-form-options";
 import { useShortlist } from "@/lib/shortlist";
@@ -146,17 +147,13 @@ export function BriefForm({
           />
         </div>
         <div className={fieldClass}>
-          <label htmlFor={`${id}-phone`} className={labelClass}>
-            Phone
-          </label>
-          <input
-            id={`${id}-phone`}
-            name="phone"
-            type="tel"
+          <PhoneField
+            id={id}
+            label="Phone"
             required
-            autoComplete="tel"
-            placeholder="+1 555 000 0000"
-            className={inputClass}
+            size={spacious ? "md" : "sm"}
+            variant="brief"
+            labelClassName={labelClass}
           />
         </div>
         <div className={fieldClass}>
@@ -168,7 +165,7 @@ export function BriefForm({
             name="company"
             required
             autoComplete="organization"
-            placeholder="Where you're briefing from"
+            placeholder="Company name"
             className={inputClass}
           />
         </div>
@@ -212,7 +209,7 @@ export function BriefForm({
             name="brief"
             required
             rows={spacious ? 4 : 3}
-            placeholder="Audience, ambition, deadline, budget shape."
+            placeholder="Let us know what formats you are considering, and when you would need them."
             className={textareaClass}
           />
         </div>
@@ -225,7 +222,7 @@ export function BriefForm({
             id={`${id}-deliverables`}
             name="deliverables"
             rows={spacious ? 4 : 3}
-            placeholder="What you need delivered, and by when."
+            placeholder="Tell us what you're promoting, who you're trying to reach, and the budget you're working to."
             className={textareaClass}
           />
         </div>

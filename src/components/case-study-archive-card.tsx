@@ -23,8 +23,8 @@ const CLIENT_MARK_SIZES: Record<
     img: "h-14 w-auto max-w-full md:h-16",
   },
   lg: {
-    box: "h-14 max-w-[12rem] sm:h-16 sm:max-w-[14rem] md:h-[4.5rem] md:max-w-[16rem] lg:h-20 lg:max-w-[18rem]",
-    img: "h-14 w-auto max-w-full sm:h-16 md:h-[4.5rem] lg:h-20",
+    box: "h-10 max-w-[9rem] sm:h-11 sm:max-w-[10rem] md:h-12 md:max-w-[11rem] lg:h-14 lg:max-w-[12rem]",
+    img: "h-10 w-auto max-w-full sm:h-11 md:h-12 lg:h-14",
   },
 };
 

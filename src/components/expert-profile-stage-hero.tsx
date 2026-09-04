@@ -157,7 +157,7 @@ export function ExpertProfileStageHero({
                   {trustedByLabel}
                 </p>
               </ProfileEditHit>
-              <ul className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-5 md:gap-x-8">
+              <ul className="mt-5 flex flex-wrap items-center justify-start gap-x-6 gap-y-5 md:gap-x-8">
                 {logoBrands.map((brand) => (
                   <li key={brand.name} className="flex h-6 items-center md:h-7">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
