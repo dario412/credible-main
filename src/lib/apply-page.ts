@@ -90,7 +90,7 @@ export const DEFAULT_APPLY_SECTIONS: ApplyPageSections = {
     headline: "Turn your expert audience into managed commercial work.",
     subhead:
       "Credible represents founders, operators, investors, and specialist voices with B2B audiences. You keep the voice. We qualify inbound, price opportunities, negotiate scope, and manage delivery.",
-    assurances: ["No fee to apply", "Clear response", "Selective roster"],
+    assurances: [],
     nextEyebrow: "What happens next",
     next: [
       "A manager checks audience fit and commercial readiness.",
@@ -260,6 +260,13 @@ function mergeStrings(raw: unknown, defaults: string[]): string[] {
   return merged.length > 0 ? merged : [...defaults];
 }
 
+function mergeOptionalStrings(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => (typeof item === "string" ? item.trim() : ""))
+    .filter(Boolean);
+}
+
 function mergeAuthority(
   raw: unknown,
   defaults: ApplyAuthorityItem[],
@@ -401,7 +408,7 @@ export function mergeApplySections(raw: unknown): ApplyPageSections {
       badge: asString(hero.badge, defaults.hero.badge),
       headline: asString(hero.headline, defaults.hero.headline),
       subhead: asString(hero.subhead, defaults.hero.subhead),
-      assurances: mergeStrings(hero.assurances, defaults.hero.assurances),
+      assurances: mergeOptionalStrings(hero.assurances),
       nextEyebrow: asString(hero.nextEyebrow, defaults.hero.nextEyebrow),
       next: mergeStrings(hero.next, defaults.hero.next),
     },

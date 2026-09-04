@@ -367,10 +367,16 @@ export async function submitRepresentationApplication(
     return value || undefined;
   };
 
+  const phoneNumber = asOptional("phone");
+  const phoneCountryCode = String(formData.get("phoneCountryCode") ?? "+44").trim();
+  const phone = phoneNumber
+    ? `${phoneCountryCode} ${phoneNumber}`.trim()
+    : undefined;
+
   const parsed = representationSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
-    phone: asOptional("phone"),
+    phone,
     linkedinUrl: formData.get("linkedinUrl"),
     instagramUrl: asOptional("instagramUrl"),
     tiktokUrl: asOptional("tiktokUrl"),
