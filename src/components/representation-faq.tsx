@@ -15,7 +15,7 @@ export function RepresentationFaq({
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <dl className="grid grid-cols-1 items-start gap-3 md:gap-4">
+    <dl className="mx-auto grid w-full grid-cols-1 items-start gap-3 md:w-3/4 md:gap-4">
       {items.map((item, index) => {
         const open = openIndex === index;
         const panelId = `${baseId}-panel-${index}`;

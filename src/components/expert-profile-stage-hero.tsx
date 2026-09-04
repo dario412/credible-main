@@ -50,8 +50,9 @@ export function ExpertProfileStageHero({
   const trustedByLabel = chrome.profileLayout.trustedByLabel;
 
   // Tall Trusted-by hero only when we have real logos; otherwise compact new-creator layout
-  const logoBrands = brandsWithLogos(trustedBy);
+  const logoBrands = brandsWithLogos(trustedBy).slice(0, 8);
   const showTrustedBy = logoBrands.length > 0;
+  const fillTrustedByRow = logoBrands.length === 8;
 
   return (
     <section
@@ -157,14 +158,27 @@ export function ExpertProfileStageHero({
                   {trustedByLabel}
                 </p>
               </ProfileEditHit>
-              <ul className="mt-5 flex flex-wrap items-center justify-start gap-x-6 gap-y-5 md:gap-x-8">
+              <ul
+                className={cn(
+                  "mt-5 w-full items-center gap-y-5",
+                  fillTrustedByRow
+                    ? "grid grid-cols-4 gap-x-4 sm:grid-cols-8 md:gap-x-6"
+                    : "flex flex-wrap justify-start gap-x-6 md:gap-x-8",
+                )}
+              >
                 {logoBrands.map((brand) => (
-                  <li key={brand.name} className="flex h-6 items-center md:h-7">
+                  <li
+                    key={brand.name}
+                    className={cn(
+                      "flex h-6 items-center md:h-7",
+                      fillTrustedByRow && "min-w-0 justify-center",
+                    )}
+                  >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={brand.logo}
                       alt={logoAltFor(brand.name)}
-                      className="h-5 w-auto object-contain brightness-0 invert md:h-6"
+                      className="h-5 w-auto max-w-full object-contain brightness-0 invert md:h-6"
                     />
                   </li>
                 ))}
