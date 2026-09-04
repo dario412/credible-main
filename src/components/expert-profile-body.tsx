@@ -547,7 +547,7 @@ function ProfileFaqSection({ name }: { name: string }) {
       <div className="mt-10">
         <ProfileEditHit field="profileFaq" label="FAQ items" block>
           {faqItems.length > 0 ? (
-            <RepresentationFaq items={faqItems} />
+            <RepresentationFaq items={faqItems} fullWidth />
           ) : (
             <p className="text-sm text-charcoal/45">
               Add FAQ questions in the profile template editor…

@@ -8,14 +8,22 @@ import { cn } from "@/lib/utils";
 
 export function RepresentationFaq({
   items,
+  fullWidth = false,
 }: {
   items: readonly { q: string; a: string }[];
+  /** Profile template uses the full content column; other pages stay at 3/4. */
+  fullWidth?: boolean;
 }) {
   const baseId = useId();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <dl className="mx-auto grid w-full grid-cols-1 items-start gap-3 md:w-3/4 md:gap-4">
+    <dl
+      className={cn(
+        "mx-auto grid w-full grid-cols-1 items-start gap-3 md:gap-4",
+        !fullWidth && "md:w-3/4",
+      )}
+    >
       {items.map((item, index) => {
         const open = openIndex === index;
         const panelId = `${baseId}-panel-${index}`;
