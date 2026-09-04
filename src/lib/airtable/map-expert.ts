@@ -8,7 +8,9 @@ import {
 import { websiteCategoriesFromFields } from "./website-categories";
 import { AIRTABLE_CREATOR_TESTIMONIALS_FIELD } from "./testimonials";
 
-export type MapExpertOptions = Record<string, never>;
+export type MapExpertOptions = {
+  topicNamesById?: Map<string, string>;
+};
 
 export type MappedExpert = {
   airtableId: string;
@@ -280,7 +282,7 @@ function slugFromValue(raw: string | null, fallbackName: string): string {
  */
 export function mapAirtableRecordToExpert(
   record: AirtableRecord,
-  _options: MapExpertOptions = {},
+  options: MapExpertOptions = {},
 ): MappedExpert | null {
   const { fields, id: airtableId } = record;
 
@@ -374,7 +376,9 @@ export function mapAirtableRecordToExpert(
 
   const topics = websiteCategoriesFromFields(fields).slice(0, 6);
 
-  const profileSections = mapAirtableProfileSections(record);
+  const profileSections = mapAirtableProfileSections(record, {
+    topicNamesById: options.topicNamesById,
+  });
 
   const highlight1 = highlightField(fields, 1);
   const highlight2 = highlightField(fields, 2);
@@ -469,9 +473,10 @@ export function mapAirtableRecordToExpert(
     highlight3: syncedHighlight3,
     highlight4: syncedHighlight4,
     growth90d,
-    audienceWho: asString(
-      field(fields, "Creator | Profile | Audience", "Audience"),
-    ),
+    audienceWho:
+      asStringList(
+        field(fields, "Creator | Profile | Audience", "Audience"),
+      ).join(", ") || null,
     audienceWhere: asString(field(fields, "Location", "Geography")),
     channels,
     exclusive,

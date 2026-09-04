@@ -22,6 +22,7 @@ import {
   loadTestimonialsByIds,
   resolveOrderedTestimonials,
 } from "./testimonials";
+import { loadTopicNamesById } from "./topics";
 
 function parseExistingProfileExtras(value: unknown): {
   channelFollowerHistory?: ChannelFollowerHistory;
@@ -146,10 +147,17 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
     return emptySyncResult(message, { errors: [message] });
   }
 
+  let topicNamesById = new Map<string, string>();
+  try {
+    topicNamesById = await loadTopicNamesById();
+  } catch {
+    topicNamesById = new Map();
+  }
+
   const mappedRows = records
     .map((record) => ({
       record,
-      mapped: mapAirtableRecordToExpert(record),
+      mapped: mapAirtableRecordToExpert(record, { topicNamesById }),
     }))
     .filter(
       (row): row is { record: AirtableRecord; mapped: NonNullable<typeof row.mapped> } =>

@@ -332,11 +332,13 @@ function TopicsAndAudience({
       </div>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-4 md:mt-12 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-5">
-        <TopicMixPie
-          topics={topicShares}
-          iconMap={iconMap}
-          className="sm:col-span-2 lg:col-span-1"
-        />
+        {topicShares.length > 0 ? (
+          <TopicMixPie
+            topics={topicShares}
+            iconMap={iconMap}
+            className="sm:col-span-2 lg:col-span-1"
+          />
+        ) : null}
         {audience.seniority.length > 0 ? (
           <AudienceShareList
             title="Audience"
@@ -614,7 +616,9 @@ export function ExpertProfileMain({
   const first = firstName(name);
   const vars = { first, name };
   const hasTopicsAudience =
-    (topicShares?.length ?? 0) > 0 && audience != null;
+    (topicShares?.length ?? 0) > 0 ||
+    (audience?.seniority.length ?? 0) > 0 ||
+    (audience?.industry.length ?? 0) > 0;
 
   const heading = {
     overview: applyProfileRailTemplate(layout.headings.overview, vars),
@@ -643,8 +647,10 @@ export function ExpertProfileMain({
     topics: hasTopicsAudience ? (
       <TopicsAndAudience
         first={first}
-        topicShares={topicShares!}
-        audience={audience!}
+        topicShares={topicShares ?? []}
+        audience={
+          audience ?? { seniority: [], industry: [], geography: [] }
+        }
         title={heading.topics}
       />
     ) : null,

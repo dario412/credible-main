@@ -1,5 +1,6 @@
 import type {
   ExpertAudience,
+  ExpertAudienceSlice,
   ExpertChannelPresence,
   ExpertFormatChannel,
   ExpertFormatOffering,
@@ -190,6 +191,46 @@ function splitLines(value: unknown): string[] {
     .filter(Boolean);
 }
 
+/** Multi-select / linked-record labels without comma-splitting choice names. */
+function selectLabels(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    const out: string[] = [];
+    const seen = new Set<string>();
+    for (const item of value) {
+      let label = "";
+      if (typeof item === "string") label = item.replace(/\s+/g, " ").trim();
+      else if (item && typeof item === "object" && "name" in item) {
+        const name = (item as { name?: unknown }).name;
+        if (typeof name === "string") label = name.replace(/\s+/g, " ").trim();
+      }
+      if (!label) continue;
+      const key = label.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(label);
+    }
+    return out;
+  }
+  return splitLines(value);
+}
+
+function recordIds(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (id): id is string => typeof id === "string" && id.startsWith("rec"),
+  );
+}
+
+function toAudienceSlices(labels: string[]): ExpertAudienceSlice[] {
+  if (labels.length === 0) return [];
+  const weight = Math.floor(100 / labels.length);
+  return labels.map((label, i) => ({
+    label,
+    percent:
+      i === labels.length - 1 ? 100 - weight * (labels.length - 1) : weight,
+  }));
+}
+
 function splitQuote(raw: string | null): {
   quote: string | null;
   attribution: string | null;
@@ -316,12 +357,43 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
   return channels;
 }
 
-function buildTopicShares(fields: Record<string, unknown>): ExpertTopicShare[] {
-  const themes = splitLines(
-    field(fields, "Creator | Profile | Key themes", "Key themes", "Topics"),
-  ).slice(0, 6);
+export type MapProfileSectionsOptions = {
+  /** Credible | Topics id → Topic label for Talks about links. */
+  topicNamesById?: Map<string, string>;
+};
+
+function buildTopicShares(
+  fields: Record<string, unknown>,
+  topicNamesById: Map<string, string>,
+): ExpertTopicShare[] {
+  // fldA1MRZ9JVvauTHC — Creator | Profile | Talks about (linked Credible | Topics)
+  const linkedIds = recordIds(
+    field(
+      fields,
+      "Creator | Profile | Talks about",
+      "Creator | Profile | Topics",
+      "Talks about",
+    ),
+  );
+  const fromLinks = linkedIds
+    .map((id) => topicNamesById.get(id))
+    .filter((name): name is string => Boolean(name?.trim()))
+    .slice(0, 8);
+
+  const themes = (
+    fromLinks.length > 0
+      ? fromLinks
+      : splitLines(
+          field(
+            fields,
+            "Creator | Profile | Key themes",
+            "Key themes",
+            "Topics",
+          ),
+        )
+  ).slice(0, 8);
   if (themes.length === 0) return [];
-  const weights = [32, 22, 16, 12, 10, 8].slice(0, themes.length);
+  const weights = [32, 22, 16, 12, 10, 8, 6, 4].slice(0, themes.length);
   const sum = weights.reduce((a, b) => a + b, 0);
   return themes.map((label, i) => ({
     label,
@@ -330,18 +402,20 @@ function buildTopicShares(fields: Record<string, unknown>): ExpertTopicShare[] {
 }
 
 function buildAudience(fields: Record<string, unknown>): ExpertAudience | null {
-  const raw = asString(
-    field(fields, "Creator | Profile | Audience", "Audience"),
+  // fldZyoLHWFebulqK3 — Creator | Profile | Audience (multipleSelects)
+  const seniority = toAudienceSlices(
+    selectLabels(
+      field(fields, "Creator | Profile | Audience", "Audience"),
+    ).slice(0, 8),
   );
-  if (!raw) return null;
-  const parts = splitLines(raw).slice(0, 6);
-  if (parts.length === 0) return null;
-  const weight = Math.floor(100 / parts.length);
-  const seniority = parts.map((label, i) => ({
-    label,
-    percent: i === parts.length - 1 ? 100 - weight * (parts.length - 1) : weight,
-  }));
-  return { seniority, industry: [], geography: [] };
+  // fldjZPa1A5wwauttb — Creator | Website | Best for (multipleSelects)
+  const industry = toAudienceSlices(
+    selectLabels(
+      field(fields, "Creator | Website | Best for", "Best for"),
+    ).slice(0, 8),
+  );
+  if (seniority.length === 0 && industry.length === 0) return null;
+  return { seniority, industry, geography: [] };
 }
 
 function ratePositive(fields: Record<string, unknown>, ...aliases: string[]) {
@@ -495,8 +569,10 @@ function buildFormats(fields: Record<string, unknown>): ExpertFormatOffering[] {
 /** Extract quote / channels / topics / audience / formats from a Credible | Data record. */
 export function mapAirtableProfileSections(
   record: AirtableRecord,
+  options: MapProfileSectionsOptions = {},
 ): AirtableProfileSections {
   const { fields } = record;
+  const topicNamesById = options.topicNamesById ?? new Map<string, string>();
   const quoteRaw = asString(
     field(fields, "Creator | Website | Quote", "Quote"),
   );
@@ -506,7 +582,7 @@ export function mapAirtableProfileSections(
     quote,
     quoteAttribution: attribution,
     channels: buildChannels(fields),
-    topicShares: buildTopicShares(fields),
+    topicShares: buildTopicShares(fields, topicNamesById),
     audience: buildAudience(fields),
     formats: buildFormats(fields),
     linkedinTopVoice: asBoolean(

@@ -308,19 +308,25 @@ export const DEMO_AUDIENCE: ExpertAudience = {
   ],
 };
 
-/** Prefer live slices; fill empty lists from enrichment / demo placeholders. */
+/** Prefer live Airtable slices; fill empty lists from enrichment only (not demo placeholders). */
 export function mergeAudience(
   primary: ExpertAudience | null | undefined,
   fallback: ExpertAudience | null | undefined,
 ): ExpertAudience | undefined {
-  const base = fallback ?? DEMO_AUDIENCE;
-  if (!primary) return fallback ?? DEMO_AUDIENCE;
+  if (!primary) return fallback ?? undefined;
   return {
     seniority:
-      primary.seniority.length > 0 ? primary.seniority : base.seniority,
-    industry: primary.industry.length > 0 ? primary.industry : base.industry,
+      primary.seniority.length > 0
+        ? primary.seniority
+        : (fallback?.seniority ?? []),
+    industry:
+      primary.industry.length > 0
+        ? primary.industry
+        : (fallback?.industry ?? []),
     geography:
-      primary.geography.length > 0 ? primary.geography : base.geography,
+      primary.geography.length > 0
+        ? primary.geography
+        : (fallback?.geography ?? []),
   };
 }
 
