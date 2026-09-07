@@ -4,7 +4,7 @@
  * a logo derived from the organisation website URL.
  */
 
-import { logoUrlFromWebsite } from "@/lib/website-logo";
+import { isLowQualityLogoUrl, logoUrlFromWebsite } from "@/lib/website-logo";
 
 const LOCAL_BRAND_LOGOS: Record<string, string> = {
   notion: "/brand/clients/notion-wordmark-white.svg",
@@ -105,14 +105,17 @@ export function resolveBrandLogo(
   airtableLogoUrl?: string | null,
   websiteUrl?: string | null,
 ): string | undefined {
-  if (airtableLogoUrl && /^https?:\/\//i.test(airtableLogoUrl.trim())) {
-    return airtableLogoUrl.trim();
+  const explicit = airtableLogoUrl?.trim();
+  if (explicit && /^https?:\/\//i.test(explicit) && !isLowQualityLogoUrl(explicit)) {
+    return explicit;
   }
   for (const key of brandLookupKeys(name)) {
     const hit = LOCAL_BRAND_LOGOS[key];
     if (hit) return hit;
   }
-  return logoUrlFromWebsite(websiteUrl);
+  const fromSite = logoUrlFromWebsite(websiteUrl);
+  if (fromSite && !isLowQualityLogoUrl(fromSite)) return fromSite;
+  return undefined;
 }
 
 export function withResolvedLogos(
@@ -142,7 +145,9 @@ export function withResolvedLogos(
   return out;
 }
 
-/** Brands that have a logo asset — drives the tall Trusted-by hero layout. */
+/** Brands that have a usable logo asset — drives the tall Trusted-by hero layout. */
 export function brandsWithLogos(brands: TrustedBrand[]): TrustedBrand[] {
-  return brands.filter((b) => Boolean(b.logo));
+  return brands.filter(
+    (b) => Boolean(b.logo) && !isLowQualityLogoUrl(b.logo),
+  );
 }

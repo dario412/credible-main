@@ -7,7 +7,7 @@ import { ArrowRight } from "@phosphor-icons/react/ssr";
 import { ExpertHeroStats } from "@/components/expert-hero-stats";
 import { useSiteChrome } from "@/components/site-chrome-context";
 import { ProfileEditHit } from "@/components/use-profile-edit-hit";
-import { brandsWithLogos } from "@/lib/brand-logos";
+import { brandsWithLogos, caseStudyLogoNeedsInvert } from "@/lib/brand-logos";
 import { firstName, type ExpertProfileStat } from "@/lib/expert-profiles";
 import { applyProfileRailTemplate } from "@/lib/site-chrome";
 import { coverAltFor, logoAltFor } from "@/lib/image-alt";
@@ -167,19 +167,31 @@ export function ExpertProfileStageHero({
                     : "justify-start gap-x-6 md:gap-x-8",
                 )}
               >
-                {logoBrands.map((brand, index) => (
-                  <li
-                    key={`${brand.name}-${index}`}
-                    className="flex h-6 shrink-0 items-center md:h-7"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={brand.logo}
-                      alt={logoAltFor(brand.name)}
-                      className="h-5 w-auto max-w-[7.5rem] object-contain brightness-0 invert md:h-6 md:max-w-[9rem]"
-                    />
-                  </li>
-                ))}
+                {logoBrands.map((brand, index) => {
+                  const logo = brand.logo!;
+                  const invert = caseStudyLogoNeedsInvert(logo);
+                  return (
+                    <li
+                      key={`${brand.name}-${index}`}
+                      className="flex h-6 shrink-0 items-center md:h-7"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={logo}
+                        alt={logoAltFor(brand.name)}
+                        className={cn(
+                          "h-5 w-auto max-w-[7.5rem] object-contain md:h-6 md:max-w-[9rem]",
+                          invert && "brightness-0 invert",
+                        )}
+                        onError={(event) => {
+                          const el = event.currentTarget;
+                          const item = el.closest("li");
+                          if (item) item.hidden = true;
+                        }}
+                      />
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ) : null}
