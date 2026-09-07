@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { isMediaAssetUrl } from "@/lib/media";
 import { logoAltFor } from "@/lib/image-alt";
 import { cn } from "@/lib/utils";
 
@@ -58,8 +59,16 @@ export function TrustedByBrandMark({
   tone: "light" | "dark";
 }) {
   const [scale, setScale] = useState(1);
+  // Only media uploads need padding compensation. Curated /brand SVGs already
+  // fill their viewBox; measuring them via canvas invents false letterboxing.
+  const shouldCompensate = isMediaAssetUrl(logoSrc);
 
   useEffect(() => {
+    if (!shouldCompensate) {
+      setScale(1);
+      return;
+    }
+
     let cancelled = false;
     const img = new window.Image();
     img.decoding = "async";
@@ -80,7 +89,7 @@ export function TrustedByBrandMark({
     return () => {
       cancelled = true;
     };
-  }, [logoSrc]);
+  }, [logoSrc, shouldCompensate]);
 
   return (
     <img
@@ -90,7 +99,7 @@ export function TrustedByBrandMark({
         "h-full w-auto max-w-full object-contain object-center transition-[opacity,transform] duration-200",
         tone === "dark" ? "brightness-0 invert" : "brightness-0",
       )}
-      style={{ transform: `scale(${scale})` }}
+      style={scale === 1 ? undefined : { transform: `scale(${scale})` }}
     />
   );
 }
