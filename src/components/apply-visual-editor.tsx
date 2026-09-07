@@ -23,6 +23,7 @@ import {
 import { RepresentationApplyCta } from "@/components/representation-apply-cta";
 import { RepresentationApplicationForm } from "@/components/representation-application-form";
 import { RepresentationFaq } from "@/components/representation-faq";
+import { RichTextEditor } from "@/components/rich-text-field";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
   APPLY_BENEFIT_ICONS,
@@ -34,6 +35,7 @@ import {
   type ApplyBenefitIcon,
   type ApplyPageSections,
 } from "@/lib/apply-page";
+import { richTextToPlainText } from "@/lib/rich-text";
 
 const BENEFIT_ICON = {
   envelope: EnvelopeSimple,
@@ -743,13 +745,12 @@ function EditorPopover({
                   />
                 </Field>
                 <Field label="Answer" id={`ve-apply-faq-a-${index}`}>
-                  <TextArea
-                    id={`ve-apply-faq-a-${index}`}
-                    rows={3}
+                  <RichTextEditor
                     value={item.a}
-                    onChange={(e) => {
+                    placeholder="Write the answer with links, bold, italic…"
+                    onChange={(html) => {
                       const items = sections.faq.items.map((row, i) =>
-                        i === index ? { ...row, a: e.target.value } : row,
+                        i === index ? { ...row, a: html } : row,
                       );
                       onChange({
                         ...sections,
@@ -888,7 +889,7 @@ function ApplyView({
   const fitItems = sections.qualify.fit.filter((item) => item.trim());
   const notFitItems = sections.qualify.notFit.filter((item) => item.trim());
   const faqItems = sections.faq.items.filter(
-    (item) => item.q.trim() || item.a.trim(),
+    (item) => item.q.trim() || richTextToPlainText(item.a),
   );
 
   return (

@@ -1,4 +1,8 @@
 import {
+  richTextToPlainText,
+  sanitizeRichTextHtml,
+} from "@/lib/rich-text";
+import {
   blocksToMarkdown,
   ensureBlockIds,
   parseInsightBody,
@@ -627,8 +631,8 @@ function mergeHomeFaqItems(
       >;
       const fallback = defaults[i] ?? { q: "", a: "" };
       const q = asString(row.q, fallback.q);
-      const a = asString(row.a, fallback.a);
-      if (!q.trim() && !a.trim()) return null;
+      const a = sanitizeRichTextHtml(asString(row.a, fallback.a));
+      if (!q.trim() && !richTextToPlainText(a)) return null;
       return { q, a };
     })
     .filter((item): item is HomeFaqItem => item !== null);

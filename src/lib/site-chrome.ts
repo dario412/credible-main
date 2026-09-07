@@ -1,3 +1,8 @@
+import {
+  richTextToPlainText,
+  sanitizeRichTextHtml,
+} from "@/lib/rich-text";
+
 export type NavLink = {
   label: string;
   href: string;
@@ -884,8 +889,10 @@ function mergeProfileFaq(raw: unknown): ProfileFaqSections {
       >;
       const fallback = defaults.items[i] ?? { q: "", a: "" };
       const q = withProfileFaqTokens(asString(row.q, fallback.q));
-      const a = withProfileFaqTokens(asString(row.a, fallback.a));
-      if (!q.trim() && !a.trim()) return null;
+      const a = sanitizeRichTextHtml(
+        withProfileFaqTokens(asString(row.a, fallback.a)),
+      );
+      if (!q.trim() && !richTextToPlainText(a)) return null;
       return { q, a };
     })
     .filter((item): item is ProfileFaqItem => item !== null);

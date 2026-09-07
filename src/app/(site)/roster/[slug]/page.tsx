@@ -1,3 +1,4 @@
+import { richTextToPlainText } from "@/lib/rich-text";
 import { notFound } from "next/navigation";
 
 import {
@@ -415,7 +416,7 @@ export default async function ExpertPage({ params }: Props) {
   const recentWork = linkedCaseStudies.map(caseStudyToExpertWork);
   const testimonials = extras.testimonials ?? [];
   const hasFaq = siteChrome.profileFaq.items.some(
-    (item) => item.q.trim() && item.a.trim(),
+    (item) => item.q.trim() && richTextToPlainText(item.a),
   );
 
   const heroStats = buildStats(

@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { MediaField } from "@/components/media-library";
+import { RichTextEditor } from "@/components/rich-text-field";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import {
   emptyWhatWeDoFaqItem,
@@ -1096,13 +1097,12 @@ export function WhatWeDoPageEditorForm({
               />
             </Field>
             <Field label="Answer" id={`wwd-faq-a-${index}`}>
-              <TextArea
-                id={`wwd-faq-a-${index}`}
-                rows={4}
+              <RichTextEditor
                 value={item.a}
-                onChange={(e) => {
+                placeholder="Write the answer with links, bold, italic…"
+                onChange={(html) => {
                   const items = sections.faq.items.map((row, i) =>
-                    i === index ? { ...row, a: e.target.value } : row,
+                    i === index ? { ...row, a: html } : row,
                   );
                   setSections({
                     ...sections,

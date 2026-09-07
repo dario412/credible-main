@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useSiteChrome } from "@/components/site-chrome-context";
+import { RichTextEditor } from "@/components/rich-text-field";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type {
   ProfileFormatKind,
@@ -470,13 +471,12 @@ function EditorPopover({
                   label="Answer ({first}, {name}, {possessive})"
                   id={`pf-faq-a-${index}`}
                 >
-                  <TextArea
-                    id={`pf-faq-a-${index}`}
-                    rows={3}
+                  <RichTextEditor
                     value={item.a}
-                    onChange={(e) => {
+                    placeholder="Write the answer with links, bold, italic…"
+                    onChange={(html) => {
                       const items = faq.items.map((row, i) =>
-                        i === index ? { ...row, a: e.target.value } : row,
+                        i === index ? { ...row, a: html } : row,
                       );
                       setFaq({ ...faq, items });
                     }}

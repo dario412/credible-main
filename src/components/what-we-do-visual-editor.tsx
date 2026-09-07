@@ -17,6 +17,7 @@ import { MediaField } from "@/components/media-library";
 import { PatternField } from "@/components/pattern-field";
 import { ProcessTimeline } from "@/components/process-timeline";
 import { RepresentationFaq } from "@/components/representation-faq";
+import { RichTextEditor } from "@/components/rich-text-field";
 import { SiteImage } from "@/components/site-image";
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import { WhatWeDoServices } from "@/components/what-we-do-services";
@@ -31,6 +32,7 @@ import {
   textToFormats,
   type WhatWeDoPageSections,
 } from "@/lib/what-we-do";
+import { richTextToPlainText } from "@/lib/rich-text";
 
 type EditTarget =
   | "hero"
@@ -1127,13 +1129,12 @@ function EditorPopover({
                   />
                 </Field>
                 <Field label="Answer" id={`ve-wwd-faq-a-${index}`}>
-                  <TextArea
-                    id={`ve-wwd-faq-a-${index}`}
-                    rows={4}
+                  <RichTextEditor
                     value={item.a}
-                    onChange={(e) => {
+                    placeholder="Write the answer with links, bold, italic…"
+                    onChange={(html) => {
                       const items = sections.faq.items.map((row, i) =>
-                        i === index ? { ...row, a: e.target.value } : row,
+                        i === index ? { ...row, a: html } : row,
                       );
                       onChange({
                         ...sections,
@@ -1181,7 +1182,7 @@ function WhatWeDoView({
   const laneCount = Math.max(sections.choose.laneLabels.length, 1);
   const matrixTemplate = `14rem minmax(0,1fr) repeat(${laneCount}, 5.5rem)`;
   const faqItems = sections.faq.items.filter(
-    (item) => item.q.trim() || item.a.trim(),
+    (item) => item.q.trim() || richTextToPlainText(item.a),
   );
 
   return (

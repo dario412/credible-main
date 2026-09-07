@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
+import { RichTextEditor } from "@/components/rich-text-field";
 import {
   APPLY_BENEFIT_ICONS,
   emptyApplyBenefit,
@@ -644,13 +645,12 @@ export function ApplyPageEditorForm({
               />
             </Field>
             <Field label="Answer" id={`apply-faq-a-${index}`}>
-              <TextArea
-                id={`apply-faq-a-${index}`}
-                rows={3}
+              <RichTextEditor
                 value={item.a}
-                onChange={(e) => {
+                placeholder="Write the answer with links, bold, italic…"
+                onChange={(html) => {
                   const items = sections.faq.items.map((row, i) =>
-                    i === index ? { ...row, a: e.target.value } : row,
+                    i === index ? { ...row, a: html } : row,
                   );
                   setSections({
                     ...sections,

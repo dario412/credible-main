@@ -42,6 +42,7 @@ import {
   type ProfileFooterBlockId,
 } from "@/lib/site-chrome";
 import { coverAltFor } from "@/lib/image-alt";
+import { richTextToPlainText } from "@/lib/rich-text";
 import { buildTopicAudienceIconMap } from "@/lib/topic-audience-icons";
 import { cn } from "@/lib/utils";
 
@@ -524,7 +525,7 @@ function ProfileFaqSection({ name }: { name: string }) {
   const vars = { first: firstName(name), name };
   const faq = chrome.profileFaq;
   const faqItems = faq.items
-    .filter((item) => item.q.trim() && item.a.trim())
+    .filter((item) => item.q.trim() && richTextToPlainText(item.a))
     .map((item) => ({
       q: applyProfileRailTemplate(item.q, vars),
       a: applyProfileRailTemplate(item.a, vars),

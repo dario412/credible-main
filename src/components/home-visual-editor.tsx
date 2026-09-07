@@ -28,6 +28,7 @@ import {
 } from "@/components/inner-page";
 import { KeyStudy } from "@/components/key-study";
 import { RepresentationFaq } from "@/components/representation-faq";
+import { RichTextEditor } from "@/components/rich-text-field";
 import type { RosterCardExpert } from "@/components/roster-card";
 import { RosterFeaturedSlotsField } from "@/components/roster-featured-slots-field";
 import { TrustedBy } from "@/components/trusted-by";
@@ -35,6 +36,7 @@ import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import type { HomePageSections } from "@/lib/cms";
 import { DEFAULT_HOME_SECTIONS, emptyHomeFaqItem } from "@/lib/cms";
 import { selectRosterPreviewCards } from "@/lib/roster-preview";
+import { richTextToPlainText } from "@/lib/rich-text";
 import type { SiteChromeSections } from "@/lib/site-chrome";
 import {
   TRUSTED_BY_LOGO_HINT,
@@ -1239,13 +1241,12 @@ function EditorPopover({
                   />
                 </Field>
                 <Field label="Answer" id={`home-faq-a-${index}`}>
-                  <TextArea
-                    id={`home-faq-a-${index}`}
-                    rows={3}
+                  <RichTextEditor
                     value={item.a}
-                    onChange={(e) => {
+                    placeholder="Write the answer with links, bold, italic…"
+                    onChange={(html) => {
                       const items = sections.faq.items.map((row, i) =>
-                        i === index ? { ...row, a: e.target.value } : row,
+                        i === index ? { ...row, a: html } : row,
                       );
                       patch("faq", { ...sections.faq, items });
                     }}
@@ -1660,7 +1661,7 @@ export function HomeVisualEditor({
     [rosterCards],
   );
   const faqItems = sections.faq.items.filter(
-    (item) => item.q.trim() || item.a.trim(),
+    (item) => item.q.trim() || richTextToPlainText(item.a),
   );
 
   useEffect(() => {

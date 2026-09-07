@@ -1,3 +1,8 @@
+import {
+  richTextToPlainText,
+  sanitizeRichTextHtml,
+} from "@/lib/rich-text";
+
 export const APPLY_BENEFIT_ICONS = [
   "envelope",
   "briefcase",
@@ -369,8 +374,8 @@ function mergeFaq(raw: unknown, defaults: ApplyFaqItem[]): ApplyFaqItem[] {
       >;
       const fallback = defaults[i] ?? { q: "", a: "" };
       const q = asString(row.q, fallback.q);
-      const a = asString(row.a, fallback.a);
-      if (!q.trim() && !a.trim()) return null;
+      const a = sanitizeRichTextHtml(asString(row.a, fallback.a));
+      if (!q.trim() && !richTextToPlainText(a)) return null;
       return { q, a };
     })
     .filter((item): item is ApplyFaqItem => item !== null);

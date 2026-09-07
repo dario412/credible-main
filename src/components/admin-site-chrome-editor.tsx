@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { Button, Field, TextArea, TextInput } from "@/components/ui";
 import { FooterNavLinkRows } from "@/components/footer-nav-link-rows";
+import { RichTextEditor } from "@/components/rich-text-field";
 import {
   emptyFooterColumn,
   emptyNavLink,
@@ -734,13 +735,12 @@ export function SiteChromeEditorForm({
               />
             </Field>
             <Field label="Answer ({first}, {name}, {possessive})" id={`pf-faq-a-${index}`}>
-              <TextArea
-                id={`pf-faq-a-${index}`}
-                rows={3}
+              <RichTextEditor
                 value={item.a}
-                onChange={(e) => {
+                placeholder="Write the answer with links, bold, italic…"
+                onChange={(html) => {
                   const items = sections.profileFaq.items.map((row, i) =>
-                    i === index ? { ...row, a: e.target.value } : row,
+                    i === index ? { ...row, a: html } : row,
                   );
                   setProfileFaq({ ...sections.profileFaq, items });
                 }}
