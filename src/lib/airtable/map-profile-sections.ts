@@ -329,6 +329,16 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
       followerAliases: ["Channel | Facebook | Followers"],
     },
     {
+      icon: "tiktok",
+      platform: "TikTok",
+      platformKey: "TikTok",
+      urlAliases: ["Channel | TikTok | URL", "TikTok"],
+      followerAliases: [
+        "Channel | TikTok | Followers",
+        "Channel | TikTok | Follower count",
+      ],
+    },
+    {
       icon: "podcast",
       platform: "Podcast",
       platformKey: "Podcast",

@@ -112,13 +112,9 @@ function mergeProfileContent(
 } {
   const sections = extras.profileSections;
   const channels = enrichChannelsWithFollowerHistory(
-    sections?.channels?.filter((channel) => {
-      // TikTok stays off the profile presence grid for now.
-      if (channel.platform === "TikTok" || channel.icon === "tiktok") {
-        return false;
-      }
-      return meetsMinimumChannelFollowers(channel.followers);
-    }) ?? [],
+    sections?.channels?.filter((channel) =>
+      meetsMinimumChannelFollowers(channel.followers),
+    ) ?? [],
     extras.channelFollowerHistory,
   );
   const topicShares =
