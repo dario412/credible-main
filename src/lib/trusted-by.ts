@@ -1,6 +1,6 @@
-/** Optimal logo asset: white wordmark SVG/PNG, ~28px tall, max ~152px wide. */
+/** Optimal logo: white wordmark on transparent, tightly cropped, ~28px tall / under ~152px wide. Avoid large black/square padding — it makes marks look tiny in the grid. */
 export const TRUSTED_BY_LOGO_HINT =
-  "White wordmark on transparent background. Aim for ~28px tall and under ~152px wide so it matches the charcoal grid.";
+  "White wordmark on transparent, tightly cropped. Aim for ~28px tall and under ~152px wide. Large black padding makes logos look tiny.";
 
 export type TrustedByTestimonial = {
   quote: string;

@@ -2,12 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import type { ReactNode } from "react";
 
+import { TrustedByBrandMark } from "@/components/trusted-by-brand-mark";
 import {
   DEFAULT_TRUSTED_CLIENTS,
   hasTrustedByStory,
   type TrustedByClient,
 } from "@/lib/trusted-by";
-import { logoAltFor, portraitAltFor } from "@/lib/image-alt";
+import { portraitAltFor } from "@/lib/image-alt";
 import { projectHref } from "@/lib/case-studies";
 import { cn } from "@/lib/utils";
 
@@ -63,13 +64,10 @@ function BrandMark({
 }) {
   if (client.logoSrc) {
     return (
-      <img
-        src={client.logoSrc}
-        alt={logoAltFor(client.name)}
-        className={cn(
-          "h-full w-auto max-w-full object-contain object-center transition-opacity duration-200",
-          tone === "dark" ? "brightness-0 invert" : "brightness-0",
-        )}
+      <TrustedByBrandMark
+        name={client.name}
+        logoSrc={client.logoSrc}
+        tone={tone}
       />
     );
   }
@@ -161,7 +159,7 @@ export function TrustedBy({
             // Pill only when a case study is linked; hover box only when a quote exists.
             const showStoryPill = Boolean(storyHref);
             const logo = (
-              <span className="flex h-6 w-full max-w-[9.5rem] items-center justify-center md:h-7">
+              <span className="flex h-6 w-full max-w-[9.5rem] items-center justify-center overflow-visible md:h-7">
                 <BrandMark client={client} tone={tone} />
               </span>
             );
@@ -215,7 +213,7 @@ export function TrustedBy({
                 {storyHref && !disableStoryLinks ? (
                   <Link
                     href={storyHref}
-                    className="flex h-6 w-full max-w-[9.5rem] items-center justify-center transition-opacity hover:opacity-80 md:h-7"
+                    className="flex h-6 w-full max-w-[9.5rem] items-center justify-center overflow-visible transition-opacity hover:opacity-80 md:h-7"
                     aria-label={`${client.name} project`}
                   >
                     <BrandMark client={client} tone={tone} />
