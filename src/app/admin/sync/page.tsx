@@ -36,7 +36,8 @@ export default async function AdminSyncPage() {
         <h1 className="font-display text-3xl">Sync</h1>
         <p className="mt-2 text-sm text-muted">
           Match the website roster to Airtable. Sync adds new creators, updates
-          existing ones, and removes anyone who is missing or archived.
+          existing ones, and removes anyone who is missing, archived, or marked
+          unpublished.
         </p>
       </div>
 

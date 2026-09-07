@@ -28,7 +28,9 @@ export function AdminAirtableSyncPanel({
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
           Matches the website roster to Airtable: adds new creators, updates
           existing ones, and removes anyone missing from Airtable or marked
-          archived.
+          archived / unpublished (
+          <code className="text-[0.8125rem]">Creator | Unpublished</code>
+          ).
         </p>
       </div>
 

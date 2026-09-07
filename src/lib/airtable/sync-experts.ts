@@ -172,7 +172,7 @@ export async function syncExpertsFromAirtable(): Promise<SyncExpertsResult> {
         total: records.length,
         skipped: records.length,
         errors: [
-          "Check that creator names are present and Archive is not set on every row.",
+          "Check that creator names are present and Archive / Unpublished are not set on every row.",
         ],
       },
     );

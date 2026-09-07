@@ -286,7 +286,14 @@ export function mapAirtableRecordToExpert(
 ): MappedExpert | null {
   const { fields, id: airtableId } = record;
 
-  if (asBoolean(field(fields, "Creator | Archive", "Archive"))) {
+  // fldn74ngkDp81or8Z — Creator | Unpublished (checkbox)
+  // Same as Archive: do not upsert, and allow stale cleanup to remove them.
+  if (
+    asBoolean(field(fields, "Creator | Archive", "Archive")) ||
+    asBoolean(
+      field(fields, "Creator | Unpublished", "Unpublished", "Creator Unpublished"),
+    )
+  ) {
     return null;
   }
 
