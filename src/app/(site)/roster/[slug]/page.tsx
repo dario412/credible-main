@@ -113,12 +113,8 @@ function mergeProfileContent(
   const sections = extras.profileSections;
   const channels = enrichChannelsWithFollowerHistory(
     sections?.channels?.filter((channel) => {
-      if (
-        channel.platform === "TikTok" ||
-        channel.platform === "Podcast" ||
-        channel.icon === "tiktok" ||
-        channel.icon === "podcast"
-      ) {
+      // TikTok stays off the profile presence grid for now.
+      if (channel.platform === "TikTok" || channel.icon === "tiktok") {
         return false;
       }
       return meetsMinimumChannelFollowers(channel.followers);

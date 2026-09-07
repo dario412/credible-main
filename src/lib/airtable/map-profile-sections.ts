@@ -138,6 +138,19 @@ function urlMatchesPlatform(url: string, platform: string): boolean {
         );
       case "TikTok":
         return host === "tiktok.com" || host.endsWith(".tiktok.com");
+      case "Podcast":
+        return (
+          host.includes("podcast") ||
+          host === "spotify.com" ||
+          host.endsWith(".spotify.com") ||
+          host === "open.spotify.com" ||
+          host.includes("apple.com") ||
+          host.includes("anchor.fm") ||
+          host.includes("transistor.fm") ||
+          host.includes("buzzsprout.com") ||
+          host.includes("simplecast.com") ||
+          host.includes("megaphone.fm")
+        );
       default:
         return true;
     }
@@ -314,6 +327,17 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
       platformKey: "Facebook",
       urlAliases: ["Channel | Facebook | URL", "Facebook"],
       followerAliases: ["Channel | Facebook | Followers"],
+    },
+    {
+      icon: "podcast",
+      platform: "Podcast",
+      platformKey: "Podcast",
+      urlAliases: ["Channel | Podcast | URL", "Podcast"],
+      followerAliases: [
+        "Channel | Podcast | Followers",
+        "Channel | Podcast | Follower count",
+        "Channel | Podcast | Downloads",
+      ],
     },
   ];
 
