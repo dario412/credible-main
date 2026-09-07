@@ -1,7 +1,10 @@
 /**
  * Resolve white wordmarks for Trusted-by strips on dark hero stages.
- * Prefer Airtable `Logo url` when present; fall back to local brand assets.
+ * Prefer Airtable `Logo url` when present; then local brand assets; then
+ * a logo derived from the organisation website URL.
  */
+
+import { logoUrlFromWebsite } from "@/lib/website-logo";
 
 const LOCAL_BRAND_LOGOS: Record<string, string> = {
   notion: "/brand/clients/notion-wordmark-white.svg",
@@ -100,6 +103,7 @@ function brandLookupKeys(name: string): string[] {
 export function resolveBrandLogo(
   name: string,
   airtableLogoUrl?: string | null,
+  websiteUrl?: string | null,
 ): string | undefined {
   if (airtableLogoUrl && /^https?:\/\//i.test(airtableLogoUrl.trim())) {
     return airtableLogoUrl.trim();
@@ -108,11 +112,11 @@ export function resolveBrandLogo(
     const hit = LOCAL_BRAND_LOGOS[key];
     if (hit) return hit;
   }
-  return undefined;
+  return logoUrlFromWebsite(websiteUrl);
 }
 
 export function withResolvedLogos(
-  brands: Array<{ name: string; logo?: string | null }>,
+  brands: Array<{ name: string; logo?: string | null; websiteUrl?: string | null }>,
 ): TrustedBrand[] {
   const seen = new Set<string>();
   const out: TrustedBrand[] = [];
@@ -132,7 +136,7 @@ export function withResolvedLogos(
     seen.add(key);
     out.push({
       name,
-      logo: resolveBrandLogo(name, brand.logo),
+      logo: resolveBrandLogo(name, brand.logo, brand.websiteUrl),
     });
   }
   return out;

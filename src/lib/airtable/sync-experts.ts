@@ -13,7 +13,7 @@ import {
 import {
   mapAirtableRecordToExpert,
 } from "./map-expert";
-import { loadOrganisationBrandsByIds } from "./organisations";
+import { loadOrganisationBrandsByIds, organisationWebsiteUrl } from "./organisations";
 import {
   mergeChannelFollowerHistory,
   type ChannelFollowerHistory,
@@ -107,11 +107,12 @@ async function loadTrustedByByExpertId(
     const name = asString(org.fields.Organisation);
     if (!name) continue;
     const logo = asString(org.fields["Logo url"]);
+    const websiteUrl = organisationWebsiteUrl(org.fields);
     const booked = org.fields["Expert booked"];
     const bookedIds = Array.isArray(booked)
       ? booked.filter((id): id is string => typeof id === "string")
       : [];
-    const brand = withResolvedLogos([{ name, logo }])[0];
+    const brand = withResolvedLogos([{ name, logo, websiteUrl }])[0];
     if (!brand) continue;
     for (const expertId of bookedIds) {
       const list = map.get(expertId) ?? [];

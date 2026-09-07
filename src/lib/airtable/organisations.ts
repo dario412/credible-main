@@ -11,23 +11,36 @@ function chunk<T>(items: T[], size: number): T[][] {
 function asString(value: unknown): string | null {
   if (typeof value === "string" && value.trim()) return value.trim();
   if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (value && typeof value === "object" && "value" in value) {
+    return asString((value as { value: unknown }).value);
+  }
   return null;
 }
 
 function asUrl(value: unknown): string | null {
   const direct = asString(value);
   if (direct && /^https?:\/\//i.test(direct)) return direct;
+  if (direct && /^(www\.)?[a-z0-9.-]+\.[a-z]{2,}\b/i.test(direct)) {
+    return `https://${direct}`;
+  }
   if (!Array.isArray(value)) return null;
   for (const item of value) {
-    if (typeof item === "string" && /^https?:\/\//i.test(item.trim())) {
-      return item.trim();
-    }
-    if (item && typeof item === "object" && "url" in item) {
-      const url = (item as { url?: unknown }).url;
-      if (typeof url === "string" && /^https?:\/\//i.test(url)) return url;
-    }
+    const url = asUrl(item);
+    if (url) return url;
   }
   return null;
+}
+
+/** Organisation website — URL field, then AI Find url. */
+export function organisationWebsiteUrl(
+  fields: Record<string, unknown>,
+): string | null {
+  return (
+    asUrl(fields.URL) ??
+    asUrl(fields.Url) ??
+    asUrl(fields.Website) ??
+    asUrl(fields["Find url"])
+  );
 }
 
 function brandFromOrg(org: AirtableRecord): TrustedBrand | null {
@@ -37,7 +50,8 @@ function brandFromOrg(org: AirtableRecord): TrustedBrand | null {
     asString(org.fields.Name);
   if (!name) return null;
   const logo = asUrl(org.fields["Logo url"]) ?? asUrl(org.fields.Logo);
-  return { name, logo: logo ?? undefined };
+  const websiteUrl = organisationWebsiteUrl(org.fields);
+  return withResolvedLogos([{ name, logo, websiteUrl }])[0] ?? null;
 }
 
 /**
