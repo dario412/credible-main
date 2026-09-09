@@ -7,7 +7,7 @@ import { createMetadata } from "@/lib/seo";
 import type { LeadStatus } from "@/generated/prisma/client";
 
 export const metadata = createMetadata({
-  title: "Leads",
+  title: "Creator applications",
   path: "/admin/leads",
   noIndex: true,
 });

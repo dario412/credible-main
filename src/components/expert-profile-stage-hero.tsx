@@ -41,6 +41,9 @@ export function ExpertProfileStageHero({
   const { chrome } = useSiteChrome();
   const first = firstName(name);
   const cover = stageImage ?? portraitImage ?? "/images/case-studies/notion.jpg";
+  const usingHeadshotFallback = !stageImage && Boolean(portraitImage);
+  const coverPosition =
+    stageImagePosition ?? (usingHeadshotFallback ? "center 22%" : undefined);
   const proof =
     heroProof ?? [title, archetype, based].filter(Boolean).join(" · ");
   const briefLabel = applyProfileRailTemplate(
@@ -76,9 +79,7 @@ export function ExpertProfileStageHero({
         sizes="100vw"
         className="object-cover"
         style={
-          stageImagePosition
-            ? { objectPosition: stageImagePosition }
-            : undefined
+          coverPosition ? { objectPosition: coverPosition } : undefined
         }
       />
       <div
@@ -91,12 +92,12 @@ export function ExpertProfileStageHero({
       />
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 h-[55%] backdrop-blur-[8px]"
+        className="absolute inset-x-0 top-0 h-[28%] backdrop-blur-[4px]"
         style={{
           maskImage:
-            "linear-gradient(to bottom, black 0%, black 35%, transparent 100%)",
+            "linear-gradient(to bottom, black 0%, black 40%, transparent 100%)",
           WebkitMaskImage:
-            "linear-gradient(to bottom, black 0%, black 35%, transparent 100%)",
+            "linear-gradient(to bottom, black 0%, black 40%, transparent 100%)",
         }}
       />
 

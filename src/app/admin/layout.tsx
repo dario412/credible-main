@@ -48,7 +48,11 @@ const nav = [
     label: "Sync",
     permission: "MANAGE_CONTENT" as const,
   },
-  { href: "/admin/leads", label: "Leads", permission: "VIEW_LEADS" as const },
+  {
+    href: "/admin/leads",
+    label: "Creator applications",
+    permission: "VIEW_LEADS" as const,
+  },
   { href: "/admin/users", label: "Users", permission: "MANAGE_USERS" as const },
   { href: "/admin/style-guide", label: "Style guide", permission: null },
 ];

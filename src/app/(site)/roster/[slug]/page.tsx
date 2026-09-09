@@ -433,12 +433,7 @@ export default async function ExpertPage({ params }: Props) {
         title={expert.title}
         archetype={expert.categories[0] ?? null}
         based={enrichment.based}
-        stageImage={
-          extras.bannerImage ?? enrichment.stageImage ?? undefined
-        }
-        stageImagePosition={
-          extras.bannerImage ? undefined : enrichment.stageImagePosition
-        }
+        stageImage={extras.bannerImage || undefined}
         portraitImage={expert.image}
         heroProof={heroProof}
         trustedBy={trustedBy}
