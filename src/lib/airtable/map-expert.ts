@@ -147,15 +147,16 @@ function splitThemeLine(value: string): string[] {
     .filter(Boolean);
 }
 
-/** "214K Combined reach" / "$75M Successful Exit as Co-Founder" / "3 Platforms". */
+/** "214K Combined reach" / "$75M Successful Exit as Co-Founder" / "60%+ Newsletter open rates". */
 export function parseHighlightStat(
   raw: string | null | undefined,
 ): { value: string; label: string } | null {
   if (!raw) return null;
   const text = raw.replace(/\s+/g, " ").trim();
   if (!text) return null;
+  // Value first: optional sign/currency, number, optional K/M/B, then % and/or + in any order.
   const match = text.match(
-    /^([+\-]?\$?\d[\d.,]*(?:\s*[KkMmBb])?\+?%?)\s+(.*)$/,
+    /^([+\-]?\$?\d[\d.,]*(?:\s*[KkMmBb])?[%+]*)\s+(.+)$/,
   );
   if (!match) return { value: text, label: "" };
   const value = (match[1] ?? "").replace(/\s+/g, "");
@@ -176,15 +177,12 @@ function isCombinedReachLabel(label: string) {
   return /\bcombined\b/.test(lower) || /^reach$/.test(lower.trim());
 }
 
-/** Keep reach highlights aligned with the summed channel follower total. */
+/** Preserve Airtable highlight text as authored (do not rewrite reach totals). */
 export function withSyncedReachHighlight(
   raw: string | null,
-  combinedReach: string | null,
+  _combinedReach: string | null,
 ): string | null {
-  if (!raw || !combinedReach) return raw;
-  const parsed = parseHighlightStat(raw);
-  if (!parsed?.label || !isCombinedReachLabel(parsed.label)) return raw;
-  return `${combinedReach} ${parsed.label}`;
+  return raw;
 }
 
 export { isCombinedReachLabel };

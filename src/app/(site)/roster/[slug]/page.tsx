@@ -184,50 +184,19 @@ function resolveCombinedReach(
   return synced || null;
 }
 
-function channelFollowersForLabel(
-  label: string,
-  channels?: ExpertChannelPresence[],
-): string | null {
-  if (!channels?.length) return null;
-  const lower = label.toLowerCase();
-
-  const match = channels.find((channel) => {
-    const platform = channel.platform.toLowerCase();
-    if (/linkedin/.test(lower)) return platform.includes("linkedin");
-    if (/youtube/.test(lower)) return platform.includes("youtube");
-    if (/newsletter/.test(lower)) return platform.includes("newsletter");
-    if (/instagram/.test(lower)) return platform.includes("instagram");
-    if (/tiktok/.test(lower)) return platform.includes("tiktok");
-    if (/facebook/.test(lower)) return platform.includes("facebook");
-    if (/podcast/.test(lower)) return platform.includes("podcast");
-    if (/\btwitter\b|(^|[\s/])x([\s/]|$)/.test(lower)) {
-      return platform.includes("x") || platform.includes("twitter");
-    }
-    return false;
-  });
-
-  return match?.followers?.trim() || null;
-}
-
+/**
+ * Keep Airtable highlight values as authored. Only inject a computed combined
+ * reach tile when the highlights omit one entirely.
+ */
 function withSyncedCombinedReach(
   stats: ExpertProfileStat[],
   combinedReach: string | null,
-  channels?: ExpertChannelPresence[],
+  _channels?: ExpertChannelPresence[],
 ): ExpertProfileStat[] {
-  let replaced = false;
-  const next = stats.map((stat) => {
-    if (isCombinedReachLabel(stat.label)) {
-      if (!combinedReach) return stat;
-      replaced = true;
-      return { ...stat, value: combinedReach };
-    }
+  const hasCombined = stats.some((stat) => isCombinedReachLabel(stat.label));
+  const next = [...stats];
 
-    const fromChannel = channelFollowersForLabel(stat.label, channels);
-    if (fromChannel) return { ...stat, value: fromChannel };
-    return stat;
-  });
-
-  if (combinedReach && !replaced) {
+  if (combinedReach && !hasCombined) {
     next.unshift({
       label: "Combined reach",
       value: combinedReach,
