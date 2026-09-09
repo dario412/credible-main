@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { ArticleSidebarCtaEditorProvider } from "@/components/article-sidebar-cta-editor";
+import { EmbedFrame } from "@/components/embed-frame";
 import { InsightArticleCta } from "@/components/insight-article-cta";
 import { InsightHeroCoverEditable } from "@/components/insight-hero-cover-editable";
 import { InsightShare } from "@/components/insight-share";
@@ -376,6 +377,16 @@ function InsightBlockView({ block }: { block: InsightBlock }) {
             </figcaption>
           ) : null}
         </figure>
+      );
+    case "embed":
+      return (
+        <div className="my-8 max-w-xl md:my-10">
+          <EmbedFrame
+            url={block.url}
+            provider={block.provider}
+            title={block.title}
+          />
+        </div>
       );
     case "callout":
       return (

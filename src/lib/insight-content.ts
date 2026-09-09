@@ -1,4 +1,5 @@
 import { coverAltFor, resolveImageAlt } from "@/lib/image-alt";
+import { parseEmbedUrl, type EmbedProvider } from "@/lib/embed-url";
 import { richTextToPlainText, sanitizeRichTextHtml } from "@/lib/rich-text";
 
 export const INSIGHT_COVER_BY_SLUG: Record<string, string> = {
@@ -57,7 +58,13 @@ export type InsightBlock =
   | { type: "ol"; items: string[] }
   | { type: "image"; src: string; alt?: string; caption?: string }
   | { type: "callout"; text: string; label?: string }
-  | { type: "hr" };
+  | { type: "hr" }
+  | {
+      type: "embed";
+      url: string;
+      provider: EmbedProvider;
+      title?: string;
+    };
 
 export type InsightTocItem = { id: string; text: string };
 
@@ -79,6 +86,8 @@ export function blocksToPlainText(blocks: InsightBlock[]): string {
           return `${block.text} ${block.attribution ?? ""}`;
         case "image":
           return [block.alt, block.caption].filter(Boolean).join(" ");
+        case "embed":
+          return "";
         case "callout":
           return `${block.label ?? ""} ${block.text}`;
         case "hr":
@@ -114,6 +123,8 @@ export function blocksToMarkdown(blocks: InsightBlock[]): string {
           return `![${block.alt ?? ""}](${block.src})${
             block.caption ? `\n*${block.caption}*` : ""
           }`;
+        case "embed":
+          return block.url;
         case "callout":
           return block.label
             ? `> **${block.label}**\n> ${block.text}`
@@ -208,6 +219,26 @@ export function parseInsightBlocks(raw: unknown): InsightBlock[] | null {
       });
     } else if (type === "hr") {
       blocks.push({ type: "hr" });
+    } else if (type === "embed") {
+      const url = typeof block.url === "string" ? block.url.trim() : "";
+      const parsed = url ? parseEmbedUrl(url) : null;
+      const provider =
+        parsed?.provider ??
+        (block.provider === "youtube" || block.provider === "linkedin"
+          ? block.provider
+          : "linkedin");
+      if (!parsed && !url && block.provider == null && block.title == null) {
+        continue;
+      }
+      blocks.push({
+        type: "embed",
+        url: parsed?.canonicalUrl ?? url,
+        provider,
+        title:
+          typeof block.title === "string" && block.title.trim()
+            ? block.title.trim()
+            : undefined,
+      });
     }
   }
   return blocks.length > 0 ? ensureBlockIds(blocks) : null;

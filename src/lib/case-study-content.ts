@@ -6,6 +6,7 @@ import type {
   CaseStudyStory,
 } from "@/lib/case-studies";
 import { CASE_STUDY_LOGO } from "@/lib/case-studies";
+import { parseEmbedUrl, type EmbedProvider } from "@/lib/embed-url";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 
 export type CaseStudyStatsItem = {
@@ -32,7 +33,13 @@ export type CaseStudyBlock =
       intro?: string[];
       items: CaseStudyDeliverable[];
     }
-  | { type: "ul"; items: string[] };
+  | { type: "ul"; items: string[] }
+  | {
+      type: "embed";
+      url: string;
+      provider: EmbedProvider;
+      title?: string;
+    };
 
 export type CaseStudyTocItem = { id: string; text: string };
 
@@ -172,6 +179,24 @@ export function parseCaseStudyBlocks(raw: unknown): CaseStudyBlock[] | null {
       const items = asStringList(block.items).map((s) => s.trim()).filter(Boolean);
       if (items.length === 0) continue;
       blocks.push({ type: "ul", items });
+    } else if (type === "embed") {
+      const url = asString(block.url).trim();
+      const parsed = url ? parseEmbedUrl(url) : null;
+      const provider =
+        parsed?.provider ??
+        (block.provider === "youtube" || block.provider === "linkedin"
+          ? block.provider
+          : "linkedin");
+      // Keep draft rows (empty URL) for CMS; live renderer shows a fallback link.
+      if (!parsed && !url && block.provider == null && block.title == null) {
+        continue;
+      }
+      blocks.push({
+        type: "embed",
+        url: parsed?.canonicalUrl ?? url,
+        provider,
+        title: asString(block.title).trim() || undefined,
+      });
     }
   }
 
@@ -297,6 +322,8 @@ export function newCaseStudyBlock(
       };
     case "ul":
       return { type: "ul", items: [""] };
+    case "embed":
+      return { type: "embed", url: "", provider: "linkedin" };
     case "richtext":
       return { type: "richtext", html: "" };
     case "p":

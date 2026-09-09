@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 
 import { SiteImage } from "@/components/site-image";
+import { EmbedFrame } from "@/components/embed-frame";
 import { RichTextContent } from "@/components/rich-text-field";
 import { StatCounter } from "@/components/stat-counter";
 import { logoAltFor } from "@/lib/image-alt";
@@ -79,7 +80,7 @@ function StatsBlock({
   return (
     <div>
       {block.heading?.trim() ? (
-        <h3 className="mb-6 font-display text-[1.35rem] leading-tight tracking-tight text-charcoal md:text-[1.5rem]">
+        <h3 className="mb-5 font-display text-[1.35rem] leading-tight tracking-tight text-charcoal md:text-[1.5rem]">
           {block.heading}
         </h3>
       ) : null}
@@ -87,22 +88,22 @@ function StatsBlock({
         {block.items.map((result) => (
           <li
             key={result.value + (result.label ?? "") + result.caption}
-            className="border-b border-charcoal/12 py-8 md:py-10"
+            className="border-b border-charcoal/12 py-5 md:py-6"
           >
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-10">
-              <p className="font-display text-[3.75rem] leading-none tracking-tight text-charcoal sm:text-[4.5rem] md:text-[5.25rem]">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+              <p className="shrink-0 font-display text-[1.85rem] leading-none tracking-tight text-charcoal sm:text-[2.1rem] md:text-[2.35rem]">
                 <StatCounter value={result.value} duration={1400} />
               </p>
-              <div className="max-w-md sm:text-right">
+              <div className="max-w-md sm:pt-1 sm:text-right">
                 {result.label ? (
-                  <p className="text-[1.05rem] leading-snug font-medium text-charcoal md:text-[1.2rem]">
+                  <p className="text-[0.95rem] leading-snug font-medium tracking-tight text-charcoal md:text-[1.05rem]">
                     {result.label}
                   </p>
                 ) : null}
                 <p
                   className={cn(
-                    "text-sm leading-relaxed text-charcoal/55",
-                    result.label ? "mt-1.5" : undefined,
+                    "text-[0.8125rem] leading-relaxed text-charcoal/55 md:text-sm",
+                    result.label ? "mt-1" : undefined,
                   )}
                 >
                   {result.caption}
@@ -260,6 +261,16 @@ function ColumnBlock({
             <li key={item.slice(0, 40)}>{item}</li>
           ))}
         </ul>
+      );
+    case "embed":
+      return (
+        <div className={cn(spacing, "max-w-xl")}>
+          <EmbedFrame
+            url={block.url}
+            provider={block.provider}
+            title={block.title}
+          />
+        </div>
       );
     case "stats":
       return (

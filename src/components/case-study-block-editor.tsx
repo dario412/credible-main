@@ -11,6 +11,7 @@ import {
   newCaseStudyBlock,
   type CaseStudyBlock,
 } from "@/lib/case-study-content";
+import { parseEmbedUrl } from "@/lib/embed-url";
 
 type BlockType = CaseStudyBlock["type"];
 
@@ -24,6 +25,7 @@ const ADD_OPTIONS: { type: BlockType; label: string }[] = [
   { type: "stats", label: "Stats" },
   { type: "deliverables", label: "Deliverables" },
   { type: "ul", label: "Bullet list" },
+  { type: "embed", label: "Embed" },
 ];
 
 function blockLabel(type: BlockType) {
@@ -420,6 +422,47 @@ export function CaseStudyBlockEditor({
                 >
                   Add deliverable
                 </Button>
+              </div>
+            ) : null}
+
+            {block.type === "embed" ? (
+              <div className="space-y-3">
+                <Field label="URL" id={`embed-url-${index}`}>
+                  <TextInput
+                    id={`embed-url-${index}`}
+                    value={block.url}
+                    onChange={(e) => {
+                      const url = e.target.value;
+                      const parsed = parseEmbedUrl(url);
+                      updateAt(index, {
+                        ...block,
+                        url,
+                        provider: parsed?.provider ?? block.provider,
+                      });
+                    }}
+                    placeholder="https://www.linkedin.com/posts/… or YouTube link"
+                  />
+                </Field>
+                <p className="text-xs text-muted">
+                  Paste a public LinkedIn post URL or YouTube link. Do not paste
+                  raw iframe HTML. LinkedIn posts must be public to embed.
+                </p>
+                <Field
+                  label="Title (optional, accessibility)"
+                  id={`embed-title-${index}`}
+                >
+                  <TextInput
+                    id={`embed-title-${index}`}
+                    value={block.title ?? ""}
+                    onChange={(e) =>
+                      updateAt(index, {
+                        ...block,
+                        title: e.target.value,
+                      })
+                    }
+                    placeholder="Embedded post"
+                  />
+                </Field>
               </div>
             ) : null}
           </li>
