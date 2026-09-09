@@ -198,7 +198,7 @@ function withSyncedCombinedReach(
 
   if (combinedReach && !hasCombined) {
     next.unshift({
-      label: "Combined reach",
+      label: "Combined audience",
       value: combinedReach,
     });
   }
@@ -240,7 +240,7 @@ function buildStats(
 
   const stats: ExpertProfileStat[] = [];
   if (combinedReach) {
-    stats.push({ label: "Combined reach", value: combinedReach });
+    stats.push({ label: "Combined audience", value: combinedReach });
   }
   if (expert.growth90d) {
     stats.push({

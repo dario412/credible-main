@@ -249,7 +249,7 @@ function CardBody({ expert }: { expert: RosterCardExpert }) {
         {expert.combinedReach ? (
           <div className="shrink-0 text-right">
             <p className="text-[10px] leading-none text-charcoal/45">
-              Combined reach
+              Combined audience
             </p>
             <p className="mt-1 font-display text-[1.05rem] leading-none tracking-tight text-charcoal md:text-[1.15rem]">
               {expert.combinedReach}

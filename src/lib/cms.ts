@@ -199,7 +199,7 @@ export const DEFAULT_HOME_SECTIONS: HomePageSections = {
     headline: "Credible gives your brand\nan unfair advantage.",
     stats: [
       { value: "24", detail: "Signed creators across 4 archetypes" },
-      { value: "18.4M", detail: "Combined reach across channels" },
+      { value: "18.4M", detail: "Combined audience across channels" },
       { value: "60+", detail: "Brand partners booked with Credible" },
       { value: "142", detail: "Stages and sessions delivered" },
     ],

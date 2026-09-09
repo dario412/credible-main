@@ -356,7 +356,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
         "The best founder stories don’t sell a product — they make operators feel less alone in the work.",
       quoteAttribution: "— from Founder’s Journal, Season 1",
       stats: [
-        { label: "Combined reach", value: "3.2M" },
+        { label: "Combined audience", value: "3.2M" },
         { label: "Podcast downloads", value: "2.1M" },
         { label: "Newsletter reach", value: "4M+" },
         { label: "Growth (90d)", value: "+18%", accent: "forest" },
@@ -504,7 +504,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
         "Culture is the operating system. Get it right and growth compounds without force.",
       quoteAttribution: "— from a 2025 SaaStr keynote",
       stats: [
-        { label: "Combined reach", value: "4.8M" },
+        { label: "Combined audience", value: "4.8M" },
         { label: "Newsletter subs", value: "180k" },
         { label: "Keynote stages", value: "90+" },
         { label: "Growth (90d)", value: "+42%", accent: "forest" },
@@ -648,7 +648,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
         "Momentum is a brief you renew every week. Audiences follow people who keep shipping.",
       quoteAttribution: "— from a 2025 Web Summit stage",
       stats: [
-        { label: "Combined reach", value: "2.1M" },
+        { label: "Combined audience", value: "2.1M" },
         { label: "Stage talks", value: "120+" },
         { label: "Podcast downloads", value: "890k" },
         { label: "Growth (90d)", value: "+28%", accent: "forest" },
@@ -783,7 +783,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
         "Partnerships work when the creator stays editorial and the brand stays clear on the outcome.",
       quoteAttribution: "— from a 2025 brand partnership brief",
       stats: [
-        { label: "Combined reach", value: "1.6M" },
+        { label: "Combined audience", value: "1.6M" },
         { label: "Newsletter subs", value: "95k" },
         { label: "Campaigns led", value: "40+" },
         { label: "Growth (90d)", value: "+19%", accent: "forest" },
@@ -918,7 +918,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
         "Operators don't need more inspiration. They need a cadence that survives contact with reality.",
       quoteAttribution: "— from a 2025 operator roundtable",
       stats: [
-        { label: "Combined reach", value: "980K" },
+        { label: "Combined audience", value: "980K" },
         { label: "Newsletter subs", value: "42k" },
         { label: "Podcast downloads", value: "610k" },
         { label: "Growth (90d)", value: "+31%", accent: "forest" },
@@ -1053,7 +1053,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
         "The best interview is invisible. The guest does the work — you just make the room safe enough.",
       quoteAttribution: "— from a 2025 media masters session",
       stats: [
-        { label: "Combined reach", value: "3.2M" },
+        { label: "Combined audience", value: "3.2M" },
         { label: "Episodes hosted", value: "280+" },
         { label: "Podcast downloads", value: "1.4M" },
         { label: "Growth (90d)", value: "+24%", accent: "forest" },
@@ -1188,7 +1188,7 @@ export const EXPERT_PROFILE_ENRICHMENT: Record<string, ExpertProfileEnrichment> 
         "Attention is a byproduct of usefulness. Build usefulness at scale and the audience shows up.",
       quoteAttribution: "— from a 2025 Startup Grind keynote",
       stats: [
-        { label: "Combined reach", value: "5.4M" },
+        { label: "Combined audience", value: "5.4M" },
         { label: "Newsletter subs", value: "210k" },
         { label: "Podcast downloads", value: "2.1M" },
         { label: "Growth (90d)", value: "+37%", accent: "forest" },
