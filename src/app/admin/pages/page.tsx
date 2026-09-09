@@ -24,10 +24,38 @@ const pages: {
       "Hero, ways in, roster, impact stats, featured project, brand brief, and FAQ. Logos live under Homepage logos.",
   },
   {
+    slug: "roster",
+    title: "Roster",
+    description: "Intro headline and supporting line on /roster.",
+  },
+  {
     slug: "profile",
     title: "Creator profile",
     description:
       "Section order, headings, hero CTA, sidebar, formats, and footer CTA on every roster profile.",
+  },
+  {
+    slug: "how-we-work",
+    title: "How we work",
+    description:
+      "Hero, service system, business moments, service cards, process, how to choose, closing CTA, and FAQ.",
+  },
+  {
+    slug: "case-studies",
+    title: "Projects",
+    description: "Intro and All stories heading on /projects.",
+  },
+  {
+    slug: "about",
+    title: "About",
+    description:
+      "Hero, thesis, why we exist, operating model, how we work, roster rail, and two ways in.",
+  },
+  {
+    slug: "apply-for-representation",
+    title: "Apply for representation",
+    description:
+      "Intro, what you get, self-qualify, path, FAQ, and start-application CTA.",
   },
   {
     slug: "site",
@@ -40,35 +68,6 @@ const pages: {
     title: "Contact",
     description:
       "Intro, briefed-by logos, What happens next sidebar, and footer contact blocks on /contact.",
-  },
-  {
-    slug: "roster",
-    title: "Roster",
-    description: "Intro headline and supporting line on /roster.",
-  },
-  {
-    slug: "case-studies",
-    title: "Projects",
-    description:
-      "Intro and All stories heading on /projects.",
-  },
-  {
-    slug: "about",
-    title: "About",
-    description:
-      "Hero, thesis, why we exist, operating model, how we work, roster rail, and two ways in.",
-  },
-  {
-    slug: "how-we-work",
-    title: "How we work",
-    description:
-      "Hero, service system, business moments, service cards, process, how to choose, closing CTA, and FAQ.",
-  },
-  {
-    slug: "apply-for-representation",
-    title: "Apply for representation",
-    description:
-      "Intro, what you get, self-qualify, path, FAQ, and start-application CTA.",
   },
   {
     slug: "legal",
