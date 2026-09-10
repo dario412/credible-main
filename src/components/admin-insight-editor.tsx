@@ -276,8 +276,9 @@ export function InsightBlockEditor({
                   />
                 </Field>
                 <p className="text-xs text-muted">
-                  Paste a public LinkedIn post URL or YouTube link. Do not paste
-                  raw iframe HTML. LinkedIn posts must be public to embed.
+                  Paste a public LinkedIn post URL or YouTube link. LinkedIn
+                  embeds use the compact “less text” layout. Posts must be
+                  public to embed.
                 </p>
                 <Field
                   label="Title (optional, accessibility)"

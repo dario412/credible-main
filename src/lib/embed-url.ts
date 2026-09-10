@@ -99,7 +99,8 @@ export function parseEmbedUrl(input: string): ParsedEmbed | null {
     if (!/^urn:li:(?:share|activity|ugcPost):\d+$/i.test(urn)) return null;
     return {
       provider: "linkedin",
-      embedSrc: `https://www.linkedin.com/embed/feed/update/${urn}`,
+      // collapsed=1 = LinkedIn's "less text" embed (truncated caption + …more)
+      embedSrc: `https://www.linkedin.com/embed/feed/update/${urn}?collapsed=1`,
       canonicalUrl: trimmed,
     };
   }
@@ -123,10 +124,17 @@ export function isAllowedEmbedSrc(src: string): boolean {
     const url = new URL(src);
     if (url.protocol !== "https:") return false;
     const host = url.hostname.toLowerCase();
-    if (host === "www.linkedin.com") {
-      return /^\/embed\/feed\/update\/urn:li:(?:share|activity|ugcPost):\d+$/i.test(
-        url.pathname,
-      );
+    if (host === "www.linkedin.com" || host === "linkedin.com") {
+      if (
+        !/^\/embed\/feed\/update\/urn:li:(?:share|activity|ugcPost):\d+$/i.test(
+          url.pathname,
+        )
+      ) {
+        return false;
+      }
+      // Allow missing collapsed, or collapsed=1 only.
+      const collapsed = url.searchParams.get("collapsed");
+      return collapsed === null || collapsed === "1";
     }
     if (host === "www.youtube.com") {
       return /^\/embed\/[\w-]{6,}$/.test(url.pathname);

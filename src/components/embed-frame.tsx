@@ -88,7 +88,7 @@ export function EmbedFrame({
           loading="lazy"
           allowFullScreen
           className="block w-full border-0"
-          style={{ minHeight: 520, height: 620 }}
+          style={{ minHeight: 480, height: 560 }}
         />
       </div>
       <figcaption className="mt-2.5 text-[0.75rem] text-charcoal/45">
