@@ -445,8 +445,9 @@ export function CaseStudyBlockEditor({
                 </Field>
                 <p className="text-xs text-muted">
                   Paste a public LinkedIn post URL or YouTube link. LinkedIn
-                  embeds use the compact “less text” layout. Posts must be
-                  public to embed.
+                  embeds use the compact “less text” layout. Place consecutive
+                  Embed blocks for a side-by-side grid. Posts must be public to
+                  embed.
                 </p>
                 <Field
                   label="Title (optional, accessibility)"

@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 
 import { SiteImage } from "@/components/site-image";
-import { EmbedFrame } from "@/components/embed-frame";
+import { EmbedGrid } from "@/components/embed-frame";
 import { RichTextContent } from "@/components/rich-text-field";
 import { StatCounter } from "@/components/stat-counter";
 import { logoAltFor } from "@/lib/image-alt";
@@ -263,15 +263,8 @@ function ColumnBlock({
         </ul>
       );
     case "embed":
-      return (
-        <div className={cn(spacing, "max-w-xl")}>
-          <EmbedFrame
-            url={block.url}
-            provider={block.provider}
-            title={block.title}
-          />
-        </div>
-      );
+      // Consecutive embeds are grouped by renderColumnBlocks → EmbedGrid.
+      return null;
     case "stats":
       return (
         <div className={spacing}>
@@ -287,6 +280,51 @@ function ColumnBlock({
     default:
       return null;
   }
+}
+
+/** Group consecutive embed blocks into a responsive grid. */
+function renderColumnBlocks(blocks: CaseStudyBlock[]) {
+  const nodes: ReactNode[] = [];
+  let i = 0;
+
+  while (i < blocks.length) {
+    const block = blocks[i]!;
+
+    if (block.type === "embed") {
+      const start = i;
+      const embeds: Extract<CaseStudyBlock, { type: "embed" }>[] = [];
+      while (i < blocks.length && blocks[i]!.type === "embed") {
+        embeds.push(blocks[i]! as Extract<CaseStudyBlock, { type: "embed" }>);
+        i += 1;
+      }
+      nodes.push(
+        <div
+          key={`embeds-${start}`}
+          className={start === 0 ? undefined : "mt-8 md:mt-10"}
+        >
+          <EmbedGrid
+            items={embeds.map((item) => ({
+              url: item.url,
+              provider: item.provider,
+              title: item.title,
+            }))}
+          />
+        </div>,
+      );
+      continue;
+    }
+
+    nodes.push(
+      <ColumnBlock
+        key={`${block.type}-${i}-${"id" in block ? block.id : i}`}
+        block={block}
+        isFirst={i === 0}
+      />,
+    );
+    i += 1;
+  }
+
+  return nodes;
 }
 
 /**
@@ -380,13 +418,7 @@ export function CaseStudyContentStream({
 
               <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-stretch lg:gap-12 xl:grid-cols-[minmax(0,1fr)_19rem] xl:gap-14">
                 <div className="min-w-0 w-full">
-                  {segment.blocks.map((block, i) => (
-                    <ColumnBlock
-                      key={`${block.type}-${i}-${"id" in block ? block.id : i}`}
-                      block={block}
-                      isFirst={i === 0}
-                    />
-                  ))}
+                  {renderColumnBlocks(segment.blocks)}
                   {isLastColumn ? afterColumn : null}
                 </div>
 

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { ArticleSidebarCtaEditorProvider } from "@/components/article-sidebar-cta-editor";
-import { EmbedFrame } from "@/components/embed-frame";
+import { EmbedGrid } from "@/components/embed-frame";
 import { InsightArticleCta } from "@/components/insight-article-cta";
 import { InsightHeroCoverEditable } from "@/components/insight-hero-cover-editable";
 import { InsightShare } from "@/components/insight-share";
@@ -241,14 +241,9 @@ export default async function InsightPage({ params }: Props) {
             </aside>
 
             <div className="min-w-0 w-full">
-              <div className="prose-credible w-full ![max-width:none]">
-                {blocks.map((block, index) => (
-                  <InsightBlockView
-                    key={`${block.type}-${index}`}
-                    block={block}
-                  />
-                ))}
-              </div>
+                <div className="prose-credible w-full ![max-width:none]">
+                  {renderInsightBlocks(blocks)}
+                </div>
 
               <div className="mt-12 rounded-sm bg-[#FBF8F5] px-5 py-6 md:mt-14 md:px-7 md:py-7">
                 <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-5">
@@ -379,15 +374,8 @@ function InsightBlockView({ block }: { block: InsightBlock }) {
         </figure>
       );
     case "embed":
-      return (
-        <div className="my-8 max-w-xl md:my-10">
-          <EmbedFrame
-            url={block.url}
-            provider={block.provider}
-            title={block.title}
-          />
-        </div>
-      );
+      // Consecutive embeds are grouped by renderInsightBlocks → EmbedGrid.
+      return null;
     case "callout":
       return (
         <aside className="my-7 rounded-sm border border-charcoal/8 bg-[#FBF8F5] px-5 py-5 md:px-6 md:py-6">
@@ -421,4 +409,41 @@ function InsightBlockView({ block }: { block: InsightBlock }) {
         />
       );
   }
+}
+
+function renderInsightBlocks(blocks: InsightBlock[]) {
+  const nodes: React.ReactNode[] = [];
+  let i = 0;
+
+  while (i < blocks.length) {
+    const block = blocks[i]!;
+
+    if (block.type === "embed") {
+      const start = i;
+      const embeds: Extract<InsightBlock, { type: "embed" }>[] = [];
+      while (i < blocks.length && blocks[i]!.type === "embed") {
+        embeds.push(blocks[i]! as Extract<InsightBlock, { type: "embed" }>);
+        i += 1;
+      }
+      nodes.push(
+        <div key={`embeds-${start}`} className="my-8 md:my-10">
+          <EmbedGrid
+            items={embeds.map((item) => ({
+              url: item.url,
+              provider: item.provider,
+              title: item.title,
+            }))}
+          />
+        </div>,
+      );
+      continue;
+    }
+
+    nodes.push(
+      <InsightBlockView key={`${block.type}-${i}`} block={block} />,
+    );
+    i += 1;
+  }
+
+  return nodes;
 }
