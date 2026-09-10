@@ -3,6 +3,8 @@ import type { ExpertChannelPresence } from "@/lib/expert-profiles";
 const SPARKLINE_POINTS = 12;
 
 export const MIN_CHANNEL_FOLLOWERS = 5_000;
+/** Newsletters are smaller lists — show from 500 subscribers. */
+export const MIN_NEWSLETTER_FOLLOWERS = 500;
 
 function hashString(input: string): number {
   let hash = 0;
@@ -33,9 +35,19 @@ export function parseFollowerMetric(value: string): number | null {
   return amount;
 }
 
-export function meetsMinimumChannelFollowers(followers: string): boolean {
+export function meetsMinimumChannelFollowers(
+  followers: string,
+  platformOrIcon?: string,
+): boolean {
   const parsed = parseFollowerMetric(followers);
-  return parsed != null && parsed >= MIN_CHANNEL_FOLLOWERS;
+  if (parsed == null) return false;
+  const isNewsletter =
+    typeof platformOrIcon === "string" &&
+    /newsletter/i.test(platformOrIcon);
+  const minimum = isNewsletter
+    ? MIN_NEWSLETTER_FOLLOWERS
+    : MIN_CHANNEL_FOLLOWERS;
+  return parsed >= minimum;
 }
 
 export function formatFollowerCount(count: number): string {

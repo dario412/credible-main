@@ -357,7 +357,8 @@ function buildChannels(fields: Record<string, unknown>): ExpertChannelPresence[]
     const url =
       rawUrl && urlMatchesPlatform(rawUrl, def.platform) ? rawUrl : null;
     const followers = followerDisplay(field(fields, ...def.followerAliases));
-    if (!followers || !meetsMinimumChannelFollowers(followers)) continue;
+    if (!followers || !meetsMinimumChannelFollowers(followers, def.platform))
+      continue;
 
     const growthRaw = asString(
       field(

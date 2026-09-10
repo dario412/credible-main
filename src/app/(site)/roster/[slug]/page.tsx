@@ -113,7 +113,10 @@ function mergeProfileContent(
   const sections = extras.profileSections;
   const channels = enrichChannelsWithFollowerHistory(
     sections?.channels?.filter((channel) =>
-      meetsMinimumChannelFollowers(channel.followers),
+      meetsMinimumChannelFollowers(
+        channel.followers,
+        channel.platform ?? channel.icon,
+      ),
     ) ?? [],
     extras.channelFollowerHistory,
   );
@@ -168,14 +171,20 @@ function resolveCombinedReach(
 ): string | null {
   const fromVisibleChannels = sumChannelFollowers(
     (channels ?? []).filter((channel) =>
-      meetsMinimumChannelFollowers(channel.followers),
+      meetsMinimumChannelFollowers(
+        channel.followers,
+        channel.platform ?? channel.icon,
+      ),
     ),
   );
   if (fromVisibleChannels) return fromVisibleChannels;
 
   const fromStoredChannels = sumChannelFollowers(
     (extras.profileSections?.channels ?? []).filter((channel) =>
-      meetsMinimumChannelFollowers(channel.followers),
+      meetsMinimumChannelFollowers(
+        channel.followers,
+        channel.platform ?? channel.icon,
+      ),
     ),
   );
   if (fromStoredChannels) return fromStoredChannels;
