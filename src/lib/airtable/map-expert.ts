@@ -147,7 +147,7 @@ function splitThemeLine(value: string): string[] {
     .filter(Boolean);
 }
 
-/** "214K Combined reach" / "$75M Successful Exit as Co-Founder" / "60%+ Newsletter open rates". */
+/** "214K Combined reach" / "$75M Successful Exit…" / text-only "Former NFL Pro". */
 export function parseHighlightStat(
   raw: string | null | undefined,
 ): { value: string; label: string } | null {
@@ -158,7 +158,10 @@ export function parseHighlightStat(
   const match = text.match(
     /^([+\-]?\$?\d[\d.,]*(?:\s*[KkMmBb])?[%+]*)\s+(.+)$/,
   );
-  if (!match) return { value: text, label: "" };
+  if (!match) {
+    // Non-numeric highlight — show as a statement, not a fake metric.
+    return { value: "", label: text };
+  }
   const value = (match[1] ?? "").replace(/\s+/g, "");
   const label = (match[2] ?? "").trim();
   return { value: value || text, label };
