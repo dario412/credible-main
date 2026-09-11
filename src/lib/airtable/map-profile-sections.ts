@@ -401,30 +401,18 @@ function buildTopicShares(
   fields: Record<string, unknown>,
   topicNamesById: Map<string, string>,
 ): ExpertTopicShare[] {
-  // fldA1MRZ9JVvauTHC — Creator | Profile | Talks about (linked Credible | Topics)
+  // https://airtable.com/.../fldA1MRZ9JVvauTHC — Creator | Profile | Talks about
+  // (linked → Credible | Topics). Prefer field id when returnFieldsByFieldId is on.
   const linkedIds = recordIds(
     field(
       fields,
+      "fldA1MRZ9JVvauTHC",
       "Creator | Profile | Talks about",
-      "Creator | Profile | Topics",
-      "Talks about",
     ),
   );
-  const fromLinks = linkedIds
+  const themes = linkedIds
     .map((id) => topicNamesById.get(id))
     .filter((name): name is string => Boolean(name?.trim()));
-
-  const themes =
-    fromLinks.length > 0
-      ? fromLinks
-      : splitLines(
-          field(
-            fields,
-            "Creator | Profile | Key themes",
-            "Key themes",
-            "Topics",
-          ),
-        );
   if (themes.length === 0) return [];
   const weights = [32, 22, 16, 12, 10, 8, 6, 4];
   const weightList = themes.map((_, i) => weights[i] ?? 4);

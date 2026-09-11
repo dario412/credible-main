@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus } from "@phosphor-icons/react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import { toggleShortlist, useIsShortlisted } from "@/lib/shortlist";
 import { portraitAltFor } from "@/lib/image-alt";
@@ -29,33 +30,61 @@ export type RosterCardExpert = {
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 
-/** Approx chip width for 9px uppercase tags with px-2.5 padding + gap. */
-function estimateTopicChipWidth(label: string) {
-  return 22 + label.length * 6.2 + 6;
-}
+/**
+ * Keep every Talks about chip that fits on at most two wrapped rows.
+ * Uses chip offsetTop (not height estimates) so we don't over-trim to one row.
+ */
+function RosterTopicTags({ topics }: { topics: string[] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(topics);
 
-function countTopicRows(topics: string[], rowWidth: number) {
-  let rows = 0;
-  let used = 0;
-  for (const topic of topics) {
-    const width = estimateTopicChipWidth(topic);
-    if (rows === 0 || used + width > rowWidth) {
-      rows += 1;
-      used = width;
-    } else {
-      used += width;
+  useLayoutEffect(() => {
+    setVisible(topics);
+  }, [topics]);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || visible.length <= 1) return;
+
+    const chips = [
+      ...el.querySelectorAll<HTMLElement>("[data-topic-chip]"),
+    ];
+    if (chips.length === 0) return;
+
+    const rowTops = [
+      ...new Set(chips.map((chip) => Math.round(chip.offsetTop))),
+    ].sort((a, b) => a - b);
+
+    if (rowTops.length <= 2) return;
+
+    const thirdRowTop = rowTops[2]!;
+    const keep = chips.filter(
+      (chip) => Math.round(chip.offsetTop) < thirdRowTop,
+    ).length;
+
+    if (keep > 0 && keep < visible.length) {
+      setVisible(visible.slice(0, keep));
     }
-  }
-  return rows;
-}
+  }, [visible]);
 
-/** Drop trailing topics until the chips fit on at most two rows. */
-function topicsForTwoRows(topics: string[], rowWidth = 350) {
-  const next = [...topics];
-  while (next.length > 1 && countTopicRows(next, rowWidth) > 2) {
-    next.pop();
-  }
-  return next;
+  if (visible.length === 0) return null;
+
+  return (
+    <div
+      ref={ref}
+      className="mt-auto flex flex-wrap content-start gap-1.5 pt-3.5"
+    >
+      {visible.map((topic) => (
+        <span
+          key={topic}
+          data-topic-chip
+          className="rounded-sm bg-cream-dark px-2.5 py-1 text-[9px] font-medium tracking-[0.08em] text-charcoal/65 uppercase"
+        >
+          {formatLabel(topic)}
+        </span>
+      ))}
+    </div>
+  );
 }
 
 /** Warm neutral washes only — client-approved roster backdrop set. */
@@ -294,16 +323,7 @@ function CardBody({ expert }: { expert: RosterCardExpert }) {
       ) : null}
 
       {expert.topics.length > 0 ? (
-        <div className="mt-auto flex flex-wrap gap-1.5 pt-3.5">
-          {topicsForTwoRows(expert.topics).map((topic) => (
-            <span
-              key={topic}
-              className="rounded-sm bg-cream-dark px-2.5 py-1 text-[9px] font-medium tracking-[0.08em] text-charcoal/65 uppercase"
-            >
-              {formatLabel(topic)}
-            </span>
-          ))}
-        </div>
+        <RosterTopicTags topics={expert.topics} />
       ) : null}
     </div>
   );

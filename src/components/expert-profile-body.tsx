@@ -56,7 +56,7 @@ function SectionHeading({
   return (
     <h2
       className={cn(
-        "max-w-[18ch] font-display text-[1.75rem] leading-[1.08] tracking-tight text-charcoal md:text-[2rem]",
+        "whitespace-nowrap font-display text-[1.75rem] leading-[1.08] tracking-tight text-charcoal md:text-[2rem]",
         className,
       )}
     >
@@ -175,7 +175,7 @@ function IntroBlock({
           label="Overview heading"
           block
         >
-          <h2 className="max-w-[16ch] font-display text-[1.75rem] leading-[1.08] tracking-tight text-charcoal md:text-[2rem]">
+          <h2 className="whitespace-nowrap font-display text-[1.75rem] leading-[1.08] tracking-tight text-charcoal md:text-[2rem]">
             {title}
           </h2>
         </ProfileEditHit>
@@ -328,7 +328,7 @@ function TopicsAndAudience({
           label="Topics heading"
           block
         >
-          <SectionHeading className="max-w-none">{title}</SectionHeading>
+          <SectionHeading>{title}</SectionHeading>
         </ProfileEditHit>
       </div>
 
@@ -540,7 +540,7 @@ function ProfileFaqSection({ name }: { name: string }) {
         <p className={EYEBROW}>
           {applyProfileRailTemplate(faq.eyebrow, vars)}
         </p>
-        <SectionHeading className="mt-4 max-w-[22ch]">
+        <SectionHeading className="mt-4">
           {applyProfileRailTemplate(faq.headline, vars)}
         </SectionHeading>
         <p className="mt-5 max-w-xl text-[0.9375rem] leading-relaxed text-charcoal/65 md:text-[1rem]">
