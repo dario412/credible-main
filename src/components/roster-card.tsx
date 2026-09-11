@@ -29,6 +29,35 @@ export type RosterCardExpert = {
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 
+/** Approx chip width for 9px uppercase tags with px-2.5 padding + gap. */
+function estimateTopicChipWidth(label: string) {
+  return 22 + label.length * 6.2 + 6;
+}
+
+function countTopicRows(topics: string[], rowWidth: number) {
+  let rows = 0;
+  let used = 0;
+  for (const topic of topics) {
+    const width = estimateTopicChipWidth(topic);
+    if (rows === 0 || used + width > rowWidth) {
+      rows += 1;
+      used = width;
+    } else {
+      used += width;
+    }
+  }
+  return rows;
+}
+
+/** Drop trailing topics until the chips fit on at most two rows. */
+function topicsForTwoRows(topics: string[], rowWidth = 350) {
+  const next = [...topics];
+  while (next.length > 1 && countTopicRows(next, rowWidth) > 2) {
+    next.pop();
+  }
+  return next;
+}
+
 /** Warm neutral washes only — client-approved roster backdrop set. */
 const BACKDROP_PALETTE = [
   { base: "#F3E8E1", stroke: "#935B3B" }, // rust
@@ -266,7 +295,7 @@ function CardBody({ expert }: { expert: RosterCardExpert }) {
 
       {expert.topics.length > 0 ? (
         <div className="mt-auto flex flex-wrap gap-1.5 pt-3.5">
-          {expert.topics.map((topic) => (
+          {topicsForTwoRows(expert.topics).map((topic) => (
             <span
               key={topic}
               className="rounded-sm bg-cream-dark px-2.5 py-1 text-[9px] font-medium tracking-[0.08em] text-charcoal/65 uppercase"

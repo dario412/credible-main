@@ -32,15 +32,15 @@ export function ExpertHeroStats({ stats }: { stats: ExpertProfileStat[] }) {
           >
             <div
               className={cn(
-                "relative flex h-full min-h-[8.75rem] flex-col overflow-hidden rounded-sm px-4 py-4 backdrop-blur-md md:min-h-[9.75rem] md:px-5 md:py-5",
-                textOnly
-                  ? "justify-end border border-cream/15 bg-cream/[0.07]"
-                  : "justify-between bg-cream/10",
+                "relative flex h-full min-h-[8.75rem] flex-col overflow-hidden rounded-sm bg-cream/10 px-4 py-4 backdrop-blur-md md:min-h-[9.75rem] md:px-5 md:py-5",
+                textOnly ? "justify-center" : "justify-between",
               )}
             >
               {textOnly ? (
-                <dd className="font-display text-[1.35rem] leading-[1.15] tracking-tight text-cream md:text-[1.5rem]">
-                  {statement}
+                <dd className="border-l-2 border-[#9BC4AD]/70 pl-3.5 md:pl-4">
+                  <span className="block font-display text-[1.4rem] leading-[1.2] tracking-tight text-cream md:text-[1.55rem]">
+                    {statement}
+                  </span>
                 </dd>
               ) : (
                 <>
