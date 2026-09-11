@@ -14,7 +14,7 @@ import {
   withResolvedLogos,
   type TrustedBrand,
 } from "@/lib/brand-logos";
-import { parseHighlightStat, isCombinedReachLabel } from "@/lib/airtable/map-expert";
+import { parseHighlightStat } from "@/lib/airtable/map-expert";
 import {
   linkedinTopVoiceFromExtras,
   type AirtableProfileSections,
@@ -194,25 +194,11 @@ function resolveCombinedReach(
 }
 
 /**
- * Keep Airtable highlight values as authored. Only inject a computed combined
- * reach tile when the highlights omit one entirely.
+ * Prefer Airtable/enrichment highlights as authored — never inject a custom
+ * Combined audience tile that would displace their four Website Highlights.
  */
-function withSyncedCombinedReach(
-  stats: ExpertProfileStat[],
-  combinedReach: string | null,
-  _channels?: ExpertChannelPresence[],
-): ExpertProfileStat[] {
-  const hasCombined = stats.some((stat) => isCombinedReachLabel(stat.label));
-  const next = [...stats];
-
-  if (combinedReach && !hasCombined) {
-    next.unshift({
-      label: "Combined audience",
-      value: combinedReach,
-    });
-  }
-
-  return next.slice(0, 4);
+function takeHeroStats(stats: ExpertProfileStat[]): ExpertProfileStat[] {
+  return stats.slice(0, 4);
 }
 
 function buildStats(
@@ -224,8 +210,6 @@ function buildStats(
   enrichmentStats?: ExpertProfileStat[],
   channels?: ExpertChannelPresence[],
 ): ExpertProfileStat[] {
-  const combinedReach = resolveCombinedReach(expert, extras, channels);
-
   const fromAirtable = [
     extras.highlight1,
     extras.highlight2,
@@ -241,12 +225,14 @@ function buildStats(
     }));
 
   if (fromAirtable.length > 0) {
-    return withSyncedCombinedReach(fromAirtable, combinedReach, channels);
+    return takeHeroStats(fromAirtable);
   }
   if (enrichmentStats?.length) {
-    return withSyncedCombinedReach(enrichmentStats, combinedReach, channels);
+    return takeHeroStats(enrichmentStats);
   }
 
+  // Fallback only when Airtable has no Website Highlights at all.
+  const combinedReach = resolveCombinedReach(expert, extras, channels);
   const stats: ExpertProfileStat[] = [];
   if (combinedReach) {
     stats.push({ label: "Combined audience", value: combinedReach });
