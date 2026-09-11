@@ -266,7 +266,7 @@ function CardBody({ expert }: { expert: RosterCardExpert }) {
 
       {expert.topics.length > 0 ? (
         <div className="mt-auto flex flex-wrap gap-1.5 pt-3.5">
-          {expert.topics.slice(0, 3).map((topic) => (
+          {expert.topics.map((topic) => (
             <span
               key={topic}
               className="rounded-sm bg-cream-dark px-2.5 py-1 text-[9px] font-medium tracking-[0.08em] text-charcoal/65 uppercase"

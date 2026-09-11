@@ -385,8 +385,8 @@ export function mapAirtableRecordToExpert(
     topicNamesById: options.topicNamesById,
   });
 
-  // Roster card tags: Creator | Profile | Talks about (fldA1MRZ9JVvauTHC), first 3.
-  const topics = profileSections.topicShares.map((t) => t.label).slice(0, 3);
+  // Roster card tags: Creator | Profile | Talks about (fldA1MRZ9JVvauTHC).
+  const topics = profileSections.topicShares.map((t) => t.label);
 
   const highlight1 = highlightField(fields, 1);
   const highlight2 = highlightField(fields, 2);

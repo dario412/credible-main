@@ -412,10 +412,9 @@ function buildTopicShares(
   );
   const fromLinks = linkedIds
     .map((id) => topicNamesById.get(id))
-    .filter((name): name is string => Boolean(name?.trim()))
-    .slice(0, 8);
+    .filter((name): name is string => Boolean(name?.trim()));
 
-  const themes = (
+  const themes =
     fromLinks.length > 0
       ? fromLinks
       : splitLines(
@@ -425,14 +424,14 @@ function buildTopicShares(
             "Key themes",
             "Topics",
           ),
-        )
-  ).slice(0, 8);
+        );
   if (themes.length === 0) return [];
-  const weights = [32, 22, 16, 12, 10, 8, 6, 4].slice(0, themes.length);
-  const sum = weights.reduce((a, b) => a + b, 0);
+  const weights = [32, 22, 16, 12, 10, 8, 6, 4];
+  const weightList = themes.map((_, i) => weights[i] ?? 4);
+  const sum = weightList.reduce((a, b) => a + b, 0);
   return themes.map((label, i) => ({
     label,
-    percent: Math.round(((weights[i] ?? 8) / sum) * 100),
+    percent: Math.round(((weightList[i] ?? 4) / sum) * 100),
   }));
 }
 
