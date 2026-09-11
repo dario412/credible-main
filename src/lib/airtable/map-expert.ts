@@ -5,7 +5,6 @@ import {
   mapAirtableProfileSections,
   type AirtableProfileSections,
 } from "./map-profile-sections";
-import { websiteCategoriesFromFields } from "./website-categories";
 import { AIRTABLE_CREATOR_TESTIMONIALS_FIELD } from "./testimonials";
 
 export type MapExpertOptions = {
@@ -382,11 +381,12 @@ export function mapAirtableRecordToExpert(
     name;
   const bio = longBio ?? shortBio ?? title;
 
-  const topics = websiteCategoriesFromFields(fields).slice(0, 6);
-
   const profileSections = mapAirtableProfileSections(record, {
     topicNamesById: options.topicNamesById,
   });
+
+  // Roster card tags: Creator | Profile | Talks about (fldA1MRZ9JVvauTHC), first 3.
+  const topics = profileSections.topicShares.map((t) => t.label).slice(0, 3);
 
   const highlight1 = highlightField(fields, 1);
   const highlight2 = highlightField(fields, 2);
