@@ -30,12 +30,7 @@ export function ExpertHeroStats({ stats }: { stats: ExpertProfileStat[] }) {
             threshold={0.15}
             className="h-full min-w-0"
           >
-            <div
-              className={cn(
-                "relative flex h-full min-h-[8.75rem] flex-col overflow-hidden rounded-sm bg-cream/10 px-4 py-4 backdrop-blur-md md:min-h-[9.75rem] md:px-5 md:py-5",
-                textOnly ? "justify-center" : "justify-between",
-              )}
-            >
+            <div className="relative flex h-full min-h-[8.75rem] flex-col justify-center overflow-hidden rounded-sm bg-cream/10 px-4 py-4 backdrop-blur-md md:min-h-[9.75rem] md:px-5 md:py-5">
               {textOnly ? (
                 <dd className="border-l-2 border-[#9BC4AD]/70 pl-3.5 md:pl-4">
                   <span className="block font-display text-[1.4rem] leading-[1.2] tracking-tight text-cream md:text-[1.55rem]">
@@ -43,7 +38,7 @@ export function ExpertHeroStats({ stats }: { stats: ExpertProfileStat[] }) {
                   </span>
                 </dd>
               ) : (
-                <>
+                <div>
                   <dd
                     className={cn(
                       "font-display text-[2.35rem] leading-none tracking-tight text-cream md:text-[2.85rem]",
@@ -57,11 +52,11 @@ export function ExpertHeroStats({ stats }: { stats: ExpertProfileStat[] }) {
                     />
                   </dd>
                   {stat.label ? (
-                    <dt className="mt-2.5 min-h-[2.6em] text-[0.75rem] tracking-[0.12em] text-cream/70 uppercase md:text-[0.8rem]">
+                    <dt className="mt-2 text-[0.75rem] tracking-[0.12em] text-cream/70 uppercase md:text-[0.8rem]">
                       {stat.label}
                     </dt>
                   ) : null}
-                </>
+                </div>
               )}
             </div>
           </FadeUp>
